@@ -1,7 +1,7 @@
 ## Welcome the global Ocean Health Index data prep repository
 
 This repository includes all the scripts used to prepare data for the global Ocean Health Assessment
-for the 2021 assessment.
+for the 2021 assessment. The tenth year of OHI! 
 
 For more information about the Ocean Health Index global assessment see: http://ohi-science.org/ohi-global/
 
