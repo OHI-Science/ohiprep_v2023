@@ -1,0 +1,234 @@
+---
+title: 'OHI 2020 - Land based nutrient and chemical plume exploration '
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../workflow/templates/ohi_hdr.html' 
+  pdf_document:
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+[REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2020/globalprep/cw_nutrient_o_chem/v2020/plume_output_exploration.html)
+
+
+# Summary
+This document is used to explore the output of the plume modeling done for this data layer.  
+
+## The following data are used:
+
+* 
+
+
+# Updates from previous assessment
+This is a new layer for the 2020 assessment year.
+
+## Initial set-up code
+
+```{r setup, eval = FALSE}
+library(tidyverse)
+library(raster)
+library(sf)
+library(mapview)
+library(janitor)
+
+
+source('../../workflow/R/common.R')
+
+ww_raw_dir <- "/home/shares/ohi/git-annex/land-based/wastewater/data/raw"
+ww_intermediate_dir <- "/home/shares/ohi/git-annex/land-based/wastewater/data/interim"
+cw_nutrient_int_dir <- "/home/shares/ohi/git-annex/globalprep/cw_nutrient_o_chem/int"
+
+```
+
+# Methods 
+
+**Take a look at the test output from the plume model**
+```{r, eval = FALSE}
+## Take a look at output rasters from plume model:
+rast_test_1 <- raster::raster(file.path("/home/sgclawson/wastewater-master/code/plumes/output/plume_effluent_au_08464.tif"))
+plot(rast_test)
+
+rast_test_2 <- raster::raster(file.path("/home/sgclawson/wastewater-master/code/plumes/output/plume_effluent_au_06284.tif"))
+plot(rast_test)
+
+rast_test_3 <- raster::raster(file.path("/home/sgclawson/wastewater-master/code/plumes/output/plume_effluent_au_06215.tif"))
+plot(rast_test)
+crs(rast_test_3)
+
+
+rast_test_all <- raster::raster(file.path("/home/sgclawson/wastewater-master/code/plumes/output/subsets/global_PO4_au_new.tif"))
+plot(log(rast_test_all+1))
+mapview(log(rast_test_all+1))
+
+```
+
+
+**Take a look at the output from the full plume model**
+ - We need to check this to see if the model ran on all of the basin_id
+ - It looks like the model did not write rasters for 10131 basin_ids. 
+ - To rectify this I will write a shapefile with all of the missing basin_ids and rerun the plume model..
+ - Update: This didn't work... recieved the same result. 
+ - Update: doesn't matter because they are all non-ocean lakes and deltas that are missing! 
+```{r, eval = FALSE}
+## Count how many rasters the plume model created and compare to the number of pourpoints with >0 PO4eq effluent
+library(tidyverse)
+
+fils <- list.files("/home/sgclawson/wastewater-master/code/plumes/output/", pattern="tif$", full.names = FALSE, recursive = TRUE)
+
+files_count <- data_frame(
+  dir = dirname(fils)
+) %>% 
+  count(dir) #%>% 
+  #mutate(dir = map_chr(dir, digest::digest))
+
+files <- data_frame(fils)
+ 
+
+pourpoint_names_files <- data.frame(fils = sub('.*plume_effluent_', '', files$fils))
+
+pourpoint_names <- data.frame(basin_id = sub('.tif', '', pourpoint_names_files$fils)) %>%
+  mutate(basin_id = as.character(basin_id))
+
+test_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(effluent >0)
+
+excluded <- c(setdiff(ws_pp_zonal_all_fix$basin_id, pourpoint_names$basin_id))
+
+included <- c(pourpoint_names$basin_id)
+
+check <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(basin_id %in% excluded)
+
+check_0 <- check %>%
+  dplyr::filter(effluent >0)
+
+## lets split this up by continent and check this way... 
+
+# africa
+af_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "af" ))
+
+af_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "af" ))
+
+setdiff(af_ws$basin_id, af_ws_model$basin_id) ## 975 basins missing
+
+# asia 
+ai_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "ai" ))
+
+ai_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "ai" ))
+
+setdiff(ai_ws$basin_id, ai_ws_model$basin_id) ## 379 basins missing
+
+
+
+# australia
+au_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "au" ))
+
+au_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "au" ))
+
+setdiff(au_ws$basin_id, au_ws_model$basin_id) ## 267 basins missing
+
+# europe 
+eu_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "eu" ))
+
+eu_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "eu" ))
+
+setdiff(eu_ws$basin_id, eu_ws_model$basin_id) ## 807 basins missing
+
+
+# north america 
+na_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "na" ))
+
+na_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "na" ))
+
+setdiff(na_ws$basin_id, na_ws_model$basin_id)
+51893 - 46987 ## 4906 basins missing
+
+
+# south america 
+sa_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "sa" ))
+
+sa_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "sa" ))
+
+setdiff(sa_ws$basin_id, sa_ws_model$basin_id) ## 909 basins missing
+
+
+# pacific
+pa_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "pa" ))
+
+pa_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "pa" ))
+
+setdiff(pa_ws$basin_id, pa_ws_model$basin_id)
+## 38 basins missing 
+
+al_ws <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(str_detect(basin_id, "al" ))
+
+al_ws_model <- pourpoint_names %>%
+  dplyr::filter(str_detect(basin_id, "al" ))
+
+mapview(al_ws)
+mapview(ai_ws)
+mapview(eu_ws)
+mapview(na_ws)
+mapview(af_ws)
+mapview(pa_ws)
+mapview(sa_ws)
+
+## Since the model missed so many basin_ids, lets write a shapefile with the missing ones, and rerun the model on those. Since it is only 10k basins, I suspect it will only take about 2.5 hours to run the plume model. 
+check <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(basin_id %in% excluded)
+
+st_write(check, file.path(cw_nutrient_int_dir, "pourpoints/PO4eq_plume_retry.shp"), overwrite = TRUE, delete_dsn = TRUE)
+
+missing_pp <- st_read(file.path(cw_nutrient_int_dir, "pourpoints/PO4eq_plume_retry.shp"))
+mapview(missing_pp)
+
+ocean <- raster::raster(file.path("/home/shares/ohi/git-annex/globalprep/cw_nutrient_o_chem/raw/ocean_mask_landnull.tif"))
+mapview(ocean)
+
+
+## from looking at this, it seems that the missing pourpoints are all non-ocean lakes and river deltas! 
+```
+
+**Explore mosaiced PO4eq tif files**
+```{r, eval = FALSE}
+## Our PO4eq file
+PO4eq_sub_tot <- raster::raster(file.path("/home/sgclawson/wastewater-master/code/plumes/output/subsets/global_effluent_PO4eq.tif"))
+
+mapview(PO4eq_sub_tot)
+plot(log(PO4eq_sub_tot+1))
+
+po4eq_effluent_log <- raster::calc(PO4eq_sub_tot, fun = function(x){log(x + 1)})
+mapview(po4eq_effluent_log)
+
+## Now lets extract the actual values from the raster and take a look: 
+ws_pp_zonal_all_fix <- st_read(file.path(cw_nutrient_int_dir, "pourpoints/PO4eq_pourpoints.shp"))
+
+po4eq_effluent_values <- extract(PO4eq_sub_tot, ws_pp_zonal_all_fix, method = "simple", df = TRUE)
+sum(po4eq_effluent_values$global_effluent_PO4eq) #12621550
+
+```
