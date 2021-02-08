@@ -3,7 +3,7 @@
 Here I will document how to run the plume model. 
  
  - You will need to download this folder (cw_nutrient_o_chem/plumes, or the plumes folder from the wastewater repo) to your local mazu drive. I.e. /home/username/
- - Go ahead and install the anaconda installer for 68 bit linux from https://www.anaconda.com/products/individual and throw the file into your home directory on mazu (or Aurora if that is what you use). You will end up with a folder akin to /home/username/anaconda3
+ - Go ahead and install the anaconda installer for 64-bit (x86) linux from https://www.anaconda.com/products/individual and throw the file into your home directory on mazu (or Aurora if that is what you use). You will end up with a folder akin to /home/username/anaconda3
  - In your terminal, ssh into mazu.. i.e. `ssh username@mazu.nceas.ucsb.edu` and enter your password
  - Create a folder in your "anaconda3/envs" folder named "py2", this will be your python environment. This can be done with this line `conda create --name py2 python=2`
  - Type `conda activate py2` in your terminal. This will activate this py2 environment and act as your python environment. 
