@@ -86,6 +86,8 @@ crs(watersheds_eu)
 st_write(watersheds_eu, file.path(cw_nutrient_int_dir, "watersheds/watersheds_eu_4326.shp"))
 
 watersheds_na <- st_read(file.path(ww_raw_dir, "basins_laea/na_bas.shp")) %>%
+  filter(ID == 79890)
+  
     clean_names() %>%
   dplyr::select(id, gridcode, area, basin_id)
 plot(watersheds_na$geometry)
@@ -140,7 +142,7 @@ global_plume <- st_transform(global_plume, 4326)
 
 **Read in PO4eq fertilizer data and disaggregate by 15 to make higher resolution.**
 ```{r, eval = FALSE}
-## N/P fertilizer data
+## N/P fertilizer databanks 
 
 n_p_rast <- raster(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/NCEAS_food_systems/d2020/crop_fert_PO4eq.tif"))
 plot(log(n_p_rast + 1))
