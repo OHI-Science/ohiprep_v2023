@@ -95,12 +95,12 @@ Additional year of data
 
 
 * __Reference__: 
-    * IUCN 2020. The IUCN Red List of Threatened Species. Version 2020-1. <http://www.iucnredlist.org>.
+    * IUCN 2020. The IUCN Red List of Threatened Species. Version 2020-3. <http://www.iucnredlist.org>.
         * Shapefiles available from: https://www.iucnredlist.org/resources/spatial-data-download
-        * __Downloaded__: April 1, 2020
-    *BirdLife International and Handbook of the Birds of the World (2019) Bird species distribution maps of the world. Version 2019.1. BirdLife International, Cambridge, UK and NatureServe, Arlington, USA. http://datazone.birdlife.org/species/requestdis.
+        * __Downloaded__: Feb 1, 2021
+    *BirdLife International and Handbook of the Birds of the World (2020) Bird species distribution maps of the world. Version 2020.1. BirdLife International, Cambridge, UK and NatureServe, Arlington, USA. http://datazone.birdlife.org/species/requestdis.
         * Zipped shapefile available from BirdLife International.  
-        * __Downloaded__: May 6, 2020
+        * __Downloaded__: Feb 26, 2021
 * __Description__:  Shapefiles containing polygons of assessed species ranges; each shapefile represents all assessed species within a comprehensively-assessed (i.e. >90% assessed) taxonomic group.
 * __Native data resolution__: NA
 * __Time range__: NA
@@ -305,7 +305,7 @@ rgn_trend_comp <- rgn_trend_comp %>%
 We estimate previous risk for each region, using the trend data.  We assume change in risk is linear.  
 
 ```{r, eval = FALSE}
-assess_years <- 2012:2021
+assess_years <- 2012:2020
 years <- expand.grid(rgn_id = unique(rgn_risk_comp$rgn_id), year=assess_years)
 
 # this is what the trend will be multiplied by to get a risk estimate for each year:
@@ -597,7 +597,7 @@ rgn_3nm_trend <- trend_df %>%
 We estimate previous risk for each region, using the trend data.  We assume change in risk is linear.  
 
 ```{r, eval = FALSE}
-assess_years <- 2012:2021
+assess_years <- 2012:2020
 years <- expand.grid(rgn_id = unique(rgn_3nm_trend$rgn_id), year=assess_years)
 
 # this is what the trend will be multiplied by to get a risk estimate for each year:
@@ -660,7 +660,7 @@ summary(res_gf)
 ```{r, eval = FALSE}
 resilience <- res_gf %>%
   dplyr::select(rgn_id, year, score = spp_status)
-dim(resilience)  # 220 * 10
+dim(resilience)  # 220 * 9
 summary(resilience) # should be no NA values
 
 write.csv(resilience, here("globalprep/spp/v2021/output/sp_status_3nm.csv"), row.names=FALSE)  
@@ -704,7 +704,7 @@ status <- read.csv(here("globalprep/spp/v2021/output/sp_status_3nm.csv")) %>%
 old_spp <- read.csv(here("globalprep/spp/v2020/output/sp_status_3nm.csv")) %>%
   filter(year == max(year)) %>%
   rename(old_score = score) %>%
-  mutate(year = 2021) %>%
+  mutate(year = 2020) %>%
   left_join(status) %>%
   rename(new_score = score) %>%
   mutate(difference = new_score - old_score) %>%
