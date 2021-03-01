@@ -58,11 +58,11 @@ Changed the code to calculate zonal statistics. No longer using the "mcapply()" 
 # Data Source
 **Reference**: IUCN and UNEP-WCMC (2021), The World Database on Protected Areas (WDPA) [On-line], February 2021. Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.
 
-**Downloaded**: February 2, 2022
+**Downloaded**: February 2, 2021
 
 **Description**:  Shapefile of World Database on Protected Areas
 
-**Time range**: 1819 - 2021; some protected areas do not have an associated "status year" and are reported as year 0.
+**Time range**: 1819 - 2020; some protected areas do not have an associated "status year" and are reported as year 0.
 
 **Format**:  Shapefile
 
