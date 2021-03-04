@@ -849,10 +849,6 @@ v2021
 
 Let's check rgn id 215
 
-Region ID | Region Name | Status | Prev Status | d_nspp | Insights
-----------|---------------|-------|-------------|---------|-------
-215 | Jordan | 66.7 | 50 | 1 | Went from having 2 spp in 2018 to 3 spp in 2019 (added humpback whale, other spp did not change status)
-
 
 ```{r outliers, include=FALSE, eval=F}
 library(tidyverse)
@@ -884,6 +880,19 @@ jordan2 <- ico_spp_rgn_prepped %>%
   dplyr::select(iucn_sid, presence, rgn_id, rgn_name, comname, sciname, cat, year)
 
 jordan <- rbind(jordan1, jordan2)
+
+
+qatar1 <- ico_spp_rgn_prepped_v2020 %>% 
+  filter(rgn_name == "Qatar") %>% 
+  dplyr::select(iucn_sid, presence, rgn_id, rgn_name, comname, sciname, cat, year)
+
+qatar2 <- ico_spp_rgn_prepped %>% 
+  filter(rgn_name == "Qatar") %>% 
+  dplyr::select(iucn_sid, presence, rgn_id, rgn_name, comname, sciname, cat, year)
+
+qatar <- rbind(qatar1, qatar2)
+
+
 
 ```
 
