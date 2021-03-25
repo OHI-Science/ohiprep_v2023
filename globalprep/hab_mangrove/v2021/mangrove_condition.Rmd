@@ -1,0 +1,132 @@
+---
+title: 'OHI 2021: Mangrove condition'
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: false
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Summary
+
+
+## Updates from previous assessment
+Using a new dataset from global mangrove watch so we are going to gapfill the new regions that have been added to the mangrove extent data. 
+
+***
+## Data Source 
+
+**Downloaded**: 
+
+**Description**:  
+
+
+**Time range**: 1980 - 2005
+
+
+***
+# Methods
+
+
+## Setup
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+library(readr)      # for read_csv()
+library(raster)
+library(here)
+library(sf)
+library(fasterize)
+library(tidyverse)
+library(mapview)
+library(sp)
+library(rgeos)
+
+source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
+
+goal     <- 'globalprep/hab_mangrove/v2021'
+dir_git  <- file.path('~/github/ohiprep_v2021', goal)
+dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_mangrove'))
+ohi_rasters() # call the region zones raster
+regions_shape()
+region_data()
+
+```
+
+
+```{r}
+
+regions <- read.csv(file.path(here('globalprep/supplementary_information/v2018/rgn_georegions_wide_2013b.csv')))
+
+all <- read.csv(file.path(here('globalprep/hab_mangrove/v2015/tmp/eez_and_land_km2.csv'))) %>%
+  dplyr::select(rgn_id = zone, mangrove = sum)
+
+all <- all %>%
+  filter(mangrove>0) %>%
+  filter(rgn_id < 255)
+sum(all$mangrove)
+
+all <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2016.csv")))
+
+
+all <- all %>%
+  filter(km2 > 0) %>%
+  filter(rgn_id < 255)
+
+#####################################################
+### gap-fill and organize health data
+health <- read.csv('globalprep/hab_mangrove/v2012/data/habitat_health_mangrove.csv')
+
+setdiff(all$rgn_id, health$rgn_id) #mangrove extent data but no health score # 14  28  37  46  48  99 120 122 123 152 209 210 - 12 regions 
+setdiff(health$rgn_id, all$rgn_id) #these have health scores, but no mangrove data, I think this is an artifact of previous gapfilling.. and using new data... doesnt matter 
+
+agg_gap_fill <- read.csv('../ohi-global/global2015/gapFilling/dissaggregated_gap_fill.csv') %>%
+  select(rgn_id=rgn_id_2013) %>%
+  left_join(health) %>%
+  filter(!(is.na(health)))
+
+tmp <- all %>%      #eliminates the regions with health scores but no mangroves
+  left_join(health)  
+
+
+tmp  <- tmp %>%
+  left_join(regions) %>%
+  group_by(r2) %>%
+  mutate(avg_health_r2 = mean(health, na.rm=TRUE)) %>%
+  ungroup() %>%
+  group_by(r1) %>%
+  mutate(avg_health_r1 = mean(health, na.rm=TRUE)) %>%
+  ungroup() %>%
+  mutate(health2 = ifelse(is.na(health), avg_health_r2, health)) %>%
+  mutate(health3 = ifelse(is.na(health2), avg_health_r1, health2)) %>%
+  mutate(habitat = "mangrove") %>%
+  mutate(gap_fill = ifelse(is.na(health), "r2_gap_fill", NA)) %>%
+  mutate(gap_fill = ifelse(is.na(health) & is.na(avg_health_r2), "r1_gap_fill", gap_fill)) %>%
+  mutate(gap_fill = ifelse(is.na(gap_fill), 0, gap_fill)) %>%
+  dplyr::select(rgn_id, habitat, gap_fill, health=health3)
+summary(tmp)
+
+### save summary of gap-filling:
+health_gaps <- tmp %>%
+  mutate(variable = "health") %>%
+  dplyr::select(rgn_id, habitat, variable, gap_fill)
+write.csv(health_gaps, 'globalprep/hab_mangrove/v2021/data/health_gap_fill.csv', row.names=FALSE)
+
+### save health data:
+health <- tmp %>%
+  dplyr::select(rgn_id, habitat, health)
+write.csv(tmp, 'globalprep/hab_mangrove/v2021/data/habitat_health_mangrove.csv', row.names=FALSE)
+
+```
+
+
+

@@ -1,0 +1,154 @@
+---
+title: 'OHI 2021: Mangrove trend'
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: false
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Summary
+
+Old methods: 
+We used Hamilton and Casey’s (2016) mangrove cover data to estimate the proportional yearly change in mangrove area using a linear regression model of the most recent five years of data (i.e., slope divided by data from the earliest year included in the regression model). The slope was then multiplied by five to get the predicted change in 5 years. The original mangrove data are provided yearly (2000-2012) at 30m raster cell resolution (with the estimated area of mangrove cover in each cell).
+
+## Updates from previous assessment
+Using a new dataset from global mangrove watch. 
+
+***
+## Data Source 
+
+**Downloaded**: 03/09/2021
+
+**Description**:  
+Global Mangrove Watch (1996 - 2016)	
+https://data.unep-wcmc.org/datasets/45
+Reported at spatial cell scale. 
+
+The GMW aims to provide geospatial information about mangrove extent and
+changes to the Ramsar Convention, national wetland practitioners, decision makers
+and NGOs. It is part of the Ramsar Science and Technical Review Panel (STRP) work
+plan for 2016-2018 and a Pilot Project to the Ramsar Global Wetlands Observation
+System (GWOS), which is implemented under the GEO-Wetlands Initiative. The
+primary objective of the GMW has been to provide countries lacking a national
+mangrove monitoring system with first cut mangrove extent and change maps, to
+help safeguard against further mangrove forest loss and degradation.
+The GMW has generated a global baseline map of mangroves for 2010 using ALOS
+PALSAR and Landsat (optical) data, and changes from this baseline for seven epochs
+between 1996 and 2017 derived from JERS-1, ALOS and ALOS-2. Annual maps are
+planned from 2018 and onwards
+
+**Time range**: 1996-2016
+
+
+***
+# Methods
+
+
+## Setup
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+library(readr)      # for read_csv()
+library(raster)
+library(here)
+library(sf)
+library(fasterize)
+library(tidyverse)
+library(mapview)
+library(sp)
+library(rgeos)
+
+source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
+
+goal     <- 'globalprep/hab_mangrove/v2021'
+dir_git  <- file.path('~/github/ohiprep_v2021', goal)
+dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_mangrove'))
+ohi_rasters() # call the region zones raster
+regions_shape()
+region_data()
+
+```
+
+```{r}
+gmw_ohi_2016 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2016.csv")))
+sum(gmw_ohi_2016$km2) # 136804.3
+
+gmw_ohi_1996 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_1996.csv")))
+sum(gmw_ohi_1996$km2) # 142919.7
+
+gmw_ohi_2007 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2007.csv")))
+sum(gmw_ohi_2007$km2) # 139059.1
+
+gmw_ohi_2008 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2008.csv")))
+sum(gmw_ohi_2008$km2) # 139264.3
+
+gmw_ohi_2009 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2009.csv")))
+sum(gmw_ohi_2009$km2) # 139033.7
+
+gmw_ohi_2010 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2010.csv")))
+sum(gmw_ohi_2010$km2) # 137775.4
+
+gmw_ohi_2015 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2015.csv")))
+sum(gmw_ohi_2015$km2) # 136855.9
+
+
+all_mangrove_extent <- rbind(gmw_ohi_1996, gmw_ohi_2007, gmw_ohi_2008, gmw_ohi_2009, gmw_ohi_2010, gmw_ohi_2015, gmw_ohi_2016) %>%
+  filter(rgn_id <= 250) %>%
+  filter(year >1996) %>% ## going to exclude 1996 from trend
+  filter(km2 != 0) # filter out the regions that have no extent and never have (all of them that have at least 1 zero have never had mangrove extent)
+
+data_region_trend <-  all_mangrove_extent %>%
+  left_join(rgns_eez) %>%
+  dplyr::select(rgn_id, rgn_name, year, habitat, km2) %>%
+  group_by(rgn_id, rgn_name) %>%
+  mutate(total_area = sum(km2)) %>% 
+  mutate(km2_rel = km2/km2[year==2007]) %>%
+  mutate(km2_rel = ifelse(total_area==0, 0, km2_rel)) %>% 
+  do(mdl = lm(km2_rel ~ year, data=.)) %>%
+  summarize(rgn_name = rgn_name,
+            rgn_id = rgn_id,
+            habitat = "mangrove",
+            trend = coef(mdl)['year']*5) %>%
+  mutate(trend = round(trend, 6)) %>%
+  ungroup()
+
+## save it 
+write.csv(data_region_trend, 'globalprep/hab_mangrove/v2021/data/habitat_trend_mangrove.csv', row.names=FALSE)
+
+## look at Benin since it had a large increase
+benin <- all_mangrove_extent %>%
+  filter(rgn_id == 99)
+
+## compare to old 
+old <- read.csv('globalprep/hab_mangrove/v2015/data/habitat_trend_mangrove_updated.csv')
+
+## note compare these when we obtain the new extents...
+# 
+setdiff(old$rgn_id, data_region_trend$rgn_id) 
+setdiff(data_region_trend$rgn_id, old$rgn_id)
+
+old <- old %>%
+  left_join(data_region_trend, by='rgn_id')
+
+plot(old$trend.x, old$trend.y, ylab="new trend", xlab="old trend") ## trend is wildly different 
+
+
+
+
+
+```
+
+
+
+
+

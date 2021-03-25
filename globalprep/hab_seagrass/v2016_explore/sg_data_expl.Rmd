@@ -21,7 +21,7 @@ library(raster)
 
 source('~/github/ohiprep/src/R/common.R')
 
-goal     <- 'globalprep/hab2016/seagrass'
+goal     <- 'globalprep/hab_seagrass/v2016_explore'
 dir_git  <- file.path('~/github/ohiprep', goal)
 dir_wcmc <- file.path(dir_neptune_data, 'git-annex/globalprep/~raw_data/wcmc_seagrass') 
 dir_data0 <- file.path(dir_git, 'data0') ### location for original data
@@ -118,13 +118,13 @@ waycott_df_mdl2 <- waycott_df %>%
   summarize(exp_mdl_r = round(log(last(area_ha) / first(area_ha)) / (last(year) - first(year)) * 100, 3))
 
 waycott_df1 <- waycott_df %>%
-  left_join(waycott_df_mdl %>% select(-mdl),
+  left_join(waycott_df_mdl %>% dplyr::select(-mdl),
             by = 'site_name') %>%
   left_join(waycott_df_mdl2 %>% 
-              select(site_name, exp_mdl_r),
+              dplyr::select(site_name, exp_mdl_r),
             by = 'site_name')
 
-DT::datatable(waycott_df1 %>% select(-site_id, -yr_start, -yr_end, -pub),
+DT::datatable(waycott_df1 %>% dplyr::select(-site_id, -yr_start, -yr_end, -pub),
               caption = 'Waycott seagrass extent data over time')
 ```
 

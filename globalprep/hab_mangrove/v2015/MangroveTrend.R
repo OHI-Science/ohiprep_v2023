@@ -9,8 +9,8 @@
 ## This file name is 'MASTER TABLE - All Countries_modified.csv'
 
 library(ohicore)
-source('src/R/common.R')
-data <- read.csv(file.path(dir_neptune_data, "git-annex/globalprep/Mangrove/v2015/raw/MASTER TABLE - All Countries_modified .csv"), stringsAsFactors=FALSE)
+source('workflow/R/common.R')
+data <- read.csv(file.path(dir_M, "git-annex/globalprep/Mangrove/v2015/raw/MASTER TABLE - All Countries_modified .csv"), stringsAsFactors=FALSE)
 
 data <- gather(data, "category", "value", X2000_MF_km2:X2014_BIOME_percent)
 
