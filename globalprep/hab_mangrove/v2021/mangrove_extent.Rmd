@@ -256,28 +256,23 @@ sum(gmw_ohi_2015$km2) # 136855.9
 
 ## All of our estimates are a little bit bigger than the raw data estimates, probably due to reprojections. I am ok with this amount of error. 
 
-old_extent <- read.csv(file.path(here("globalprep/hab_mangrove/v2015/data/habitat_extent_mangrove_updated.csv")))
-sum(old_extent$km2) # 118507.7
+old_extent <- read.csv(file.path(here("globalprep/hab_mangrove/v2015/data/habitat_extent_mangrove_updated.csv"))) %>%
+  filter(habitat == "mangrove")
+sum(old_extent$km2) # 82292.24 km2
 
 ## Our new extent is much larger than our old extent 
-
-old_extent_fix <- old_extent %>%
-  group_by(rgn_id, year) %>%
-  summarise(km2 = sum(km2)) %>%
-  ungroup() %>%
-  mutate(habitat = "mangrove")
-
 
 
 compare_habitat_extent <- gmw_ohi_2016 %>%
   filter(rgn_id <= 250) %>%
-  left_join(old_extent_fix, by = "rgn_id") %>%
+  left_join(rgns_eez) %>%
+  left_join(old_extent, by = "rgn_id") %>%
   mutate(km2.y = ifelse(
     km2.x >0 & is.na(km2.y) ,0, #assign 0 values to old data km2 that have new data so that we can properly graph these differences.
     km2.y
   )) %>%
   mutate(difference = km2.x - km2.y)
-sum(compare_habitat_extent$km2.x) - sum(compare_habitat_extent$km2.y) # 18182.27 km2 increase 
+sum(compare_habitat_extent$km2.x) - sum(compare_habitat_extent$km2.y) # 54397.7 km2 increase 
 
 test <- compare_habitat_extent %>%
   filter(km2.x == 0, km2.y > 0) ## we lost 11 regions but gained 4... net loss of 7

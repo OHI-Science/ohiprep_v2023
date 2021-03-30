@@ -146,7 +146,9 @@ setdiff(data_region_trend$rgn_id, old$rgn_id)
 # [1]  37 123 152 155
 
 old <- old %>%
-  left_join(data_region_trend, by='rgn_id')
+  left_join(data_region_trend, by='rgn_id') %>%
+  left_join(rgns_eez) %>%
+  mutate(differece = trend.x - trend.y)
 
 plot(old$trend.x, old$trend.y, ylab="new trend", xlab="old trend") ## trend is wildly different... but that is expected given the new data.... the same thing happened in 2015 when the data was updated. 
 

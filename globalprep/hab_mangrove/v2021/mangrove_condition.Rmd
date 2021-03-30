@@ -246,7 +246,8 @@ old_health <- read_csv(file.path(here("globalprep/hab_mangrove/v2015/data/habita
 compare_habitat_health <- health %>%
   filter(rgn_id <= 250) %>%
   left_join(old_health, by = "rgn_id") %>%
-  mutate(difference = health.x - health.y)
+  mutate(difference = health.x - health.y) %>%
+  left_join(rgns_eez)
 
 test <- compare_habitat_health %>%
   filter(is.na(health.y)) ## we gained 4 regions 
