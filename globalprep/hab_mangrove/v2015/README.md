@@ -6,4 +6,4 @@ Hamilton, S. E., & Casey, D. (2016). Creation of a high spatio-temporal resoluti
 
 Because the 30m resolution raster the data is provided as (although awesome!) can be difficult to work with, we created a 500m resolution raster and converted to a Mollweide coordinate reference system.
 
-Health is based on 2012 data (v2012) because the time frame of thee data is not long enough for a good health estimate.
+Health is based on 2012 data (v2012) because the time frame of these data is not long enough for a good health estimate.

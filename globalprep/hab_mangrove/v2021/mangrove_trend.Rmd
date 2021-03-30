@@ -122,6 +122,13 @@ data_region_trend <-  all_mangrove_extent %>%
   mutate(trend = round(trend, 6)) %>%
   ungroup()
 
+mean(data_region_trend$trend)
+
+test <- data_region_trend %>%
+  filter(rgn_id != 99)
+mean(test$trend) # -0.006990163
+
+  
 ## save it 
 write.csv(data_region_trend, 'globalprep/hab_mangrove/v2021/data/habitat_trend_mangrove.csv', row.names=FALSE)
 
@@ -141,9 +148,6 @@ old <- old %>%
   left_join(data_region_trend, by='rgn_id')
 
 plot(old$trend.x, old$trend.y, ylab="new trend", xlab="old trend") ## trend is wildly different 
-
-
-
 
 
 ```

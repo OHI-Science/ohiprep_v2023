@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Coral extent'
+title: 'OHI 2021: Mangrove extent'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -20,7 +20,7 @@ editor_options:
 
 # Summary
 
-This script generates the extent of mangrove for each OHI region for the latest year of data (year == 2016). We do this using polygon data. We extract the area of each polygon per each ohi region.
+This script generates the extent of mangrove for each OHI region for the latest year of data (year == 2016). We do this using polygon data. We extract the area of each polygon per each ohi region using our combined land and eez raster.
 
 
 ## Updates from previous assessment
