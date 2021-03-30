@@ -7,7 +7,7 @@
 ## The original data file downloaded from the website was: 'MASTER TABLE - All Countries.csv'
 ## I hand changed the header names and removed a few variables and summary row/columns to prepare the data for analysis.
 ## This file name is 'MASTER TABLE - All Countries_modified.csv'
-
+devtools::install_github("ohi-science/ohicore@dev") # used when testing new code in ohicore.. use this for 2020 assessment year
 library(ohicore)
 source('workflow/R/common.R')
 data <- read.csv(file.path(dir_M, "git-annex/globalprep/Mangrove/v2015/raw/MASTER TABLE - All Countries_modified .csv"), stringsAsFactors=FALSE)
@@ -35,13 +35,12 @@ data <- data %>%
   filter(grepl("km2", category)) %>%
   mutate(year = as.numeric(substring(category, 2, 5))) %>%
   mutate(km2 = as.numeric(gsub(",", "", value))) %>%
-  select(country, year, km2)
+  dplyr::select(country, year, km2)
 
 
 # #### Convert names to regions (in this case sum because working with area, change to average if working with percent data):
-data_region = name_to_rgn(data, fld_name='country', flds_unique=c('country','year'), 
-                          fld_value='km2', add_rgn_name=T, collapse_fxn = 'sum_na',
-                          dir_lookup = "src/LookupTables"); head(data_region); summary(data_region) 
+data_region = name_2_rgn(data, fld_name='country', flds_unique=c('country','year'), 
+                          keep_fld_name = TRUE); head(data_region); summary(data_region) 
 
 
 ########################################################################
