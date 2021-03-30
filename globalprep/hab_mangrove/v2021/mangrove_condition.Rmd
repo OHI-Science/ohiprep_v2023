@@ -234,7 +234,7 @@ write.csv(health_gaps, 'globalprep/hab_mangrove/v2021/data/health_gap_fill.csv',
 health <- tmp %>%
   dplyr::select(rgn_id, habitat, health) %>%
   mutate(year = 2021)
-write.csv(tmp, 'globalprep/hab_mangrove/v2021/data/habitat_health_mangrove.csv', row.names=FALSE)
+write.csv(health, 'globalprep/hab_mangrove/v2021/data/habitat_health_mangrove_updated.csv', row.names=FALSE)
 
 ```
 
