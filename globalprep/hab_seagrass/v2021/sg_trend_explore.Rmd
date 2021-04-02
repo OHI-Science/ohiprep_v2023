@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2019: Seagrass trend explore'
+title: 'OHI 2021: Seagrass trend explore'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -24,162 +24,111 @@ library(fasterize)
 library(tidyverse)
 library(broom)
 
-source('http://ohi-science.org/ohiprep_v2019/workflow/R/common.R')
+source('http://ohi-science.org/ohiprep_v2021/workflow/R/common.R')
 
-ohi_rasters() # call the region zones raster
-regions_shape()
-
-zones_all <- fasterize(regions,
-          zones,
-          field = "rgn_ant_id"
-          ) # create a zones raster to include all land... since most salt marsh probably isn't in the eez
-```
-
-## seagrass data
-```{r eval=F}
-
-seagrass <- raster(file.path(dir_M, "/git-annex/globalprep/hab_seagrass/v2019/int/combined_pt_py_adjusted.tif"))
-
-seagrass_points <- rasterToPoints(seagrass)
-
-```
-
-
-## nutrient data
-
-```{r eval=F}
-
-nutrient <- list.files(file.path(dir_M, "git-annex/impact_acceleration/stressors/land_based/int"),
-           pattern="fert", full=TRUE)
-
-nutrient <- grep("raw", nutrient, value=TRUE)
-nutrient <- grep("2002", nutrient, value=TRUE, invert=TRUE) # only want 10 years of data
-
-stack_nutrient <- stack(c(zones_all, nutrient))
+goal     <- 'globalprep/hab_seagrass/v2021'
+dir_git  <- file.path('~/github/ohiprep_v2021', goal)
+dir_waycott <- file.path(dir_git, "waycott_data_extract")
 
 
 ```
 
 
-## extract nutrient data and save
+"Trend in seagrass condition was determined using two data sources (Waycott et al. 2009, Short et al. 2010). Short et al. (2010) measured percent cover on a per sample, per site, per year basis, whereas Waycott et al. (2009) measured habitat area on a per site, per year basis. We used data from Short if there were at least 3 data points between 2001-2010. If this condition was not met, we calculated trends from Waycott for the most recent 10 years after 1990 or else we used the mean of the trend in the adjacent regions or the regions within the corresponding seagrass geographical regions using the same methods described above for the in status."
 
-```{r eval=F}
+## Waycott data 
+Let's take a look at the Waycott and short data... extracted in 2016
 
-nutrient_data <- extract(stack_nutrient, seagrass_points[, 1:2], progress="text", df=TRUE, cellnumbers=TRUE)
+```{r}
+waycott_data <- read_csv(file.path("~/github/ohiprep_v2021/globalprep/hab_seagrass/v2016_explore/data1/data_waycott.csv"))
+summary(waycott_data)
 
-write.csv(nutrient_data, file.path(dir_M, "git-annex/globalprep/hab_seagrass/v2019/sg_trend/seagrass_cell_nutrients.csv"), row.names=FALSE)
+waycott_trend <- waycott_data %>%
+ dplyr::filter(year >= 1990,
+               !is.na(area_ha),
+               area_ha != 0) %>%
+ dplyr::group_by(site_id, rgn, site_name) %>%
+ dplyr::mutate(year_length = max(year) - min(year)) %>%
+  dplyr::mutate(min_year = min(year)) %>%
+  dplyr::filter(year_length >= 10) %>%
+ dplyr::mutate(extent_rel = area_ha/area_ha[year == min_year]) %>%
+ dplyr::do(mdl = lm(extent_rel ~ year, data=.)) %>%
+  dplyr::summarize(country = rgn,
+                   site_name = site_name, 
+                   site_id = site_id,
+            habitat = "seagrass",
+            trend = coef(mdl)['year']*5) %>%
+  dplyr::mutate(trend = round(trend, 6)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(country, habitat) %>%
+  dplyr::summarise(trend = mean(trend, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(data_source = "Waycott")
+
+unique(waycott_trend$country) # 4 regions - we ultimately only use 1 (france).. see Short data below
+# [1] "Australia" "Colombia"  "France"    "USA"
+
+
+short_data <- read_csv(file.path("~/github/ohiprep_v2021/globalprep/hab_seagrass/v2016_explore/data1/data_short.csv")) %>%
+  mutate(sg_prop_mean = sg_pct_mean/100)
+
+## Filter out those where the first year has an extent of 0... these screw up the trend calculation later on..
+short_0s <- short_data %>%
+   dplyr::group_by(site_name, country) %>%
+  dplyr::mutate(min_year = min(year)) %>%
+  dplyr::mutate(n_obs = n()) %>%
+  dplyr::filter(n_obs >= 3) %>%
+   dplyr::mutate(prop_rel = sg_prop_mean/sg_prop_mean[year == min_year]) %>%
+  dplyr::filter(prop_rel %in% c("Inf", "NaN")|site_name == "Oregon / Valino Island, South Slough") %>% ## fix oregon site outlier..
+  dplyr::filter(site_name != "Zadar / Novigradsko More") %>% ## filter out zadar bc without the first one it doesnt have more than 3 observations
+  dplyr::filter(sg_prop_mean > 0.0003) %>% ## filter out this observation because it totally screws up the USA trend as an outlier... 
+  dplyr::mutate(min_year = min(year),
+                n_obs = n()) %>%
+  dplyr::mutate(prop_rel = sg_prop_mean/sg_prop_mean[year == min_year]) ## now recalculate with the correct number of observations for those site
+
+
+short_trend <- short_data %>%
+  dplyr::filter(!(site_name %in% c("Zadar / Novigradsko More", "New York / Fire Is., Long Island", "Glovers Reef Atoll", "Oregon / Valino Island, South Slough"))) %>%
+ dplyr::group_by(site_name, country) %>%
+  dplyr::mutate(min_year = min(year)) %>%
+  dplyr::mutate(n_obs = n()) %>%
+  dplyr::filter(n_obs >= 3) %>% 
+ dplyr::mutate(prop_rel = sg_prop_mean/sg_prop_mean[year == min_year]) %>%
+  rbind(short_0s) %>% ## rbind with the outlier fixes
+ dplyr::do(mdl = lm(prop_rel ~ year, data=.)) %>%
+  dplyr::summarize(country = country,
+                   site_name = site_name, 
+            habitat = "seagrass",
+            trend = coef(mdl)['year']*5) %>%
+  dplyr::mutate(trend = round(trend, 6)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(country = ifelse(is.na(country), "United States of America", country)) %>% # fix massachussettes
+  dplyr::group_by(country, habitat) %>%
+  dplyr::summarise(trend = mean(trend, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(data_source = "Short")
+
+unique(short_trend$country)
+
+#  [1] "Australia"                        "Belize"                           "Brazil"                          
+#  [4] "China"                            "Colombia"                         "Fiji"                            
+#  [7] "Indonesia"                        "Madagascar"                       "Malaysia"                        
+# [10] "Micronesia (Federated States of)" "Palau"                            "Papua New Guinea"                
+# [13] "Philippines"                      "Portugal"                         "Thailand"                        
+# [16] "United Republic of Tanzania"      "United States of America" 
+
+waycott_trend_using <- waycott_trend %>%
+  dplyr::filter(country == "France")
+
+all_trend <- rbind(short_trend, waycott_trend_using)
+
+old_trend <- read_csv(file.path("~/github/ohiprep_v2021/globalprep/hab_seagrass/v2012/data/habitat_trend_seagrass_updated.csv")) %>%
+  left_join(rgns_eez)
+```
+
+```{r}
+short_data_raw <- read_csv(file.path("~/github/ohiprep_v2021/globalprep/hab_seagrass/v2016_explore/data0/short_latlong.csv"))
 
 ```
 
 
-## extract nutrient data and save
-
-```{r eval=F}
-
-nutrient_data <- extract(stack_nutrient, seagrass_points[, 1:2], progress="text", df=TRUE, cellnumbers=TRUE)
-
-write.csv(nutrient_data, file.path(dir_M, "git-annex/globalprep/hab_seagrass/v2019/sg_trend/seagrass_cell_nutrients.csv"), row.names=FALSE)
-
-```
-
-
-## estimate slope over time
-
-```{r eval=F}
-
-
-nutrient_trend <- read.csv(file.path(dir_M, "git-annex/globalprep/hab_seagrass/v2019/sg_trend/seagrass_cell_nutrients.csv"))
-
-
-21537/215951 # about 10% NA values...more than I would have expected. Might want to gapfill these.
-
-sum(duplicated(nutrient_trend$ID)) # is a unique ID
-sum(duplicated(nutrient_trend$cells)) # also is a unique ID
-
-nutrient_trend <- nutrient_trend %>%
-  rename(rgn_id = layer) %>%
-  gather("year", "fert", starts_with("global"))
-
-nutrient_trend <- nutrient_trend %>%
-  mutate(year = gsub("global_plumes_fert_", "", year)) %>%
-  mutate(year = gsub("_raw", "", year)) %>%
-  mutate(year = as.numeric(year))
-
-nutrient_lm <- nutrient_trend %>%
-  filter(!is.na(fert)) %>%
-  group_by(ID, cells, rgn_id) %>%
-  do(trend_fert = lm(fert ~ year, data = ., na.action=na.exclude))
-
-
-# get the coefficients by group in a tidy data_frame
-nutrient_coef = tidy(nutrient_lm, trend_fert)
-
-nutrient_coef2 <- nutrient_coef %>%
-  dplyr::filter(term == "year") %>%
-  mutate(inverse_estimate = estimate*(-1)) %>%
-  dplyr::filter(inverse_estimate>-20 & inverse_estimate<30) %>%
-  data.frame()
-
-ggplot(dplyr::filter(nutrient_coef2, estimate <= 1 & estimate >-1), aes(x=estimate)) + 
-  geom_histogram()
-
-
-```
-
-
-### Rescale according to Waycott
-
-From 1990-2000 (the most recent years of trend analysis) there were 115 sites with decreasing seagrass, 72 sites with increasing seagrass and 88 sites with no detectable change.  I will assume the proportion of seagrass beds sampled in each category is representative of global seagrass beds.  
-
-I also assume that each ~1km2 raster cell is an independent seagrass bed.  This is similar to the average size based on polygon areas in original data.
-
-```{r eval=F}
-
-# proportion sites decreasing:
-115/(115+72+88) # 0.42
-
-# proportion sites increasing:
-72/(115+72+88) # 0.26
-
-# proportion sites remaining the same:
-88/(115+72+88) # 0.32
-
-# find values that correspond to these quantiles in the raster data
-quants <- quantile(nutrient_coef2$inverse_estimate, c(0.42, 0.74))
-
-nutrient_coef2$trend_cat <- cut(nutrient_coef2$inverse_estimate, c(-Inf, quants[1], quants[2], Inf), 
-                                labels=c("Decreasing", "Constant", "Increasing"))
-
-# check I did this correctly:
-table(nutrient_coef2$trend_cat)
-81651/(81651+62210+50546)
-
-```
-
-
-## Scale data
-
-The constant values will have a trend of 0.  For the Increasing and Decreasing categories this will scale linearly from 0 to the 99th predicted quantile based on SD.  
-
-```{r eval=F}
-
-library("scales")
-
-decreasing_quant <- quantile(nutrient_coef2$inverse_estimate[nutrient_coef2$trend_cat=="Decreasing"], c(0.5))
-
-nutrient_coef2$rescale_0to1 <-  ifelse(nutrient_coef2$trend_cat=="Decreasing", 
-                                       rescale(nutrient_coef2$inverse_estimate[nutrient_coef2$trend_cat=="Decreasing"]), NA)
-
-
-sd_sample <- 1.92*sqrt(265)
-
-hist(rnorm(1000, mean=-1.26, sd=sd_sample))
-
-install.packages("fGarch")
-library(fGarch)
-
-test <- rsnorm(100000, mean=-1.26, sd = sd_sample, xi=-1.1)
-hist(test)
-mean(test)
-median(test)
-```
