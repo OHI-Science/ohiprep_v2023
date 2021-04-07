@@ -384,7 +384,8 @@ seagrass_area_final <- seagrass_area_py_sum %>%
   mutate(extent_km2_final = sum_extent_km2 + sum_extent_km2_pts,
          habitat = "seagrass", 
          year = 2020) %>% ## the latest raw data update is year = 2020
-  dplyr::select(rgn_id, year, habitat, km2 = extent_km2_final)
+  dplyr::select(rgn_id, year, habitat, km2 = extent_km2_final) %>%
+  dplyr::filter(rgn_id < 255)
 
 write.csv(seagrass_area_final, "data/habitat_extent_seagrass_updated.csv", row.names = FALSE)
 
@@ -394,7 +395,8 @@ seagrass_area_final_gf <- seagrass_area_final %>%
   mutate(variable = "extent", gap_fill = 0) %>% 
   full_join(rgns_eez, by = "rgn_id") %>%
   dplyr::select(rgn_id, habitat, variable, gap_fill) %>%
-  mutate(habitat = "seagrass", variable = "extent")
+  mutate(habitat = "seagrass", variable = "extent") %>%
+  filter(rgn_id < 255)
 
 write.csv(seagrass_area_final_gf, "data/extent_seagrass_gf.csv", row.names = FALSE)
 
