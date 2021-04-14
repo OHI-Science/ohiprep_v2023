@@ -46,6 +46,9 @@ regions_shape()
 Based on this, we will score all regions health as 1 - 0.29 = 0.71. 
 
 
+"This reflects global loss since 1879; however, most of the loss is expected to have occurred since 1990.  There is likely to be much spatial variation that isn't accounted for by using a global value, but we are limited by the availability of data."
+
+
 ```{r}
 seagrass_extent <- read_csv("data/habitat_extent_seagrass_updated.csv")  ## read in extent data
 
