@@ -38,7 +38,7 @@ This dataset shows the global distribution of saltmarshes, and is composed of tw
 
 ***
 # Methods
-Reclassify the saltmarsh extent data into a mask of 1 or NA, and then compute zonal statistics for the count of cells within an OHI region that have saltmarsh and then convert into km2.
+
 
 
 ## Setup
@@ -327,7 +327,9 @@ saltmarsh_area_final <- saltmarsh_area_py_sum %>%
   mutate(extent_km2_final = sum_extent_km2 + sum_extent_km2_pts,
          habitat = "saltmarsh", 
          year = 2017) %>% ## the latest raw data update is year = 2017 (when this dataset was published)
-  dplyr::select(rgn_id, year, habitat, km2 = extent_km2_final)
+  dplyr::select(rgn_id, year, habitat, km2 = extent_km2_final) %>%
+    filter(rgn_id < 255)
+
 
 write.csv(saltmarsh_area_final, "data/habitat_extent_saltmarsh_updated.csv", row.names = FALSE)
 

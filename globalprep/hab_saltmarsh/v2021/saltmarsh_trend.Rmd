@@ -1,0 +1,120 @@
+---
+title: 'OHI 2021: Saltmarsh trend'
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+  pdf_document:
+    toc: true
+---
+
+# Summary
+
+This script generates the trend of saltmarsh. 
+
+
+## Updates from previous assessment
+
+***
+## Data Source 
+
+**Downloaded**: 
+
+**Description**:  
+
+
+**Time range**: 
+
+
+***
+# Methods
+
+
+
+## Setup
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+library(readr)      # for read_csv()
+library(raster)
+library(here)
+library(sf)
+library(fasterize)
+library(tidyverse)
+library(mapview)
+library(sp)
+library(rgeos)
+
+
+source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
+
+goal     <- 'globalprep/hab_saltmarsh/v2021'
+dir_git  <- file.path('~/github/ohiprep_v2021', goal)
+dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_saltmarsh'))
+ohi_rasters() # call the region zones raster
+regions_shape()
+
+```
+
+```{r}
+extent <- read_csv("data/habitat_extent_saltmarsh_updated.csv") %>%
+  left_join(rgns_eez)
+
+crosby_raw <- read_csv("raw/crosby_saltmarsh.csv") %>%
+  clean_names() %>%
+  mutate(slr_rate_mm_y = ifelse(slr_rate_mm_y == "Not given", NA , slr_rate_mm_y)) %>%
+  mutate(slr_rate_mm_y = as.numeric(slr_rate_mm_y))
+```
+
+For missing SLR rate, give the global average. Fix country names 
+
+```{r}
+
+avg_slr <- mean(crosby_raw$slr_rate_mm_y, na.rm = TRUE)
+
+crosby_raw_gf <- crosby_raw %>%
+  mutate(slr_rate_mm_y = ifelse(is.na(slr_rate_mm_y), avg_slr , slr_rate_mm_y)) %>% ## gapfill missing slr rates w global average 
+  mutate(country = sub('.*\\,', '', study_location)) %>%
+  mutate(country = case_when(str_detect(country, "SC|NY|LA|Louisiana") ~ "USA",
+                             str_detect(country, "England") ~ "UK",
+                           TRUE ~ as.character(country))) %>%
+  mutate(country = gsub(" ", "", country)) ## fix country names 
+
+
+unique(crosby_raw_gf$country) ## 10 countries 
+
+## make into sf and take a look 
+gadm_crs <- "+proj=longlat +datum=WGS84 +no_defs"
+
+crosby_sf <- st_as_sf(crosby_raw_gf, coords = c("deg_e", "deg_n"), 
+                         crs = gadm_crs, agr = "constant")
+
+mapview(crosby_sf) ## a couple of weird coordinates, but for the most part it is ok...
+
+
+```
+
+Calculate a trend 
+
+```{r}
+# positive means you are gaining x mm saltmarsh per year and negative means you are losing x mm saltmarsh per year. 
+
+crosby_trends <- crosby_raw_gf %>%
+  mutate(trend_gain_lose = accretion_rate_mm_y - slr_rate_mm_y) %>%
+  mutate(trend_overall = trend_gain_lose/(accretion_rate_mm_y + slr_rate_mm_y))
+
+## now group by country and get averages
+
+crosby_country_trends <- crosby_trends %>%
+  group_by(country) %>%
+  summarise(trend_overall_mean = mean(trend_overall)) %>%
+  ungroup()
+```
+
+
+
+
+

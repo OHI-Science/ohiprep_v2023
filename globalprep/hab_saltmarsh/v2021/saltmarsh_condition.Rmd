@@ -1,0 +1,73 @@
+---
+title: 'OHI 2021: saltmarsh condition'
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+  pdf_document:
+    toc: true
+---
+
+# Summary
+
+This script generates the condition of saltmarsh. 
+
+
+## Updates from previous assessment
+
+***
+## Data Source 
+
+**Downloaded**: 
+
+**Description**:  
+
+
+**Time range**: 
+
+
+***
+# Methods
+
+
+
+## Setup
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+library(readr)      # for read_csv()
+library(raster)
+library(here)
+library(sf)
+library(fasterize)
+library(tidyverse)
+library(mapview)
+library(sp)
+library(rgeos)
+library(janitor)
+
+
+source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
+
+goal     <- 'globalprep/hab_saltmarsh/v2021'
+dir_git  <- file.path('~/github/ohiprep_v2021', goal)
+dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_saltmarsh'))
+ohi_rasters() # call the region zones raster
+regions_shape()
+region_data()
+
+
+
+```
+
+
+
+
+
+
+
+
+
