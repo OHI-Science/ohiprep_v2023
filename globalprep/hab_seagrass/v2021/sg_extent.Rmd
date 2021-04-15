@@ -421,7 +421,8 @@ compare_habitat_extent <- seagrass_area_final %>%
     km2.x >0 & is.na(km2.y) ,0, #assign 0 values to old data km2 that have new data so that we can properly graph these differences.
     km2.y
   )) %>%
-  mutate(difference = km2.x - km2.y)
+  mutate(difference = km2.x - km2.y) %>%
+  left_join(rgns_eez)
 
 ggplot(compare_habitat_extent, aes(x = km2.y, y = km2.x)) +
   geom_point() +

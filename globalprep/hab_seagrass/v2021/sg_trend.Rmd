@@ -392,4 +392,21 @@ ggplot(trends_rgns_final, aes(trend)) +
   geom_histogram()
 ```
 
+```{r}
+
+seagrass_trend <- read_csv("data/habitat_trend_seagrass_updated.csv")
+
+old_seagrass_trend <- read_csv(file.path(here(), "globalprep/hab_seagrass/v2012/data/habitat_trend_seagrass_updated.csv"))
+
+compare_habitat_trend <- seagrass_trend %>%
+  left_join(old_seagrass_trend, by = "rgn_id") %>%
+  # mutate(km2.y = ifelse(
+  #   km2.x >0 & is.na(km2.y) ,0, #assign 0 values to old data km2 that have new data so that we can properly graph these differences.
+  #   km2.y
+  # )) %>%
+  mutate(difference = trend.x - trend.y) %>%
+  left_join(rgns_eez)
+```
+
+
 
