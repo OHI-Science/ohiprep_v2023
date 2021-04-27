@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2020: Coral extent'
+title: 'OHI 2021: Coral extent'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:

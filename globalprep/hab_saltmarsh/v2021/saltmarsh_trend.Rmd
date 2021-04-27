@@ -115,6 +115,20 @@ crosby_country_trends <- crosby_trends %>%
 ```
 
 
+Take a look at WET Index data
+```{r}
+wet_index_raw <- read_csv("raw/WET_database_2017_Analysis_Master_FINAL_270617.csv")
+
+unique(wet_index_raw$`Land cover (from paper)`)
+
+wet_index_saltmarsh <- wet_index_raw %>%
+  filter(str_detect(`Land cover (from paper)`, "altmarsh|saltmarsh|Saltmarsh|salt marsh"),
+         `Ramsar type` == "Marine/Coastal")
+unique(wet_index_saltmarsh$Country)
+```
+
+I don't think the WET Index data will work... not enough data for saltmarsh to determine any sort of meaningful trend or condition...
+
 
 
 
