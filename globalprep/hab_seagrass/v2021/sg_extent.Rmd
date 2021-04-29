@@ -75,6 +75,12 @@ mapview(v7_seagrass_pts)
 mapview(head(v7_seagrass_py$geometry))
 test <- head(v7_seagrass_py)
 test2 <- head(v7_seagrass_pts)
+
+unique(v7_seagrass_py$BIO_CLASS)
+unique(v7_seagrass_py$FAMILY)
+# Laminariales are kelp
+unique(v7_seagrass_pts$FAMILY)
+unique(v7_seagrass_py$habitat)
 ```
 
 **Convert seagrass shapefiles into same CRS as our regions shapefile**

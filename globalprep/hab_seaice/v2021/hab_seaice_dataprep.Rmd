@@ -123,7 +123,6 @@ lapply(c(pkg, "ohicore"), require, character.only = TRUE)
 ## UPDATE THESE!
 assessYear <- "v2021" # change to reflect assessment year
 previous_yr <- "v2020" # previous assessment year
-data_yr_gci <- "d2021" # change to reflect year of most recently downloaded data
 final.year <- 2020 # final year of data (all months)
 
 library(here)
@@ -286,9 +285,12 @@ health_2020 <- health %>%
   filter(year == 2020)
 
 health_2019 <- ice_health_eez %>%
-  filter(year == 2019)
+  filter(year == 2019) %>%
+  dplyr::select(-year, -health)
 
-plot(health_2019$health_prev_assess, health_2020$health)
+health_old_new <- left_join(health_2020, health_2019)
+
+plot(health_old_new$health_prev_assess, health_old_new$health)
 abline(0, 1, col="red") ## ok makes more sense to me now 
 
 ## Trend comparison
@@ -300,12 +302,40 @@ ice_trend_eez <- read.csv(sprintf("../%s/output/hab_ice_trend_eez.csv", previous
 plot(ice_trend_eez$trend_prev_assess, ice_trend_eez$trend)
 abline(0, 1, col="red")
 
+### let's compare the data year 2020 to data year 2019
+
+trend_2020 <- trend %>%
+  filter(year == 2020)
+
+trend_2019 <- ice_trend_eez %>%
+  filter(year == 2019) %>%
+  dplyr::select(-year, -trend)
+
+trend_old_new <- left_join(trend_2020, trend_2019)
+
+plot(trend_old_new$trend_prev_assess, trend_old_new$trend)
+abline(0, 1, col="red") ## ok makes more sense to me now 
+
+
 ## Extent comparison
 extent <- read.csv("output/hab_ice_extent_eez.csv", stringsAsFactors = FALSE)
 ice_extent_eez <- read.csv(sprintf("../%s/output/hab_ice_extent_eez.csv", previous_yr), stringsAsFactors = FALSE) %>% # compare to last year's data
   dplyr::rename(km2_prev_assess = km2)
 plot(ice_extent_eez$km2_prev_assess, extent$km2)
 abline(0, 1, col="red")
+
+### let's compare the data year 2020 to data year 2019
+
+extent_2020 <- extent 
+
+extent_2019 <- ice_extent_eez
+
+extent_old_new <- left_join(extent_2020, extent_2019)
+
+plot(extent_old_new$km2_prev_assess, extent_old_new$km2)
+abline(0, 1, col="red") # extent doesn't change at all, because we use the same year for extent every year
+
+
 
 ## Pair with region names
 regions <- rgn_master %>%
@@ -316,6 +346,29 @@ regions <- rgn_master %>%
 data <- read.csv("output/hab_ice_health_eez.csv") %>%
   dplyr::left_join(regions, by = "rgn_id") %>%
   dplyr::arrange(habitat, health)
+
+
+
+#### Check largest score changes for v2021 ####
+
+## Bouvet Island, rgn_id == 105, HAB score +15.15
+
+# health 
+bouv_health <- health_old_new %>%
+  filter(rgn_id == 105) %>%
+  mutate(diff = health - health_prev_assess) # +0.19 
+
+# trend 
+bouv_trend <- trend_old_new %>%
+  filter(rgn_id == 105) %>%
+  mutate(diff = trend - trend_prev_assess) # trend got worse 
+
+## checked against previous conditions, and it looks like Bouvet Island and Jan Mayen (our two largest increases for 2021) have pretty volatile condition scores year after year, so I think this is ok. Nothing went wrong in the data processing on our part. 
+
+
+
+
+
 
 ```
 
