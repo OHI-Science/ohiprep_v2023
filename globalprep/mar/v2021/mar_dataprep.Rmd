@@ -94,7 +94,7 @@ Filter freshwater mariculture, make long format, and clean FAO codes.
 ```{r tidy-data, eval = FALSE}
 
 mar <- mar %>%
-  dplyr::select(-S, -`Unit (Name)`) %>%
+  dplyr::select(-`Unit (Name)`) %>%
   rename(country = `Country (Name)`,
          FAO_name = `ASFIS species (Name)`, 
          fao = `FAO major fishing area (Name)`, 
@@ -116,7 +116,7 @@ mar <- mar %>%
 
 mar <- mar %>%
   gather(key="year", value="value", num_range("",1950:2019)) %>%
-    fao_clean_data() 
+    fao_clean_data_new() 
 
 ```
 
@@ -267,7 +267,7 @@ table(mar_rgn_gf$gap_0_fill)
 ## 3790 of these out of 27810+3790 cases had NA values converted to 0 - 2018 assessment
 ## 3763 of these out of 28694+4291 cases had NA values converted to 0 - 2019 assessment
 ## 5932  of these out of 29305 +5932  cases had NA values converted to 0 - 2020 assessment
-## 0  of these out of 36611  cases had NA values converted to 0 - 2021 assessment
+## 6441  of these out of 30170 + 6441  cases had NA values converted to 0 - 2021 assessment
 
 ```
 
@@ -901,6 +901,19 @@ yield <- mar_old %>%
   full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
 
 plot(yield$old_value, yield$value);abline(0,1,col="red")
+
+## Compare yield data for Ecuador, score increased by a lot
+mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
+  filter(rgn_id == 137, year == 2018) %>% 
+  select(rgn_id, species, fao, old_value = value)
+mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
+  filter(rgn_id == 137, year == 2019) %>% 
+  select(rgn_id, species, fao, value)
+
+yield <- mar_old %>% 
+  full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
+
+plot(yield$old_value, yield$value)
 
 
 ## Compare new/old Mariculture sustainability scores
