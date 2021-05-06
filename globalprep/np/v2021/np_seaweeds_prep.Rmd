@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2020: Natural Products: Ornamentals data prep'
+title: 'OHI 2021: Natural Products: Ornamentals data prep'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -13,13 +13,13 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2020/globalprep/np/v2020/np_dataprep.html]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/np_dataprep.html]
 
 # Summary
-This analysis converts FAO mariculture data into one of the data layers used to calculate OHI 2020 global natural products (NP) scores. We will conduct the overall NP data prep on seaweeds, fish oil/fish meal (FOFM), and ornamentals, however, our final layer from this data prep will only consist of seaweeds.
+This analysis converts FAO mariculture data into one of the data layers used to calculate OHI 2021 global natural products (NP) scores. We will conduct the overall NP data prep on seaweeds, fish oil/fish meal (FOFM), and ornamentals, however, our final layer from this data prep will only consist of seaweeds.
 
 # Updates from previous assessment
-Instead of using all NP commodity categories (seaweed, FOFM, coral, sponge, and ornamentals), we are only prepping seaweeds in this data prep. Overall, we are excluding corals, shells, and sponges from our calculations for the NP goal. FOFM is calcualted from Watson fisheries data, seaweed production are calculated from FAO mariculture datasets, while ornamentals production is calculated from FAO commodities datasets. New year of FAO mariculture data (1950-2018). 
+New year of FAO mariculture data (1950-2019). 
 
 ***
 
@@ -29,15 +29,15 @@ Instead of using all NP commodity categories (seaweed, FOFM, coral, sponge, and 
 
 **Reference**:      
 http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-Release date: March 2019
-FAO Global Aquaculture Production Quantity 1950_2018
+Release date: March 2021
+FAO Global Aquaculture Production Quantity 1950_2019
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
-**Downloaded**: 5/11/2020
+**Downloaded**:  April 29, 2021
 
 **Description**:  Quantity (tonnes) of mariculture for each country, species, year.
 
-**Time range**: 1950-2018 
+**Time range**: 1950-2019 
 
 ## Seafood Watch sustainability data
 
@@ -69,8 +69,8 @@ library(readr)
 ## Load FAO-specific user-defined functions
 source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO files
 source(here('workflow/R/common.R')) # directory locations
-source(here('globalprep/np/v2020/R/np_fxn.R'))
-source(here('globalprep/mar/v2020/mar_fxs.R')) # functions specific to mariculture dealing with compound countries
+source(here('globalprep/np/v2021/R/np_fxn.R'))
+source(here('globalprep/mar/v2021/mar_fxs.R')) # functions specific to mariculture dealing with compound countries
 ```
 
 # Import Raw Data: FAO Mariculture data
@@ -78,7 +78,7 @@ source(here('globalprep/mar/v2020/mar_fxs.R')) # functions specific to maricultu
 Mariculture production in tonnes.
 
 ```{r}
-mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2020/FAO_GlobalAquacultureProduction_Quantity_1950_2018.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
+mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2021/FAO_GlobalAquacultureProduction_Quantity_1950_2019.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
 ```
 
 # Wrangle: 
@@ -89,20 +89,26 @@ Filter freshwater mariculture, make long format, and clean FAO codes.
 
 ```{r}
 mar <- mar %>%
-  rename(country = `Country (Country)`,
-         FAO_name = `ASFIS species (ASFIS species)`, 
-         fao = `FAO major fishing area (FAO major fishing area)`, 
-         environment = `Environment (Environment)`)
+  dplyr::select(-`Unit (Name)`) %>%
+  rename(country = `Country (Name)`,
+         FAO_name = `ASFIS species (Name)`, 
+         fao = `FAO major fishing area (Name)`, 
+         environment = `Environment (Name)`) %>%
+  rename_at(vars(matches("\\[")), ~ str_remove(., "\\[")) %>%
+  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]"))
+
 table(mar$environment)  
-## Include only marine environments
+
+## Include only marine and brackishwater environments
 mar <- mar %>%
 filter(environment %in% c("Brackishwater", "Marine"))  
+
 ## Convert to long format and clean FAO codes:
 mar <- mar %>%
   select(-Unit) 
 mar <- mar %>%
-  gather(key="year", value="value", num_range("",1950:2018)) %>%
-    fao_clean_data() 
+  gather(key="year", value="value", num_range("",1950:2019)) %>%
+    fao_clean_data_new() 
 ```
 
 ## Update seaweed species information
@@ -110,13 +116,12 @@ mar <- mar %>%
 Filter out seaweed species from 'raw/species_list.csv' (from 'globalprep/mar/v2020/raw'), rename columns, and assign proportions to "include" column determined by research of non-human food vs human food seaweed species cultivated in mariculture. For NP, we are only including non-human food seaweed species. Since some species are used for both non-human food and human food purposes, a proportion is assigned based on research and best guess.
 
 ```{r}
-#### NOTE: this is likely only necessary for the v2020 udpate. If any species are to be added, it will be done in the chunk below this one ####
-## Read in 'species_list.csv' (originally from 'globalprep/mar/v2020/raw'). Filter for 'Taxon_code = AL' (only seaweed species). Rename 'exclude' columns to 'include' since we're now including seaweed species that were excluded in the MAR dataprep (not primarily used as human food). Therefore, "0" means exclude completely (0%), and "1" means include completely (100%). 
-seaweed_sp <- read.csv(file.path('../../mar/v2020/raw/species_list.csv'), stringsAsFactors=FALSE) %>% 
+## Read in 'species_list.csv' (originally from 'globalprep/mar/v2021/raw'). Filter for 'Taxon_code = AL' (only seaweed species). Rename 'exclude' columns to 'include' since we're now including seaweed species that were excluded in the MAR dataprep (not primarily used as human food). Therefore, "0" means exclude completely (0%), and "1" means include completely (100%). 
+seaweed_sp <- read.csv(file.path('../../mar/v2021/raw/species_list.csv'), stringsAsFactors=FALSE) %>% 
   filter(Taxon_code == 'AL') %>% 
   rename(include = exclude)
 
-## Save in 'globalprep/np/v2020/raw' as 'species_list_np_seaweeds.csv'.
+## Save in 'globalprep/np/v2021/raw' as 'species_list_np_seaweeds.csv'.
 write.csv(seaweed_sp,"raw/species_list_np_seaweeds.csv", row.names = FALSE)
 ```
 
@@ -126,6 +131,8 @@ write.csv(seaweed_sp,"raw/species_list_np_seaweeds.csv", row.names = FALSE)
 Update species name in the `raw/species_list_np_seaweeds_edited.csv` file with names in the `mar` dataset. Simplified the species list and cut the "species" name columns because it wasn't clear what this was trying to accomplish and created potential error.  
 
 ```{r}
+
+
 ## Read in edited 'species_list_np_seaweeds_edited.csv'.
 seaweeds <- read.csv('raw/species_list_np_seaweeds.csv', stringsAsFactors = FALSE)
 
@@ -136,8 +143,10 @@ seaweeds_sp <- seaweeds %>%
 seaweed_np <- seaweeds_sp %>% 
   left_join(mar, by="FAO_name") %>% 
   filter(include > 0)
-unique(seaweed_np$FAO_name)
-# went from 43 species to 39 species (4 completely human food species removed) - v2020
+
+spp_1 <- unique(sort(seaweed_np$FAO_name))
+rgn_1 <- unique(seaweed_np$country)
+# went from 45 species to 41 species (4 completely human food species removed) - v2021
  
 ## Change names using species alias or FAO species name (global changes)
 seaweed_np$species <- ifelse(!is.na(seaweed_np$alias), seaweed_np$alias, seaweed_np$FAO_name) 
@@ -147,9 +156,14 @@ seaweed_np <- seaweed_np %>%
   group_by(country, fao, environment, species, year, Taxon_code, family, include) %>% 
     summarize(value = sum(value)) %>% 
   ungroup()
-unique(seaweed_np$species)
-# went from 39 species to 35 species (lost "Aquatic plants nei", "Bright green nori", "Kelp nei", "Giant kelps nei") due to no production values for those species - v2020
-# went from 50 to 49 countries
+spp_2 <- unique(sort(seaweed_np$species))
+rgn_2 <- unique(seaweed_np$country)
+
+setdiff(spp_1, spp_2)
+# went from 41 species to 37 species (lost "Bright green nori", "Kelp nei", "Giant kelps nei", "Mozuku") due to no production values for those species - v2021
+setdiff(rgn_1, rgn_2)
+# went from 53 to 52 countries - this is ok... because the one we "lost" was an NA - v2021
+
 ## Eliminate country-species data with zero production throughout the time-series (1950-recent)
 seaweed_np <- seaweed_np %>%
   group_by(country, species) %>%
@@ -168,7 +182,7 @@ seaweed_np <- seaweed_np %>%
 # Bonaire/S.Eustatius/Saba
 # Yugoslavia SFR: no longer a country after 1992
 seaweed_np <- seaweed_np %>%
-  mutate(country = ifelse(country=="Réunion", "Reunion", country)) %>%  # this one is hard to get right; v2020: last year it was "R\xe9union", but this year it was "Réunion"
+  mutate(country = ifelse(country=="Réunion", "Reunion", country)) %>%  # this one is hard to get right; v2020: last year it was "R\xe9union", but this year it was "Réunion" - not present in v2021 data
   mar_split()  # function in mar_fxs.R
 mar_rgn <- name_2_rgn(df_in = seaweed_np, 
                        fld_name='country', 
@@ -179,6 +193,7 @@ mar_rgn <- mar_rgn %>%
   summarize(value = sum(value)) %>%
   ungroup()
 # went from 2979 to 2950 observations - v2020
+# went from 3150 to 3121 obs - v2021 - This is correct; Un. Sov. Soc. Rep. and Russian Federation were combined.
 ```
 
 **Take a look at the tidied data for a single year and region**
@@ -200,7 +215,7 @@ Checked to make sure that there weren't instances in which it made more sense to
 mar_rgn_spread <- spread(mar_rgn, year, value)
 dim(mar_rgn_spread)
 ## Turn data frame back into long format
-mar_rgn_gf <- gather(mar_rgn_spread, "year", "value", num_range("",1950:2018)) %>%
+mar_rgn_gf <- gather(mar_rgn_spread, "year", "value", num_range("",1950:2019)) %>% ## udpate year 
   arrange(rgn_id, species, year, Taxon_code, fao, environment) 
 ## NA values are converted to zero
 mar_rgn_gf <- mar_rgn_gf %>%
@@ -220,6 +235,7 @@ See how may NA values were converted to 0
 ```{r}
 table(mar_rgn_gf$gap_0_fill)
 ## 382 of these out of 2299+382 cases had NA converted to 0 - v2020
+## 422 of these out of 2448+442 cases had NA converted to 0 - v2021 - seems reasonable given the added year of production
 ```
 
 Remove species-region-environment time series with less than four years of seaweeed mariculture production > 0 tonnes (assume these are not established seaweed mariculture programs).
@@ -241,7 +257,8 @@ identifier = mar_rgn_gf %>%
   select(rgn_id, species, fao, environment) %>% 
   unique() %>% 
   mutate(species_code = 1:n())
-# 82 unique identifiers - v2020
+# 93 unique identifiers - v2021
+
 mar_rgn_gf = left_join(mar_rgn_gf, identifier)
 maric <- mar_rgn_gf
 ```

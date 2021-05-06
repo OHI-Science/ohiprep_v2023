@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2020: Natural Products: weighting data prep'
+title: 'OHI 2021: Natural Products: weighting data prep'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -13,7 +13,7 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2020/globalprep/np/v2020/np_dataprep.html]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/np_dataprep.html]
 
 # Summary
 This analysis converts FAO commodities tonnes data for ornamentals, Watson fisheries tonnes data for FOFM, and FAO mariculture tonnes data for seasweeds into a weighting scheme per each ohi region, based off of 5 year averages of tonnes and values (in usd) for each product. This weighting scheme will be applied to the scores when updating in ohi global. 
@@ -26,15 +26,15 @@ This analysis converts FAO commodities tonnes data for ornamentals, Watson fishe
 **Reference**:      
     http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
     App release date: July 2019 
-FAO raw commodities quantity 1976_2017
-FAO raw commodities value 1976_2017
+FAO raw commodities quantity 1976_2018
+FAO raw commodities value 1976_2018
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commodities-production/en)
 
-**Downloaded**: May 3 2020
+**Downloaded**: April 29, 2021
 
 **Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: shells, corals, ornamental fish, fish oil, seaweed and plants, sponges (see: raw/commodities2products.csv for details).
 
-**Time range**: 1976-2017
+**Time range**: 1976-2018
 
 
 **Reference**: Watson, R. A. and Tidd, A. 2019. Mapping nearly a century and a half of global marine fishing: 1869–2017. Marine Policy, 93, pp. 171-177. [(Paper URL)](https://doi.org/10.1016/j.marpol.2018.04.023)
@@ -81,15 +81,15 @@ FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commoditi
 
 
 **Reference**: [FAO Mariculture data](http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp)
-Release date: March 2019
+Release date: March 2020
 FAO Global Aquaculture Production Quantity 1950_2018
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
-**Downloaded**: 5/11/2020
+**Downloaded**: April 29, 2021
 
 **Description**:  Quantity (tonnes) of mariculture for each country, species, year.
 
-**Time range**: 1950-2018 
+**Time range**: 1950-2019 
 ***
 
 ## Setup
@@ -101,7 +101,7 @@ knitr::opts_chunk$set(eval=FALSE)
 library(here)
 library(tidyverse)
 source(here('workflow/R/common.R'))
-source(here('globalprep/np/v2020/R/np_fxn.R'))
+source(here('globalprep/np/v2021/R/np_fxn.R'))
 
 ```
   
@@ -231,7 +231,7 @@ sw_tonnes <- read_csv("int/np_seaweeds_tonnes_weighting.csv") %>%
 
 ```
 
-Now we will calculate the weights per each product. To do this we need to multiply our average $ value for each product * tonnes of each product, and then divide by the total per each region. We will also assign year = 2020 so that this can be read into OHI-global (2020 corresponds to the year that these weights were calculated).
+Now we will calculate the weights per each product. To do this we need to multiply our average $ value for each product * tonnes of each product, and then divide by the total per each region. We will also assign year = 2021 so that this can be read into OHI-global (2021 corresponds to the year that these weights were calculated).
 
 ```{r}
 harvest_weighting_values <- read_csv("int/harvest_weighting_values.csv") %>%
@@ -248,7 +248,7 @@ prod_weights <- orn_tonnes %>%
   ungroup() %>%
   mutate(weight = usd_product/total_usd) %>%
   dplyr::select(-3, -4, -5, -6) %>%
-  mutate(year = 2020) %>%
+  mutate(year = 2021) %>%
   dplyr::select(rgn_id, year, product, weight)
 
 write.csv(prod_weights, "output/np_product_weights.csv", row.names = FALSE)
@@ -256,7 +256,7 @@ write.csv(prod_weights, "output/np_product_weights.csv", row.names = FALSE)
 
 ```{r}
 ##datacheck
-old_prod_weights <- read_csv("../v2020/output/np_harvest_weights_from_usd.csv")
+old_prod_weights <- read_csv("../v2020/output/np_product_weights.csv")
 
 check <- prod_weights %>%
   rename("new_weight" = "weight") %>%
@@ -272,16 +272,37 @@ plot(check_sw$new_weight, check_sw$weight)
 abline(0,1, col="red")
 
 check_orn <- check %>%
-  filter(product == "ornamentals")
+  filter(product == "ornamentals") %>%
+  mutate(difference = new_weight - weight)
 
 plot(check_orn$new_weight, check_orn$weight)
 abline(0,1, col="red")
+
+## check saint martin, Niue, Bonaire, Sint Eustasius - should decrease in production
+## check djibouti - should increase in production
+
+test <- harvest_tonnes_usd %>%
+  filter(rgn_id == 46)
+
+harvest_tonnes_usd_old <- read_csv("../v2020/int/np_harvest_tonnes_usd.csv") %>%
+  filter(rgn_id != 213)
+
+test2 <- harvest_tonnes_usd_old %>%
+  filter(rgn_id == 46)
+
+## Saint Martin, Bonaie, Sint Eustasius are due to ornamental production going to completely 0 over the last 5 years. Last years weight was much higher, because there was still some ornamental production in 2013, but since there is an extra year of data, 2013 is excluded and now every year has a production/usd value of 0. These are all part of our Netherlands Antilles split.
+
+## Niue; a similar thing happened to Niue, from 2014-2018 there is 0 production of ornamental now, which used to dominate (because its production of fofm is so small... but now that there is 0 ornamental and seaweed, the score is entirely driven by FOFM weights and production)
+
+## Djibouti; changes for these weights are due to georegional gapfilling of ornamental tonnes data.
+
+gf_orn <- read_csv("output/np_ornamentals_harvest_tonnes_gf.csv")
 
 check_fofm <- check %>%
   filter(product == "fish_oil")
 
 plot(check_fofm$new_weight, check_fofm$weight)
-abline(0,1, col="red")
+abline(0,1, col="red") ## these change because they are dependent upon the other things
 
 ```
 

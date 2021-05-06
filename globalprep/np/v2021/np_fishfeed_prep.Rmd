@@ -1,5 +1,5 @@
 ---
-title: "OHI 2020: Natural Products, Preparing catch and B/Bmsy data for forage fish species"
+title: "OHI 2021: Natural Products, Preparing catch and B/Bmsy data for forage fish species"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -20,7 +20,7 @@ editor_options:
 
 # Summary
 
-This script takes the Watson 2020 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. 
+This script takes the Watson 2020 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
 
 ## Updates from previous assessment
 

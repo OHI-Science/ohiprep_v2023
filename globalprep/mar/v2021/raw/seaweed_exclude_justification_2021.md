@@ -45,5 +45,8 @@ Spirulina nei.             |  0.3                 | More than 70% of Spirulina m
 [Dunaliella salina]        | 1           | Used in cosmetics and dietary supplements
 [Capsosiphon fulvescens]   |  0.1                 | Used as traditional medicine
 Slender wart weed          |  0.75                | Primarily used for agar and fish feed, but also consumed as food
+[Macrocystis integrifolia] | 0.001          | food use determined https://www.centralcoastbiodiversity.org/giant-perennial-kelp-bull-macrocystis-integrifolia.html - 1% proportion determined by best guess.
+[Cladosiphon okamuranus]   | 0.1            | food use determined https://en.wikipedia.org/wiki/Cladosiphon_okamuranus - sometimes used to treat cancer
+
 
 More detailed explanations are included in the "notes_2" column of species_list.csv. 

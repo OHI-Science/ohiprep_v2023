@@ -218,7 +218,7 @@ write.csv(h, "int/h_methods_sum.csv", row.names = FALSE)
 # test <- h %>%
 #   group_by(product) %>%
 #   summarise(sum_tonnes = sum(tonnes, na.rm = TRUE),
-#             sum_usd = sum(usd)) ## we will show this table in the methods doc
+#             sum_usd = sum(usd, na.rm = TRUE)) ## we will show this table in the methods doc
 
 h <- h %>%
     dplyr::filter(product %in% c("fish_oil", "ornamentals", "seaweeds")) ##filter for our commodities of interest
@@ -429,7 +429,7 @@ np_harvest_orn <- read_csv("int/np_harvest_tonnes_usd.csv") %>%
       dplyr::filter(km2 > 0)
 
     
-    hab_coral <- read_csv(file.path(here(), "globalprep/hab_coral/v2012/data/habitat_extent_coral_updated.csv")) %>%
+    hab_coral <- read_csv(file.path(here(), "globalprep/hab_coral/v2021/data/habitat_extent_coral_updated.csv")) %>%
       dplyr::select(rgn_id, km2) %>%
       dplyr::filter(km2 > 0)
     
