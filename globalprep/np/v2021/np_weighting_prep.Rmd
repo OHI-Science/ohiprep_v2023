@@ -258,6 +258,8 @@ write.csv(prod_weights, "output/np_product_weights.csv", row.names = FALSE)
 ##datacheck
 old_prod_weights <- read_csv("../v2020/output/np_product_weights.csv")
 
+prod_weights <- read_csv("output/np_product_weights.csv")
+
 check <- prod_weights %>%
   rename("new_weight" = "weight") %>%
   left_join(old_prod_weights, by = c("rgn_id", "product"))
@@ -295,6 +297,8 @@ test2 <- harvest_tonnes_usd_old %>%
 ## Niue; a similar thing happened to Niue, from 2014-2018 there is 0 production of ornamental now, which used to dominate (because its production of fofm is so small... but now that there is 0 ornamental and seaweed, the score is entirely driven by FOFM weights and production)
 
 ## Djibouti; changes for these weights are due to georegional gapfilling of ornamental tonnes data.
+
+## Tonga, rgn_id == 
 
 gf_orn <- read_csv("output/np_ornamentals_harvest_tonnes_gf.csv")
 

@@ -428,3 +428,39 @@ mar_sust_gf <- mar_sw_sus %>%
  
 write.csv(mar_sust_gf, "output/np_seaweed_sust_gf.csv", row.names = FALSE)
 ```
+
+Datacheck: 
+
+```{r}
+## compare the harvest
+
+## in particular, saint lucia's score increased a lot in 2021
+
+## Compare yield data for Saint Lucia
+np_old <- read.csv("../v2020/output/np_seaweed_harvest_tonnes.csv") %>% 
+  filter(rgn_id == 122, year == 2018) %>% 
+  select(rgn_id, taxa_code, tonnes)
+np_new <- read.csv("output/np_seaweed_harvest_tonnes.csv") %>% 
+  filter(rgn_id == 122, year == 2019) %>% 
+  select(rgn_id, taxa_code, tonnes)
+
+yield <- np_old %>% 
+  full_join(np_new, by = c("rgn_id","taxa_code")); View(yield) ## the production increased by ~80 tonnes 
+
+
+## Compare yield data for Vietnam - Vietnam score decreased
+np_old <- read.csv("../v2020/output/np_seaweed_harvest_tonnes.csv") %>% 
+  filter(rgn_id == 207, year == 2018) %>% 
+  select(rgn_id, taxa_code, year, tonnes)
+np_new <- read.csv("output/np_seaweed_harvest_tonnes.csv") %>% 
+  filter(rgn_id == 207, year == 2019) %>% 
+  select(rgn_id, taxa_code, year, tonnes)
+
+yield <- np_old %>% 
+  full_join(np_new, by = c("rgn_id","taxa_code")); View(yield) ## the production increased by ~80 tonnes 
+
+
+
+
+```
+

@@ -32,15 +32,15 @@ One more year of data
 
 #Data Source 
     http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-     Release date: March 2019 
-FAO Global Capture Production Quantity 1950_2018
+     Release date: March 2021
+FAO Global Capture Production Quantity 1950_2019
 Information: http://www.fao.org/fishery/statistics/global-capture-production/en
 
-**Downloaded**: May 11 2020
+**Downloaded**: April 29, 2021
 
 **Description**:  Quantity (tonnes) of fisheries capture for each county, species, year.
 
-**Time range**: 1950-2018
+**Time range**: 1950-2019
 
 ***
 
@@ -66,10 +66,10 @@ This includes the FAO capture production data and a list of the "target" species
 ```{r, eval=FALSE}
 
 ## FAO capture production data - all columns being parsed as characters and producing error in one column, but not sure which? (read.csv might help avoid this error?)
-fis_fao_raw <-  read_csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_capture/d2020/Global_capture_production_Quantity_1950-2018.csv'))
+fis_fao_raw <-  read_csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_capture/d2021/Global_capture_production_Quantity_1950-2019.csv'))
 
-# species list - used same raw files from v2019
-sp2grp <-  read_csv(here('globalprep/prs_targetedharvest/v2020/raw/species2group.csv')) %>%
+# species list - used same raw files from v2020
+sp2grp <-  read_csv(here('globalprep/prs_targetedharvest/v2021/raw/species2group.csv')) %>%
   dplyr::filter(incl_excl == 'include') %>%
   dplyr::select(target, species); head(sp2grp)
 
@@ -83,16 +83,18 @@ sp2grp <-  read_csv(here('globalprep/prs_targetedharvest/v2020/raw/species2group
 
 # Rename columns and remove unit column
 fao_clean <- fis_fao_raw %>% 
-  dplyr::rename(country = "Country (Country)",
-                species = "ASFIS species (ASFIS species)",
-                area = "FAO major fishing area (FAO major fishing area)") %>%
-  select(-"Unit (Unit)")
+  dplyr::rename(country = "Country (Name)",
+                species = "ASFIS species (Name)",
+                area = "FAO major fishing area (Name)") %>%
+  select(-"Unit (Name)") %>%
+    rename_at(vars(matches("\\[")), ~ str_remove(., "\\[")) %>%
+  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]"))
 
 # Gather by year and value to expand and make each line a single observation for country, species and year (tidy data!) 
 fao_clean <- fao_clean %>%
   tidyr::gather("year", "value", -(1:3)) %>%
   dplyr::mutate(year = gsub("X", "", year)) %>%
-    fao_clean_data() 
+    fao_clean_data_new() 
 
 fao_clean <- fao_clean %>%
   dplyr::mutate(species = as.character(species)) %>%
@@ -112,7 +114,6 @@ groups <-  c('turtle', 'whale', 'dolphin', 'porpoise') # seals and sea lions rem
 
 # Going through FAO data species and seeing if they're in our master list of species
 ## Looking to see if we need to add species that have changed name
-### v2020: All species in error message are excluded. Chinese softshell turtle and River and lake turtles nei are not marine turtles, and Velvet whalefish and Common dolphinfish are fish, not cetaceans.
 for (group in groups) {# group='dolphin'
 possibles <- spgroups[grep(group, spgroups)]
 d_missing_l <-  setdiff(possibles, sp2grp$species)
@@ -130,13 +131,26 @@ if (length(l_missing_d)>0){
   print(l_missing_d)
 }
 
+#### v2021
+# MISSING in the lookup the following species in target='turtle'.
+#     Chinese softshell turtle - not a marine turtle
+#     River and lake turtles nei - not a marine turtle 
+# 
+# MISSING in the lookup the following species in target='whale'.
+#     Pygmy right whale - will add this to the include species list 
+#     Velvet whalefish - fish, not a whale
+# 
+# MISSING in the lookup the following species in target='dolphin'.
+#     Common dolphinfish - fish not a cetacean
+#     Indian Ocean humpback dolphin - will add this to the include species list 
+#     Pompano dolphinfish - fish not a cetacean
 
 ## filter data to include only target species ----
 target_spp <-  fao_clean %>%
-  dplyr::filter(species %in% sp2grp$species) # this goes from 2211 spp in FAO list to just 69
+  dplyr::filter(species %in% sp2grp$species) # this goes from 2384 spp in FAO list to just 72
 
 unique(target_spp$area) # confirm these are all marine regions
-
+unique(fao_clean$species) # 2384 species
 
 ```
 
@@ -189,8 +203,8 @@ m_sum_rgn <- name_2_rgn(df_in = sum,
                        fld_name='country', 
                        flds_unique=c('year'))
 
-# Filter out duplicates based on error message from previous step
-dplyr::filter(m_sum_rgn, country %in% c("Guadeloupe", "Martinique"))
+# Check out duplicates based on error message from previous step
+dplyr::filter(m_sum_rgn, country %in% c("Guadeloupe", "Martinique")) # this is ok, we report these two together, so this will be fixed with the summarize in the next step 
 
 # They will be summed:
 m_sum_rgn <- m_sum_rgn %>%
@@ -206,13 +220,13 @@ Data is rescaled by dividing by the 95th quantile of values across all regions f
 ```{r, eval=FALSE}
 
 target_harvest <- m_sum_rgn %>%
-  dplyr::mutate(quant_95 = quantile(value[year %in% 2011:2018], 0.95, na.rm = TRUE)) %>%
+  dplyr::mutate(quant_95 = quantile(value[year %in% 2011:2019], 0.95, na.rm = TRUE)) %>%
   dplyr::mutate(score = value / quant_95) %>% 
   dplyr::mutate(score = ifelse(score>1, 1, score)) %>%
   dplyr::select(rgn_id, year, pressure_score = score) %>%
   dplyr::arrange(rgn_id, year); head(target_harvest); summary(target_harvest)
   
-# v2020 quant_95 = 3477.15
+# v2021 quant_95 = 3409.4
 
 
 # any regions that did not have a catch should have score = 0 
@@ -225,7 +239,7 @@ rgns <-  rgn_master %>%
 
 # This is just a list of rgn IDS - do we want to update it to a rgn list more recent than 2013?
 
-# Add year; for v2020, min year is 1950, and max year is 2018  
+# Add year; for v2021, min year is 1950, and max year is 2019 
 rgns <- expand.grid(rgn_id = rgns$rgn_id, year = min(target_harvest$year):max(target_harvest$year))
 
 # Change NAs in pressure_score column to 0s
@@ -236,7 +250,7 @@ target_harvest <-  rgns %>%
 
 # Write target_harvest to "fao_targeted.csv" in output folder
 write_csv(target_harvest, 
-          file.path(here('globalprep/prs_targetedharvest/v2020/output/fao_targeted.csv')))
+          file.path(here('globalprep/prs_targetedharvest/v2021/output/fao_targeted.csv')))
 
 # Create gapfill dataframe
 target_harvest_gf <- target_harvest %>%
@@ -246,7 +260,7 @@ target_harvest_gf <- target_harvest %>%
 
 # Write target_harvest_gf to "fao_targeted_gf.csv" in output folder
 write_csv(target_harvest_gf,
-          file.path(here('globalprep/prs_targetedharvest/v2020/output/fao_targeted_gf.csv')))
+          file.path(here('globalprep/prs_targetedharvest/v2021/output/fao_targeted_gf.csv')))
 
 ```
 
@@ -257,15 +271,14 @@ In this case, all of the regions looked very similar.
 
 ```{r, eval=FALSE}
 
-new <- read_csv(here("globalprep/prs_targetedharvest/v2020/output/fao_targeted.csv")) %>% 
-  filter(year==2016)
-# pull just 2016 data from target_harvest df - should we change this to a more recent year for v2020?
+new <- read_csv(here("globalprep/prs_targetedharvest/v2021/output/fao_targeted.csv")) %>% 
+  filter(year==2018)
+# pull just 2018 data from target_harvest df, since its the most recent year in common
 
-old <- read_csv(here("globalprep/prs_targetedharvest/v2019/output/fao_targeted.csv")) %>%
-  dplyr::filter(year == 2016) %>%
+old <- read_csv(here("globalprep/prs_targetedharvest/v2020/output/fao_targeted.csv")) %>%
+  dplyr::filter(year == 2018) %>%
   dplyr::select(rgn_id, year, pressure_score_old=pressure_score) %>%
   dplyr::left_join(new, by=c("rgn_id", "year"))
-
 # Compare pressure_score between last year and this year's assessments
 compare_plot <- ggplot(data = old, aes(x=pressure_score_old, y= pressure_score, label=rgn_id))+
   geom_point()+
@@ -274,7 +287,7 @@ compare_plot <- ggplot(data = old, aes(x=pressure_score_old, y= pressure_score, 
 plot(compare_plot)
 ggplotly(compare_plot)
 
-### v2020: outliers for rgn_id 141 (Faroe Islands) and 163 (United States). I look at Faroe Islands below.
+### v2021: outliers for 163 (United States). I look at US below
 
 # explore United States[163]
 unitedstates <- long %>% 
@@ -283,33 +296,6 @@ unitedstates <- long %>%
   dplyr::filter(country == 'United States of America', target == 'cetacean', year >= 2000) 
 # Could just be due to updated backfilled FAO data?
 
-## Use more recent year: 2017
-new <- read_csv(here("globalprep/prs_targetedharvest/v2020/output/fao_targeted.csv")) %>% 
-  filter(year==2017)
-# pull just 2016 data from target_harvest df - should we change this to a more recent year for v2020?
-
-old <- read_csv(here("globalprep/prs_targetedharvest/v2019/output/fao_targeted.csv")) %>%
-  dplyr::filter(year == 2017) %>%
-  dplyr::select(rgn_id, year, pressure_score_old=pressure_score) %>%
-  dplyr::left_join(new, by=c("rgn_id", "year"))
-
-# Compare pressure_score between last year and this year's assessments
-compare_plot <- ggplot(data = old, aes(x=pressure_score_old, y= pressure_score, label=rgn_id))+
-  geom_point()+
-  geom_abline(color="red")
-
-plot(compare_plot)
-ggplotly(compare_plot)
-
-
-### v2020: outlier for rgn_id 141, which is the Faeroe Islands (OHI region name in m_sum_rgn) or Atlantic, Northeast (FAO area).
-
-# explore Faeroe Islands[141]
-faroe <- long %>% 
-  dplyr::group_by(country, target, year) %>%
-  dplyr::summarize(value = sum(value)) %>% 
-  dplyr::filter(country == 'Faroe Islands', target == 'cetacean', year >= 2000) 
-# It looks like in v2019, the pressure_score for rgn_id 141 in 2017 was 0, compared to a pressure_score of 0.5 in v2020. Looking at the capture production quantity value (in tonnes) for the Faroe Islands however, there were definitely cetaceans harvested in 2017. I looked at fao_targeted.csv for v2019, and noticed rgn_id 141 (Faroe Islands) has a pressure_score of 0 from 2014 to 2017. A pressure_score of 0 makes sense for 2006, 2007, and 2015, when there was no reported harvest value for the Faroe Islands, but there should be scores for 2014, 2016, and 2017. It looks like this was corrected in v2020 though, so might not be an issue. Could just be due to updated backfilled FAO data?
 
 ```
 
