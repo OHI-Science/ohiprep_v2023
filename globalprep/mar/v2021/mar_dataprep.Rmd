@@ -43,9 +43,8 @@ FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquacultu
 
 **Reference**: 
 https://www.seafoodwatch.org/-/m/sfw/pdf/whats%20new/complete%20recommendation%20list.pdf
-Release date: August 3, 2020
 
-**Downloaded**: Auguest 3, 2020
+**Downloaded**: May 7, 2021
 
 **Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1.
 
@@ -322,9 +321,11 @@ These data describe the sustainability country/species combinations. In cases wh
 ```{r sw-scores, eval = FALSE}
 
 ## Load in Seafood Watch sustainability scores data from mazu:
-sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2020/Seafood-Watch_aquaculture-recs_July-2020.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2021/Seafood-Watch_aquaculture-recs_May-2021.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 
 head(sw_sus)
+
+old_sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2020/Seafood-Watch_aquaculture-recs_July-2020.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 
 ```
 
@@ -338,24 +339,22 @@ Rename columns to match with MAR data and fill in species column
 
 ## Rename columns
 sw_sus <- sw_sus %>%
-  rename(report_title = 'Report Title',
-         start_year = 'Start year',
-         sw_species = 'Common name',
+  rename(report_title = 'ReportTitle',
+         published_date = 'PublishedDate',
+         sw_species = 'CommonNames',
          genus = 'Genus',
          spp = 'Species',
-         fao_species = 'FAO Common name',
-         region = 'Region',
-         country = 'Country',
-         state_territory = 'State/Territory',
-         sub_region = 'Sub-Region',
-         water_body = 'Body of Water',
-         parent_method = 'Parent Method',
-         method = 'Method',
+         fao_species = 'FAOCommonName',
+         fda_species = 'FDACommonName',
+         water_body = 'BOWs',
+         country = 'Countries',
+         state_territory = 'CountrySubs',
+         method = 'Methods',
          score = 'Overall Score',
-         escapes_score = 'AqCriteria6',
+         escapes_score = 'C6Score',
          rec = 'Overall Recommendation'
          ) %>% 
-  dplyr::select(report_title, start_year, sw_species, genus, spp, fao_species, region, country, state_territory, sub_region, water_body, parent_method, method, escapes_score, score, rec)
+  dplyr::select(report_title, published_date, sw_species, genus, spp, fao_species, fda_species, country, state_territory, water_body, method, escapes_score, score, rec)
 
 ## Change species names using FAO species name (fao_species); if NA, use common name (sw_species)
 sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$sw_species)
@@ -367,8 +366,8 @@ sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$
 ```{r keep-na-countries_sw-sus, eval = FALSE}
 
 ## These need to be re-added later (get cut when associated with region ids)
-sw_sus_no_rgn <- filter(sw_sus, is.na(country))
-  # 203 entries with no country
+sw_sus_no_rgn <- filter(sw_sus, is.na(country)|country == "Worldwide")
+  # 118 entries with no country
 
 ```
 
@@ -377,23 +376,30 @@ sw_sus_no_rgn <- filter(sw_sus, is.na(country))
 ```{r sw-sus_convert-region, eval = FALSE}
 
 ## Change country names to match OHI region names
-sw_sus <- sw_sus %>% 
-  mutate(country = ifelse(country=="Korea, the Republic of", "South Korea", country)) %>% # Data removed for not having a match; change name to match
-  mutate(country = ifelse(country=="United Kingdom of Great Britain and Northern Ireland (the)", "United Kingdom", country))  # Data removed for not having a match; change name to match
+sw_sus_multiple <- sw_sus %>% 
+  filter(str_detect(country, "\\|")) %>%
+  separate_rows(country, sep = " \\| ")
+
+sw_sus_df <- sw_sus %>%
+  filter(!str_detect(country, "\\|")) %>%
+  rbind(sw_sus_multiple) %>%
+  filter(!is.na(country), country!="Worldwide")
+  
 
 ## Convert country names to OHI region IDs. (ohicore/R/name_2_rgn.R)
-sw_sus_rgn <- name_2_rgn(df_in = sw_sus, 
+sw_sus_rgn <- name_2_rgn(df_in = sw_sus_df, 
                        fld_name='country', 
-                       flds_unique=c('fao_species', 'sw_species', 'region', 'score'),
+                       flds_unique=c('fao_species', 'fda_species', 'sw_species', 'score'),
                        keep_fld_name = TRUE) # 'country' now shows the original Seafood Watch data name; 'rgn_name' is what we want to use from now on
-  # Goes from 330 obs. to 127 obs. (because 203 obs. have no country associated)
-
 
 ## Re-add NA countries
 sw_sus_rgn <- bind_rows(sw_sus_rgn, sw_sus_no_rgn) %>%
   unique()
-  # Back to 330 obs.
+  # Back to 254 obs.
 
+
+setdiff(sw_sus_rgn$spp, old_sw_sus$`Species`)
+setdiff(old_sw_sus$`Species`, sw_sus_rgn$spp)
 ```
 
 **Check that the non-matches between Seafood Watch sustainability data species (sw_sus_rgn) and the FAO mariculture species in the wrangled FAO Aquaculture Production data table (maric) are not due to spelling errors or slightly different names. We want to include as many species that have sustainability scores as possible**
@@ -415,28 +421,21 @@ sort(setdiff(maric$species, sw_sus_rgn$species)) # FAO species with no Seafood W
 ```{r sw-sus_fix-non-matches, eval = FALSE}
 
 ## Rename species in Seafood Watch data to match FAO species data
-sw_sus_rgn$species <- gsub("Abalone", "Abalones nei", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Barramundi", "Barramundi(=Giant seaperch)", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Coho salmon", "Coho(=Silver) salmon", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Manila clam", "Japanese carpet shell", sw_sus_rgn$species) # Japanese carpet shell is another name for Manila clam (thanks animal crossing :P )
-sw_sus_rgn$species <- gsub("New Zealand Mussel", "New Zealand mussel", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Common sole", "[Solea spp]", sw_sus_rgn$species)
+sw_sus_rgn$species <- gsub("Abalones", "Abalones nei", sw_sus_rgn$species)
+sw_sus_rgn$species <- gsub("Clams", "Clams, etc. nei", sw_sus_rgn$species) # Japanese carpet shell is another name for Manila clam (thanks animal crossing :P )
 sw_sus_rgn$species <- gsub("Mussels", "Sea mussels nei", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Blood clams", "Blood cockle", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Cockle", "Cockles nei", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Chinook salmon", "Chinook(=Spring=King) salmon", sw_sus_rgn$species)
-sw_sus_rgn$species <- gsub("Littleneck clam", "Pacific littleneck clam", sw_sus_rgn$species)
-sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Hard clam \\(unspecified\\)", "Northern quahog(=Hard clam)") #  Hard clams are also known as quahogs, round clams, or hard-shell clams
-sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Lyrate hard clam", "Northern quahog(=Hard clam)") 
-# Meretrix lyrata, the lyrate Asiatic hard clam, also known simply as the hard clam, is an edible saltwater clam, a marine bivalve mollusc in the family Veneridae, the Venus clams. 
-
-sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Seaweed \\(unspecified\\)", "Seaweeds nei") 
+sw_sus_rgn$species <- gsub("Cockles", "Blood cockle", sw_sus_rgn$species)
+sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Seaweed", "Seaweeds nei") 
+sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Atlantic Bluefin tuna", "Atlantic bluefin tuna") 
+sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Oysters", "Cupped oysters nei") 
+sw_sus_rgn$species <- str_replace(sw_sus_rgn$species, "Scallops", "Scallops nei") 
 
 
 
 
 ## rename any mistakes in the FAO data 
 maric$species <- gsub("blood cockle", "Blood cockle", maric$species)
+maric$species <- gsub("\\[Solea spp\\]", "Common sole", maric$species)
 ```
 
 # FAO mariculture and Seafood Watch sustainability scores
@@ -445,13 +444,15 @@ maric$species <- gsub("blood cockle", "Blood cockle", maric$species)
 
 ## Add column "match_type" to categorize obs. that 1) have a country associated, 2) are "global" Seafood Watch data, or 3) only distinguished by water body
 sw_sus_rgn <- sw_sus_rgn %>% 
-  dplyr::mutate(match_type = dplyr::case_when(!is.na(country) ~ "sw_sp_c", # Add match type specific to species/country
-                                str_detect(report_title, regex("Global")) ~ "sw_sp_g", # Add match type specific to species/global Seafood Watch data
+  dplyr::mutate(match_type = dplyr::case_when(!is.na(rgn_name) ~ "sw_sp_c", # Add match type specific to species/country
+                                country == "Worldwide" ~ "sw_sp_g", # Add match type specific to species/global Seafood Watch data
                                 TRUE ~ "sw_sp_w" # Add match type specific to species/water body
   ))
 
 table(sw_sus_rgn$match_type)
 
+# sw_sp_c sw_sp_g sw_sp_w 
+#     136     117       1 
 ```
 
 **Assign a mediterraen bordering rgn id to each waterbody row**
@@ -562,8 +563,7 @@ mar_sw_sus <- mar_sw_sus %>%
 ```{r sw-sus-summary, eval = FALSE}
 
 summary(mar_sw_sus)
-# Sust_avg still has 18551 NAs out of 30938 total obs.; ~60% without sustainability data
-# esc_score still have 18551 NAs out of 30938 total obs; ~60% without scores
+# 20595 out of 30938 total obs; ~66 without scores - a higher percentage than last year.. this is because there were some error species in the raw sfw data that have been fixed now (2021)
 
 ```
 
@@ -781,7 +781,7 @@ mar_harvest_tonnes_gf = mar_sw_sus_final %>%
 
 ## Save sustainability scores data for 2020 (SFW data year)
 mar_sustainability_score = mar_sw_sus_final %>%
-  mutate(year = 2020) %>% # Only 2020 sustainability scores exist (Seafood Watch)
+  mutate(year = 2021) %>% # 2021 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, taxa_code, sust_coeff = Sust) %>%
   unique()
 
@@ -808,7 +808,7 @@ mar_sustainability_score_gf = mar_sw_sus_final %>%
 ## save mar sustainability for data checking; rgn_id, species, score
 
 mar_sustainability_score = mar_sw_sus_final %>%
-  mutate(year = 2020) %>% # Only 2020 sustainability scores exist (Seafood Watch)
+  mutate(year = 2021) %>% # Only 2021 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, species, sust_coeff = Sust) %>%
   unique()
 

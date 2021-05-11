@@ -293,5 +293,9 @@ old_coral <- read_csv("globalprep/prs_coral_harvest/v2020/output/prs_coral_harve
 
 plot(old_coral$old_prs, old_coral$pressure_score)
 abline(0,1, col = "red")
+
+roll_prod <- read_csv("globalprep/prs_coral_harvest/v2021/int/tonnes_coral_harvest.csv") %>%
+  filter(rgn_id == 207)
+
 ```
 
