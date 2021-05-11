@@ -4,7 +4,7 @@
 5,2021,"Snappers nei",0.58
 6,2021,"Blue shrimp",0.68
 6,2021,"Whiteleg shrimp",0.68
-7,2021,"Elkhorn sea moss",0.79
+7,2021,"Elkhorn sea moss",0.67
 7,2021,"Giant tiger prawn",0.68
 8,2021,"Bear paw clam",0.7
 8,2021,"Crocus giant clam",0.7
@@ -14,7 +14,7 @@
 8,2021,"Milkfish",0.58
 8,2021,"Penaeus shrimps nei",0.59
 8,2021,"Smooth giant clam",0.7
-9,2021,"Eucheuma seaweeds nei",0.79
+9,2021,"Eucheuma seaweeds nei",0.67
 10,2021,"Milkfish",0.58
 11,2021,"Sixfinger threadfin",0.58
 13,2021,"Banana prawn",0.68
@@ -42,7 +42,7 @@
 14,2021,"Japanese hard clam",0.7
 14,2021,"Japanese spiny lobster",0.61
 14,2021,"Kuruma prawn",0.68
-14,2021,"Laver (Nori)",0.79
+14,2021,"Laver (Nori)",0.67
 14,2021,"Marine crabs nei",0.61
 14,2021,"Marine fishes nei",0.58
 14,2021,"Marine molluscs nei",0.68
@@ -53,19 +53,19 @@
 14,2021,"Porgies, seabreams nei",0.53
 14,2021,"Redtail prawn",0.68
 14,2021,"Seabasses nei",0.58
-14,2021,"Seaweeds nei",0.79
+14,2021,"Seaweeds nei",0.67
 14,2021,"Snappers, jobfishes nei",0.58
 14,2021,"Trumpet emperor",0.58
-14,2021,"Warty gracilaria",0.79
+14,2021,"Warty gracilaria",0.67
 14,2021,"Whiteleg shrimp",0.68
 15,2021,"Banana prawn",0.68
 15,2021,"Barramundi(=Giant seaperch)",0.68
-15,2021,"Caulerpa seaweeds",0.79
+15,2021,"Caulerpa seaweeds",0.67
 15,2021,"Cupped oysters nei",0.67
-15,2021,"Elkhorn sea moss",0.79
+15,2021,"Elkhorn sea moss",0.67
 15,2021,"Flathead lobster",0.61
 15,2021,"Giant tiger prawn",0.68
-15,2021,"Gracilaria seaweeds",0.79
+15,2021,"Gracilaria seaweeds",0.67
 15,2021,"Green mussel",0.67
 15,2021,"Groupers, seabasses nei",0.58
 15,2021,"Indo-Pacific swamp crab",0.61
@@ -77,7 +77,7 @@
 15,2021,"Scats",0.58
 15,2021,"Snappers nei",0.58
 15,2021,"Snubnose pompano",0.68
-15,2021,"Spiny eucheuma",0.79
+15,2021,"Spiny eucheuma",0.67
 15,2021,"Tropical spiny lobsters nei",0.61
 15,2021,"Whiteleg shrimp",0.68
 16,2021,"Abalones nei",0.68
@@ -97,17 +97,17 @@
 16,2021,"Penaeus shrimps nei",0.68
 16,2021,"Rainbow trout",0.68
 16,2021,"Southern bluefin tuna",0.5
-17,2021,"Elkhorn sea moss",0.79
+17,2021,"Elkhorn sea moss",0.67
 17,2021,"Giant tiger prawn",0.68
 17,2021,"Indo-Pacific swamp crab",0.61
 17,2021,"Milkfish",0.58
 17,2021,"Pearl oyster shells nei",0.68
-18,2021,"Eucheuma seaweeds nei",0.79
+18,2021,"Eucheuma seaweeds nei",0.67
 18,2021,"Giant tiger prawn",0.68
 18,2021,"Indo-Pacific swamp crab",0.61
 18,2021,"Pearl oyster shells nei",0.68
 19,2021,"Milkfish",0.58
-20,2021,"[Capsosiphon fulvescens]",0.79
+20,2021,"[Capsosiphon fulvescens]",0.67
 20,2021,"Abalones nei",0.68
 20,2021,"Aquatic invertebrates nei",0.61
 20,2021,"Bastard halibut",0.58
@@ -116,22 +116,22 @@
 20,2021,"Dotted gizzard shad",0.58
 20,2021,"Filefishes, leatherjackets nei",0.58
 20,2021,"Fleshy prawn",0.68
-20,2021,"Fragile codium",0.79
-20,2021,"Fusiform sargassum",0.79
+20,2021,"Fragile codium",0.67
+20,2021,"Fusiform sargassum",0.67
 20,2021,"Globose clam",0.7
-20,2021,"Green laver",0.79
+20,2021,"Green laver",0.67
 20,2021,"groupers nei",0.58
 20,2021,"Horned turban",0.68
 20,2021,"Inflated ark",0.7
 20,2021,"Jack and horse mackerels nei",0.32
 20,2021,"Japanese carpet shell",0.7
 20,2021,"Japanese hard clam",0.7
-20,2021,"Japanese kelp",0.79
+20,2021,"Japanese kelp",0.67
 20,2021,"Japanese seabream",0.53
 20,2021,"Korean mussel",0.67
 20,2021,"Korean rockfish",0.58
 20,2021,"Kuruma prawn",0.68
-20,2021,"Laver (Nori)",0.79
+20,2021,"Laver (Nori)",0.67
 20,2021,"Marine crustaceans nei",0.61
 20,2021,"Marine fishes nei",0.58
 20,2021,"Marine molluscs nei",0.68
@@ -146,23 +146,23 @@
 20,2021,"Scorpionfishes, redfishes nei",0.58
 20,2021,"Sea squirts nei",0.61
 20,2021,"Seabasses nei",0.58
-20,2021,"Wakame",0.79
+20,2021,"Wakame",0.67
 20,2021,"Whiteleg shrimp",0.68
 20,2021,"Yesso scallop",0.67
 21,2021,"Atlantic salmon",0.68
 21,2021,"Clams, etc. nei",0.7
-21,2021,"Gelidium seaweeds",0.79
-21,2021,"Gracilaria seaweeds",0.79
-21,2021,"Japanese kelp",0.79
+21,2021,"Gelidium seaweeds",0.67
+21,2021,"Gracilaria seaweeds",0.67
+21,2021,"Japanese kelp",0.67
 21,2021,"Japanese sea cucumber",0.61
-21,2021,"Laver (Nori)",0.79
+21,2021,"Laver (Nori)",0.67
 21,2021,"Marine fishes nei",0.58
 21,2021,"Tiger pufferfish",0.58
-21,2021,"Wakame",0.79
+21,2021,"Wakame",0.67
 21,2021,"Yesso scallop",0.67
 24,2021,"Barramundi(=Giant seaperch)",0.68
 24,2021,"Blood cockle",0.7
-24,2021,"Eucheuma seaweeds nei",0.79
+24,2021,"Eucheuma seaweeds nei",0.67
 24,2021,"Green mussel",0.67
 24,2021,"Groupers nei",0.58
 24,2021,"Indo-Pacific swamp crab",0.61
@@ -201,23 +201,23 @@
 37,2021,"Metapenaeus shrimps nei",0.58
 37,2021,"Red drum",0.46
 40,2021,"Barramundi(=Giant seaperch)",0.68
-40,2021,"Elkhorn sea moss",0.79
+40,2021,"Elkhorn sea moss",0.67
 40,2021,"Giant tiger prawn",0.68
 40,2021,"Indian backwater oyster",0.67
 40,2021,"Indo-Pacific swamp crab",0.61
 40,2021,"Milkfish",0.58
 40,2021,"Tropical spiny lobsters nei",0.61
-41,2021,"Elkhorn sea moss",0.79
+41,2021,"Elkhorn sea moss",0.67
 41,2021,"Giant tiger prawn",0.68
 41,2021,"Indian white prawn",0.68
 41,2021,"Japanese meagre",0.46
-42,2021,"Eucheuma seaweeds nei",0.79
+42,2021,"Eucheuma seaweeds nei",0.67
 42,2021,"Giant tiger prawn",0.68
 42,2021,"Indo-Pacific swamp crab",0.61
 42,2021,"Sea cucumbers nei",0.61
 43,2021,"Milkfish",0.58
 43,2021,"Penaeus shrimps nei",0.68
-43,2021,"Spiny eucheuma",0.79
+43,2021,"Spiny eucheuma",0.67
 45,2021,"Penaeus shrimps nei",0.68
 47,2021,"Indian white prawn",0.68
 48,2021,"Gilthead seabream",0.68
@@ -267,7 +267,7 @@
 62,2021,"Mediterranean mussel",0.67
 62,2021,"Pacific cupped oyster",0.67
 62,2021,"Penaeus shrimps nei",0.68
-62,2021,"Slender wart weed",0.79
+62,2021,"Slender wart weed",0.67
 62,2021,"Yesso scallop",0.67
 65,2021,"Gasar cupped oyster",0.67
 66,2021,"Blue mussel",0.67
@@ -285,7 +285,7 @@
 72,2021,"Mediterranean mussel",0.67
 73,2021,"Aquatic invertebrates nei",0.61
 73,2021,"Atlantic salmon",0.68
-73,2021,"Brown seaweeds",0.79
+73,2021,"Brown seaweeds",0.67
 73,2021,"Cupped oysters nei",0.67
 73,2021,"Flatfishes nei",0.58
 73,2021,"Japanese sea cucumber",0.61
@@ -372,12 +372,12 @@
 95,2021,"Pacific cupped oyster",0.67
 101,2021,"Blue mussel",0.67
 101,2021,"European flat oyster",0.67
-101,2021,"Gracilaria seaweeds",0.79
+101,2021,"Gracilaria seaweeds",0.67
 101,2021,"Mediterranean mussel",0.67
 101,2021,"Pacific cupped oyster",0.67
 101,2021,"Perlemoen abalone",0.68
 102,2021,"Giant tiger prawn",0.68
-102,2021,"Gracilaria seaweeds",0.79
+102,2021,"Gracilaria seaweeds",0.67
 102,2021,"Indian white prawn",0.68
 102,2021,"Japanese meagre",0.46
 102,2021,"Kuruma prawn",0.68
@@ -386,7 +386,7 @@
 102,2021,"Pacific cupped oyster",0.67
 102,2021,"Perlemoen abalone",0.68
 102,2021,"Red bait",0.61
-102,2021,"Sea lettuces nei",0.79
+102,2021,"Sea lettuces nei",0.67
 102,2021,"Sea mussels nei",0.67
 102,2021,"Smooth mactra",0.68
 102,2021,"Turbot",0.68
@@ -409,10 +409,10 @@
 116,2021,"Cobia",0.68
 116,2021,"Penaeus shrimps nei",0.51
 117,2021,"Caribbean spiny lobster",0.61
-122,2021,"Eucheuma seaweeds nei",0.79
-122,2021,"Gracilaria seaweeds",0.79
-125,2021,"Eucheuma seaweeds nei",0.79
-127,2021,"Eucheuma seaweeds nei",0.79
+122,2021,"Eucheuma seaweeds nei",0.67
+122,2021,"Gracilaria seaweeds",0.67
+125,2021,"Eucheuma seaweeds nei",0.67
+127,2021,"Eucheuma seaweeds nei",0.67
 129,2021,"Blue shrimp",0.68
 129,2021,"Cobia",0.53
 129,2021,"Florida pompano",0.68
@@ -433,7 +433,7 @@
 134,2021,"Whiteleg shrimp",0.68
 135,2021,"Abalones nei",0.68
 135,2021,"Bastard halibuts nei",0.58
-135,2021,"Brown seaweeds",0.79
+135,2021,"Brown seaweeds",0.67
 135,2021,"Clams, etc. nei",0.7
 135,2021,"Cortez oyster",0.67
 135,2021,"Crevalle jack",0.68
@@ -453,26 +453,26 @@
 136,2021,"Sea mussels nei",0.67
 136,2021,"Whiteleg shrimp",0.68
 137,2021,"Blue shrimp",0.4
-137,2021,"Elkhorn sea moss",0.79
+137,2021,"Elkhorn sea moss",0.67
 137,2021,"Pacific cupped oyster",0.67
 137,2021,"Red drum",0.46
 137,2021,"Whiteleg shrimp",0.4
 138,2021,"False abalone",0.68
 138,2021,"Flatfishes nei",0.58
-138,2021,"Giant kelp",0.79
-138,2021,"Gracilaria seaweeds",0.79
+138,2021,"Giant kelp",0.67
+138,2021,"Gracilaria seaweeds",0.67
 138,2021,"Pacific cupped oyster",0.67
 138,2021,"Scallops nei",0.67
 138,2021,"Whiteleg shrimp",0.68
-139,2021,"Elkhorn sea moss",0.79
+139,2021,"Elkhorn sea moss",0.67
 139,2021,"South American rock mussel",0.67
 139,2021,"Whiteleg shrimp",0.68
 140,2021,"Cobia",0.68
 140,2021,"Red drum",0.46
 141,2021,"Atlantic salmon",0.38
-141,2021,"Babberlocks",0.79
+141,2021,"Babberlocks",0.67
 141,2021,"Rainbow trout",0.68
-141,2021,"Sea belt",0.79
+141,2021,"Sea belt",0.67
 143,2021,"Abalones nei",0.68
 143,2021,"Arctic char",0.68
 143,2021,"Atlantic cod",0.68
@@ -494,8 +494,8 @@
 153,2021,"Clams, etc. nei",0.7
 153,2021,"Pacific asaphis",0.7
 153,2021,"Rough turban",0.68
-155,2021,"[Cladosiphon okamuranus]",0.79
-155,2021,"Elkhorn sea moss",0.79
+155,2021,"[Cladosiphon okamuranus]",0.67
+155,2021,"Elkhorn sea moss",0.67
 155,2021,"Elongate giant clam",0.7
 155,2021,"Fluted giant clam",0.7
 155,2021,"Giant clam",0.7
@@ -509,7 +509,7 @@
 163,2021,"Atlantic salmon",0.48
 163,2021,"Blue crab",0.61
 163,2021,"Blue mussel",0.67
-163,2021,"Brown seaweeds",0.79
+163,2021,"Brown seaweeds",0.67
 163,2021,"Butter clam",0.7
 163,2021,"Chinook(=Spring=King) salmon",0.68
 163,2021,"Clams, etc. nei",0.7
@@ -530,10 +530,10 @@
 163,2021,"Rainbow trout",0.67
 163,2021,"Red drum",0.67
 163,2021,"Sand gaper",0.68
-163,2021,"Seaweeds nei",0.79
+163,2021,"Seaweeds nei",0.67
 163,2021,"Whiteleg shrimp",0.7
 164,2021,"Cobia",0.68
-164,2021,"Eucheuma seaweeds nei",0.79
+164,2021,"Eucheuma seaweeds nei",0.67
 164,2021,"Whiteleg shrimp",0.68
 166,2021,"Cupped oysters nei",0.67
 166,2021,"Whiteleg shrimp",0.68
@@ -543,8 +543,8 @@
 167,2021,"Whitemouth croaker",0.46
 168,2021,"Whiteleg shrimp",0.68
 171,2021,"Cupped oysters nei",0.67
-171,2021,"Elkhorn sea moss",0.79
-171,2021,"Gracilaria seaweeds",0.79
+171,2021,"Elkhorn sea moss",0.67
+171,2021,"Gracilaria seaweeds",0.67
 171,2021,"Groupers nei",0.58
 171,2021,"Marine fishes nei",0.58
 171,2021,"Marine molluscs nei",0.68
@@ -563,7 +563,7 @@
 174,2021,"Rainbow trout",0.68
 174,2021,"Sea trout",0.46
 175,2021,"Blue mussel",0.67
-175,2021,"Brown seaweeds",0.79
+175,2021,"Brown seaweeds",0.67
 175,2021,"Clams, etc. nei",0.7
 175,2021,"European eel",0.53
 175,2021,"Rainbow trout",0.68
@@ -583,7 +583,7 @@
 177,2021,"Yellowtail amberjack",0.68
 179,2021,"Atlantic salmon",0.68
 179,2021,"Blue mussel",0.67
-179,2021,"Brown seaweeds",0.79
+179,2021,"Brown seaweeds",0.67
 179,2021,"Clams, etc. nei",0.7
 179,2021,"Coho(=Silver) salmon",0.68
 179,2021,"Common edible cockle",0.7
@@ -594,7 +594,7 @@
 179,2021,"Gilthead seabream",0.44
 179,2021,"Great Atlantic scallop",0.67
 179,2021,"Grooved carpet shell",0.7
-179,2021,"Harpoon seaweeds",0.79
+179,2021,"Harpoon seaweeds",0.67
 179,2021,"Japanese carpet shell",0.7
 179,2021,"Kuruma prawn",0.59
 179,2021,"Marine fishes nei",0.58
@@ -605,10 +605,10 @@
 179,2021,"Periwinkles nei",0.68
 179,2021,"Rainbow trout",0.68
 179,2021,"Sea trout",0.43
-179,2021,"Seaweeds nei",0.79
+179,2021,"Seaweeds nei",0.67
 179,2021,"Tuberculate abalone",0.68
 179,2021,"Turbot",0.68
-179,2021,"Wakame nei",0.79
+179,2021,"Wakame nei",0.67
 179,2021,"White seabream",0.44
 180,2021,"Atlantic cod",0.68
 180,2021,"Atlantic halibut",0.68
@@ -631,7 +631,7 @@
 181,2021,"Abalones nei",0.68
 181,2021,"Aquatic invertebrates nei",0.61
 181,2021,"Atlantic salmon",0.68
-181,2021,"Babberlocks",0.79
+181,2021,"Babberlocks",0.67
 181,2021,"Blue mussel",0.67
 181,2021,"European flat oyster",0.67
 181,2021,"Great Atlantic scallop",0.67
@@ -658,7 +658,7 @@
 182,2021,"European seabass",0.44
 182,2021,"Gastropods nei",0.68
 182,2021,"Gilthead seabream",0.44
-182,2021,"Gracilaria seaweeds",0.79
+182,2021,"Gracilaria seaweeds",0.67
 182,2021,"Great Atlantic scallop",0.67
 182,2021,"Greater amberjack",0.68
 182,2021,"Green crab",0.61
@@ -677,11 +677,11 @@
 182,2021,"Pod razor shell",0.68
 182,2021,"Pollack",0.68
 182,2021,"Queen scallop",0.67
-182,2021,"Sea belt",0.79
+182,2021,"Sea belt",0.67
 182,2021,"Sea mussels nei",0.67
 182,2021,"Seabasses nei",0.58
 182,2021,"Seabasses nei",0.44
-182,2021,"Seaweeds nei",0.79
+182,2021,"Seaweeds nei",0.67
 182,2021,"Senegalese sole",0.68
 182,2021,"Silversides(=Sand smelts) nei",0.58
 182,2021,"Soles nei",0.58
@@ -705,7 +705,7 @@
 183,2021,"Flat and cupped oysters nei",0.67
 183,2021,"Gilthead seabream",0.44
 183,2021,"Golden carpet shell",0.7
-183,2021,"Green seaweeds",0.79
+183,2021,"Green seaweeds",0.67
 183,2021,"Grooved carpet shell",0.7
 183,2021,"Marine fishes nei",0.58
 183,2021,"Marine molluscs nei",0.68
@@ -728,7 +728,7 @@
 184,2021,"Flathead grey mullet",0.58
 184,2021,"Giant tiger prawn",0.68
 184,2021,"Gilthead seabream",0.44
-184,2021,"Gracilaria seaweeds",0.79
+184,2021,"Gracilaria seaweeds",0.67
 184,2021,"Grooved carpet shell",0.7
 184,2021,"Japanese carpet shell",0.7
 184,2021,"Kuruma prawn",0.68
@@ -765,12 +765,12 @@
 196,2021,"Mullets nei",0.58
 196,2021,"Penaeus shrimps nei",0.68
 196,2021,"Snappers nei",0.58
-202,2021,"Elkhorn sea moss",0.79
-202,2021,"Eucheuma seaweeds nei",0.79
+202,2021,"Elkhorn sea moss",0.67
+202,2021,"Eucheuma seaweeds nei",0.67
 202,2021,"Giant tiger prawn",0.68
 202,2021,"Indo-Pacific swamp crab",0.61
 202,2021,"Milkfish",0.58
-202,2021,"Spiny eucheuma",0.79
+202,2021,"Spiny eucheuma",0.67
 203,2021,"Barramundi(=Giant seaperch)",0.68
 203,2021,"Giant tiger prawn",0.22
 203,2021,"Green mussel",0.67
@@ -778,7 +778,7 @@
 203,2021,"Indian white prawn",0.25
 203,2021,"Marine fishes nei",0.58
 203,2021,"Orange mud crab",0.61
-203,2021,"Red seaweeds",0.79
+203,2021,"Red seaweeds",0.67
 203,2021,"Whiteleg shrimp",0.37
 204,2021,"Giant tiger prawn",0.5
 204,2021,"Indian white prawn",0.5
@@ -788,7 +788,7 @@
 204,2021,"Speckled shrimp",0.5
 205,2021,"Aquatic invertebrates nei",0.61
 205,2021,"Barramundi(=Giant seaperch)",0.68
-205,2021,"Elkhorn sea moss",0.79
+205,2021,"Elkhorn sea moss",0.67
 205,2021,"Giant tiger prawn",0.77
 205,2021,"Groupers nei",0.58
 205,2021,"Indo-Pacific swamp crab",0.61
@@ -798,7 +798,7 @@
 206,2021,"Blood cockle",0.7
 206,2021,"Broad geloina",0.7
 206,2021,"Cupped oysters nei",0.67
-206,2021,"Elkhorn sea moss",0.79
+206,2021,"Elkhorn sea moss",0.67
 206,2021,"Fourfinger threadfin",0.58
 206,2021,"Giant tiger prawn",0.38
 206,2021,"Green mussel",0.67
@@ -809,14 +809,14 @@
 206,2021,"Milkfish",0.58
 206,2021,"Snappers nei",0.58
 206,2021,"Snubnose pompano",0.68
-206,2021,"Spiny eucheuma",0.79
+206,2021,"Spiny eucheuma",0.67
 206,2021,"Tropical spiny lobsters nei",0.61
 206,2021,"Whiteleg shrimp",0.39
 207,2021,"Banana prawn",0.43
 207,2021,"Cobia",0.68
-207,2021,"Elkhorn sea moss",0.79
+207,2021,"Elkhorn sea moss",0.67
 207,2021,"Giant tiger prawn",0.46
-207,2021,"Gracilaria seaweeds",0.79
+207,2021,"Gracilaria seaweeds",0.67
 207,2021,"Indian white prawn",0.43
 207,2021,"Indo-Pacific swamp crab",0.61
 207,2021,"Marine fishes nei",0.58
@@ -853,21 +853,21 @@
 209,2021,"Aquatic invertebrates nei",0.61
 209,2021,"Barramundi(=Giant seaperch)",0.68
 209,2021,"Blood cockle",0.7
-209,2021,"Brown seaweeds",0.79
+209,2021,"Brown seaweeds",0.67
 209,2021,"Cobia",0.68
 209,2021,"Cupped oysters nei",0.67
-209,2021,"Dark green nori",0.79
-209,2021,"Eucheuma seaweeds nei",0.79
+209,2021,"Dark green nori",0.67
+209,2021,"Eucheuma seaweeds nei",0.67
 209,2021,"Fleshy prawn",0.46
-209,2021,"Fusiform sargassum",0.79
+209,2021,"Fusiform sargassum",0.67
 209,2021,"Giant tiger prawn",0.68
 209,2021,"Goldlined seabream",0.53
-209,2021,"Gracilaria seaweeds",0.79
+209,2021,"Gracilaria seaweeds",0.67
 209,2021,"Green mud crab",0.61
 209,2021,"Groupers nei",0.58
 209,2021,"Japanese carpet shell",0.7
-209,2021,"Japanese isinglass",0.79
-209,2021,"Japanese kelp",0.79
+209,2021,"Japanese isinglass",0.67
+209,2021,"Japanese kelp",0.67
 209,2021,"Japanese sea cucumber",0.61
 209,2021,"Jellyfishes nei",0.61
 209,2021,"Kuruma prawn",0.46
@@ -876,7 +876,7 @@
 209,2021,"Marine crabs nei",0.61
 209,2021,"Marine fishes nei",0.58
 209,2021,"Marine molluscs nei",0.68
-209,2021,"Nori nei",0.79
+209,2021,"Nori nei",0.67
 209,2021,"Pearl oyster shells nei",0.68
 209,2021,"Pen shells nei",0.68
 209,2021,"Penaeus shrimps nei",0.46
@@ -894,7 +894,7 @@
 209,2021,"Snubnose pompano",0.68
 209,2021,"Tiger pufferfish",0.58
 209,2021,"Turbot",0.68
-209,2021,"Wakame",0.79
+209,2021,"Wakame",0.67
 209,2021,"Whiteleg shrimp",0.26
 210,2021,"Aquatic invertebrates nei",0.61
 210,2021,"Bastard halibut",0.58
@@ -907,9 +907,9 @@
 210,2021,"Gazami crab",0.61
 210,2021,"Japanese amberjack",0.11
 210,2021,"Japanese jack mackerel",0.11
-210,2021,"Japanese kelp",0.79
+210,2021,"Japanese kelp",0.67
 210,2021,"Kuruma prawn",0.62
-210,2021,"Laver (Nori)",0.79
+210,2021,"Laver (Nori)",0.67
 210,2021,"Marine crustaceans nei",0.61
 210,2021,"Marine fishes nei",0.58
 210,2021,"Octopuses, etc. nei",0.61
@@ -917,13 +917,13 @@
 210,2021,"Pacific cupped oyster",0.67
 210,2021,"Pearl oyster shells nei",0.68
 210,2021,"Red oyas",0.61
-210,2021,"Seaweeds nei",0.79
+210,2021,"Seaweeds nei",0.67
 210,2021,"Spiny lobsters nei",0.61
 210,2021,"Tiger pufferfish",0.58
-210,2021,"Wakame",0.79
+210,2021,"Wakame",0.67
 210,2021,"White trevally",0.11
 210,2021,"Yesso scallop",0.67
-212,2021,"Eucheuma seaweeds nei",0.79
+212,2021,"Eucheuma seaweeds nei",0.67
 212,2021,"Milkfish",0.58
 214,2021,"European seabass",0.07
 214,2021,"Gilthead seabream",0.06
@@ -935,9 +935,9 @@
 216,2021,"Akiami paste shrimp",0.59
 216,2021,"Banana prawn",0.32
 216,2021,"Barramundi(=Giant seaperch)",0.68
-216,2021,"Eucheuma seaweeds nei",0.79
+216,2021,"Eucheuma seaweeds nei",0.67
 216,2021,"Giant tiger prawn",0.31
-216,2021,"Gracilaria seaweeds",0.79
+216,2021,"Gracilaria seaweeds",0.67
 216,2021,"Groupers nei",0.58
 216,2021,"Indo-Pacific swamp crab",0.61
 216,2021,"Marine fishes nei",0.58
@@ -946,7 +946,7 @@
 216,2021,"Mullets nei",0.58
 216,2021,"Penguin wing oyster",0.68
 216,2021,"Portunus swimcrabs nei",0.61
-216,2021,"Red seaweeds",0.79
+216,2021,"Red seaweeds",0.67
 216,2021,"Sea cucumbers nei",0.61
 216,2021,"Tropical spiny lobsters nei",0.61
 216,2021,"Whiteleg shrimp",0.34
@@ -971,7 +971,7 @@
 223,2021,"Atlantic cod",0.68
 223,2021,"Atlantic halibut",0.68
 223,2021,"Atlantic salmon",0.27
-223,2021,"Babberlocks",0.79
+223,2021,"Babberlocks",0.67
 223,2021,"Blue mussel",0.67
 223,2021,"Chars nei",0.58
 223,2021,"European flat oyster",0.67
@@ -980,7 +980,7 @@
 223,2021,"Marine crustaceans nei",0.61
 223,2021,"Rainbow trout",0.68
 223,2021,"Scallops nei",0.67
-223,2021,"Sea belt",0.79
+223,2021,"Sea belt",0.67
 224,2021,"Atlantic salmon",0.36
 224,2021,"Chilean mussel",0.67
 224,2021,"Chinook(=Spring=King) salmon",0.68
@@ -988,15 +988,15 @@
 224,2021,"Choro mussel",0.67
 224,2021,"Coho(=Silver) salmon",0.38
 224,2021,"Flat oysters nei",0.68
-224,2021,"Giant kelp",0.79
-224,2021,"Gracilaria seaweeds",0.79
+224,2021,"Giant kelp",0.67
+224,2021,"Gracilaria seaweeds",0.67
 224,2021,"Japanese abalone",0.68
 224,2021,"Pacific cupped oyster",0.67
 224,2021,"Rainbow trout",0.38
 224,2021,"Red abalone",0.68
 224,2021,"Scallops nei",0.67
 224,2021,"Turbot",0.68
-231,2021,"Eucheuma seaweeds nei",0.79
+231,2021,"Eucheuma seaweeds nei",0.67
 231,2021,"Milkfish",0.58
 231,2021,"Penaeus shrimps nei",0.55
 232,2021,"Common dentex",0.68

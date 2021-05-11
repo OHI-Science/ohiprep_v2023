@@ -65,6 +65,7 @@ library(tidyverse)
 library(taxize)
 library(knitr)
 library(kableExtra)
+library(here)
 
 ## Load FAO-specific user-defined functions
 source('mar_fxs.R') # functions specific to mariculture dealing with compound countries
@@ -634,7 +635,7 @@ Steps:
  2. Group by georegion and family and summarise to get mean sustainability and escapes values (gapfilled by georegion/family)
  3. Group by family to get mean sustainability and escapes values (global family gapfilled)
  4. Gapfill by average of the taxon_code to get mean sustainability and escapes values (taxon_group gapfilled)
- 5. Assign any Algae with the seaweeds score from SFW data (7.92 for sustainability, 4 for escapes)
+ 5. Assign any Algae with the seaweeds score from SFW data (6.72 for sustainability, 4 for escapes)
  6. Apply the global average to any remaining sustainability and escapes score NAs 
 
 ```{r sw-sus-gapfill-missing, eval = FALSE}
@@ -650,8 +651,8 @@ mar_sw_sus_final = mar_sw_sus %>%
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_fam_sust, "family_avg", gapfill_sus)) %>% ## Add in family gapfill record
   mutate(Sust = ifelse(is.na(Sust), avg_taxon_code_sust, Sust)) %>%
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_taxon_code_sust, "taxon_group_avg", gapfill_sus)) %>%
-  mutate(Sust = ifelse(Taxon_code == "AL", 7.92, Sust)) %>% ## assign any algae with the SFW seaweed score (7.92)
-  mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == 7.92, "seaweed_score", gapfill_sus)) %>%
+  mutate(Sust = ifelse(Taxon_code == "AL", 6.72, Sust)) %>% ## assign any algae with the SFW seaweed score (7.92)
+  mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == 6.72, "seaweed_score", gapfill_sus)) %>%
   mutate(Sust = ifelse(is.na(Sust), avg_global, Sust)) %>% 
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_global, "global_avg", gapfill_sus)) %>%
   
@@ -920,37 +921,40 @@ plot(yield$old_value, yield$value)
 tmp_old <- read.csv("../v2020/output/mar_sustainability.csv") %>% 
   select(rgn_id, taxa_code, sust_old = sust_coeff)
   
-  tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
+tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
 
-
-  
 tmp_new <- read.csv("int/mar_sustainability_check.csv") %>% 
   select(rgn_id, species, sust_new = sust_coeff)
 
 test <- tmp_new %>% 
-  full_join(tmp_old, by=c("rgn_id", "species"))
+  full_join(tmp_old, by=c("rgn_id", "species")) %>%
+  mutate(difference = sust_new - sust_old)
 View(test)
 
 plot(test$sust_old, test$sust_new);abline(0,1,col="red")
 
 
-## Compare new/old Mariculture sustainability scores for Egypt
+## Compare new/old Mariculture sustainability scores for Bosnia
 tmp_old <- read.csv("../v2020/output/mar_sustainability.csv") %>% 
   select(rgn_id, taxa_code, sust_old = sust_coeff) %>%
-  filter(rgn_id == 214) 
+  filter(rgn_id == 232) 
   tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
 
 
   
 tmp_new <- read.csv("int/mar_sustainability_check.csv") %>% 
   select(rgn_id, species, sust_new = sust_coeff) %>% 
-  filter(rgn_id == 214)
+  filter(rgn_id == 232)
 
 test <- tmp_new %>% 
   full_join(tmp_old, by=c("rgn_id", "species"))
 View(test)
 
 plot(test$sust_old, test$sust_new);abline(0,1,col="red")
+## now look at bosnia production 
+mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
+  filter(rgn_id == 232, year == 2019) %>% 
+  select(rgn_id, species, fao, value)
 
 
 ## Compare new/old Mariculture sustainability scores for Greece
@@ -992,11 +996,11 @@ plot(compare$prs_score_old, compare$pressure_score);abline(0,1,col="red")
 
 ## Compare genetic escapes pressure scores for Vietnam; no change in pressures between 2021 and 2020 assessment years.
 old <- read.csv("../v2020/output/GenEsc.csv") %>%
-  filter(rgn_id == 207) %>% 
+  filter(rgn_id == 232) %>% 
   select(rgn_id, year, prs_score_old=pressure_score)
 
 new <- read.csv("../v2021/output/GenEsc.csv") %>%
-  filter(rgn_id == 207) %>% 
+  filter(rgn_id == 232) %>% 
   select(rgn_id, year, pressure_score)
 
 compare <- full_join(old, new, by=c("rgn_id","year")); View(compare)
