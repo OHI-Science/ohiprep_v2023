@@ -285,7 +285,7 @@ These data describe the sustainability country/species combinations. In cases wh
 
 ```{r sw-scores, eval = FALSE}
 ## Load in Seafood Watch sustainability scores data from mazu:
-sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2020/Seafood-Watch_aquaculture-recs_July-2020.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2021/Seafood-Watch_aquaculture-recs_May-2021.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 head(sw_sus)
 ```
 
@@ -298,68 +298,78 @@ Rename columns to match with MAR data and fill in species column
 ```{r tidy_sw-sus, eval = FALSE}
 ## Rename columns
 sw_sus <- sw_sus %>%
-  rename(report_title = 'Report Title',
-         start_year = 'Start year',
-         sw_species = 'Common name',
+  rename(report_title = 'ReportTitle',
+         published_date = 'PublishedDate',
+         sw_species = 'CommonNames',
          genus = 'Genus',
          spp = 'Species',
-         fao_species = 'FAO Common name',
-         region = 'Region',
-         country = 'Country',
-         state_territory = 'State/Territory',
-         sub_region = 'Sub-Region',
-         water_body = 'Body of Water',
-         parent_method = 'Parent Method',
-         method = 'Method',
+         fao_species = 'FAOCommonName',
+         fda_species = 'FDACommonName',
+         water_body = 'BOWs',
+         country = 'Countries',
+         state_territory = 'CountrySubs',
+         method = 'Methods',
          score = 'Overall Score',
-         escapes_score = 'AqCriteria6',
+         escapes_score = 'C6Score',
          rec = 'Overall Recommendation'
          ) %>% 
-  dplyr::select(report_title, start_year, sw_species, genus, spp, fao_species, region, country, state_territory, sub_region, water_body, parent_method, method, escapes_score, score, rec)
+  dplyr::select(report_title, published_date, sw_species, genus, spp, fao_species, fda_species, country, state_territory, water_body, method, escapes_score, score, rec)
+
 ## Change species names using FAO species name (fao_species); if NA, use common name (sw_species)
 sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$sw_species)
+
 ```
 
 ### Keep NA countries
 
 ```{r keep-na-countries_sw-sus, eval = FALSE}
 ## These need to be re-added later (get cut when associated with region ids)
-sw_sus_no_rgn <- filter(sw_sus, is.na(country))
-  # 203 entries with no country
+sw_sus_no_rgn <- filter(sw_sus, is.na(country)|country == "Worldwide")
+  # 118 entries with no country
 ```
 
 ### Convert country names to OHI region IDs.
 
 ```{r sw-sus_convert-region, eval = FALSE}
 ## Change country names to match OHI region names
-sw_sus <- sw_sus %>% 
-  mutate(country = ifelse(country=="Korea, the Republic of", "South Korea", country)) %>% # Data removed for not having a match; change name to match
-  mutate(country = ifelse(country=="United Kingdom of Great Britain and Northern Ireland (the)", "United Kingdom", country))  # Data removed for not having a match; change name to match
+sw_sus_multiple <- sw_sus %>% 
+  filter(str_detect(country, "\\|")) %>%
+  separate_rows(country, sep = " \\| ")
+
+sw_sus_df <- sw_sus %>%
+  filter(!str_detect(country, "\\|")) %>%
+  rbind(sw_sus_multiple) %>%
+  filter(!is.na(country), country!="Worldwide")
+  
+
 ## Convert country names to OHI region IDs. (ohicore/R/name_2_rgn.R)
-sw_sus_rgn <- name_2_rgn(df_in = sw_sus, 
+sw_sus_rgn <- name_2_rgn(df_in = sw_sus_df, 
                        fld_name='country', 
-                       flds_unique=c('fao_species', 'sw_species', 'region', 'score'),
+                       flds_unique=c('fao_species', 'fda_species', 'sw_species', 'score'),
                        keep_fld_name = TRUE) # 'country' now shows the original Seafood Watch data name; 'rgn_name' is what we want to use from now on
-  # Goes from 330 obs. to 127 obs. (because 203 obs. have no country associated)
+
 ## Re-add NA countries
 sw_sus_rgn <- bind_rows(sw_sus_rgn, sw_sus_no_rgn) %>%
   unique()
-  # Back to 330 obs.
+  # Back to 254 obs.
 ```
 
 
 **Join the seaweed sustainability data with the mariculture data**
 ```{r sw-fao-joining, eval = FALSE}
+maric <- read_csv("int/np_seaweeds_tonnes_weighting.csv")
+
+
 mar_sw_sus <- maric %>%
   left_join(sw_sus_rgn, by = c("species", "rgn_id")) %>%
-  dplyr::select(rgn_id, year, species, Taxon_code, species_code, score, tonnes, gap_0_fill )
+  dplyr::select(rgn_id, year, species, Taxon_code, species_code, score, tonnes, gap_0_fill ) ## none of the specific species match
 ```
 
 
 **Since there are no sustainability scores for any of the species listed, we will gapfill with the seafood watch "Seaweed (Global)" score, which is 7.92.**
 ```{r}
 mar_sw_sus <- mar_sw_sus %>%
-  mutate(Sust = round(7.92/10,2)) %>%
+  mutate(Sust = round(6.72/10,2)) %>% ## since none of the species match, we will give the general worldwide seaweed score from seafood watch (6.72)
   dplyr::select(-score)
 ```
 
