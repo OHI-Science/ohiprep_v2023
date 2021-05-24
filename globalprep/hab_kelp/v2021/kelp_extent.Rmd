@@ -29,6 +29,9 @@ This is an entirely new layer for the 2021 assessment!
 ***
 ## Data Source 
 
+**Reference**: Jayathilake, D.R.M., Costello, M.J., 2020. A modelled global distribution of the kelp biome. Biological Conservation 252, 108815. https://doi.org/10.1016/j.biocon.2020.108815
+
+
 **Downloaded**: 04/28/2021 
 
 **Description**:  
@@ -124,8 +127,14 @@ print(sum(zonal_sums_km2$km2)) # 1394773
 
 write.csv(zonal_sums_km2, file.path(here("globalprep/hab_kelp/v2021/data/habitat_extent_kelp.csv")), row.names = FALSE)
 
+## make gapfilling file
 
+kelp_extent_gf <- read_csv(file.path(dir_git, "data/habitat_extent_kelp.csv")) %>%
+  mutate(variable = "extent") %>%
+  dplyr::select(-km2, -year) %>%
+  mutate(gap_fill = 0)
 
+write.csv(kelp_extent_gf, file.path(dir_git, "data/extent_kelp_gf.csv"), row.names = FALSE)
 ```
 
 

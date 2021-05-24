@@ -27,10 +27,9 @@ Using a new dataset from global mangrove watch so we are going to gapfill the ne
 ***
 ## Data Source 
 
-**Downloaded**: 
+**Reference**: United Nations, 2007. The world’s mangroves 1980-2005. FAO Forestry Paper 153.
 
-**Description**:  
-
+**Description**: "The world’s mangroves 1980–2005 was prepared in collaboration with mangrove specialists throughout the world and was cofunded by the International Tropical Timber Organization (ITTO). It builds on a 1980 assessment by FAO and the United Nations Environment Programme (UNEP), on the FAO Global Forest Resources Assessment 2000 (FRA 2000) and 2005 (FRA 2005), and on an extensive literature search and communication with mangrove and forest resources assessment specialists."
 
 **Time range**: 1980 - 2005
 
@@ -43,7 +42,7 @@ First we need to download the raw data from the [FAO forestry paper](http://www.
 The health will be calculated as followed: 
 "Mangrove condition was defined as the current cover divided by reference cover. FAO mangrove area data was provided on a country basis for 1980, 1990, 2000, and 2005. Current condition is based on 2005 cover, and reference condition is based on the 1980 cover."
 
-Then for those countries which have extent data, but no health data, we will gapfilled based on georegion. 
+Then for those countries which have extent data, but no health data, we will gapfill based on georegion. 
 
 
 ## Setup

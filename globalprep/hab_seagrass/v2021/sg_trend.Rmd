@@ -36,11 +36,55 @@ ohi_rasters()
 
 ```
 
+# Summary
+
+This script generates the trend of kelp for each OHI region for the latest year of data. We do this using trend data from Krumhansl et al. 2016, which calculated regional kelp trend values using Bayesian hierarchical linear models. We extract these trends per the Marine Ecoregions of the World (MEOW), and a take weighted area mean to get final trends per region represented in the paper. We then gapfill the remaining areas with kelp extent but no trends with georegional averages. 
+
+
+## Updates from previous assessment
+We now calculate 
+
+
+***
+## Data Sources
+
+**Reference**: Waycott, M., Duarte, C.M., Carruthers, T.J.B., Orth, R.J., Dennison, W.C., Olyarnik, S., Calladine, A., Fourqurean, J.W., Heck, K.L., Hughes, A.R., Kendrick, G.A., Kenworthy, W.J., Short, F.T., Williams, S.L., 2009. Accelerating loss of seagrasses across the globe threatens coastal ecosystems. PNAS 106, 12377–12381. https://doi.org/10.1073/pnas.0905620106
+
+**Description**: Contains data regarding the trends of seagrasses since 1879. 
+
+**Time range**: 1879 - 2007
+
+
+
+**Reference**: Short, F.T., Polidoro, B., Livingstone, S.R., Carpenter, K.E., Bandeira, S., Bujang, J.S., Calumpong, H.P., Carruthers, T.J.B., Coles, R.G., Dennison, W.C., Erftemeijer, P.L.A., Fortes, M.D., Freeman, A.S., Jagtap, T.G., Kamal, A.H.M., Kendrick, G.A., Judson Kenworthy, W., La Nafie, Y.A., Nasution, I.M., Orth, R.J., Prathep, A., Sanciangco, J.C., Tussenbroek, B. van, Vergara, S.G., Waycott, M., Zieman, J.C., 2011. Extinction risk assessment of the world’s seagrass species. Biological Conservation 144, 1961–1971. https://doi.org/10.1016/j.biocon.2011.04.010
+
+**Description**: Contains general population trends of seagrass species.
+
+**Time range**: 2011
+
+
+
+**Reference**: IUCN 2020. The IUCN Red List of Threatened Species. Version 2020-3. <http://www.iucnredlist.org>. 
+
+Shapefiles available from: https://www.iucnredlist.org/resources/spatial-data-download
+
+**Downloaded**: Feb 1, 2021
+
+**Description**: Shapefiles containing the species distribution of seagrass.
+
+
+
+
+# Methods
+
+We will use data from Short et al. 2011, Waycott et al. 2009, and the IUCN 2020 to determine the trends of seagrass for our OHI regions. First, we determine the population trends for seagrasses (increasing, stable, decreasing), based on Short and IUCN data. Then we replace the population trends with numerical values from Waycott et al. 2009. Following we gapfill missing trends first by species family average, and then by the global average if there is no species family average. Then, we calculate the trend per OHI region using a species distribution weighted mean. The final round of gapfilling we gapfill any region that has extent data but no trend data by the georegional average. 
+
+
 ## Use IUCN species maps, Short et al. 2011, and Waycott et al. 2009
 
 This is basically recreating the analysis done in Short et al. 2011: https://www.researchgate.net/publication/235433892_Extinction_Risk_Assessment_of_the_World's_Seagrass_Species
 
- 1. Use the IUCN maps to map the location of all species of seagrass (similar to the Short paper). Then: use Table 2 in Waycott to see whether species are increasing/decreasing. We gapfill the iucn population trend data with short data and vice versa when it is missing in the table. 
+ 1. Use the IUCN maps to map the location of all species of seagrass (similar to the Short paper). We gapfill the iucn population trend data with short data and vice versa when it is missing in the IUCN data. 
 
  2. Then: we replace stable species with 0, increasing with 0.0845, and decreasing with -0.0767. These numbers come from Table S2 in Waycott et al. 2009: https://www.pnas.org/content/pnas/suppl/2009/07/08/0905620106.DCSupplemental/ST2_PDF.pdf
  
@@ -280,7 +324,7 @@ write.csv(zonal_combined_area_trends, "int/seagrass_trends_distributions_area_fi
 ```
 
 ## Step 5
-Calculate the trend using an species distribution area weighted mean. Create a gapfilling flag based on the proportion of species trends that are gapfilled within a region. 
+Calculate the trend using an area weighted mean per each region. Create a gapfilling flag based on the proportion of species trends that are gapfilled within a region. 
 
 ```{r}
 ## now lets calculate the trend based on a area weighted average

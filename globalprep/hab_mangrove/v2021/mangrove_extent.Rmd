@@ -29,6 +29,8 @@ Using a new dataset from global mangrove watch.
 ***
 ## Data Source 
 
+**Reference**: Bunting, P., Rosenqvist, A., Lucas, R., Rebelo, L.-M., Hilarides, L., Thomas, N., Hardy, A., Itoh, T., Shimada, M., Finlayson, C., 2018. The Global Mangrove Watch—A New 2010 Global Baseline of Mangrove Extent. Remote Sensing 10, 1669. https://doi.org/10.3390/rs10101669
+
 **Downloaded**: 03/09/2021
 
 **Description**:  

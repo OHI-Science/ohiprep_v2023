@@ -48,11 +48,6 @@ Made a slight change to the calc_area function by moving the `ungroup()` step on
 Got rid of ggplotly funtion, simply called the comparison graph
 
 
-2019
-Using updated April 2019 data. 
-Implementing here() for filepaths not in Mazu.
-Changed the code to calculate zonal statistics. No longer using the "mcapply()" function to calculate each lsp_crosstab(). Updated to calculate each zonal statistic df individually. 
-
 ***
 
 # Data Source
