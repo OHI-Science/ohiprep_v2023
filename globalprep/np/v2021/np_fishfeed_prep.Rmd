@@ -24,7 +24,7 @@ This script takes the Watson 2020 catch data, a list of fish oil/fish meal (FOFM
 
 ## Updates from previous assessment
 
-This is brand new to the 2020 assessment. Previously we used FAO commodities export data set, but we refined our approach with actual catch tonnes, instead of export tonnes. 
+No methods updates. Just updated RAM data.
 
 ***
 
@@ -56,9 +56,9 @@ This is brand new to the 2020 assessment. Previously we used FAO commodities exp
 **Format**:  CSV format
 
 
-**Reference**: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.491
+**Reference**: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.495
 
-**Downloaded**: 06/10/2020
+**Downloaded**: 06/03/2021
 
 **Description**: B/Bmsy value by stock and year (other data, which we do not use, are also available in the database)
 
@@ -70,7 +70,7 @@ This is brand new to the 2020 assessment. Previously we used FAO commodities exp
 
 **Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here. 
 
-* DOI: 10.5281/zenodo.2542919
+
 ***
 
 ## Setup
@@ -82,6 +82,7 @@ knitr::opts_chunk$set(eval=FALSE)
 library(here)
 library(tidyverse)
 source(here('workflow/R/common.R'))
+setwd(here())
 
 ```
 
@@ -112,16 +113,16 @@ Get the list of forage fish used for FOFM:
 ```{r, eval=FALSE}
 
 ## Read in Froehlich list of forage fish species
-forage <- read_csv(file.path(here(), "globalprep/np/v2020/raw/msleckman.61.1-CatchMSY_Nis_FAOAreas.csv"))
+forage <- read_csv(file.path(here(), "globalprep/np/v2021/raw/msleckman.61.1-CatchMSY_Nis_FAOAreas.csv"))
 sort(unique(forage$Species)) #238 forage fish groups listed
 
 ## Compare this with Watson list of species (IDed forage fish by hand). For future assessments this will just be "globalprep/fis/v2020/int/watson_taxon_key_vyyyy.csv"
-watson_v3 <- read_csv(file.path(here(), "globalprep/np/v2020/raw/Codes_taxa.csv"))
+watson_old <- read_csv(file.path(here(), "globalprep/fis/v2020/int/watson_taxon_key_v2020.csv"))
 sort(setdiff(forage$Species, watson_v3$TaxonName))
 sort(setdiff(watson_v3$TaxonName[watson_v3$forage_fish %in% 1], forage$Species))
 
 
-watson_v5 <- read_csv(file.path(here(), "globalprep/fis/v2020/int/watson_taxon_key_v2020.csv")) %>%
+watson_v5 <- read_csv(file.path(here(), "globalprep/fis/v2021/int/watson_taxon_key_v2021.csv")) %>%
   dplyr::select(1:3)
 
 sort(setdiff(watson_v5$TaxonName, watson_v3$TaxonName))
@@ -129,14 +130,14 @@ sort(setdiff(watson_v3$TaxonName, watson_v5$TaxonName))
 
 ## Combine old and new watson list: 
 watson_combine <- watson_v5 %>%
-  left_join(watson_v3, by = c("Taxonkey" = "TaxonKey", "TaxonName", "CommonName"))
+  left_join(watson_old, by = c("Taxonkey", "TaxonName", "CommonName"))
 
 sort(setdiff(watson_combine$TaxonName, watson_v3$TaxonName))
 
 write.csv(watson_combine, "int/watson_new.csv", row.names = FALSE) ## now we will correct the forage fish column by hand. Just look at what species differ from v5 to v3, and look them up to see if they should be classified as forage fish. 
 
 ## read in the corrected dataset
-watson_new_corr <- read_csv(file.path(here(), "globalprep/np/v2020/int/watson_new_corr.csv"))
+watson_new_corr <- read_csv(file.path(here(), "globalprep/np/v2021/int/watson_new_corr.csv"))
 
 sort(setdiff(forage$Species, watson_new_corr$TaxonName))
 sort(setdiff(watson_new_corr$TaxonName[watson_new_corr$forage_fish %in% 1], forage$Species))
@@ -148,13 +149,13 @@ missing <- setdiff(foragefish_list$forage_fish, watson_new_corr$TaxonName)
 foragefish_list <- foragefish_list %>%
   mutate(inWatson = ifelse(forage_fish %in% missing, NA, "yes")) ## 281 species
 
-write.csv(foragefish_list, here("globalprep/np/v2020/int/master_taxa_list_v5.csv"), row.names=FALSE)
+write.csv(foragefish_list, here("globalprep/np/v2021/int/master_taxa_list_v5.csv"), row.names=FALSE)
 
 ```
 
 ## Read in v2020 catch data 
 ```{r}
-file <- file.path(dir_M,'git-annex/globalprep/fis/v2020/int/stock_catch_by_rgn_taxa.csv')
+file <- file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_taxa.csv')
 
 catch <- read_csv(file) %>%
   rename(common = CommonName, fao_id = fao_rgn, species=TaxonName)
@@ -176,7 +177,7 @@ catch <- catch %>%
 ```{r}
 ## need to get TaxonKey's for each species to join with catch
 
-foragefish_list <- read_csv(file.path("globalprep/np/v2020/int/master_taxa_list.csv"))
+foragefish_list <- read_csv(here("globalprep/np/v2021/int/master_taxa_list_v5.csv"))
 
 forage_fish_taxa_list <- foragefish_list %>%
   left_join(catch, by = c("forage_fish" = "species")) %>%
@@ -187,14 +188,14 @@ forage_fish_taxa_list <- foragefish_list %>%
 forage_fish_no_watson <- forage_fish_taxa_list %>%
   filter(is.na(Taxonkey))
 
-write.csv(forage_fish_no_watson, file.path(here(), "globalprep/np/v2020/int/forage_fish_not_in_watson.csv"), row.names = FALSE)
+write.csv(forage_fish_no_watson, file.path(here(), "globalprep/np/v2021/int/forage_fish_not_in_watson.csv"), row.names = FALSE)
 
 ## now join with catch data set 
 catch_fishfeed <- catch %>%
   left_join(forage_fish_taxa_list, by = c("Taxonkey")) %>%
   dplyr::filter(!is.na(forage_fish))
 
-write.csv(catch_fishfeed, file.path(here(), "globalprep/np/v2020/int/watson_catch_forage_fish.csv"), row.names = FALSE)
+write.csv(catch_fishfeed, file.path(here(), "globalprep/np/v2021/int/watson_catch_forage_fish.csv"), row.names = FALSE)
 ```
 
 # Step 2 
@@ -204,7 +205,7 @@ write.csv(catch_fishfeed, file.path(here(), "globalprep/np/v2020/int/watson_catc
 Justification from the [Froelich et al. 2018](https://www.nature.com/articles/s41893-018-0077-1#Sec11): "Currently, it is estimated about 10% of forage fish enter the human diet directly, but the notoriously tiny-boned fish are labour intensive (thus expensive) to process for human consumption, are the foundation of several industries and thus jobs (creating inertia to change) and are not the preferred fish type for most people."
 
 ```{r}
-catch_fishfeed <- read_csv(file.path(here(),"globalprep/np/v2020/int/watson_catch_forage_fish.csv"))
+catch_fishfeed <- read_csv(file.path(here(),"globalprep/np/v2021/int/watson_catch_forage_fish.csv"))
 
 catch_non_human <- catch_fishfeed %>% 
   mutate(tons_non_human = tons*0.9)
@@ -249,7 +250,7 @@ mean_catch_FOFM <- mean_catch %>%
   data.frame() %>%
   rename(catch = catch_non_human)
 
-write.csv(mean_catch_FOFM,  file.path(here(), "globalprep/np/v2020/int/mean_catch_FOFM.csv"), row.names = FALSE)
+write.csv(mean_catch_FOFM,  file.path(here(), "globalprep/np/v2021/int/mean_catch_FOFM.csv"), row.names = FALSE)
 ```
 
 
@@ -258,9 +259,9 @@ write.csv(mean_catch_FOFM,  file.path(here(), "globalprep/np/v2020/int/mean_catc
 ## Join with the final B/Bmsy layer from the fis model, convert the B/Bmsy values to scores (this is done in functions.R for FIS subgoal, but we do it in the dataprep for NP), apply the underharvest penalty, and take a catch weighted average of B/Bmsy scores for each region/year.
 
 ```{r}
-fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2020/output/fis_bbmsy.csv"))
+fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2021/output/fis_bbmsy.csv"))
 
-catch_FOFM <- read_csv(file.path(here(), "globalprep/np/v2020/int/mean_catch_FOFM.csv")) 
+catch_FOFM <- read_csv(file.path(here(), "globalprep/np/v2021/int/mean_catch_FOFM.csv")) 
 
 
   # The following stocks are fished in multiple regions and often have high b/bmsy values
@@ -380,7 +381,7 @@ b <- b %>%
            gapfilled,
            method) 
   
-  write.csv(gap_fill_data, here('globalprep/np/v2020/output/NP_bbmsy_summary_gf.csv'), row.names = FALSE)
+  write.csv(gap_fill_data, here('globalprep/np/v2021/output/NP_bbmsy_summary_gf.csv'), row.names = FALSE)
   
   score_data <- data_fis_gf %>%
     dplyr::select(rgn_id, stock_id, year, catch, score)
@@ -403,6 +404,11 @@ b <- b %>%
 
 summary(score_data)
 
-write.csv(score_data, here('globalprep/np/v2020/output/np_fofm_scores.csv'), row.names = FALSE)
+write.csv(score_data, here('globalprep/np/v2021/output/np_fofm_scores.csv'), row.names = FALSE)
+
+
+old <- read_csv(here('globalprep/np/v2020/output/np_fofm_scores.csv')) 
+
+plot(score_data$score, old$score) # some changes
 
 ```
