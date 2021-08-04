@@ -275,7 +275,7 @@ summary(d_stand_rgn) # no NAs
 gdppcppp_data <- d_stand_rgn %>%
   select(rgn_id, year, value)
 
-write_csv(gdppcppp_data, here("globalprep/ao/v2020/intermediate/gdppcppp_ohi.csv"))
+write_csv(gdppcppp_data, here("globalprep/ao/v2021/intermediate/gdppcppp_ohi.csv"))
 
 ```
 
