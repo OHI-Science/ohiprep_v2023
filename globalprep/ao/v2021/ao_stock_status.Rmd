@@ -1,0 +1,168 @@
+---
+title: 'OHI 2021 - Artisanal Opportunities: Preparing stock status data'
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Summary
+
+This script takes prepped non-industrial 2020 watson data (created in ao_catch_prep.Rmd), and B/Bmsy estimates of those stocks to calculate a score for artisanal fishing species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
+
+## Updates from previous assessment
+This is a new layer to the 2021 assessment. 
+
+***
+
+# Data Source
+
+**Reference**: Watson, R. A. and Tidd, A. 2019. Mapping nearly a century and a half of global marine fishing: 1869–2017. Marine Policy, 93, pp. 171-177. [(Paper URL)](https://doi.org/10.1016/j.marpol.2018.04.023)
+
+**Downloaded**: December 11, 2019 from [IMAS portal](http://data.imas.utas.edu.au/portal/search?uuid=ff1274e1-c0ab-411b-a8a2-5a12eb27f2c0) - click on download tab, step 3
+
+**Description**:  Global fisheries landings data. 
+
+**Native data resolution**:   
+
+**Time range**: 1950 - 2017
+
+**Format**:  CSV format
+
+**Additional Information**: [Metadata](http://metadata.imas.utas.edu.au/geonetwork/srv/eng/metadata.show), [Supplementary Material](https://ars.els-cdn.com/content/image/1-s2.0-S0308597X18300605-mmc1.docx)
+
+
+**Reference**: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.495
+
+**Downloaded**: 06/03/2021
+
+**Description**: B/Bmsy value by stock and year (other data, which we do not use, are also available in the database)
+
+**Native data resolution**: stock (fish stock, species and region specific)
+
+**Time range**: 1950 - 2016
+
+**Format**: CSV format 
+
+**Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here. 
+
+
+# Methods 
+
+**Steps:**
+1. Join the non-industrial catch data with the final B/Bmsy layer used in the FIS model
+2. Convert the B/Bmsy values to scores.
+3. Take a catch weighted average of B/Bmsy scores for each region/year.
+
+
+
+## Join with the final B/Bmsy layer from the fis model, convert the B/Bmsy values to scores (this is done in functions.R for FIS subgoal, but we do it in the dataprep for AO), and take a catch weighted average of B/Bmsy scores for each region/year.
+
+```{r}
+fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2021/output/fis_bbmsy.csv"))
+
+catch_AO <- read_csv(file.path(here(), "globalprep/ao/v2021/intermediate/mean_catch.csv")) 
+
+
+b <- fis_bbmsy %>%
+    dplyr::mutate(bbmsy = ifelse(bbmsy > 1, 1, bbmsy))
+
+c <- catch_AO %>%
+    dplyr::mutate(stock_id_taxonkey = as.character(stock_id_taxonkey)) %>%
+    dplyr::mutate(taxon_key = stringr::str_sub(stock_id_taxonkey,-6,-1)) %>%
+    dplyr::mutate(stock_id = substr(stock_id_taxonkey, 1, nchar(stock_id_taxonkey) -
+                               7)) %>%
+    dplyr::mutate(catch = as.numeric(mean_catch)) %>%
+    dplyr::mutate(year = as.numeric(as.character(year))) %>%
+    dplyr::mutate(region_id = as.numeric(as.character(rgn_id))) %>%
+    dplyr::mutate(taxon_key = as.numeric(as.character(taxon_key))) %>%
+    dplyr::select(rgn_id, year, stock_id, taxon_key, mean_catch)
+
+b <- b %>%
+    dplyr::mutate(bbmsy = as.numeric(bbmsy)) %>%
+    dplyr::mutate(region_id = as.numeric(as.character(rgn_id))) %>%
+    dplyr::mutate(year = as.numeric(as.character(year))) %>%
+    dplyr::mutate(stock_id = as.character(stock_id))
+  
+  
+  ####
+  # Merge the b/bmsy data with catch data
+  ####
+  data_fis <- c %>%
+    dplyr::left_join(b, by = c('rgn_id', 'stock_id', 'year')) %>%
+    dplyr::select(rgn_id, stock_id, year, taxon_key, mean_catch, bbmsy)
+  
+  
+  ###
+  #  Estimate scores for taxa without b/bmsy values
+  # Median score of other fish in the region is the starting point
+  # Then a penalty is applied based on the level the taxa are reported at
+  ###
+  
+  ## this takes the mean score within each region and year
+  data_fis_gf <- data_fis %>%
+    dplyr::group_by(rgn_id, year) %>%
+    dplyr::mutate(mean_score = mean(bbmsy, na.rm = TRUE)) %>%
+    dplyr::ungroup()
+  
+  ## this takes the mean score across all regions within a year
+  # (when no stocks have scores within a region)
+  data_fis_gf <- data_fis_gf %>%
+    dplyr::group_by(year) %>%
+    dplyr::mutate(mean_score_global = mean(bbmsy, na.rm = TRUE)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(mean_score = ifelse(is.na(mean_score), mean_score_global, mean_score)) %>%
+    dplyr::select(-mean_score_global)
+  
+  
+  data_fis_gf <- data_fis_gf %>%
+    dplyr::mutate(TaxonPenaltyCode = as.numeric(substring(taxon_key, 1, 1))) %>%
+    dplyr::mutate(score_gf = mean_score) %>%
+    dplyr::mutate(method = ifelse(is.na(bbmsy), "Mean gapfilled", NA)) %>%
+    dplyr::mutate(gapfilled = ifelse(is.na(bbmsy), 1, 0)) %>%
+    dplyr::mutate(score = ifelse(is.na(bbmsy), score_gf, bbmsy))
+  
+  
+  gap_fill_data <- data_fis_gf %>%
+    dplyr::select(rgn_id,
+           stock_id,
+           taxon_key,
+           year,
+           mean_catch,
+           score,
+           gapfilled,
+           method) 
+  
+  write.csv(gap_fill_data, here('globalprep/ao/v2021/output/AO_bbmsy_summary_gf.csv'), row.names = FALSE)
+  
+  score_data <- data_fis_gf %>%
+    dplyr::select(rgn_id, stock_id, year, mean_catch, score)
+  
+   ###
+  # Calculate status for each region
+  ###
+
+  ## Take a catch weighted average of B/Bmsy scores for each region/year.
+  
+  score_data <- score_data %>%
+    dplyr::group_by(rgn_id, year) %>%
+    dplyr::summarize(score = weighted.mean(score, mean_catch)) %>%
+    dplyr::ungroup() 
+
+summary(score_data)
+
+write.csv(score_data, here('globalprep/ao/v2021/output/ao_nind_scores.csv'), row.names = FALSE)
+
+```

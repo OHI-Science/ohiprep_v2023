@@ -424,7 +424,7 @@ taxon_res = read_csv('output/taxon_resilience_lookup.csv') %>%
  - Add the resilience information to the stks dataframe created above, and re-write it to the output folder. 
  
 ```{r prep_data_bbmsy1, eval=FALSE}
-stks <- read_csv("output/stock_catch_no_res.csv")
+stks <- read_csv("globalprep/fis/v2021/output/stock_catch_no_res.csv")
 
 stks_res <- stks %>%
               dplyr::left_join(taxon_res, by = "CommonName") %>%                  #add resilience information

@@ -183,6 +183,7 @@ write_csv(z, zonal_files_to_run[3])
 
 ```
 
+
 Once the WDPA raster is cross-tabulated against the OHI region rasters (both 3 nm offshore and 1 km inland) we have the number of protected cells, identified by year of protection, within each region.  NA values are unprotected cells.
 
 ### Summary of zonal stats dataframes (3 nm offshore):
@@ -452,6 +453,35 @@ x <- lsp_new_old %>%
 
 write.csv(x, "output/major_changes_2021.csv" ) #added this so I could come back to it without rerunning everything
 ```
+
+
+```{r}
+
+## Calculates this year and last year's coastline protected ratio (CP/Ref-CP) for plotting
+status_1km_new <- read_csv(file.path(dir_goal, 'output', 'lsp_prot_area_inland1km.csv')) %>%
+  full_join(read_csv(file.path(dir_goal, 'output', 'rgn_area_inland1km.csv')),
+            by = 'rgn_id') %>%
+  mutate(pct_prot_1km_new = a_prot_1km / area,
+         status_1km_new   = pct_prot_1km_new / 0.3,
+         status_1km_new   = ifelse(status_1km_new > 1, 1, status_1km_new)) %>%
+  filter(rgn_id == 146)
+
+status_3nm_new <- read_csv(file.path(dir_goal, 'output', 'lsp_prot_area_offshore3nm.csv')) %>%
+  full_join(read_csv(file.path(dir_goal, 'output', 'rgn_area_offshore3nm.csv')),
+            by = 'rgn_id') %>%
+  mutate(pct_prot_3nm_new = a_prot_3nm / area,
+         status_3nm_new   = pct_prot_3nm_new / 0.3,
+         status_3nm_new   = ifelse(status_3nm_new > 1, 1, status_3nm_new)) %>% 
+  filter(rgn_id == 146)
+
+
+lsp_new_old <- status_3nm_new %>%
+  full_join(status_1km_new, by = c('rgn_id', 'year')) %>%
+  mutate(
+         status_new = (status_3nm_new + status_1km_new) / 2)
+  
+```
+
 
 
 ***

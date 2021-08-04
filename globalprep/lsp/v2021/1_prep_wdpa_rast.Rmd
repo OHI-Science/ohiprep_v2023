@@ -64,6 +64,7 @@ library(tidyverse)
 library(here)
 library(sf)
 library(mapview)
+library(fasterize)
 
 source('http://ohi-science.org/ohiprep_v2020/workflow/R/common.R')
 
@@ -345,7 +346,6 @@ check <- raster::raster(rast_wdpa_file)
 check2 <- raster::raster(file.path("/home/shares/ohi/git-annex/globalprep/lsp/v2020/rast/wdpa_2020_moll_500m.tif"))
 ## they look almost exactly the same... good.
 
-
 ```
 
 ## Data Checking
@@ -378,6 +378,31 @@ wdpa_poly_all_21 <- rbind(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)
 
 plot(wdpa_poly_all_21[1])
 plot(wdpa_sf_19[1])
+
+
+colnames(wdpa_poly_all_21)
+
+unique(wdpa_poly_all_21$orig_name)
+
+
+test <- wdpa_poly_all_21 %>%
+  filter(parent_iso == "GBR") %>%
+  filter(iso3 == "PCN")
+
+mapview(test)
+
+st_area(test) # 836075862002 m2 
+
+
+  rast_base <- raster::raster(file.path(dir_M, 'git-annex/globalprep/spatial/d2014',
+                                'data/rgn_mol_raster_500m',
+                                'rgn_inland1km_mol_500mcell.tif'))
+
+  rast_wdpa <- fasterize(test, rast_base, field = 'status_yr', fun = 'min')
+  
+  plot(rast_wdpa)
+  
+  rast_wdpa
 
 ```
 
