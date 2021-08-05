@@ -88,7 +88,7 @@ IMAS_d2020 <- file.path(dir_M, "git-annex/globalprep/_raw_data/IMAS_GlobalFisher
 
 ## Non-Industrial Catch
 
-The raw Watson data is separated into industrial and non-industrial fishing. We will only grab the non-industrial catch for Artisanal Opportunities
+The raw Watson data is separated into industrial and non-industrial fishing. We will only grab the non-industrial catch for Artisanal Opportunities. The non-industrial catch files are downloaded and prepped in the prs_fish/ folder. 
 
 
 Look at catch data
@@ -100,18 +100,21 @@ data_files <- list.files(file.path(path_data, "annual_catch"), pattern = "NInd",
 
 ## read in one of the catch data
 catch <- readRDS(file.path(path_data, "annual_catch","NIndCatch_2015.rds"))
+sort(unique(catch$CountryName))
 
+test <- catch %>%
+  filter(CountryName == "Sweden")
 
 ```
 
 ## Read in Cells Datatable
 
-This file is created in the fisheries data prep, in **clean_cells.Rmd**. It will be used later to align the catch dta with appropriate regiosn. 
+This file is created in the fisheries data prep, in **clean_cells.Rmd**. It will be used later to align the catch data with appropriate regiosn. 
 
 
 ```{r load_data, eval=F}
 
-cells <- read.csv('globalprep/fis/v2021/int/cells.csv')
+cells <- read.csv(file.path('../../fis/v2021/int/cells.csv'))
 head(cells)
 
 ```
@@ -133,13 +136,18 @@ Note:  Save IUU and Reported only (`CatchTotal`) as the catch sum.
 ## list all data files
 data_files <- list.files(file.path(path_data, "annual_catch"), pattern = "NInd", full.names = T)
 
+
 ## function to wrangle data into what we need (total catch per OHI region per stock)
 stock_rgn_total <- function(file) {  
-  #file = data_files[64]
+  #file = data_files[68]
 
   catch <- readRDS(file)
 
   
+  # test <- output_df %>%
+  #   filter(rgn_id == 235)
+
+    
 output_df <- catch %>% 
     dplyr::mutate(CatchTotal = IUU + Reported) %>% 
     dplyr::select(year = Year, TaxonName, CommonName, Cell, CatchTotal) %>%
@@ -147,7 +155,7 @@ output_df <- catch %>%
     dplyr::left_join(cells, by = "CellID") %>%
     dplyr::mutate(catch_prop = CatchTotal * area) %>% # no NAs - every cell ID matches
     dplyr::group_by(year, rgn_id, fao_id, TaxonName, CommonName) %>%
-    dplyr::summarise(catch = sum(catch_prop)) %>% 
+    dplyr::summarise(catch = sum(CatchTotal)) %>% 
     dplyr::ungroup() %>%
     dplyr::mutate(stock_id = gsub(" ", "_", paste(TaxonName, fao_id, sep='-'), fixed=TRUE))%>%
     dplyr::rename(fao_rgn  = fao_id,
@@ -158,6 +166,12 @@ return(output_df)
 }
 
 total_catch <- purrr::map_df(data_files, stock_rgn_total)
+
+# missing <- c("Belgium", "Latvia", "Estonia", "Kerguelen Islands", "Faeroe Islands", "Iceland", "Finland",           "Poland", "Lithuania", "Sweden")
+# 
+# test <- total_catch %>%
+#   left_join(rgns_eez) %>%
+#   filter(rgn_name %in% missing)
 
 write.csv(total_catch, file = file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn.csv'), row.names=FALSE)
 
@@ -228,8 +242,19 @@ write.csv(stock_rgn_taxa, file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_
 
 Take a look at catch data with missing ohi and fao regions in **stock_catch_by_rgn_taxa**. These have taxon key matches, but no ohi or fao regions assigned to them. 
 ```{r, eval=FALSE}
+region_data()
 
-df <- read_csv(file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn_taxa.csv'))
+df <- read_csv(file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn_taxa.csv')) %>%
+  left_join(rgns_eez)
+
+sort(unique(df$rgn_name))
+
+missing <- c("Belgium", "Latvia", "Estonia", "Kerguelen Islands", "Faeroe Islands", "Iceland", "Finland",           "Poland", "Lithuania", "Sweden")
+
+test <- df %>%
+  filter(rgn_name %in% missing)
+sort(unique(test$rgn_name))
+sort(missing)
 
 # 32 NAs for OHI regions
 df_na <- df %>% 
@@ -338,6 +363,15 @@ catch <- catch %>%
   summarize(catch = sum(tons)) %>%
   ungroup()
 
+
+missing <- c("Belgium", "Latvia", "Estonia", "Kerguelen Islands", "Faeroe Islands", "Iceland", "Finland",           "Poland", "Lithuania", "Sweden")
+
+test <- catch %>%
+  left_join(rgns_eez) %>%
+  filter(rgn_name %in% missing)
+sort(unique(test$rgn_name))
+sort(missing)
+
 ```
 
 Take a look at a few stocks.
@@ -382,6 +416,8 @@ mean_catch <- catch_zeros %>%
   mutate(mean_catch = mean(catch, na.rm=TRUE)) %>% # mean catch for each stock (in a specific ohi-fao region)
   filter(mean_catch != 0)  %>%      ## some stocks have no reported catch for time period
   ungroup()
+
+
 
 ```
 
