@@ -39,10 +39,10 @@ One additional year of data, 2018, was added.
 The source data are monthly mean sea level anomalies, in meters. These anomalies are calculated by subtracting the current absolute sea level for each month from the average sea level for that month calculated from 1993 - 2012.
 
 **Reference**: The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](http://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/msla-mean-climatology.html)  
-**Downloaded**: July 30, 2019 (for 2018 data)   
+**Downloaded**: August 10, 2021  
 **Description**: Monthly mean sea level anomaly (meters above mean sea level)   
 **Native data resolution**: 0.25 degree grid cells   
-**Time range**: January 1993 - December 2018  
+**Time range**: January 1993 - December 2019
 **Format**: NetCDF   
 **Citation information**  The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](http://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/msla-mean-climatology.html)
 
@@ -84,7 +84,7 @@ library(here)
  
 ## define paths and variables to use throughout data prep
  
-scen_year <- 2020 # change to reflect assessment year!
+scen_year <- 2021 # change to reflect assessment year!
 dir_anx_aviso <- file.path(dir_M, "git-annex/globalprep/_raw_data/AVISO_slr") # raw data file path
 dir_prs_slr <-  sprintf("%s/git-annex/globalprep/prs_slr/v%s", dir_M, scen_year)
 
@@ -100,9 +100,17 @@ ocean <- raster(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif")
 
 ## Download the New Data
 
+These chunks can be used to download the data from AVISO. You will need an AVISO account to do this. If you want to view the files to see if a full previous year of data is available to download, go here: ftp://ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean
+
+or here: ftp://yourlogin@ftp-access.aviso.altimetry.fr/climatology
+
+And you will be prompted to either open up a FTP application, like Cyberduck, or to just plug in your username and password.
+
+If you don't want to go through the trouble of running the download process in R, you can do it manually by just click-and-drag between two cyberduck-2 browsers (I found this method to be much quicker and easier). 
+
 ```{r login_info, eval=FALSE}
 
-# didn't download new data for v2020 since data has only been updated until September 2019, and we need up until Dec 2019. Therefore, we're using v2019 (data up to Dec 2018)
+# This layer lags by 2 years unfortunately, since we need a full year of data. 
 
 ## need AVISO username and password, define in console when prompted, don't save here!!
 ## if either password or username contain the @ symbol, replace with '%40' (percent-encoding for reserved characters)
@@ -115,7 +123,7 @@ userpasswd <- readline("Type AVISO username and password, separated by colon no 
 
 ## there is a 'download_data.R' script in the Mazu raw data folder but that routine was not working for me...
 
-year <- 2019 # data year to download
+year <- 2019 # data year to download; lags by 2 years, since 2020 only goes to may as of now... v2021
 months <- str_pad(1:12, 2, pad = "0") #if they upload the rest just change the numbers here to reflect rest of months
 
 ## download data from FTP and collect each month/year in raster stack
@@ -128,11 +136,14 @@ for (mo in months){
   
   ## retrieve the data (compressed, gzipped files)
   u <- sprintf("%s/dt_global_allsat_msla_h_y2019_m%s.nc.gz", ub, mo)
-  u_filename <- file.path(dir_anx_aviso, "d2020", substr(u, 115, 155)) #updated 2020 to include full filename
+  u_filename <- file.path(dir_anx_aviso, "d2021", substr(u, 115, 155)) #updated 2020 to include full filename
   res <- httr::GET(u, write_disk(u_filename))
 }
 closeAllConnections()
+```
 
+Unzip the files you've just downloaded: 
+```{r}
 zipfiles <- list.files(file.path(dir_anx_aviso, paste0("d", scen_year)),
                        full.names = TRUE, pattern = "*nc.gz")
 for(zipfile in zipfiles){
@@ -152,7 +163,9 @@ All NetCDF files for each month are rasterized.
 
 ## d2016/msla_monthly_mean has data for 1993-2015
 ## then include list.files for d2017 through the data folder for current scenario year
-nc_files <- c(list.files(file.path(dir_anx_aviso, "d2019"),
+nc_files <- c(list.files(file.path(dir_anx_aviso, "d2021"),
+                       full.names = TRUE, pattern = ".nc"),
+              list.files(file.path(dir_anx_aviso, "d2019"),
                        full.names = TRUE, pattern = ".nc"),
               list.files(file.path(dir_anx_aviso, "d2018"),
                        full.names = TRUE, pattern = ".nc"),
@@ -161,7 +174,6 @@ nc_files <- c(list.files(file.path(dir_anx_aviso, "d2019"),
               list.files(file.path(dir_anx_aviso, "d2016/msla_monthly_mean"),
                       full.names = TRUE, pattern = ".nc"))
 
-nc_files <- nc_files[-1:-2] # double check this, but it since the first two files are zip files I am confident in removing them. However, I did grab it directly from the most recent version of global so I so still want to make sure it's correct
 ```
 
 The raw monthly data looks like this:
@@ -169,7 +181,7 @@ The raw monthly data looks like this:
 ```{r test_plot_raw, eval=FALSE}
 
 plot(raster(nc_files[3]), col = cols, axes = F, 
-     main = paste("Year", substr(nc_files[3], 90, 93), "Month", substr(nc_files[3], 96, 97))) # didn't work
+     main = paste("Year", substr(nc_files[3], 90, 93), "Month", substr(nc_files[3], 96, 97))) 
 
 ```
 
@@ -258,20 +270,25 @@ foreach(file = annual_means) %dopar% {  #file = annual_means[1]
   yr <- str_sub(file, -8, -5)
   msla_int <- file.path(dir_prs_slr, "int")
   
+  
   rast_data <- raster(file) %>%
     projectRaster(crs = mollCRS, over = TRUE) %>%
     raster::resample(ocean, method = "ngb", 
              filename = sprintf("%s/msla_annual_mol/mlsa_annual_mol_%s.tif", 
                                 msla_int, yr), overwrite = TRUE)
+  
+                                
 }
 
 annual_mol <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol"), full = TRUE)
 foreach(file = annual_mol) %dopar% { # file = annual_mol[2]
   yr <- str_sub(file,-8,-5)
+
   
   rast <- raster(file)
   mask(raster(file), s, filename = sprintf("%s/int/msla_annual_mol_coastal/msla_annual_mol_coastal_%s.tif", 
                                 dir_prs_slr, yr), overwrite = TRUE)
+                                
 }
 
 plot(raster(file.path(dir_prs_slr, "int/msla_annual_mol_coastal/msla_annual_mol_coastal_2010.tif")))
@@ -301,6 +318,9 @@ vals <- foreach(i = 1993:2015, .combine = c) %dopar% { # i = 1993
 
 ref_point_slr <- quantile(vals, 0.9999)
 
+## If not rerunning the above, use this (taken from v2019 reference point csv)
+ref_point_slr <- 0.335938483476639
+
 dir_refpt <- "../../supplementary_information"
 if(file.exists(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_year))){
   ## if already created and been partially updated for this assessment, don't want to overwrite with v2016 csv...
@@ -314,7 +334,7 @@ ref_tab$ref_point[ref_tab$pressure == "Sea Level Rise"] <- ref_point_slr # set s
 write.csv(ref_tab, sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_year), row.names = FALSE)
 
 ## grab reference value from the supp_info csv
-ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "2018")) %>%
+ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "2021")) %>%
        filter(pressure == "Sea Level Rise") %>%
        .$ref_point %>%
         as.numeric()
@@ -330,13 +350,20 @@ Each annual raster is recaled from 0 to 1 using the reference point. If a value 
 ```{r rescale, eval = F}
 # registerDoParallel(10) # reregister if restarted session between parallel steps above and here
 
-foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[10]
+foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[26]
   yr <- str_sub(file, -8,-5)
-
+  
+  if(file.exists(sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr))){
+    
+    message("skipping")
+  }else{
+    
     raster::raster(file) %>%
     calc(fun = function(x){ifelse(x < 0, 0, x)}) %>% # set all negative values to 0
     calc(fun = function(x){ifelse(x > ref, 1, x/ref)}, # set equal to one if greater than ref, otherwise scale
-         filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) }
+         filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) 
+  }
+}
 ```
 
 
@@ -344,8 +371,8 @@ foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[10]
 
 ```{r plot_results, eval=FALSE}
 
-r <- raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 1))
-plot(ocean, col = "cornsilk2", axes = FALSE, box = FALSE, main = "Sea Level Rise Pressure 2018", legend = FALSE)		
+r <- raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
+plot(ocean, col = "cornsilk2", axes = FALSE, box = FALSE, main = "Sea Level Rise Pressure 2019", legend = FALSE)		
 plot(r, col = cols, axes = FALSE, box = FALSE, add = TRUE)
 
 r_new <- raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 1))
@@ -373,30 +400,6 @@ rgn_data <- read_sf(file.path(dir_M, "git-annex/globalprep/spatial/v2017"), "reg
 ## extract data for each region
 ## fyi takes awhile... about 2 hours for v2019.... 
 regions_stats <- zonal(stack_slr, zones, fun = "mean", na.rm = TRUE, progress = "text") %>% data.frame()
-
-rgn_stats_long <- foreach(i = zones, .packages = c("raster", "dplyr"), .combine = "rbind") %dopar% {
-  zonal(stack_slr, zones, fun = "mean", na.rm = TRUE, progress = "text") %>% data.frame()
-} ## I don't think this line of code or any of the commented out are necessary... waiting for response from Mel on this. 
-
-# t0 <- Sys.time()
-# zones_shp <- st_read(file.path(dir_M, "git-annex/globalprep/spatial/v2017"), "regions_2017_update") %>% 
-#   filter(rgn_type == "eez" & rgn_id <= 250 & rgn_id != 213)
-# rgn_data <- rgn_data %>% filter(rgn_id <= 250 & rgn_id != 213)
-# 
-# rgn_stats_long <- foreach(i = 1:nlayers(stack_slr), .packages = c("raster", "dplyr"), .combine = "rbind") %dopar% {
-#   zonal_cmp_fun <- compiler::cmpfun(function(x){
-#     rgn_mean <- cellStats(rasterize(x, crop(stack_slr[[i]], as.matrix(extent(x))), mask = TRUE),
-#                           stat = "mean", na.rm = TRUE)
-#   })
-#   foreach(j = rgn_data$rgn_id[1:20], .packages = c("dplyr"), .combine = "rbind") %dopar% {
-#     # rgn <- zones_shp %>% filter(rgn_id == j)
-#     rgn_stats_long <- c(as.integer(str_sub(rasts[i], -8, -5)), j, 
-#                         zonal_cmp_fun(zones_shp %>% filter(rgn_id == j)))
-#   }
-# }
-# regions_stats_test <- rgn_stats_long %>% data.frame() %>%
-#   rename(year = X1, rgn_id = X2, pressure_score = X3) # rownames not used ok
-# Sys.time() - t0
 
 
 setdiff(regions_stats$zone, rgn_data$rgn_id) # High Seas regions are in there, makes sense....no land
@@ -433,7 +436,7 @@ print(Motion, file = "slr.html")
 new_data <- read.csv("output/slr.csv") %>%
   dplyr::select(rgn_id, year, new_pressure_score = pressure_score)
 
-old <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 1)) %>%
+old <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 2)) %>%
   left_join(new_data, by = c("year", "rgn_id"))
 
 plot(old$pressure_score, old$new_pressure_score, ylab = "new score", xlab = "old score")
