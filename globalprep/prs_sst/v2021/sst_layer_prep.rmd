@@ -19,14 +19,14 @@ output:
 
 # Summary
 
-This script creates the Sea Surface Temperature (SST) layer for the 2018 global Ocean Health Index assessment.
+This script creates the Sea Surface Temperature (SST) layer for the 2021 global Ocean Health Index assessment.
 
 
 ***  
 
 # Updates from previous assessment
 
-Previously, data source only extended from 1982 to 2012. In the 2016 assessment, the data year 2012 was used as a proxy for 2016, data year 2011 was used as a proxy for 2015, and so on. For the 2018 assessment, data year will match the exact year, so data year 2017 represents year 2017, the most recent year of data, and so on. 
+Previously, data source only extended from 1982 to 2012. In the 2016 assessment, the data year 2012 was used as a proxy for 2016, data year 2011 was used as a proxy for 2015, and so on. For the 2021 assessment, data year will match 2020, so data year 2020 represents year 2019, and so on. 
 
 ***
 
@@ -38,11 +38,11 @@ See `prs_sst/v2015/dataprep.R` for preparation of the "annual_pos_anomalies" dat
 
 **Native Data Resolution**: ~4km   
 **Description**: 
-Cortadv5_SSTA.nc = SST anomalies (weekly SST minus weekly climatological SST), weekly data for all years, degrees Kelvin
-Cortadv5_weeklySST.nc =  SST, weekly data for all years, degrees Kelvin  
-**Time Range**: 1982 - 2017 (weekly averages across all years)  
+Cortadv6_SSTA.nc = SST anomalies (weekly SST minus weekly climatological SST), weekly data for all years, degrees Kelvin
+Cortadv6_weeklySST.nc =  SST, weekly data for all years, degrees Kelvin  
+**Time Range**: 1982 - 2020 (weekly averages across all years)  
 **Format**: NetCDF
-**Downloaded**: August 21, 2018
+**Downloaded**: August 10, 2021
 
 ***  
 
@@ -85,10 +85,12 @@ dir_data <- file.path(dir_M, "git-annex/globalprep/_raw_data/CoRTAD_sst/d2021")
 dir_int  <- file.path(dir_M, "git-annex/globalprep/prs_sst/v2021/int")
 dir_output  <- file.path(dir_M, "git-annex/globalprep/prs_sst/v2021/output")
 
+
 ohi_rasters()
 regions_shape()
 
 yrs <- 1982:2020
+
 cols <- rev(colorRampPalette(brewer.pal(11, 'Spectral'))(255)) # rainbow color scheme
 land <- regions %>% subset(rgn_type %in% c("land", "land-disputed", "land-noeez"))
 ```
@@ -142,7 +144,10 @@ ssta_df <- names_ssta %>% # View(ssta_df)
 
 ## the next for-loop takes a long time, ~22min for each of 53 layers
 ## create weekly standard deviations across all years
-for(i in 1:53){
+
+for(i in 5:53){
+  
+ # i = 3
   t0 = Sys.time()
   print(paste("calculating sd for week", i, "-- started at", t0))
   s = stack()
@@ -154,9 +159,33 @@ for(i in 1:53){
     s = stack(s, w_week)
   }
   
-  sd_sst = calc(s, fun = function(x){sd(x, na.rm = TRUE)},
-                progress ="text",
-                filename = file.path(dir_int, sprintf("sd_sst_week_%s.tif", i)))
+
+  rasterOptions(todisk = FALSE) 
+
+ # raster::calc(s, fun = function(x){sd(x, na.rm = TRUE)},
+ #                progress ="text",
+ #                filename = file.path(dir_int, sprintf("sd_sst_week_%s.tif", i)))
+ 
+ 
+ ## try with parallel processing 10 cores.. this will speed it up significantly. 
+ raster::beginCluster(n = 10)
+
+ parallel_sd <- raster::clusterR(s, fun = calc,
+                            args = list(fun = sd, na.rm = TRUE))
+
+endCluster()
+
+# parallel_sd
+# plot(parallel_sd)
+
+writeRaster(parallel_sd, filename = file.path(dir_int, sprintf("sd_sst_week_%s.tif", i)))
+
+
+# test <- raster::raster(file.path(dir_int, sprintf("sd_sst_week_%s.tif", "2")))
+# plot(test)
+# test
+  
+
 }
 
 registerDoParallel(5)
