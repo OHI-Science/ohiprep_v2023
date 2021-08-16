@@ -11,7 +11,7 @@ output:
     theme: cerulean
     highlight: haddock
     includes: 
-      in_header: '../../../src/templates/ohi_hdr.html'
+      in_header: '../../../workflow/templates/ohi_hdr.html'
   pdf_document:
     toc: true
 ---
@@ -59,8 +59,6 @@ Cortadv6_weeklySST.nc =  SST, weekly data for all years, degrees Kelvin
 
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message = FALSE, warning = FALSE)
 
-# setwd("globalprep/prs_sst/v2018") # update to reflect current assessment year!
-# source("~/github/ohiprep_v2018/src/R/common.R")
 
 library(raster)
 library(RColorBrewer)
@@ -167,7 +165,8 @@ for(i in 5:53){
  #                filename = file.path(dir_int, sprintf("sd_sst_week_%s.tif", i)))
  
  
- ## try with parallel processing 10 cores.. this will speed it up significantly. 
+ ## try with parallel processing 10 cores.. this will speed it up significantly. 10 cores is a lot though, so if you NOT are running it overnight, maybe decrease to 6-8 cores (don't wanna hog cores during the workday). 
+  
  raster::beginCluster(n = 10)
 
  parallel_sd <- raster::clusterR(s, fun = calc,
@@ -190,6 +189,8 @@ writeRaster(parallel_sd, filename = file.path(dir_int, sprintf("sd_sst_week_%s.t
 
 registerDoParallel(5)
 combine_fun = function(x){sum(x, na.rm = TRUE)} # takes raster stack object as x arg
+
+ # yrs <- yrs[12:39]
 
 ## calculate annual positive anomalies; ~17 minutes per year with 5 cores
 for(j in yrs){
@@ -230,7 +231,7 @@ ref <- stack(anom_files[ref_years]) %>% sum(.)
 anom_proj = "+proj=longlat +ellps=WGS84 +no_defs"
 land_mask <- land %>% st_geometry %>% st_transform(anom_proj) %>% as("Spatial") # sf multipoly not working for mask...
 
-## calculate difference between recent 5-year cumulative sum and historical 1985-1989
+## calculate difference between recent 5-year cumulative sum and historical 1985-1989; writes in chunks of 5 files, every 5 files takes about 2 hrs and 15 mins. So with a total of 31 files should take ~14 hours to complete
 registerDoParallel(5)
 t0 = Sys.time()
 foreach(i = seq(1986, max(yrs)-4)) %dopar% {
@@ -260,16 +261,16 @@ for(i in 1:length(diffs)){
 }
 
 ## get min, max, and 99.99th quantile
-min_val   <- min(vals, na.rm = TRUE) # -142 in v2018
-max_val   <- max(vals, na.rm = TRUE) # 182 in v2018
-resc_num  <- quantile(vals, prob = 0.9999, na.rm = TRUE) # 128 for v2018
+min_val   <- min(vals, na.rm = TRUE) # -142 in v2018; -159 in v2021
+max_val   <- max(vals, na.rm = TRUE) # 182 in v2018; 228 in v2021
+resc_num  <- quantile(vals, prob = 0.9999, na.rm = TRUE) # 128 for v2018; 148 for v2021
 
 ## write the reference point; only if changed since the last assessment
-sup_info <- "~/github/ohiprep_v2018/globalprep/supplementary_information/v2018" # should reflect assessment year
+sup_info <- "~/github/ohiprep_v2021/globalprep/supplementary_information/v2021" # should reflect assessment year
 
 rescale <- read.csv(file.path(sup_info, "reference_points_pressures.csv"))
-# rescale$ref_point[rescale$pressure == "Sea Surface Temperature"] <- resc_num 
-# write.csv(rescale, file.path(sup_info, "reference_points_pressures.csv"), row.names = FALSE)
+ rescale$ref_point[rescale$pressure == "Sea Surface Temperature"] <- resc_num 
+ write.csv(rescale, file.path(sup_info, "reference_points_pressures.csv"), row.names = FALSE)
 ```
 
 The minimum value is `min_v`, maximum value is `max_v` and the reference point is `resc_num`.
@@ -291,9 +292,15 @@ registerDoParallel(6)
 if(!file.exists(dir_output)){dir.create(path = dir_output)} # create directory if doesn't exist
 
 foreach(i = 1:length(diffs)) %dopar% {
+  
 
   r = raster(diffs[i])
   y = substr(diffs[i], 72, 80)
+  
+  if(file.exists(sprintf("%s/sst_%s_1985-1989.tif", dir_output, y))){
+    
+    print(paste("skipping"))
+  }else{
 
   projection(r) = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   
@@ -302,20 +309,22 @@ foreach(i = 1:length(diffs)) %dopar% {
         resample(., ocean, method = "ngb", 
                  filename = sprintf("%s/sst_%s_1985-1989.tif", dir_output, y), 
                  overwrite = TRUE)
+  
+  }
 }
 ```
 
 ```{r compare rescaled diffs between assessments, eval = FALSE}
-## compare 2008-2012 extremes between v2018 and v2016 assessement 
-sst_v2018_test <- raster(file.path(dir_output, "sst_2008-2012_1985-1989.tif"))
-sst_v2016_test <- raster(sprintf("%s/git-annex/globalprep/prs_sst/v2016/output/%s", 
+## compare 2008-2012 extremes between v2021 and v2018 assessement 
+sst_v2021_test <- raster(file.path(dir_output, "sst_2008-2012_1985-1989.tif"))
+sst_v2018_test <- raster(sprintf("%s/git-annex/globalprep/prs_sst/v2018/output/%s", 
                                       dir_M, "sst_2008-2012_1985-1989.tif"))
-df_tmp <- data.frame(v2018 = getValues(sst_v2018_test), 
-                     v2016 = getValues(sst_v2016_test))
+df_tmp <- data.frame(v2021 = getValues(sst_v2021_test), 
+                     v2018 = getValues(sst_v2018_test))
 df_samp <- df_tmp %>% mutate(rowcol = rownames(.)) %>% 
   filter(rowcol %in% sample(1:length(rowcol), 70000))
-plot(df_samp$v2016, df_samp$v2018, "n")
-points(cbind(df_samp$v2016, df_samp$v2018), 
+plot(df_samp$v2018, df_samp$v2021, "n")
+points(cbind(df_samp$v2018, df_samp$v2021), 
        col = rgb(0, 0, 1, alpha = 0.01), pch = 16, cex = 2)
 ```
 
@@ -339,7 +348,7 @@ plot(raster(sst_rasters[[length(sst_rasters)]])) # length(sst_rasters) # plot to
 ## apply ice mask
 ice_mask <- raster(file.path(dir_M, "git-annex/Global/NCEAS-Pressures-Summaries_frazier2013/ice_mask_resampled"))
 
-registerDoParallel(4)
+registerDoParallel(3)
 foreach(rast = sst_rasters) %dopar% {
   overlay(raster(rast), ice_mask, 
           fun = function(x, y) {x * y}, 
@@ -360,11 +369,11 @@ saveGIF({
                 substr(sst_res_mask[i], 64, 72))
     plot(raster(sst_res_mask[i]), 
          zlim = c(0, 1), # fix zlimits
-         axes = FALSE, box = FALSE, col = cols,
+         axes = FALSE, box = FALSE, 
          main = n)}}, 
   ani.width = 750,
   ani.height = 400,
-  movie.name = sprintf("%s/sst.gif", dir_output))
+  movie.name = sprintf("%s/sst.gif", dir_output)) ## couldnt get this to work - v2021
 
 ```
 
@@ -375,18 +384,20 @@ sst_stack <- stack(list.files(dir_output,
                               full.names = TRUE))
 
 ## some exploring
-plot(sst_stack[[nlayers(sst_stack)]], col = cols)
+plot(sst_stack[[nlayers(sst_stack)]])
 click(sst_stack[[nlayers(sst_stack)]])
+
+plot(sst_stack[[31]])
 
 ## extract data by region
 regions_stats <- zonal(sst_stack, zones, fun = "mean", na.rm = TRUE,
                        progress = "text") %>% data.frame
 
-setdiff(regions_stats$zone, rgn_data$sp_id) # check; antarctica high seas (268, 271, 278), 265 NA high seas region, conflict areas 255...  
-setdiff(rgn_data$sp_id, regions_stats$zone)
+setdiff(regions_stats$zone, rgn_data$rgn_id) # check; antarctica high seas (268, 271, 278), 265 NA high seas region, conflict areas 255...  
+setdiff(rgn_data$rgn_id, regions_stats$zone)
 
 ## wrangle and save
-data <- merge(rgn_data, regions_stats, all.y = TRUE, by.x = "sp_id", by.y = "zone") %>% 
+data <- merge(rgn_data, regions_stats, all.y = TRUE, by.x = "rgn_id", by.y = "zone") %>% 
   write.csv(file.path(dir_output, "rgn_sst_prs.csv"), row.names = FALSE)
 data <- read.csv(file.path(dir_output, "rgn_sst_prs.csv"), stringsAsFactors = FALSE)
 ```
@@ -416,9 +427,9 @@ for(years in c(2012:max(yrs))){
 
 ```{r gapfilling record for most recent year of data, eval = FALSE}
 ## sst has no gapfilling...
-sst <- read.csv("output/sst_eez_2017.csv")
+sst <- read.csv("output/sst_eez_2020.csv")
 sst <- mutate(sst, pressure_score_gf = 0)
-write.csv(sst, "output/sst_eez_2017_gf.csv", row.names = FALSE)
+write.csv(sst, "output/sst_eez_2020_gf.csv", row.names = FALSE)
 ```
 
 # Save altogether
@@ -427,9 +438,9 @@ write.csv(sst, "output/sst_eez_2017_gf.csv", row.names = FALSE)
 
 sst_final <- data.frame()
 
-for (year in 2012:2017){ # year = 2012
-  
-  prs <- read.csv(sprintf("globalprep/prs_sst/v2018/output/sst_eez_%s.csv", year))
+for (year in 2012:2020){ # year = 2012
+
+    prs <- read.csv(sprintf("output/sst_eez_%s.csv", year))
   
   prs <- prs %>%
     mutate(year = year) %>%
@@ -453,16 +464,15 @@ write.csv(sst_final, "output/sst_updated.csv", row.names=FALSE)
 ## plot results to check, for most recent year
 res <- list.files(dir_output, pattern = "sst.*icemask.tif", full.names = TRUE)
 
-plot(raster(res[length(res)]), 
-     col = cols, axes = FALSE, 
-     main = "Sea Surface Temperature Pressure Layer \n OHI 2016")
+plot(raster(res[[length(res)]]), axes = FALSE, 
+     main = "Sea Surface Temperature Pressure Layer \n OHI 2021")
 ```
 
 ```{r compare results, eval = FALSE}
 ## compare with last year's data
-old_sst <- read.csv("../v2016/output/sst_updated.csv")
+old_sst <- read.csv("../v2018/output/sst_updated.csv")
 compare <- old_sst %>%
-  filter(year == 2016) %>% 
+  filter(year == 2017) %>% 
   dplyr::select(rgn_id, old_pressure_score = pressure_score) %>%
   left_join(data, by = "rgn_id") %>%
   filter(!(is.na(rgn_name))) %>%
@@ -472,39 +482,47 @@ compare <- old_sst %>%
                 matches("sst_.*2013_1985.1989.*"),
                 matches("sst_.*2014_1985.1989.*"), 
                 matches("sst_.*2015_1985.1989.*"),
-                matches("sst_.*2016_1985.1989.*")) %>% 
+                matches("sst_.*2016_1985.1989.*"),
+                matches("sst_.*2017_1985.1989.*"),
+                matches("sst_.*2018_1985.1989.*"),
+                matches("sst_.*2019_1985.1989.*"),
+                matches("sst_.*2020_1985.1989.*")) %>% 
   rename(sst_2012 = matches("sst_.*2012_1985.1989.*"),
          sst_2013 = matches("sst_.*2013_1985.1989.*"),
          sst_2014 = matches("sst_.*2014_1985.1989.*"),
          sst_2015 = matches("sst_.*2015_1985.1989.*"),
-         sst_2016 = matches("sst_.*2016_1985.1989.*"))
+         sst_2016 = matches("sst_.*2016_1985.1989.*"),
+         sst_2017 = matches("sst_.*2017_1985.1989.*"),
+         sst_2018 = matches("sst_.*2018_1985.1989.*"),
+         sst_2019 = matches("sst_.*2019_1985.1989.*"),
+         sst_2020 = matches("sst_.*2020_1985.1989.*"))
 
-p <- ggplot(compare, aes(x = old_pressure_score, y = sst_2016, label = rgn_name)) +
+p <- ggplot(compare, aes(x = old_pressure_score, y = sst_2017, label = rgn_name)) +
   geom_point(shape = 19) + 
   theme_bw() + 
   geom_abline(intercept = 0, slope = 1) + 
   labs(title = "SST comparison")
 ggplotly(p)
 
-ggplot(compare, aes(x = sst_2015)) +
+ggplot(compare, aes(x = sst_2020)) +
   geom_histogram(fill = "gray", color = "black") + 
   theme_bw() + 
-  labs(title = "SST 2015")
-quantile(compare$sst_2015)
+  labs(title = "SST 2021")
+quantile(compare$sst_2017)
 ```
 
 ## Compare final outputs of v2016 and v2018
 
-After combining sst data into the output table `sst_updated.csv`, compare to last year. Last year, the most recent year of data is 2012. This year it's 2017. In last year's output table, data year 2012 served as a proxy for 2016. Compare scenario years that used data year 2012, the most recent shared year between v2018 and v2016.
+After combining sst data into the output table `sst_updated.csv`, compare to last year. Compare scenario years that used data year 2017, the most recent shared year between v2021 and v2018.
 
 ```{r, eval=FALSE}
 
-old_sst <- read.csv("../v2016/output/sst_updated.csv") %>% 
-  filter(year == 2016) %>% 
+old_sst <- read.csv("../v2018/output/sst_updated.csv") %>% 
+  filter(year == 2017) %>% 
   select(rgn_id, old_prs_score = pressure_score)
 
 sst <- read.csv("output/sst_updated.csv") %>%
-  filter(year == 2012) %>% 
+  filter(year == 2017) %>% 
   select(rgn_id, prs_score = pressure_score)
 
 combine <- sst %>% 
@@ -516,7 +534,7 @@ p <- ggplot(combine, aes(x = old_prs_score, y = prs_score, label = rgn_id)) +
   geom_point(shape = 19) + 
   theme_bw() + 
   geom_abline(intercept = 0, slope = 1) + 
-  labs(title = "SST comparison v2018 and v2016 \n (data year 2012)")
+  labs(title = "SST comparison v2021 and v2018 \n (data year 2017)")
 ggplotly(p)
 
 ```

@@ -25,7 +25,7 @@ library(here)
 setwd(here::here("globalprep","fp","v2021"))
 
 ## Load FAO-specific user-defined functions
-source('http://ohi-science.org/ohiprep_v2020/workflow/R/common.R')
+source('http://ohi-science.org/ohiprep_v2021/workflow/R/common.R')
 
 ```
 
@@ -35,14 +35,14 @@ source('http://ohi-science.org/ohiprep_v2020/workflow/R/common.R')
 Mariculture production in tonnes.
 ```{r}
 
-mar <- read.csv('../../mar/v2020/output/MAR_FP_data.csv')
+mar <- read.csv('../../mar/v2021/output/MAR_FP_data.csv')
 
 ```
 
 Fisheries data.
 ```{r}
 
-fis <- read.csv("../../fis/v2020/output/FP_fis_catch.csv") %>%
+fis <- read.csv("../../fis/v2021/output/FP_fis_catch.csv") %>%
   dplyr::select(rgn_id, year, fis_t = fis_catch)
 
 ```
@@ -106,7 +106,7 @@ hist(tmp$w_fis)
 Compare to previous year data (a big jump in fish data, so not super compatible, but should be correlated at least)
 ```{r}
 
-compare <- read.csv("../../fp/v2019/output/wildcaught_weight.csv") %>%
+compare <- read.csv("../../fp/v2020/output/wildcaught_weight.csv") %>%
   rename(w_fis_old = w_fis) %>%
   left_join(tmp, by=c('rgn_id', 'year'))
 plot(compare$w_fis_old, compare$w_fis)
