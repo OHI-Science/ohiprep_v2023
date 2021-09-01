@@ -1,0 +1,518 @@
+---
+title: "OHI 2021: Download SAUP production data and match FAO regions"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: false
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Summary
+
+This script downloads aggregated catch data from the Sea Around Us Project (SAUP). We will download 3 different data sets from this page: https://www.seaaroundus.org/data/#/search
+
+1. Download region specific EEZ data.
+
+2. Download FAO region data.
+
+3. Download high seas data. 
+
+Additionally, we will assign FAO ids to each year/region/species record to the EEZs and high seas data. SAUP shared a lookup table with OHI (in 2016) that links SAUP EEZ region names and ids to the FAO region they are located in. The proportional area of each EEZ within the FAO region was calculated for overlapping EEZs, so that we assign the correct amount of catch to EEZs.
+
+# Data Source
+The Sea Around Us Project has summarized catch data for each SAUP region and FAO region region.
+
+
+Reference: 
+
+* Downloaded: August 24, 2021
+* Description: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
+* Native data resolution: Country
+* Time range: 1950 - 2018
+* Format: csv files (.csv)
+
+
+***
+
+## Setup
+
+``` {r setup, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/',message = FALSE, warning = FALSE, echo = TRUE, eval=FALSE)
+
+library(tidyverse)
+library(rjson)
+library(RCurl)
+library(data.table)
+library(purrr)
+library(sf)
+library(mapview)
+```
+
+Use the SAUP API to download by eez production data. To do this, we need SAUP region id numbers. 
+
+```{r}
+## this is the api link.. 
+
+## we need to figure out all of their region_ids, paste them into a string with region_id = "", and change the limit="" to however many regions there are 
+
+
+# http://api.seaaroundus.org/api/v1/eez/tonnage/taxon/?format=csv&limit=10&sciname=false&region_id=56&region_id=174&region_id=233&region_id=328&region_id=400&region_id=478&region_id=586&region_id=882&region_id=914&region_id=851
+
+## NOTE: for v2022, we will read in /home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_eez_production.csv and conduct the download with those region ids. 
+saup_old <- read.csv("/home/shares/ohi/git-annex/globalprep/fis/v2016/raw/SAUP_catch_taxon_tons_eezs.csv")
+
+saup_regions <- saup_old %>%
+  distinct(rgn_name, rgn_num)
+
+length(unique(saup_old$rgn_num)) # 280.. means there are 280 regions in the old SAUP data. I counted through the dropdown here http://www.seaaroundus.org/data/#/search, and they have 281 regions, which indicates we might have some mismatches when we get to the end of this process. 
+
+unique(saup_old$rgn_num)
+
+region_ids <- saup_old %>%
+  distinct(rgn_num) %>%
+  mutate(url_id = paste(sprintf("region_id=%s", rgn_num))) %>%
+  mutate(tester = rep(c(1:28), times = 10)) %>%
+  group_by(tester) %>%
+  summarize(text = str_c(url_id, collapse = "&"))
+
+
+for(i in 1:28){
+  
+  # i = 1
+region_id_string <- region_ids$text[i]
+
+full_url = paste("http://api.seaaroundus.org/api/v1/eez/tonnage/taxon/?format=csv&limit=10&sciname=false&",region_id_string, sep="")
+
+
+full_url <- URLencode(full_url)
+
+bin <- getBinaryURL(full_url,
+                    ssl.verifypeer=FALSE)
+
+con <- file(file.path(sprintf("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_zip/%s_saup_eez.zip", i)), open = "wb")
+
+writeBin(bin, con)
+close(con)
+
+}
+
+
+## unzip the files
+unzip_files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_zip") 
+
+walk(unzip_files, ~ unzip(zipfile = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_zip/", .x), 
+                         exdir = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_unzip/", .x)))
+
+## extract the csvs and rbind
+
+files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_unzip", full.names = T, recursive = T, pattern = ".*.csv")
+
+list_df <- lapply(files, function(f) {
+  fread(f) # faster
+
+})
+
+all_df <- bind_rows(list_df, .id = "column_label")
+
+## See if any regions are missing 
+
+test_df <- all_df %>%
+  left_join(saup_regions, by = c("area_name" = "rgn_name")) 
+
+setdiff(test_df$rgn_num, saup_old$rgn_num)
+setdiff(saup_old$rgn_num, test_df$rgn_num) # 903  56 898 174 906 233 328 400 408 478 586 908 882 953 914 851
+setdiff(saup_old$rgn_name, test_df$area_name) 
+
+## These are the regions that are missing, however, some of them could be misspellings, or new region names
+#  [1] "Balearic Island (Spain)"              "Belgium"                              "Clipperton Isl.  (France)"           
+#  [4] "Comoros Isl."                         "Curacao (Netherlands)"                "Estonia"                             
+#  [7] "Guyana"                               "Jordan"                               "Korea (North)"                       
+# [10] "Mauritania"                           "Pakistan"                             "Saba and Sint Eustaius (Netherlands)"
+# [13] "Samoa"                                "South Africa (Atlantic Coast)"        "Sweden (Baltic)"                     
+# [16] "USA (East Coast)" 
+
+
+test_df2 <- all_df %>%
+  distinct(area_name)
+
+## These regions are misspellings (new name == old name): 
+# "Balearic Islands (Spain)" =="Balearic Island (Spain)"
+# "Clipperton Isl. (France)" == Clipperton Isl.  (France)
+# Curaçao (Netherlands) == Curacao (Netherlands)
+# Saba and Sint Eustatius (Netherlands) == Saba and Sint Eustaius (Netherlands)
+# South Africa (Atlantic and Cape) == South Africa (Atlantic Coast)
+
+## these regions are new regions: 
+# Korea (North, Sea of Japan) == Korea (North)
+# Korea (North, Yellow Sea) == Korea (North)
+
+## These regions were not downloaded, but all of these names are present in the old SAUP data. 
+
+# "Belgium"
+# "Comoros Isl."
+# "Estonia"                           
+# "Guyana"
+# "Jordan"
+# "Mauritania"
+# "Pakistan" 
+# "Samoa"
+# "Sweden (Baltic)"            
+# "USA (East Coast)"
+
+
+## Lets manually download the missed regions on the SAUP website: http://www.seaaroundus.org/data/#/search. Once the zip files are downloaded, add them to our zip folder and our unzip folder, and we will repeat the above steps. (All of this will be able to be better reproduced next year). 
+
+## Need to download these regions: 
+# "Belgium"
+# "Comoros Isl."
+# "Estonia"                           
+# "Guyana"
+# "Jordan"
+# "Mauritania"
+# "Pakistan" 
+# "Samoa"
+# "Sweden (Baltic)"            
+# "USA (East Coast)"
+# Korea (North, Sea of Japan) == Korea (North)
+# Korea (North, Yellow Sea) == Korea (North)
+
+## give the unmatched regions a region number from the SAUP website, we will likely have to add some of these later when we match to the old SAUP data to get SAUP region ids. 
+
+## These are the regions that for some reason didn't download the first time (Region name == SAUP region id):
+# "Belgium"   == 56
+# "Comoros Isl." ==  174
+# "Estonia" == 233                            
+# "Guyana" == 328
+# "Jordan" == 400
+# "Korea (North)" == NA                   
+# "Mauritania" == 478
+# "Pakistan"   == 586
+# "Samoa" == 882
+# "Sweden (Baltic)"    == 914               
+# "USA (East Coast)" ==851
+
+## New region names (Region Name == SAUP region id):
+# Korea (North, Sea of Japan) == 973
+# Korea (North, Yellow Sea) == 974
+
+## Name mispellings, but were downloaded in the first pass (Region name == SAUP region id):
+# "Balearic Islands (Spain)"  == 903
+# "Clipperton Isl. (France)"  == 898
+# Curaçao (Netherlands) == 906
+# Saba and Sint Eustatius (Netherlands) == 908
+# South Africa (Atlantic and Cape) == 953
+
+
+## Repeat the unzipping process
+
+## unzip the files
+unzip_files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_zip") 
+
+walk(unzip_files, ~ unzip(zipfile = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_zip/", .x), 
+                         exdir = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_unzip/", .x)))
+
+## extract the csvs and rbind
+
+files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_unzip", full.names = T, recursive = T, pattern = ".*.csv")
+
+# list_df <- lapply(files, function(f) {
+#   fread(f) # faster
+# 
+# })
+
+list_df <- lapply(files, read.csv)
+
+all_df <- bind_rows(list_df)
+
+sum(all_df$tonnes) # 6129245230
+
+# now join to the old SAUP regions to get the region ids
+all_df_ids <- all_df %>%
+  left_join(saup_regions, by = c("area_name" = "rgn_name")) 
+
+unique(all_df_ids$area_name) # 281 regions... perfect! 
+
+## See what is missing, we will have to manually add these regions ids
+
+test_ids <- all_df_ids %>%
+  filter(is.na(rgn_num))
+unique(test_ids$area_name)
+
+# [1] "Saba and Sint Eustatius (Netherlands)" "Clipperton Isl. (France)"              "Balearic Islands (Spain)"             
+# [4] "Curaçao (Netherlands)"                 "South Africa (Atlantic and Cape)"      "Korea (North, Sea of Japan)"          
+# [7] "Korea (North, Yellow Sea)"    
+
+# just as I thought
+
+all_df_ids_eez_final <- all_df_ids %>%
+  mutate(rgn_num = as.double(rgn_num)) %>%
+  mutate(rgn_num = case_when(
+    area_name == "Saba and Sint Eustatius (Netherlands)" ~ 908,
+    area_name ==  "Clipperton Isl. (France)" ~ 898,  
+    area_name ==  "Balearic Islands (Spain)" ~ 903, 
+    area_name ==  "Curaçao (Netherlands)" ~ 906, 
+    area_name ==  "South Africa (Atlantic and Cape)" ~ 953, 
+    area_name ==  "Korea (North, Sea of Japan)" ~ 973, 
+    area_name ==  "Korea (North, Yellow Sea)" ~ 974, 
+    TRUE ~ rgn_num
+  ))
+
+test_ids <- all_df_ids_eez_final %>%
+  filter(is.na(rgn_num))
+unique(test_ids$area_name) # 0 - perfect
+
+## save eez csv
+
+write.csv(all_df_ids_eez_final, file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_eez_production.csv"), row.names = FALSE)
+
+sum(all_df_ids_eez_final$tonnes) # 6129245230
+
+34943315.43 + 39239102.47 + 47614556.48 + 6129245230 # 6251042204
+
+test <- all_df_ids_eez_final %>%
+  filter(year == 2017)
+
+sum(test$tonnes) # 104583995 # seems reasonable... i think watson was something like 111 million
+
+
+
+```
+
+
+Download SAUP data by the FAO region
+
+```{r}
+# http://api.seaaroundus.org/api/v1/fao/tonnage/eez/?format=csv&limit=10&sciname=false&region_id=18&region_id=48&region_id=34&region_id=27&region_id=21
+
+## fao regions are 18, 48, 34, 27, 21, 47, 41, 31, 58, 57, 51, 37, 88, 77, 67, 61, 87, 81, 71
+
+region_ids <- data.frame(rgn_num = c(18, 48, 34, 27, 21, 47, 41, 31, 58, 57, 51, 37, 88, 77, 67, 61, 87, 81, 71)) %>%
+  distinct(rgn_num) %>%
+  mutate(url_id = paste(sprintf("region_id=%s", rgn_num))) %>%
+  mutate(tester = c(1:19)) %>%
+  group_by(tester) %>%
+  summarize(text = str_c(url_id, collapse = "&"))
+
+
+for(i in 1:19){
+  
+  # i = 1
+region_id_string <- region_ids$text[i]
+
+full_url = paste("http://api.seaaroundus.org/api/v1/fao/tonnage/eez/?format=csv&limit=10&sciname=false&",region_id_string, sep="")
+
+
+full_url <- URLencode(full_url)
+
+bin <- getBinaryURL(full_url,
+                    ssl.verifypeer=FALSE)
+
+con <- file(file.path(sprintf("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_fao_area_zip/%s_saup_eez.zip", region_id_string)), open = "wb")
+
+writeBin(bin, con)
+close(con)
+
+}
+
+
+## unzip the files
+unzip_files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_fao_area_zip") 
+
+walk(unzip_files, ~ unzip(zipfile = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_fao_area_zip/", .x), 
+                         exdir = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_fao_area_unzip/", .x)))
+
+## extract the csvs and rbind
+
+files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_fao_area_unzip", full.names = T, recursive = T, pattern = ".*.csv")
+
+# list_df <- lapply(files, function(f) {
+#   fread(f) # faster
+# 
+# })
+
+read_csv_filename <- function(filename){
+    ret <- read.csv(filename)
+    ret$Source <- filename #EDIT
+    ret
+}
+
+test <- read_csv_filename(files[[1]])
+
+list.df <- lapply(files, function(x){
+  
+  read_csv_filename(x) %>%
+      mutate(fao_id = sub('.*\\/', '', Source)) %>%
+  mutate(fao_id = substr(fao_id, 9,10))
+    
+})
+
+
+all_fao_df <- bind_rows(list.df) %>%
+  dplyr::select(-Source, fao_name = area_name)
+sum(all_fao_df$tonnes) # 6253148740 # this is different from the rgn dataset above... did i miss a region or two? No. I think it is because the EEZ data I downloaded does not include high seas. Yep, looks like that. 
+
+
+write.csv(all_fao_df, file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_fao_production.csv"), row.names = FALSE)
+```
+
+Unzip high seas data from SAUP 
+
+```{r}
+
+## unzip the files
+unzip_files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/high_seas_zip") 
+
+walk(unzip_files, ~ unzip(zipfile = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/high_seas_zip/", .x), 
+                         exdir = str_c("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/high_seas_unzip/", .x)))
+
+## extract the csvs and rbind
+
+files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/high_seas_unzip", full.names = T, recursive = T, pattern = ".*.csv")
+
+list.df <- lapply(files, function(f) {
+  fread(f) # faster
+
+})
+
+list.df <- lapply(files, read.csv)
+
+
+
+all_hs_df <- bind_rows(list.df)
+
+sum(all_hs_df$tonnes) # 121796974
+
+121796974 + 6129245230 #  6251042204 ; pretty close to the global and FAO estimates from SAUP
+
+
+write.csv(all_hs_df, file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_high_seas_production.csv"), row.names = FALSE)
+```
+
+Now obtain FAO ids for the high seas and the EEZ datasets. 
+
+```{r}
+  
+saup_eez_fao <- st_read(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2016/SAU_EEZ_FAO/SAU_EEZ_FAO.shp")) %>%
+  st_drop_geometry() %>% ## this is what I need; 
+  dplyr::select(-OBJECTID)
+  # - Join by EEZID
+  # - I will probably need to split the catch between those that are duplicated, so that we end up with the correct amount of eez catch? Maybe do it by a area weighted average or something like that? Bigger the shape area the more catch is allocated to that area for that species?  
+  # - I will also need to add a new region for the north korea split.
+  # - Don't worry about high seas, we will keep that simple and just join by the fao region with the high seas region, and use the fishing entity as the EEZ region? 
+
+
+
+fao_areas_prod <- read_csv(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_fao_production.csv")) %>%
+  dplyr::select(-landed_value) 
+
+saup_eezs_prod <- read_csv(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_eez_production.csv")) %>%
+  dplyr::select(-data_layer, -uncertainty_score, -landed_value) 
+sum(saup_eezs_prod$tonnes)
+
+high_seas_prod <- read_csv(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/saup_high_seas_production.csv")) %>%
+  mutate(rgn_num = NA) %>%
+  dplyr::select(-landed_value) 
+
+
+######## Join SAUP high seas production data to get the FAO id ########
+
+join_fao_high_seas <- high_seas_prod %>%
+  left_join(fao_areas_prod, by = c("area_name" = "fao_name", "year", "scientific_name", "common_name", "functional_group", "commercial_group", "fishing_entity", "fishing_sector", "catch_type", "reporting_status", "gear_type", "end_use_type")) %>%
+  dplyr::select(1, "area_type" = "area_type.x", 3:13, "tonnes" = "tonnes.x", 18)
+
+sum(join_fao_high_seas$tonnes) # 121796974 ; perfect 
+sum(high_seas_prod$tonnes) # 121796974
+
+# save high seas FAO ids 
+write.csv(join_fao_high_seas, file.path("/home/shares/ohi/git-annex/globalprep/fis/v2021/high_seas_fao_ids_prod.csv"), row.names = FALSE)
+
+################
+
+######## Join SAUP eez production data to get FAO ids ########
+
+saup_eez_rgns_new <- saup_eezs_prod %>%
+  distinct(rgn_num, area_name)
+
+# fix the North Korea split for the saup_eez_fao regions dataset. Old North Korea EEZID == 408. Now is split into Korea (North, Sea of Japan) == 973, Korea (North, Yellow Sea) == 974. Split the old North Korea region into 2, and halve the area associated with it. 
+
+north_korea_rgn_fix <- saup_eez_fao %>%
+  dplyr::filter(EEZID == 408) %>%
+  mutate(Shape_Leng = Shape_Leng/2,
+         Shape_Area = Shape_Area/2,
+         Area_km. = Area_km./2) %>%
+  add_row(EEZID = 973, F_AREA = "61", Shape_Leng = 3136525, Shape_Area = 57775239853, Area_km. = 57775.24) %>%
+  add_row(EEZID = 974, F_AREA = "61", Shape_Leng = 3136525, Shape_Area = 57775239853, Area_km. = 57775.24) %>%
+  dplyr::filter(EEZID != 408)
+
+colnames(north_korea_rgn_fix)
+
+# Now join back together with the original rgn_fao dataset 
+saup_eez_fao_fix <- saup_eez_fao %>%
+  filter(EEZID != 408) %>%
+  rbind(north_korea_rgn_fix)
+
+length(unique(saup_eez_fao_fix$EEZID)) # 280?
+setdiff(saup_eez_rgns_new$rgn_num, saup_eez_fao_fix$EEZID) # missing 925 - Canada pacific? Need to fix that. 
+
+# Add Canada pacific into the dataset. We will give it FAO ID = 67 (since the Pacific ocean in canada only intersects that region) and give it the same area as Canada (Arctic) in the pacific ocean (470100.3 km). 
+
+saup_eez_fao_fix_2 <- saup_eez_fao_fix %>%
+  add_row(EEZID = 925, F_AREA = "67", Shape_Leng = NA, Shape_Area = NA, Area_km. = 470100.3) %>%
+  dplyr::select(-Shape_Leng, -Shape_Area)
+
+length(unique(saup_eez_fao_fix_2$EEZID)) # 281, perfect. 
+
+setdiff(saup_eezs_prod$rgn_num, saup_eez_fao_fix_2$EEZID) # 0
+setdiff(saup_eez_fao_fix_2$EEZID, saup_eezs_prod$rgn_num) # 0 ; perfect
+
+
+
+# test argentina since it has overlapping FAO regions... 
+test_2 <- saup_eezs_prod %>%
+  filter(rgn_num == 32)
+sum(test_2$tonnes) # 61154495
+
+test <- saup_eezs_prod %>%
+  left_join(saup_eez_fao_fix_2, by = c("rgn_num" = "EEZID")) %>% 
+  filter(rgn_num == 32) %>%
+  group_by(area_name, area_type, year, scientific_name, common_name, functional_group, commercial_group, fishing_entity, fishing_sector, catch_type, reporting_status, gear_type, end_use_type, rgn_num, tonnes) %>%
+  mutate(total_area = sum(Area_km.)) %>%
+  ungroup() %>%
+  mutate(area_prop = Area_km./total_area) %>%
+  mutate(tonnes_fix = tonnes*area_prop)
+
+sum(test$tonnes_fix) # 61154495 - perfect, it worked! 
+
+# Now lets join the SAUP 2021 production dataset to our FAO region dataset
+join_eez_fao_ids <- saup_eezs_prod %>%
+  left_join(saup_eez_fao_fix_2, by = c("rgn_num" = "EEZID")) %>%
+    group_by(area_name, area_type, year, scientific_name, common_name, functional_group, commercial_group, fishing_entity, fishing_sector, catch_type, reporting_status, gear_type, end_use_type, rgn_num, tonnes) %>%
+  mutate(total_area = sum(Area_km.)) %>%
+  ungroup() %>%
+  mutate(area_prop = Area_km./total_area) %>%
+  mutate(tonnes_fix = tonnes*area_prop)
+
+sum(saup_eezs_prod$tonnes) # 6129245226
+sum(join_eez_fao_ids$tonnes_fix) # 6129245226 ; it worked! 
+
+test <- join_eez_fao_ids %>%
+  head(10000)
+
+# now write this out to mazu and we are finished! 
+
+write.csv(join_eez_fao_ids, file.path("/home/shares/ohi/git-annex/globalprep/fis/v2021/eez_fao_ids_prod.csv"), row.names = FALSE)
+```
+
+
+***

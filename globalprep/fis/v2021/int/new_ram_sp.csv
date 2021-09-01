@@ -32,8 +32,6 @@ Caulolatilus microps,163,31,NA,BLTILESATLC,Blueline tilefish Southern Atlantic c
 Caulolatilus microps,163,21,NA,BLTILESATLC,Blueline tilefish Southern Atlantic coast
 Centroberyx gerrardi,16,57,511884000000,BIGHTREDSE,Bight redfish Southeast Australia
 Centroberyx gerrardi,16,81,9554514306,BIGHTREDSE,Bight redfish Southeast Australia
-Chionoecetes bairdi,163,61,27569734262,TANNERCRABBSAI,Tanner crab Bering Sea and Aleutian Islands
-Chionoecetes bairdi,163,67,262305000000,TANNERCRABBSAI,Tanner crab Bering Sea and Aleutian Islands
 Chrysophrys auratus,3,81,144076461,NZSNAPNZ8,New Zealand snapper New Zealand Area 8 (Auckland and Central West)
 Chrysophrys auratus,162,81,44383445710,NZSNAPNZ1BOP-HAGU,New Zealand snapper New Zealand SNA 1 Bay of Plenty and Hauraki Gulf
 Chrysophrys auratus,162,81,195795000000,NZSNAPNZ1ENLD,New Zealand snapper New Zealand SNA 1 east Northland
@@ -43,10 +41,14 @@ Chrysophrys auratus,276,81,28081993.52,NZSNAPNZ7,New Zealand snapper New Zealand
 Chrysophrys auratus,276,81,27959424.77,NZSNAPNZ8,New Zealand snapper New Zealand Area 8 (Auckland and Central West)
 Cleisthenes herzensteini,210,61,NA,PHFLOUNSOJ,Pointhead flounder Sea of Japan
 Eopsetta grigorjewi,210,61,NA,RSFLOUNSOJ,Round nose flounder Sea of Japan
+Epinephelus flavolimbatus,135,31,44932328,YEGROUPGM,Yellowedge grouper Gulf of Mexico
+Epinephelus flavolimbatus,163,31,331298000000,YEGROUPGM,Yellowedge grouper Gulf of Mexico
+Epinephelus niveatus,110,31,16746976058,SNOWGROUPSATLC,Snowy grouper Southern Atlantic coast
+Epinephelus niveatus,163,21,24424401720,SNOWGROUPSATLC,Snowy grouper Southern Atlantic coast
+Epinephelus niveatus,163,31,293108000000,SNOWGROUPSATLC,Snowy grouper Southern Atlantic coast
 Etrumeus teres,20,61,NA,RHERRTSST,Round herring Tsushima Strait
 Etrumeus teres,209,61,NA,RHERRTSST,Round herring Tsushima Strait
 Etrumeus teres,210,61,NA,RHERRTSST,Round herring Tsushima Strait
-Glyptocephalus zachirus,163,67,NA,REXSOLEGA,Rex sole Gulf of Alaska
 Haliotis iris,162,81,3232547955,PAUANPAU5A,Paua NZ Area North PAUA 5A
 Haliotis iris,162,81,10920769848,PAUAPAU7,Paua New Zealand Area PAU 7 (Marlborough)
 Haliotis iris,162,81,4055324832,PAUASPAU5A,Paua NZ Area South PAUA 5A
@@ -54,231 +56,25 @@ Haliotis iris,162,81,4679310466,PAUAPAU5B,Paua New Zealand Area PAU 5B (Stewart 
 Haliotis iris,162,81,7600357527,PAUAPAU5D,Paua New Zealand Area PAU 5D (Otago)
 Hexagrammos decagrammus,163,67,180771000000,KELPGREENLINGORECOAST,Kelp greenling Oregon Coast
 Hexagrammos decagrammus,273,67,12419579.78,KELPGREENLINGORECOAST,Kelp greenling Oregon Coast
-Istiompax indica,1,57,467246000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,2,57,328011000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,16,57,2986740000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,25,57,119029000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,26,57,660044000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,28,51,164528000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,29,51,62931711919,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,30,51,43410343144,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,31,51,1332330000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,32,51,314873000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,33,51,62210846312,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,34,51,121568000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,35,51,125064000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,36,51,270501000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,37,51,1272730000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,38,51,638542000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,39,51,914973000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,39,57,1343085812,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,40,57,530775000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,41,51,571965000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,42,51,1198440000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,43,51,111798000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,44,51,779164000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,46,51,5298695620,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,47,51,506967000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,48,51,533679000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,53,51,221421000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,54,51,4343757184,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,92,51,318760000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,92,57,67813595445,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,102,47,373392000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,102,51,317901000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,191,51,64395837804,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,202,51,241257000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,203,51,1007480000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,203,57,622574000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,204,57,85408160236,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,205,57,514844000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,206,57,61958457416,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,206,71,2263.235493,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,216,57,1442980000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,216,71,677530.6313,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,255,51,51291261274,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,255,57,3244749705,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,267,47,249562000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,269,47,4.084240562,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,269,51,15605600000000,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,269,57,32.50872765,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,270,51,8.941224277,BLKMARLINIO,Black marlin Indian Ocean
-Istiompax indica,270,57,15108100000000,BLKMARLINIO,Black marlin Indian Ocean
-Kajikia audax,1,57,467246000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,2,57,328011000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,3,81,431062000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,5,71,1275670000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,5,81,93728142960,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,6,71,618924000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,7,71,1600530000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,8,71,604366000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,9,71,2883030000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,9,71,23425528811,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,10,71,85100155951,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,10,71,126914000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,11,71,1992340000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,12,61,158382000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,12,71,248835000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,13,61,230288000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,13,71,740702000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,14,61,182140000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,14,71,1577124071,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,15,61,101513000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,15,71,1497480000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,16,57,2986740000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,16,57,88675011235,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,16,71,1633690000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,16,81,1092860000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,17,71,172935000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,17,71,2080590000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,18,71,1281860000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,18,81,792649051.7,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,19,71,752127000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,20,61,326589000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,21,61,115784000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,25,57,119029000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,26,57,660044000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,28,51,164528000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,29,51,62931711919,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,30,51,43410343144,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,31,51,1332330000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,32,51,314873000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,33,51,62210846312,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,34,51,121568000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,35,51,125064000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,36,51,270501000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,37,51,1272730000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,38,51,638542000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,39,51,914973000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,39,57,1343085812,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,40,57,530775000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,41,51,571965000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,42,51,1198440000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,43,51,111798000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,44,51,779164000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,46,51,5298695620,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,47,51,506967000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,48,51,533679000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,53,51,221421000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,54,51,4343757184,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,73,61,589479000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,92,51,318760000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,92,57,67813595445,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,102,47,373392000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,102,51,317901000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,107,77,431288000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,129,77,188740000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,129,87,133382352.5,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,130,77,388254000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,130,87,157003000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,131,77,61487584529,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,132,77,29225954.22,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,132,87,329129000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,133,77,875930783.7,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,134,77,93832091471,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,135,77,2444660000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,136,77,116146000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,137,87,1072900000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,138,87,71138626351,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,146,77,13236556621,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,146,81,25853640561,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,147,77,13638078299,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,147,77,4078390000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,147,81,693203000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,148,77,494299000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,148,77,982761000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,149,77,59788738124,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,149,77,64307854065,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,150,77,351169000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,151,77,404443000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,152,77,131452000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,153,77,1954300000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,153,81,5882793095,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,154,77,316580000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,155,71,280680000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,155,77,362298000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,155,81,22074183487,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,156,71,23964874121,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,156,77,295102000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,157,71,163098000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,157,77,435831000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,158,71,183481000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,158,71,38024364573,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,158,77,47907427738,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,159,77,442635000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,161,71,235932000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,161,77,25409421138,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,162,81,1537900000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,163,61,499583000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,163,67,193466000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,163,77,511465000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,163,77,1975130000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,191,51,64395837804,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,202,51,241257000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,203,51,1007480000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,203,57,622574000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,204,57,85408160236,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,205,57,514844000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,206,57,61958457416,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,206,71,2263.235493,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,206,71,20566393770,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,209,61,533968000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,210,61,3848630000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,210,71,180333000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,212,71,367549000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,212,71,406613000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,216,57,1442980000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,216,71,677530.6313,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,216,71,735509000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,216,71,81017962512,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,255,51,51291261274,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,255,57,3244749705,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,255,61,437160000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,255,71,3930650057,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,267,47,249562000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,269,47,4.084240562,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,269,51,15605600000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,269,57,32.50872765,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,270,51,8.941224277,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,270,57,15108100000000,STMARLINIO,Striped marlin Indian Ocean
-Kajikia audax,272,61,9776480000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,273,61,44.41967992,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,273,67,755962000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,273,67,2620970000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,274,61,18.77482953,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,274,71,5443190000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,274,71,759435000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,274,81,3.392806399,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,275,61,78.44969496,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,275,67,99.89133924,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,275,67,211.8415424,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,275,71,127.3208751,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,275,77,15394400000000,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,275,77,12185700000000,STMARLINWCNPAC,Striped marlin Western and Central North Pacific
-Kajikia audax,275,77,2318450000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,275,81,32.76178972,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,276,71,68765847036,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,276,81,8681540000000,STMARLINSWPO,Striped marlin Western Pacific Ocean
-Kajikia audax,277,77,166.8514048,STMARLINNEPAC,Striped marlin Northeast Pacific
-Kajikia audax,277,87,3454150000000,STMARLINNEPAC,Striped marlin Northeast Pacific
 Lepidopsetta polyxystra,163,61,78166767032,NRSOLEEBSAI,Northern rock sole Eastern Bering Sea and Aleutian Islands
 Lepidopsetta polyxystra,163,67,465100000000,NRSOLEEBSAI,Northern rock sole Eastern Bering Sea and Aleutian Islands
 Lepidopsetta polyxystra,163,61,NA,NRSOLEGA,Northern rock sole Gulf of Alaska
 Lepidorhombus spp,180,27,NA,MEGSPPIVa-VIa,Megrim spp ICES 4a-6a
 Lepidorhombus spp,181,27,NA,MEGSPPIVa-VIa,Megrim spp ICES 4a-6a
+Loligo pealeii,163,21,140080000000,LISQUIDATLC,Longfin inshore squid Atlantic Coast
+Loligo pealeii,163,31,14383651638,LISQUIDATLC,Longfin inshore squid Atlantic Coast
+Loligo pealeii,218,21,5581498.444,LISQUIDATLC,Longfin inshore squid Atlantic Coast
 Loligo reynaudii,101,47,56409073.71,CHSQUIDSA,Cape Hope squid South Africa
 Loligo reynaudii,102,47,604767000000,CHSQUIDSA,Cape Hope squid South Africa
 Loligo reynaudii,267,47,2761094350,CHSQUIDSA,Cape Hope squid South Africa
 Merluccius gayi,224,87,NA,SPHAKECH,South Pacific hake Central-Southern Chile
+Merluccius paradoxus,101,47,56409073.71,DEEPCHAKESA,Deep water cape hake South Africa
+Merluccius paradoxus,102,47,604767000000,DEEPCHAKESA,Deep water cape hake South Africa
+Merluccius paradoxus,267,47,2761094350,DEEPCHAKESA,Deep water cape hake South Africa
 Merluccius spp,101,47,NA,HAKESPPSAF,Hake spp Southern Africa
 Neoplatycephalus richardsoni,16,57,211780000000,TIGERFLATSE,Tiger flathead Southeast Australia
 Neoplatycephalus richardsoni,16,71,420497376.6,TIGERFLATSE,Tiger flathead Southeast Australia
 Neoplatycephalus richardsoni,16,81,41207480971,TIGERFLATSE,Tiger flathead Southeast Australia
-Pagrus major,20,61,NA,RBRMECS,Red seabream East China Sea
-Pagrus major,209,61,NA,RBRMECS,Red seabream East China Sea
-Pagrus major,210,61,NA,RBRMECS,Red seabream East China Sea
-Pagrus major,210,61,NA,RBRMSETOE,Red seabream Inland Sea of Japan (East)
-Pagrus major,210,61,NA,RBRMSETOW,Red seabream Inland Sea of Japan (West)
 Penaeus esculentus,16,57,NA,BTSHRIMPNAUST,Brown tiger shrimp Northern Australia
 Penaeus esculentus,16,71,NA,BTSHRIMPNAUST,Brown tiger shrimp Northern Australia
 Platycephalus conatus,16,57,205558000000,DEEPFLATHEADSE,Deepwater flathead Southeast Australia
@@ -287,9 +83,6 @@ Sardinops melanostictus,73,61,NA,PILCHPJPN,Japanese sardine Pacific Coast of Jap
 Sardinops melanostictus,209,61,NA,PILCHTSST,Japanese sardine Tsushima Strait
 Sardinops melanostictus,210,61,NA,PILCHPJPN,Japanese sardine Pacific Coast of Japan
 Sardinops melanostictus,210,61,NA,PILCHTSST,Japanese sardine Tsushima Strait
-Scomber colias,172,41,NA,ACMACKSARG,Argentine chub mackerel Southern Argentina
-Scophthalmus maximus,177,27,NA,TURIV,Turbot North Sea
-Scophthalmus maximus,180,27,NA,TURIV,Turbot North Sea
 Scorpaena guttata,135,77,0.767144629,CALSCORPSCAL,California scorpionfish Southern California
 Scorpaena guttata,163,77,91245173618,CALSCORPSCAL,California scorpionfish Southern California
 Sebastes aleutianus,163,61,70342948389,REYEROCKBSAI,Rougheye rockfish Bering Sea and Aleutian Islands
@@ -308,9 +101,6 @@ Sebastes chlorostictus,163,77,98670070378,GRSPROCKNCAL,Greenspotted rockfish Nor
 Sebastes chlorostictus,163,77,91245173618,GRSPROCKSCAL,Greenspotted rockfish Southern Pacific Coast
 Sebastes chlorostictus,273,67,5416763.99,GRSPROCKNCAL,Greenspotted rockfish Northern Pacific Coast
 Sebastes chlorostictus,275,77,116206.2422,GRSPROCKNCAL,Greenspotted rockfish Northern Pacific Coast
-Sebastes crameri,135,77,7827.088317,DKROCKPCOAST,Darkblotched rockfish Pacific Coast
-Sebastes crameri,163,77,189912000000,DKROCKPCOAST,Darkblotched rockfish Pacific Coast
-Sebastes crameri,275,77,154695.3982,DKROCKPCOAST,Darkblotched rockfish Pacific Coast
 Sebastes diploproa,135,77,7827.088317,SNROCKPCOAST,Splitnose rockfish Pacific Coast
 Sebastes diploproa,163,77,189912000000,SNROCKPCOAST,Splitnose rockfish Pacific Coast
 Sebastes diploproa,275,77,154695.3982,SNROCKPCOAST,Splitnose rockfish Pacific Coast
@@ -327,10 +117,6 @@ Sebastes nebulosus,163,67,NA,CHROCKCPCOAST,China rockfish Central Pacific Coast
 Sebastes nebulosus,163,67,NA,CHROCKNPCOAST,China rockfish Northern Pacific Coast
 Sebastes nebulosus,163,77,NA,CHROCKCPCOAST,China rockfish Central Pacific Coast
 Sebastes nebulosus,163,77,NA,CHROCKSPCOAST,China rockfish Southern Pacific Coast
-Sebastes norvegicus,143,27,NA,GOLDREDV-VI-XII-XIV,Golden redfish ICES 5-6-12-14
-Sebastes paucispinis,163,67,9172293465,BOCACCBCW,Bocaccio British Columbia Waters
-Sebastes paucispinis,218,67,121015000000,BOCACCBCW,Bocaccio British Columbia Waters
-Sebastes paucispinis,163,77,NA,BOCACCSPCOAST,Bocaccio Southern Pacific Coast
 Sebastes polyspinis,163,61,48977718986,NROCKBSAI,Northern rockfish Bering Sea and Aleutian Islands
 Sebastes polyspinis,163,67,86232868247,NROCKBSAI,Northern rockfish Bering Sea and Aleutian Islands
 Sebastes polyspinis,163,67,151541000000,NROCKGA,Northern rockfish Gulf of Alaska
@@ -349,15 +135,172 @@ Seriola quinqueradiata,210,61,NA,JAMBERJPN,Japanese amberjack Japan
 Sillago flindersi,16,57,298626000000,SWHITSE,School whiting Southeast Australia
 Sillago flindersi,16,71,20345072554,SWHITSE,School whiting Southeast Australia
 Sillago flindersi,16,81,36213015209,SWHITSE,School whiting Southeast Australia
-Sphyrna tiburo,135,31,171578.8009,BHEADSHARATL,Bonnethead shark Atlantic
-Sphyrna tiburo,163,31,99929934230,BHEADSHARATL,Bonnethead shark Atlantic
-Squalus suckleyi,135,77,7827.088317,SPSDOGPCOAST,Spotted spiny dogfish Pacific Coast
-Squalus suckleyi,163,77,189912000000,SPSDOGPCOAST,Spotted spiny dogfish Pacific Coast
-Squalus suckleyi,275,77,154695.3982,SPSDOGPCOAST,Spotted spiny dogfish Pacific Coast
 Takifugu rubripes,210,61,NA,JPUFFIMKB,Japanese pufferfish Ise and Mikawa Bay
 Takifugu rubripes,210,61,NA,JPUFFSOJECSSI,Japanese pufferfish Sea of Japan and East China Sea and Seto Inland sea
 Tanakius kitaharae,20,61,NA,WLFLOUNNPAC,Willowy flounder North Pacific
 Tanakius kitaharae,209,61,NA,WLFLOUNNPAC,Willowy flounder North Pacific
 Tanakius kitaharae,210,61,NA,WLFLOUNNPAC,Willowy flounder North Pacific
-Zearaja chilensis,224,87,NA,YNOSESKACSCH,Yellownose skate Central-Southern Chile
-Zearaja chilensis,224,87,NA,YNOSESKASCH,Yellownose skate Southern Chile
+Tetrapturus albidus,55,27,793177000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,55,34,162454000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,56,34,796637000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,57,27,12638271819,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,57,34,441200000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,58,34,448411000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,59,27,3456501096,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,60,37,407331600.8,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,62,34,257178000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,62,37,1188711978,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,63,34,250980000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,64,34,155355000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,65,34,22681993923,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,66,34,157755000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,69,27,28922275718,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,70,27,35961945753,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,73,18,9952102.145,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,73,27,1289140000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,85,34,68325591323,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,85,47,373436000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,86,47,444915000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,88,47,754882000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,89,48,1449740000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,95,41,550877000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,96,34,159351000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,97,34,246168000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,98,34,15355790416,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,99,34,30033724711,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,100,34,30862527163,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,100,47,8710977244,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,101,47,559606000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,102,47,374812000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,103,34,130671000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,104,34,308370000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,105,48,441172000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,106,34,224920000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,108,21,24529399206,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,108,31,425867000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,110,31,596493000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,111,31,154163000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,112,31,365920000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,113,31,119080000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,114,31,123541000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,115,31,269157000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,116,31,210958000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,117,31,80167574484,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,118,31,92160547619,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,119,31,10281053359,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,120,31,107845000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,121,31,7573110619,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,122,31,15452746183,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,123,31,28546247339,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,124,31,183902000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,125,31,26149209954,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,126,31,75477885811,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,127,31,36355496255,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,129,31,142992000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,130,31,26888681083,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,131,31,161215000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,132,31,398872000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,133,31,218193000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,135,31,826017000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,136,31,1637195103,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,139,31,473765000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,140,31,137955000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,141,27,267411000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,143,27,755843000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,144,27,293448000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,145,18,9678601.004,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,145,21,857890000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,145,27,1308520000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,163,21,488584000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,163,31,1137240000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,164,31,35993364169,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,166,31,244834000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,167,31,136152000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,168,31,128190000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,169,31,130280000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,169,41,4485271245,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,171,31,43285709944,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,171,34,178626000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,171,41,3433580000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,172,41,1084610000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,172,87,18638032.43,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,173,41,129745000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,174,27,84257733878,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,175,27,103278000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,176,27,57050045774,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,177,27,64588698354,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,178,27,32022954331,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,179,27,256586000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,180,27,726739000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,181,27,427735000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,182,27,292740000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,182,34,2303976235,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,182,37,1937170019,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,183,27,266414000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,183,34,45153381206,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,189,27,6124611341,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,193,34,106471000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,194,34,109252000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,195,34,174568000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,196,34,182148000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,197,34,14422484602,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,198,34,191800000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,198,47,1679869169,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,199,34,1907851723,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,199,47,11655162007,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,200,34,9659541198,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,200,47,480699000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,218,18,52716391.94,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,218,21,2279810000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,219,21,12323945182,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,220,31,490564779.3,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,221,31,5361979365,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,222,27,160726000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,223,27,1740010000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,224,41,2770399347,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,224,87,5956818.596,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,227,27,2965500844,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,228,27,8695142645,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,244,31,30387019186,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,245,31,13209978805,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248,31,9424556418,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,249,31,2228128391,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,250,31,25237491544,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,255,31,22607683799,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,255,34,84288792925,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,260,18,143.0115125,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,260,27,3526917413,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,261,21,2637120000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,261,27,15.14353269,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,261,31,4.241982039,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,262,21,25.52048997,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,262,27,5400990000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,263,21,177.9886164,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,263,27,11.42958793,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,263,31,7334640000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,263,34,13.03182012,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,264,27,82.88177014,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,264,34,9068900000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,264,41,20.35386015,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,266,31,25.93962336,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,266,34,58.40171043,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,266,41,12331800000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,266,48,13.20902199,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,267,34,174.3657035,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,267,41,122.0930757,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,267,47,13825900000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,277,41,0.092467817,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,277,87,78302580.9,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248100,41,35.92079827,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248100,48,672379000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248100,87,5.677459717,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248200,48,695676000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248300,41,29.61029053,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248300,48,281984000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248400,41,14.80456347,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248400,48,404136000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248500,48,2626250000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248600,41,3.86e-10,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248600,47,29569142.77,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,248600,48,4733240000000,WMARLINATL,White marlin Atlantic Ocean
+Tetrapturus albidus,288300,48,942.3219615,WMARLINATL,White marlin Atlantic Ocean
