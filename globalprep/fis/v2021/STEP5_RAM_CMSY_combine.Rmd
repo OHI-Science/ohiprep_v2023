@@ -176,7 +176,7 @@ B/Bmsy values for each catch record are generated (for the species where this is
    dplyr::select(rgn_id, stock_id, taxon_key, year, bbmsy, bmsy_data_source, RAM_gapfilled=method, mean_catch) %>%
    filter(year >= 2001)
 
-old <- read_csv(file.path("../v2020/output/fis_bbmsy_gf.csv"))
+old <- read_csv(file.path("../v2021_old/output/fis_bbmsy_gf.csv"))
 
 summary(old)
 summary(data_gf)
@@ -199,4 +199,65 @@ bbmsy_dups_fixed <- bbmsy %>%
 write.csv(bbmsy_dups_fixed, "output/fis_bbmsy.csv", row.names=FALSE) 
 
 ```
+
+Data check
+```{r}
+## check pitcairn
+old <- read_csv(file.path("../v2021_old/output/fis_bbmsy_gf.csv"))
+
+new <- read_csv(file.path("../v2021/output/fis_bbmsy_gf.csv"))
+
+old_pit <- old %>%
+  filter(rgn_id == 146)
+mean(old_pit$bbmsy, na.rm = TRUE) # 1.221473
+
+new_pit <- new %>%
+  filter(rgn_id == 146)
+mean(new_pit$bbmsy, na.rm = TRUE) # 1.140603
+
+
+## split each into bbmsy ranges by 0.2 
+
+new_pit_range <- new_pit %>%
+  mutate(bbmsy_range = case_when(
+    bbmsy < 0.2 ~ "[0,0.2)",
+    bbmsy >=0.2 & bbmsy < 0.4 ~ "[0.2,0.4)",
+    bbmsy >=0.4 & bbmsy < 0.6 ~ "[0.4,0.6)",
+    bbmsy >=0.6 & bbmsy < 0.8 ~ "[0.6,0.8)",
+    bbmsy >=0.8 & bbmsy <1 ~ "[0.8,1)",
+    bbmsy >=1 & bbmsy <1.2 ~ "[1,1.2)", 
+    bbmsy >=1.2 & bbmsy <1.4 ~ "[1.2,1.4)",
+    bbmsy >=1.4 & bbmsy <1.6 ~ "[1.4,1.6)",
+    bbmsy >=1.6 & bbmsy <1.8 ~ "[1.6,1.8)",
+    bbmsy >=1.8 & bbmsy <2 ~ "[1.8,2)",
+    bbmsy >=2 & bbmsy <2.2 ~ "[2,2.2)", 
+    bbmsy >=2.2 ~ "[2.2, 3)"
+  )) %>%
+  group_by(year, bbmsy_range) %>%
+  summarise(mean_catch = mean(mean_catch, na.rm = TRUE)) %>%
+  ungroup()
+
+old_pit_range <- old_pit %>%
+  mutate(bbmsy_range = case_when(
+    bbmsy < 0.2 ~ "[0,0.2)",
+    bbmsy >=0.2 & bbmsy < 0.4 ~ "[0.2,0.4)",
+    bbmsy >=0.4 & bbmsy < 0.6 ~ "[0.4,0.6)",
+    bbmsy >=0.6 & bbmsy < 0.8 ~ "[0.6,0.8)",
+    bbmsy >=0.8 & bbmsy <1 ~ "[0.8,1)",
+    bbmsy >=1 & bbmsy <1.2 ~ "[1,1.2)", 
+    bbmsy >=1.2 & bbmsy <1.4 ~ "[1.2,1.4)",
+    bbmsy >=1.4 & bbmsy <1.6 ~ "[1.4,1.6)",
+    bbmsy >=1.6 & bbmsy <1.8 ~ "[1.6,1.8)",
+    bbmsy >=1.8 & bbmsy <2 ~ "[1.8,2)",
+    bbmsy >=2 & bbmsy <2.2 ~ "[2,2.2)", 
+    bbmsy >=2.2 ~ "[2.2, 3)"
+  )) %>%
+  group_by(year, bbmsy_range) %>%
+  summarise(mean_catch = mean(mean_catch, na.rm = TRUE)) %>%
+  ungroup()
+
+
+## ok, this is making more sense. It seems that in the Watson data, the majority of catch in Pitcairn came from stocks that were doing well (>0.8, <1.2), whereas in the SAUP data, the majority of catch came from stocks that doing poorly (>1.2; and there is a lot more catch in SAUP). This is why we see such a dramatic change in scores for Pitcairn FIS (-85 points). 
+```
+
 

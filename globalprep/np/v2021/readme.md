@@ -17,20 +17,23 @@ If using these data, please see our [citation policy](http://ohi-science.org/cit
 * Seaweed sustainability data (np_seaweed_sust)
 
 
-### Files: 
-* np_ornamentals_prep.Rmd - script for preparing the ornamentals data, as well as the intermediate data used in the weighting prep. Files of importance that are created (and associated gapfilling datasets): 
+### Files:
+
+The first 3 files can be completed in any order. The last file needs to be done last. 
+
+* STEP1a_np_ornamentals_prep.Rmd - script for preparing the ornamentals data, as well as the intermediate data used in the weighting prep. Files of importance that are created (and associated gapfilling datasets): 
     * int/np_harvest_tonnes_usd.csv
     * output/np_ornamentals_harvest_tonnes_rel.csv
     * output/np_risk_ornamentals.csv
     * output/np_exposure_orenamentals.csv
-* np_seaweeds_prep.Rmd - script for preparing the seaweeds data. Files of importance that are created (and associated gapfilling datasets): 
+* STEP1b_np_seaweeds_prep.Rmd - script for preparing the seaweeds data. Files of importance that are created (and associated gapfilling datasets): 
     * int/np_seaweeds_tonnes_weighting.csv
     * output/np_seaweed_harvest_tonnes.csv 
     * output/np_seaweed_sust.csv
-* np_fishfeed_pred.Rmd - script for preparing the FOFM data. Files of importance that are created (and associated gapfilling datasets): 
+* STEP1c_np_fishfeed_pred.Rmd - script for preparing the FOFM data. Files of importance that are created (and associated gapfilling datasets): 
     * int/mean_catch_FOFM.csv 
     * output/np_fofm_scores.csv
-* np_weighting_prep - script for preparing weighting scheme for ohi global. Files of importance that are created (and associated gapfilling datasets): 
+* STEP2_np_weighting_prep - script for preparing weighting scheme for ohi global. Files of importance that are created (and associated gapfilling datasets): 
     * output/np_product_weights.csv
 
 

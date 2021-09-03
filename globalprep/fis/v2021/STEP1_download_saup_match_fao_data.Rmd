@@ -36,6 +36,7 @@ The Sea Around Us Project has summarized catch data for each SAUP region and FAO
 
 Reference: 
 
+* Link: http://www.seaaroundus.org/data/#/search
 * Downloaded: August 24, 2021
 * Description: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
 * Native data resolution: Country

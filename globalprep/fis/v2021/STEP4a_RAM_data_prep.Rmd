@@ -42,7 +42,7 @@ Reference: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.495
 * Downloaded: 06/03/2021
 * Description: B/Bmsy value by stock and year (other data, which we do not use, are also available in the database)
 * Native data resolution: stock (fish stock, species and region specific)
-* Time range: 1950 - 2016
+* Time range: 1950 - 2024 (we only use the year which matches our fisheries catch data (2018 for v2021))
 * Format: R data files (.rds)
 * DOI: http://doi.org/10.5281/zenodo.4824192
 

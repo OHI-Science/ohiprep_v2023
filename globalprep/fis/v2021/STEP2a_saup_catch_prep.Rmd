@@ -39,6 +39,17 @@ v2021: Added new SAUP fisheries data to include year 2018 and updated the RAM da
 
 # Data Source
 
+**Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
+
+**Downloaded**: August 24, 2021
+
+**Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
+
+**Time range**: 1950 - 2018
+
+**Format**: CSV
+
+**Additional Information**: [Methods](http://www.seaaroundus.org/sea-around-us-methods-index/)
 
 ***
 
@@ -82,6 +93,14 @@ SAUP_d2021 <- file.path(dir_M, "git-annex/globalprep/fis/v2021")
 ```{r}
 fao_eez_prod <- read_csv(file.path(SAUP_d2021, "eez_fao_ids_prod.csv"))
 fao_high_seas <- read.csv(file.path(SAUP_d2021, "high_seas_fao_ids_prod.csv"))
+
+
+# test <- fao_eez_prod %>%
+#   filter(str_detect(area_name, "Pitcairn"))
+# 
+# test2 <- test %>%
+#    group_by(year) %>%
+#   summarise(sum = sum(tonnes_fix))
 
 
 high_seas_regions <- fao_high_seas %>%
@@ -260,8 +279,12 @@ sum(final_eez_matched$tonnes) == sum(fao_eez_prod_fix$tonnes) # TRUE perfect
 write.csv(final_eez_matched, file.path(fis_path, "ohi_rgn_eez_prod.csv"), row.names = FALSE)
 
 
-test <- final_eez_matched %>%
-  filter(rgn_id == 22)
+# test <- read.csv(file.path(fis_path, "ohi_rgn_eez_prod.csv")) %>%
+#   filter(rgn_id == 146)
+# 
+# test2 <- test %>%
+#   group_by(year) %>%
+#   summarise(sum = sum(tonnes))
 ```
 
 
@@ -328,7 +351,11 @@ unique(output_df$fishing_sector)
 ## compare the two 
 
 # watson_output_df <- read.csv(file.path(dir_M,'git-annex/globalprep/fis/v2021_old/int/stock_catch_by_rgn.csv')) %>%
-#   filter(rgn_id < 255)
+#   filter(rgn_id < 255) 
+# 
+# test_watson <- watson_output_df %>%
+#   group_by(year) %>%
+#   summarise(sum = sum(tons))
 # 
 # unique(watson_output_df$year)
 # unique(watson_output_df$rgn_id)
@@ -352,6 +379,14 @@ unique(output_df$fishing_sector)
 # setdiff(test_saup_2017$stock_id, test_watson_2017$stock_id)
 # setdiff(test_watson_2017$stock_id, test_saup_2017$stock_id) # lots of stock_id differences. Expected given the new data source.
   
+
+
+# test <- read.csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn.csv')) %>%
+#   filter(rgn_id == 146)
+# 
+# test2 <- test %>%
+#   group_by(year) %>%
+#   summarise(sum = sum(tons))
 ```
 
 ## Add Taxon Key Information
@@ -492,6 +527,13 @@ write.csv(stock_rgn_taxa, file.path(dir_M,'git-annex/globalprep/fis/v2021/int/st
 #   distinct(rgn_id) %>%
 #   left_join(rgns_eez)
 
+# 
+# test <- read.csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_taxa.csv')) %>%
+#   filter(rgn_id == 146)
+# 
+# test2 <- test %>%
+#   group_by(year) %>%
+#   summarise(sum = sum(tons))
 ```
 
 ## Data Check
@@ -614,7 +656,10 @@ Mean catch data is used to weight the B/Bmsy values in the fishery subgoal.
 file <- file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_taxa.csv')
 
 catch <- read_csv(file) %>%
-  rename(common = CommonName, fao_id = fao_rgn, species=TaxonName)
+  rename(common = CommonName, fao_id = fao_rgn, species=TaxonName) 
+
+# %>%
+# filter(rgn_id == 146)
 
 summary(catch)
 
@@ -676,6 +721,10 @@ catch_zeros <- catch_zeros %>%
   dplyr::select(-cum_catch) %>%
   ungroup()
 
+# test <- catch_zeros %>%
+#   group_by(year) %>%
+#   summarise(sum = sum(catch))
+
 ```
 
 ## Calculate Mean Catch
@@ -716,6 +765,12 @@ catch_zeros <- catch_zeros %>%
   )) %>%
   dplyr::select(-forage_fish, -inWatson)
 
+# test <- catch_zeros %>%
+#   group_by(rgn_id) %>%
+#   group_by(year) %>%
+#   summarise(tons_sum = sum(catch_human)) %>%
+#   mutate(tons_mean = mean(tons_sum)) 
+
 sum(catch_zeros$catch_human, na.rm = TRUE) # 3388041152
 sum(catch_zeros$catch_fish_feed, na.rm = TRUE) # 1920063062
 
@@ -730,6 +785,11 @@ mean_catch <- catch_zeros %>%
          mean_catch_human != 0)  %>%      ## some stocks have no reported catch for time period
   ungroup()
 
+sum(mean_catch$mean_catch)
+
+# test <- mean_catch %>%
+#   group_by(year) %>%
+#   summarise(sum = sum(mean_catch))
 
 ## now lets gapfill the 3 missing fishing regions with their high admin regions, Monaco, Gibraltar, Oecussi Ambeno. This is the same as giving them the same score as their admin region. Doing it here is easier than doing it in ohi-global.
 mean_catch_gf <- mean_catch %>%
