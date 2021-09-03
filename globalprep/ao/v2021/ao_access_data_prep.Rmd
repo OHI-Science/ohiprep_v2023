@@ -241,7 +241,7 @@ kiribati_split <- deleted_rgns %>%
 
 
 ## Now rbind all fixes together 
-all_deleted_fixes <-kiribati_split %>%
+all_deleted_fixes <- kiribati_split %>%
   left_join(rgns_eez, by = c("geo_area_name" = "rgn_name")) %>% 
   dplyr::select(region_name, sub_region_name, intermediate_region_name, region_type, rgn_id, "rgn_name" = "geo_area_name", time_detail, score, small_island_developing_states_sids) 
 

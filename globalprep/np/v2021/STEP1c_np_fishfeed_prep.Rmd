@@ -422,4 +422,20 @@ write.csv(score_data, here('globalprep/np/v2021/output/np_fofm_scores.csv'), row
 old <- read_csv(here('globalprep/np/v2020/output/np_fofm_scores.csv')) 
 summary(old)
 
+new <- read_csv(here('globalprep/np/v2021/output/np_fofm_scores.csv'))
+
+
+# old_prod_weights <- read_csv("../v2020/output/np_product_weights.csv")
+
+# prod_weights <- read_csv("output/np_product_weights.csv")
+
+check <- new %>%
+  rename("new_score" = "score") %>%
+  left_join(old, by = c("rgn_id", "year")) %>%
+  mutate(diff = new_score - score) %>%
+  filter(year == 2017)
+
+plot(check$new_score, check$score)
+abline(0,1, col="red")
+
 ```

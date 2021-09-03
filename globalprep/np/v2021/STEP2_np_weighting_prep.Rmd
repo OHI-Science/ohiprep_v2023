@@ -265,7 +265,9 @@ prod_weights <- read_csv("output/np_product_weights.csv")
 
 check <- prod_weights %>%
   rename("new_weight" = "weight") %>%
-  left_join(old_prod_weights, by = c("rgn_id", "product"))
+  left_join(old_prod_weights, by = c("rgn_id", "product")) %>%
+  mutate(diff = new_weight - weight) %>%
+  left_join(rgns_eez)
 
 plot(check$new_weight, check$weight)
 abline(0,1, col="red")
