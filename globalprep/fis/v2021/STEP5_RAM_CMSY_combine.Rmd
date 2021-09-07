@@ -92,14 +92,14 @@ mean_catch <- read.csv("output/mean_catch_minus_feed.csv", stringsAsFactors = FA
 
 Check number of Watson stocks that have CMSY or RAM B/Bmsy values:
 ```{r}
-## Watson v RAM BBMSY
+## SAUP v RAM BBMSY
 setdiff(ram$stock_id, mean_catch$stock_id)
 setdiff(mean_catch$stock_id, ram$stock_id)
 intersect(ram$stock_id, mean_catch$stock_id) #342 stocks with RAM-B/Bmsy data (although RAM is matched by fao and rgn ids) - v2019
 #332 stocks with RAM-B/Bmsy data (although RAM is matched by fao and rgn ids) - v2020
 #365 stocks with RAM-B/Bmsy data (although RAM is matched by fao and rgns ids) - v2021
 
-## Watson v CMSY
+## SAUP v CMSY
 setdiff(cmsy$stock_id, mean_catch$stock_id)
 setdiff(mean_catch$stock_id, cmsy$stock_id)
 length(intersect(mean_catch$stock_id, cmsy$stock_id)) #738 stocks with CMSY-B/Bmsy data - v2019

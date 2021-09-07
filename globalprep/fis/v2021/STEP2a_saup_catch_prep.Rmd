@@ -35,6 +35,8 @@ First, we need to match SAUP EEZ regions to OHI regions, and summarize per regio
 ## Updates from previous assessment
 v2021: Added new SAUP fisheries data to include year 2018 and updated the RAM data.
 
+NOTE: for next year (v2022), consider using the FOFM identifier in the SAUP data, instead of what we currently do to quantify the FOFM use. In v2021, the FOFM identifier in the SAUP did not seem correct. 
+
 ***
 
 # Data Source
@@ -91,16 +93,8 @@ SAUP_d2021 <- file.path(dir_M, "git-annex/globalprep/fis/v2021")
 # Create lookup tables to match OHI region names to SAUP area_name (EEZ) 
 
 ```{r}
-fao_eez_prod <- read_csv(file.path(SAUP_d2021, "eez_fao_ids_prod.csv"))
+fao_eez_prod <- read.csv(file.path(SAUP_d2021, "eez_fao_ids_prod.csv"))
 fao_high_seas <- read.csv(file.path(SAUP_d2021, "high_seas_fao_ids_prod.csv"))
-
-
-# test <- fao_eez_prod %>%
-#   filter(str_detect(area_name, "Pitcairn"))
-# 
-# test2 <- test %>%
-#    group_by(year) %>%
-#   summarise(sum = sum(tonnes_fix))
 
 
 high_seas_regions <- fao_high_seas %>%
@@ -109,7 +103,7 @@ high_seas_regions <- fao_high_seas %>%
     area_name == "Atlantic, Western Central" ~ "Atlantic, Western-Central",
     str_detect(area_name, "Antarctic") ~ "Antarctica",
     TRUE ~ area_name
-  ))
+  )) # fix some names
 region_data()
 
 high_seas_ohi <- rgns_all %>%
@@ -144,8 +138,7 @@ write.csv(matched_area_names, "int/area_name_lookup_raw.csv", row.names = FALSE)
 
 area_name_matched <- read_csv("int/area_name_lookup_manual.csv") # perfect
 
-## gibraltar, monaco, oecussi ambeno tricky - will gapfill at the end.. assign them the scores of their admin regions (Spain, France, East Timor)
-## bouvet is included? Not enough catch? Protected area anyways; uninhabited?
+## gibraltar, monaco, oecussi ambeno are not included - will gapfill at the end.. assign them the scores of their admin regions (Spain, France, East Timor)
 
 ```
 
@@ -279,12 +272,6 @@ sum(final_eez_matched$tonnes) == sum(fao_eez_prod_fix$tonnes) # TRUE perfect
 write.csv(final_eez_matched, file.path(fis_path, "ohi_rgn_eez_prod.csv"), row.names = FALSE)
 
 
-# test <- read.csv(file.path(fis_path, "ohi_rgn_eez_prod.csv")) %>%
-#   filter(rgn_id == 146)
-# 
-# test2 <- test %>%
-#   group_by(year) %>%
-#   summarise(sum = sum(tonnes))
 ```
 
 
@@ -378,15 +365,7 @@ unique(output_df$fishing_sector)
 # 
 # setdiff(test_saup_2017$stock_id, test_watson_2017$stock_id)
 # setdiff(test_watson_2017$stock_id, test_saup_2017$stock_id) # lots of stock_id differences. Expected given the new data source.
-  
 
-
-# test <- read.csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn.csv')) %>%
-#   filter(rgn_id == 146)
-# 
-# test2 <- test %>%
-#   group_by(year) %>%
-#   summarise(sum = sum(tons))
 ```
 
 ## Add Taxon Key Information
@@ -526,33 +505,6 @@ write.csv(stock_rgn_taxa, file.path(dir_M,'git-annex/globalprep/fis/v2021/int/st
 #   filter(rgn_id < 255) %>%
 #   distinct(rgn_id) %>%
 #   left_join(rgns_eez)
-
-# 
-# test <- read.csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_taxa.csv')) %>%
-#   filter(rgn_id == 146)
-# 
-# test2 <- test %>%
-#   group_by(year) %>%
-#   summarise(sum = sum(tons))
-```
-
-## Data Check
-
-Take a look at catch data with missing ohi and fao regions in **stock_catch_by_rgn_taxa**. These have taxon key matches, but no ohi or fao regions assigned to them. There are none for v2021!
-```{r, eval=FALSE}
-
-df <- read_csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_taxa.csv'))
-
-# 0 NAs for OHI regions
-df_na <- df %>% 
-  filter(is.na(rgn_id))
-nrow(df_na)
-
-# 0 catch data without fao regions assigned - v2021
-df_na <- df %>% 
-  filter(is.na(fao_rgn))
-nrow(df_na)
-
 ```
 
 
@@ -658,8 +610,6 @@ file <- file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_t
 catch <- read_csv(file) %>%
   rename(common = CommonName, fao_id = fao_rgn, species=TaxonName) 
 
-# %>%
-# filter(rgn_id == 146)
 
 summary(catch)
 

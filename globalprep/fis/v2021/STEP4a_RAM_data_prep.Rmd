@@ -29,7 +29,7 @@ This script prepares the RAM B/Bmsy data:
 
 ## Updates from previous assessment
 
-Using new SAUP data
+Using new SAUP catch data
 
 
 ***
