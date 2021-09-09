@@ -26,13 +26,13 @@ This script creates the Sea Surface Temperature (SST) layer for the 2021 global 
 
 # Updates from previous assessment
 
-Previously, data source only extended from 1982 to 2012. In the 2016 assessment, the data year 2012 was used as a proxy for 2016, data year 2011 was used as a proxy for 2015, and so on. For the 2021 assessment, data year will match 2020, so data year 2020 represents year 2019, and so on. 
+ For the 2021 assessment, data year will match 2020, so data year 2020 represents year 2019, and so on. 
 
 ***
 
 # Data Source
 
-Data comes from [CoRTAD version 6](http://www.nodc.noaa.gov/sog/cortad/)
+Data comes from [CoRTAD version 6](https://www.ncei.noaa.gov/products/coral-reef-temperature-anomaly-database)
 
 See `prs_sst/v2015/dataprep.R` for preparation of the "annual_pos_anomalies" data. 
 
