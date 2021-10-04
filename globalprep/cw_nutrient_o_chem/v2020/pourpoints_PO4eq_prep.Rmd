@@ -165,6 +165,12 @@ n_p_dis_log_rast <- raster::calc(n_p_dis_rast, fun = function(x){log(x + 1)}) ##
 
 plot(n_p_dis_log_rast)
 plot(watersheds_all$geometry, add = TRUE)
+
+
+# cellStats(n_p_rast, "sum") # 10451586
+# 
+# test <- raster(file.path(cw_nutrient_int_dir, "rasters/crop_fert_PO4eq_disagg.tif"))
+#  cellStats(test, "sum")
 ```
 
 **Calculate zonal stats per watershed and save.**
@@ -191,6 +197,7 @@ plot(raster_watersheds)
 #writeRaster(x = raster_watersheds, filename = file.path(cw_nutrient_int_dir, "rasters/raster_watersheds.tif"), overwrite = TRUE)
 
 raster_watersheds <- raster::raster(file.path(cw_nutrient_int_dir, "rasters/raster_watersheds.tif"))
+
 
 zs_n_p <- raster::zonal(n_p_dis_rast, raster_watersheds, fun = 'sum', progress = 'text', na.rm = TRUE) ## calculate sum of PO4eq per watershed
 zs_n_p_df <- data.frame(zs_n_p)
@@ -308,6 +315,7 @@ summary(ws_pp_zonal_all_fix)
 st_write(ws_pp_zonal_all_fix, file.path(cw_nutrient_int_dir, "pourpoints/PO4eq_pourpoints.shp"), overwrite=TRUE, delete_dsn = TRUE) ## this is our final pourpoint data set we will plug into the plume model 
 
 mapview(ws_pp_zonal_all_fix)
+
 ```
 
 **Create a shapefile to test the plume model on first**

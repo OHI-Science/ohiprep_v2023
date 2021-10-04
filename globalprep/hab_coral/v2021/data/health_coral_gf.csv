@@ -73,6 +73,7 @@
 132,"coral","health","0",2012
 133,"coral","health","adjacent",2012
 135,"coral","health","0",2012
+136,"coral","health","adjacent",2012
 137,"coral","health","adjacent",2012
 139,"coral","health","0",2012
 140,"coral","health","adjacent and disagg2012_gap_fill",2012
@@ -120,7 +121,6 @@
 248,"coral","health","disagg2012_gap_fill",2012
 249,"coral","health","disagg2012_gap_fill",2012
 250,"coral","health","disagg2012_gap_fill",2012
-136,"coral","health","adjacent",2012
 3,"coral","health",NA,2012
 4,"coral","health",NA,2012
 20,"coral","health",NA,2012

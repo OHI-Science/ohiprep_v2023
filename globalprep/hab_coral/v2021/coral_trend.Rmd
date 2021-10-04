@@ -113,7 +113,7 @@ write.csv(trend_gaps, 'globalprep/hab_coral/v2021/data/trend_coral_gf.csv', row.
 ### save health data:
 trend <- tmp %>%
   dplyr::select(rgn_id, habitat, trend) %>%
-  mutate(year = 2018)
+  mutate(year = 2021)
 write.csv(trend, 'globalprep/hab_coral/v2021/data/habitat_trend_coral_updated.csv', row.names=FALSE)
 
 ```

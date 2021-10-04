@@ -163,7 +163,7 @@ spp_narr_chunk_files <- list.files(file.path(dir_goal_anx, 'tmp'),
   spp_narr_url <- 'http://apiv3.iucnredlist.org/api/v3/species/narrative/id/%s/region/RGN_ID?token=%s'
   
   spp_narr <- vector('list', length = nrow(spp_ids_valid))
-  for(i in c(1083:nrow(spp_ids_valid))) { # i <- 1
+  for(i in c(1:nrow(spp_ids_valid))) { # i <- 1
     spp_id <- spp_ids_valid$iucn_sid[i]
     rgn_id <- spp_ids_valid$iucn_rgn[i]
     cat_msg(i, 'of', nrow(spp_ids_valid), ': Trying spp', spp_id, 'from', rgn_id, '\n')

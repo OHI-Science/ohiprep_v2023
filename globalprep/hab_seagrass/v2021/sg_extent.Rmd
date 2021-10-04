@@ -148,7 +148,7 @@ datasets <- unique(sort(v7_seagrass_py_moll$datasetID))
 n_datasets <- length(unique(sort(v7_seagrass_py_moll$datasetID)))
 
 
-for(i in c(81:107, 110:n_datasets)){   #i = 2 ## have to start with 2 since we've already created a baseline with the first row intersection.. going to skip over rows 108 and 109 and further chunk those below, because they are so large
+for(i in c(2:107, 110:n_datasets)){   #i = 2 ## have to start with 2 since we've already created a baseline with the first row intersection.. going to skip over rows 108 and 109 and further chunk those below, because they are so large
 
 dataset_id <- datasets[i]
   
