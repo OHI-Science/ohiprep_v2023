@@ -1,0 +1,234 @@
+---
+title: 'OHI 2021 - Land based nutrient plume exploration '
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../workflow/templates/ohi_hdr.html' 
+  pdf_document:
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+[REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2020/globalprep/cw_nutrient_o_chem/v2020/plume_output_exploration.html)
+
+
+# Summary
+This document is used to explore the output of the plume modeling done for this data layer.  
+
+## The following data are used:
+
+* 
+
+
+
+## Initial set-up code
+
+```{r setup, eval = FALSE}
+library(tidyverse)
+library(raster)
+library(sf)
+library(mapview)
+library(janitor)
+
+
+source(here('workflow/R/common.R'))
+
+ww_raw_dir <- "/home/shares/ohi/git-annex/land-based/wastewater/data/raw"
+ww_intermediate_dir <- "/home/shares/ohi/git-annex/land-based/wastewater/data/interim"
+prs_int_dir <- "/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int"
+prep <- file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021")
+
+```
+
+**Take a look at the output from the full plume model**
+ - We need to check this to see if the model ran on all of the basin_id
+ - It looks like the model did not write rasters for everything. I think this is due to very small effluent values. 
+ - Check the plumes that were run, and see if the ones with really small values are included. 
+ 
+```{r, eval = FALSE}
+## Count how many rasters the plume model created and compare to the number of pourpoints with >0 N effluent
+
+fils <- list.files("/home/sgclawson/plumes/output1/", pattern="tif$", full.names = FALSE, recursive = TRUE)
+
+files <- data_frame(fils)
+ 
+
+pourpoint_names_files <- data.frame(fils = sub('.*plume_effluent_', '', files$fils))
+
+pourpoint_names <- data.frame(basin_id = sub('.tif', '', pourpoint_names_files$fils)) %>%
+  mutate(basin_id = as.character(basin_id)) %>%
+  dplyr::filter(str_detect(basin_id, "subsets", negate = TRUE))
+
+
+## now read in total shp file
+
+files_shp <- list.files(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints/"), pattern = "shp", full = TRUE)
+
+ws_pp_zonal_all_fix <- st_read(files_shp[1])   %>%
+  mutate(row_num = row_number()) 
+
+test_ws <- ws_pp_zonal_all_fix %>%
+  filter(effluent !=0)
+sum(test_ws$effluent) # 16217349
+
+excluded_2005 <- c(setdiff(ws_pp_zonal_all_fix$basin_id, pourpoint_names$basin_id))
+
+included_2005 <- c(pourpoint_names$basin_id)
+
+
+
+fils_2006 <- list.files("/home/sgclawson/plumes/output2/", pattern="tif$", full.names = FALSE, recursive = TRUE)
+
+files_2006 <- data_frame(fils)
+ 
+
+pourpoint_names_files_2006 <- data.frame(fils = sub('.*plume_effluent_', '', files_2006$fils))
+
+pourpoint_names_2006 <- data.frame(basin_id = sub('.tif', '', pourpoint_names_files_2006$fils)) %>%
+  mutate(basin_id = as.character(basin_id)) %>%
+  dplyr::filter(str_detect(basin_id, "subsets", negate = TRUE))
+
+
+ws_pp_zonal_all_fix <- st_read(files_shp[2])   %>%
+  mutate(row_num = row_number()) 
+
+excluded_2006 <- c(setdiff(ws_pp_zonal_all_fix$basin_id, pourpoint_names_2006$basin_id))
+
+included_2006 <- c(pourpoint_names_2006$basin_id)
+
+
+setdiff(included_2005, included_2006)
+setdiff(included_2006, included_2005)
+
+
+ws_pp_zonal_all_fix <- st_read(files_shp[3])   %>%
+  mutate(row_num = row_number()) 
+
+excluded_2007 <- c(setdiff(ws_pp_zonal_all_fix$basin_id, pourpoint_names$basin_id))
+
+included_2007 <- c(pourpoint_names$basin_id)
+
+
+setdiff(included_2005, included_2007)
+setdiff(included_2006, included_2007)
+
+
+check <- ws_pp_zonal_all_fix %>%
+  dplyr::filter(basin_id %in% excluded)
+
+check_0 <- check %>%
+  dplyr::filter(effluent >0) ## yes, the really small values were excluded... 
+
+# Now lets check where those small pourpoints were located in the shapefile... I bet that one of them is in row number 36522?
+check_2 <- ws_pp_zonal_all_fix %>%
+  arrange(basin_id) %>%
+  mutate(row_num = row_number()) %>%
+  filter(effluent >0)
+
+check_1 <- ws_pp_zonal_all_fix %>%
+  filter(effluent == 0)
+
+
+test <- raster("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/output/N_plume/pourpoints_crop_manure_leached_volt_N_2005_joined.tif")
+cellStats(test, "sum") # 4296690
+
+plot(test)
+
+test2 <- raster::select(test)
+plot(test2)
+
+N_effluent_log <- raster::calc(test, fun = function(x){log(x + 1)})
+plot(N_effluent_log)
+
+
+files_shp <- list.files(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints/"), pattern = "shp", full = TRUE)
+
+tester <- st_read(files_shp[1])
+sum(tester$effluent) # 16217349
+
+min(tester$effluent)
+
+
+testing <- tester %>%
+  filter(effluent != 0)
+
+
+testing <- tester %>% 
+  filter(str_detect(basin_id, "ai"))
+
+mapview(testing)
+
+
+test_0_val <- raster(file.path("/home/sgclawson/plumes/output2/subsets/subset4/plume_effluent_pa_00001.tif"))
+plot(test_0_val)
+cellStats(test_0_val, "sum")
+```
+
+
+Test small plumes 
+
+```{r}
+small_2005 <- raster(file.path("/home/sgclawson/plumes/output_testing_small/subsets/effluent_sub1.tif"))
+cellStats(small_2005, "sum") # 7.769491e-08
+
+
+small_2005_shp <- st_read(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints_small/small_pourpoints_crop_manure_leached_volt_N_2005.shp"))
+sum(small_2005_shp$effluent) # 8.603584e-08
+
+
+8.603584e-08 - 7.769491e-08 # there is a difference... why am I missing plumes 
+
+
+
+
+
+
+fils <- list.files("/home/sgclawson/plumes/output_testing_small/subsets/subset1", pattern="tif$", full.names = FALSE, recursive = TRUE)
+
+
+files <- data_frame(fils)
+ 
+
+pourpoint_names_files <- data.frame(fils = sub('.*plume_effluent_', '', files$fils))
+
+pourpoint_names <- data.frame(basin_id = sub('.tif', '', pourpoint_names_files$fils)) %>%
+  mutate(basin_id = as.character(basin_id)) %>%
+  dplyr::filter(str_detect(basin_id, "subsets", negate = TRUE))
+
+small_shp_test <- small_2005_shp %>%
+  filter(!(basin_id %in% c(pourpoint_names$basin_id)))
+
+mapview(small_shp_test)
+
+small_shp_test_2 <- small_2005_shp %>%
+  filter((basin_id %in% c(pourpoint_names$basin_id)))
+
+mapview(small_shp_test_2)
+
+
+all_2005 <- st_read(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints/pourpoints_crop_manure_leached_volt_N_2005.shp"))
+
+all_2005_na <- all_2005 %>%
+  filter(str_detect(basin_id, "na_"))
+
+mapview(all_2005_na)
+
+
+ocean <- raster("/home/shares/ohi/git-annex/globalprep/cw_nutrient_o_chem/raw/ocean_mask_landnull.tif")
+
+plot(ocean)
+
+test <- raster("/home/shares/ohi/git-annex/land-based/wastewater/data/interim/ocean_masks/ocean_mask_orginal.tif")
+plot(test)
+
+```
+
