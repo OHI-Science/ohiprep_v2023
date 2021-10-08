@@ -5,7 +5,7 @@
 cd /home/sgclawson/plumes
 
 # Load ocean mask null into grass session 
-r.in.gdal /home/sgclawson/grassdata/location/PERMANENT/ocean_mask_landnull.tif output='ocean'
+r.in.gdal /home/sgclawson/grassdata/location/PERMANENT/ocean_mask_10km.tif output='ocean'
 
 outdir=/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/output/N_plume
 
@@ -82,8 +82,8 @@ do
    printf "Starting $i \n"
    mkdir subsets/subset$i
   
-   # move the tif files in batches of 10000
-   mv `ls | head -10000` subsets/subset$i/
+   # move the tif files in batches of 10000 - NOTE CHANGE TO 10000 before running again gage
+   mv `ls | head -15` subsets/subset$i/
   
    # mosaic subset 
    cd subsets/subset$i/

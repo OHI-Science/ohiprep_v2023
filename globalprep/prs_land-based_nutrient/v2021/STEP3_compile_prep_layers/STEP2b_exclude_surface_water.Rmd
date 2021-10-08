@@ -18,6 +18,10 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary
+
+Multiply our leaching and volatized rasters by the appropriate surfwater rasters to get an estimate of the amount of N that will reach the coast. See below for more instructions. 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -35,8 +39,9 @@ source(here(git_crop, "R/common_spatial.R")) # read in necessary spatial files
 
 ```
 
+## Methods 
 
-Now loop that will multiply the yearly leaching raster by the surface water raster and save. Multiply the volatilization rasters by a raster proportion of cell covered by surface water + 1km from coast. Additionally save the total cellStats sum for each of the multiplied rasters so that we can compare to the total nutrient layers. 
+Loop that will multiply the yearly leaching raster by the surface water raster and save. Multiply the volatilization rasters by a raster proportion of cell covered by surface water + 1km from coast. Additionally save the total cellStats sum for each of the multiplied rasters so that we can compare to the total nutrient layers. 
 
 Do this for: 
 

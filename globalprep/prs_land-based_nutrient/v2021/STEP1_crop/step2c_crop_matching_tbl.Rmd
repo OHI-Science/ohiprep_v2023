@@ -18,6 +18,9 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary
+Make a table which outlines codes for the different types of crops represented in the FAOSTAT database and the bouwman datasets
+
 
 ## Setup
 ```{r setup, include = FALSE}

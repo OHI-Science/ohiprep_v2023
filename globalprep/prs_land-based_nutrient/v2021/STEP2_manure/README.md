@@ -1,6 +1,6 @@
 # Animal Nutrient
 
-This folder contains all the scripts and data produced from creating rasters of P leaching, N leaching, and N volatization from livestock animal systems.
+This folder contains all the scripts and data produced from creating rasters of P leaching, N leaching, and N volatization from livestock animal systems for years 2005-2019 of FAOSTAT data. 
 
 
 ## Scripts
@@ -16,7 +16,6 @@ This folder contains all the scripts and data produced from creating rasters of 
 | STEP5.5_prop_manure_leaching_volt_applied pastures.Rmd | Creates rasters for 1) the proportion manure that leaches after manure that has been through mms is then applied to pastures  2) the proportion manure that volatizes after manure that has been through mms is then applied to pastures| Creates rasters for the proportion of N leached and volatized from being applied to pastures |
 | STEP6_prop_manure_leaching_pastures.Rmd | Creates rasters for 1) the proportion manure that leaches when left on pastures 2) the proportion manure that volatizes when left on pastures | Creates rasters for the proportion of N leached and volatized from being left on pasture |
 | STEP7_total_N_leach_volatize.Rmd | Combines all the sources of manure volatization for each livestock system | Creates rasters all livestock systems volatization |
-| STEP8_combine_all_nutrients.Rmd | Combines all the sources of excess nutrients (N leaching, P leaching, and N volatizing | Creates rasters all livestock systems nutrient inputs |
 
 
 ## Contributors

@@ -2,6 +2,8 @@
 title: "grassland_fertilizer_distribution"
 output: html_document
 ---
+# Summary
+Distribute grassland fertilizer across grazers at the country-level
 
 ```{r setup, include = FALSE}
 # getting packages we want

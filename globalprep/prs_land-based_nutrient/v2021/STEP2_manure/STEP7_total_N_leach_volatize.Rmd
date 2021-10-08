@@ -18,6 +18,9 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary 
+Combines all the sources of manure volatization and leaching for each livestock system 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 

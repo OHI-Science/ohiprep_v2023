@@ -18,6 +18,9 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary
+Creates rasters for 1) the proportion manure that leaches after manure that has been through mms is then applied to pastures  2) the proportion manure that volatizes after manure that has been through mms is then applied to pastures
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 

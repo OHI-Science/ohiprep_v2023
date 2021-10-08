@@ -288,7 +288,7 @@ def processCategory(c, c_data, vname, log):
     print("cmd: {}".format(cmd))
     os.popen(cmd)
 
-    # Mask out non-ocean cells
+    # Mask out non-ocean cells - TRY COMMENTING OUT THIS PART GAGE 
     cmd = 'r.mapcalc "%s = if( %s, %s)"' % (dw, mask, cost) 
     print("cmd: {}".format(cmd))
     os.popen(cmd)

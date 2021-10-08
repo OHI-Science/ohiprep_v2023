@@ -18,6 +18,17 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary
+Use FAOSTAT N excreted in manure data to calculate excretion rates for livestock.
+
+## The following data are used:
+
+* Source: [FAOSTAT N excreted in manure](http://www.fao.org/faostat/en/#data/EMN)
+
+* Downloaded: 09/13/2021
+
+* Data years: 2005 - 2019
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 

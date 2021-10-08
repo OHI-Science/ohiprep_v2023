@@ -44,15 +44,6 @@ library("readr")
 library(tabulizer)
 library(ohicore)
 
-# Raster templates
-# source(here("_spatial/template_raster.R"))
-# source(here("_workflow/common.R"))
-# source(here("_workflow/common_spatial.R"))
-
-# Import food_rgns xy df
-# food_rgns_xy <- 
-#   food_rgns_xy %>% 
-#   select(x, y, iso3c)
 
 
 source(here('workflow/R/common.R'))

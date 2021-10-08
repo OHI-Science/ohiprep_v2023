@@ -18,6 +18,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary 
+Creates rasters for the proportion of initial manure N that is volatized during active manure management systems
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

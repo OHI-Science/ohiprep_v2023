@@ -20,16 +20,16 @@ Here I will document how to run the plume model. Much of this was written by Gag
 
 conda activate py2
 
-cp /home/shares/ohi/git-annex/globalprep/cw_nutrient_o_chem/raw/ocean_mask_landnull.tif /home/username/grassdata/ 
-## copy the ocean mask to your grassdata folder. The ocean mask is a raster where the land values are set to nan and the ocean values to 1. You can find it here: /home/tuholske/wastewater/data/interim/ocean_masks/ocean_mask_landnull.tif, or here: /home/shares/ohi/git-annex/globalprep/cw_nutrient_o_chem/raw/ocean_mask_landnull.tif. Or you could just create it yourself! You only need to do this once.
+cp /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/ocean_masks/ocean_mask_1km.tif /home/sgclawson/grassdata/ 
+## copy the ocean mask to your grassdata folder. The ocean mask is a raster where the land values are set to nan and the ocean values to 1.
 
 rm -r /home/sgclawson/grassdata/location # replace username with your home directory name
 
-grass -c ~/grassdata/ocean_mask_landnull.tif ~/grassdata/location ## start a grass session and create a location folder where grass will run 
+grass -c ~/grassdata/ocean_mask_1km.tif ~/grassdata/location ## start a grass session and create a location folder where grass will run 
 
-exit ## exit grass, and copy ocean_mask_landnull.tif to PERMANENT folder, located in location folder
+exit ## exit grass, and copy ocean_mask_1km.tif to PERMANENT folder, located in location folder
 
-cp /home/sgclawson/grassdata/ocean_mask_landnull.tif /home/sgclawson/grassdata/location/PERMANENT/
+cp /home/sgclawson/grassdata/ocean_mask_1km.tif /home/sgclawson/grassdata/location/PERMANENT/
 
 # Move your poupoint files into a folder in plumes. 
 ##first create the folder, called "shp" 
@@ -40,7 +40,7 @@ mkdir plumes/shp # make new shps folder
 
 ## navigate to the folder they were saved to which in my case is the prs_land-based_nutrient/v2021 folder
 
-cd /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints/
+cd /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints_retry/
 
 ## copy files to the new shp folder you just created
 

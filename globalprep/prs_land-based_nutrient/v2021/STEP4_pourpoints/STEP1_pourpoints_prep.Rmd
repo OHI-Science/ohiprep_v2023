@@ -23,11 +23,13 @@ editor_options:
 
 
 # Summary
-This document describes the steps for obtaining and prepping data used for the land based nutrient data layer for clean waters. In specific, this data prep focuses on prepping the N and P pourpoint shapefiles from crop fertilizer and manure excretion, which will be fed into the plume model. 
+This document describes the steps for obtaining and prepping data used for the land based nutrient data layer for clean waters. In specific, this data prep focuses on prepping the N pourpoint shapefiles from crop fertilizer and manure excretion, which will be fed into the plume model. Here we aggregate each N raster to the appropriate watershed, and eventually the appropriate pourpoint.
 
 ## The following data are used:
 
-* 
+* N leaching and volatilization rasters created in previous steps of this prep.
+* Global watersheds dataset 
+* Global pourpoints dataset (associated with each watershed)
 
 
 # Updates from previous assessment
@@ -166,8 +168,7 @@ foreach(yr = years) %dopar% {
   
  # file = files_list[1]
  rast <- volt_file + leached_file
-#  plot(log(rast+1))
-# 
+
 # cellStats(rast, "sum") # 18172110
 
 # divide nutrients by area of cell.  to get nutrients/km2 (or, whatever); 2, Disagregate the data; 3. multiply the disagregated raster by the new cell areas; 4. sum across all raster cells and compare to the original raster…the total should be about the same
@@ -216,9 +217,6 @@ watersheds_all <- watersheds_all %>%
   arrange(id) %>%
   mutate(id_new = 1:wat_length) # produce a new id for watersheds so that we can fasterize correctly... I don't believe fasterize would work with basin_id since it is a character variable. 
 
-
-# plot(rast)
-# plot(watersheds_all$geometry, add = TRUE)
 
 raster_watersheds <- fasterize::fasterize(watersheds_all, rast, field = "id_new") ## make watershed raster
 
@@ -340,18 +338,6 @@ coastal_pourpoints <- st_read(file.path(ww_intermediate_dir, "watersheds_coastal
 
 coastal_pp_ids <- unique(coastal_pourpoints$basin_id)
 
-## create vector of pourpoints to exclude from 2005, 2006, and 2007, since these have already run (DELETE THIS LATER GAGE)
-
-fils <- list.files("/home/sgclawson/plumes/output1_try1/", pattern="tif$", full.names = FALSE, recursive = TRUE)
-files <- data_frame(fils)
-pourpoint_names_files <- data.frame(fils = sub('.*plume_effluent_', '', files$fils))
-pourpoint_names <- data.frame(basin_id = sub('.tif', '', pourpoint_names_files$fils)) %>%
-  mutate(basin_id = as.character(basin_id)) %>%
-  dplyr::filter(str_detect(basin_id, "subsets", negate = TRUE))
-ws_pp_zonal_all_fix <- st_read(files_shp[1]) %>%
-  mutate(row_num = row_number())
-         
-included <- c(pourpoint_names$basin_id)
 
 registerDoParallel(cores = 5)
 foreach(file = files_list) %dopar% {
@@ -411,13 +397,6 @@ ws_pp_zonal_all_fix <- ws_pp_zonal_all_no_dups %>%
   filter(effluent > 0) # filter for effluent greater than 0... no reason to run the plume model on no nutrients
 
 
-if(str_detect(file, "2005|2006|2007|2008")){
-  
-  ws_pp_zonal_all_fix <- ws_pp_zonal_all_fix %>%
-    filter(!(basin_id %in% c(included_2005)))
-} else{
-  ws_pp_zonal_all_fix <- ws_pp_zonal_all_fix
-}
   
 # str(ws_pp_zonal_all_fix)
 # 
@@ -427,93 +406,10 @@ if(str_detect(file, "2005|2006|2007|2008")){
 
 final_name <- gsub("^.*?disagg_", "pourpoints_", file)
 
-st_write(ws_pp_zonal_all_fix, file.path(prs_int_dir, "pourpoints", final_name), delete_dsn = TRUE) ## this is our final pourpoint data set we will plug into the plume model 
+st_write(ws_pp_zonal_all_fix, file.path(prs_int_dir, "pourpoints", final_name), delete_dsn = TRUE) 
 
 # mapview(ws_pp_zonal_all_fix)
 }
-
-
-```
-
-**Create a shapefile to test the plume model on first**
-```{r, eval = FALSE}
-## Write out an Australia shapefile for each year to use for testing... 
-
-files_list <- str_subset(string = c(list.files(file.path(prs_int_dir, "pourpoints")), full = TRUE), ".shp")
-
-registerDoParallel(cores = 5)
-foreach(file = files_list) %dopar% {
-  
-#  file = files_list[1]
-  
-ws_pp_zonal_all_fix <- st_read(file.path(paste0(prs_int_dir, "/pourpoints/", file))) %>%
-  mutate(basin_id = as.character(basin_id))
-# crs(ws_pp_zonal_all_fix)
-
-au_pp_all <- ws_pp_zonal_all_fix %>%
-  #dplyr::filter(str_detect(basin_id, "au")) %>%
-  arrange(effluent) %>%
- # top_n(100, effluent)
-  filter(effluent < 1) %>%
-  slice_min(n = 200, effluent)
-
-# mapview(au_pp_all)
-
-st_write(au_pp_all, file.path(paste0(prs_int_dir, "/pourpoints_small/", "small_", file)), delete_dsn = TRUE)
-}
-
-
-```
-
-
-```{r}
-files_tif <- list.files(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/output/au_test_N_plume/"), full = TRUE)
-files_tif
-
-files_shp <- list.files(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints/"), pattern = "shp", full = TRUE)
-files_shp[1]
-
-test <- st_read(files_shp[1])
-
-sum_df <- data.frame(sum=NA, name = NA)
-
-for(file in files_shp){
-
-test_au <- st_read(file)
-
-test_df <- data.frame(sum = sum(test_au$effluent), name = basename(file)) # 184230.8
-
-sum_df <- rbind(test_df, sum_df)
-
-}
-
-
-
-sum_df_2 <- data.frame(sum = NA, name = NA)
-
-for(file in files_tif){
- 
-  test_rast <- raster(file)
-
-  test_df <- data.frame(sum = cellStats(test_rast, "sum", na.rm = TRUE), name = basename(file))
-
-  sum_df_2 <- rbind(sum_df_2, test_df)
-  
-       
-}
-
-
-
-
-test_total <- cbind(sum_df %>% arrange(name) %>% rename("sum_shp" = "sum", "name_shp" = "name"), sum_df_2 %>% arrange(name)) %>%
-  mutate(diff = sum_shp - sum) # missing ~15k for each... I believe that these are just inland pourpoints that aren't being picked up by the plume model
- 
-
-test_total <- test_total %>%
-  mutate(diff = sum_shp - sum)
-
-# missing ~15k 
-
 
 
 ```

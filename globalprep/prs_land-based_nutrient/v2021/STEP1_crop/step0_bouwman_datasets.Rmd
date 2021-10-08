@@ -7,16 +7,21 @@ Citation: Bouwman, A. F., A. H. W. Beusen, and G. Billen (2009), Human alteratio
 
 ```{r}
 library(here)
-library(vroom)
 library(janitor)
-source(here("_spatial/template_raster.R"))
-source(here("_workflow/common.R"))
-source(here("_workflow/common_spatial.R"))
+library(vroom)
+library("readr")
+library(tabulizer)
+library(ohicore)
 
-# Import food_rgns xy df
-food_rgns_xy <- 
-  food_rgns_xy %>% 
-  dplyr::select(x, y, iso3c)
+
+
+source(here('workflow/R/common.R'))
+
+crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP1_crop")
+
+region_data()
+
+food_rgns <- read_csv(here("globalprep/spatial/v2021/food_rgns.csv"), col_types = "cdc")
 ```
 
 We need to convert table 2 “Overall efficiency of N and P Use of the Total Agricultural System" to a dataframe with all our iso3c regions and gapfilling any missing regions.
@@ -24,7 +29,7 @@ We need to convert table 2 “Overall efficiency of N and P Use of the Total Agr
 # Browse regions
 ```{r}
 regions <- 
-  vroom::vroom(here("_spatial/_output/UNSD_Methodology.csv"), 
+  vroom::vroom(here("globalprep/spatial/v2021//UNSD_Methodology.csv"), 
                .name_repair = make_clean_names)
 unique(regions$intermediate_region_name)
 ```
@@ -33,7 +38,7 @@ unique(regions$intermediate_region_name)
 ```{r}
 # Add UN `region` column to dataframe
 bouwman_2009_regions <- 
-  vroom::vroom(here("_spatial/_output/UNSD_Methodology.csv"), 
+  vroom::vroom(here("globalprep/spatial/v2021//UNSD_Methodology.csv"), 
                .name_repair = make_clean_names) %>%
   mutate(IMAGE_region = 
            case_when(sub_region_name %in% "Northern America" ~ "north_america",
@@ -54,10 +59,10 @@ bouwman_2009_regions <-
 # Import nutrient dataset table from Bouwman 2009
 ```{r}
 bouwman_2009_tbl2 <- 
-  vroom(here("crop/nutrient/data/bouwman_2009_tbl2_N_raw.csv"),
+  vroom(here(crop_nutrient, "data/bouwman_2009_tbl2_N_raw.csv"),
              .name_repair = make_clean_names) %>% 
   mutate(nutrient = "N") %>% 
-  bind_rows(., vroom(here("crop/nutrient/data/bouwman_2009_tbl2_P_raw.csv"),
+  bind_rows(., vroom(here(crop_nutrient, "data/bouwman_2009_tbl2_P_raw.csv"),
                  .name_repair = make_clean_names)) %>% 
   mutate(nutrient = if_else(is.na(nutrient), 
                             "P",
@@ -97,13 +102,13 @@ bouwman_2009_tbl2_tidy <-
   select(!IMAGE_region)
 
 write_csv(bouwman_2009_tbl2_tidy,
-         here("crop/nutrient/data/bouwman_2009_tbl2.csv"))
+         here(crop_nutrient, "data/bouwman_2009_tbl2.csv"))
 ```
 
 # I visually compared the numbers to see if they were in the right ballpark.
 ```{r}
 view(bouwman_2009_tbl2)
-view(vroom::vroom(here("crop/nutrient/data/bouwman_2009_tbl2_N_raw.csv"),
+view(vroom::vroom(here(crop_nutrient, "data/bouwman_2009_tbl2_N_raw.csv"),
                   .name_repair = make_clean_names))
 ```
 
@@ -113,7 +118,7 @@ view(vroom::vroom(here("crop/nutrient/data/bouwman_2009_tbl2_N_raw.csv"),
 ```{r}
 # Add UN `region` column to dataframe
 bouwman_2005_regions <- 
-  vroom::vroom(here("_spatial/_output/UNSD_Methodology.csv"), 
+  vroom::vroom(here("globalprep/spatial/v2021//UNSD_Methodology.csv"), 
                .name_repair = make_clean_names) %>%
   mutate(IMAGE_region = 
            case_when(sub_region_name %in% "Northern America" ~ "north_america",
@@ -180,7 +185,7 @@ bouwman_2005_tbl5_final <-
   na.omit()
 
 write_csv(bouwman_2005_tbl5_final,
-          here("crop/nutrient/data/bouwman_2005_tbl5.csv"))
+          here(crop_nutrient, "raw/bouwman_2005_tbl5.csv"))
 ```
 
 -------------------------------------------------------------------------------
@@ -193,7 +198,7 @@ Table 4 from here (all three categories, columns "N use, kt" and "NH3-N loss, kt
 
 ```{r}
 bouwman_2002_regions <- 
-  vroom::vroom(here("_spatial/_output/UNSD_Methodology.csv"), 
+  vroom::vroom(here("globalprep/spatial/v2021//UNSD_Methodology.csv"), 
                .name_repair = make_clean_names) %>%
   mutate(IMAGE_region = 
            case_when(region %in% c("Albania", "Bosnia and Herzegovina",
@@ -236,7 +241,7 @@ bouwman_2002_regions <-
 # Merge iso3c with regions in the table
 ```{r}
 bouwman_2002_tbl4 <- 
-  vroom(here("crop/nutrient/data/bouwman_2002_tbl4_raw.csv"),
+  vroom(here(crop_nutrient, "data/bouwman_2002_tbl4_raw.csv"),
         .name_repair = make_clean_names)[c(1,9,10)] %>% 
   rename(IMAGE_region = region)
 bouwman_2002_tbl4$IMAGE_region <- make_clean_names(bouwman_2002_tbl4$IMAGE_region)
@@ -248,13 +253,13 @@ bouwman_2002_tbl4_tidy <-
   na.omit()
 
 write_csv(bouwman_2002_tbl4_tidy,
-            here("crop/nutrient/data/bouwman_2002_tbl4.csv"))
+            here(crop_nutrient, "raw/bouwman_2002_tbl4.csv"))
 ```
 
 # grasslands
 ```{r}
 bouwman_2002_tbl4_grasslands <- 
-  vroom(here("crop/nutrient/data/bouwman_2002_tbl4_raw.csv"),
+  vroom(here(crop_nutrient, "data/bouwman_2002_tbl4_raw.csv"),
         .name_repair = make_clean_names)[c(1:3)] %>% 
   mutate(prop_nh3_total_grasslands = nh3_n_grassland_loss / n_use_fertilized_grasslands_kt) %>% 
   mutate(prop_nh3_total_grasslands = if_else(is.finite(prop_nh3_total_grasslands),
@@ -273,14 +278,14 @@ bouwman_2002_tbl4_grasslands_tidy <-
   na.omit()
 
 write_csv(bouwman_2002_tbl4_grasslands_tidy,
-            here("crop/nutrient/data/bouwman_2002_tbl4_grasslands.csv"))
+            here(crop_nutrient, "raw/bouwman_2002_tbl4_grasslands.csv"))
 ```
 
 
 # Merge iso3c with regions in the table
 ```{r}
 bouwman_2002_tbl5 <- 
-  vroom(here("crop/nutrient/data/bouwman_2002_tbl5_raw.csv"),
+  vroom(here(crop_nutrient, "data/bouwman_2002_tbl5_raw.csv"),
         .name_repair = make_clean_names,
         skip = 1)[c(1,9,10,11,14)] %>% 
   rename(IMAGE_region = region)
@@ -293,5 +298,5 @@ bouwman_2002_tbl5_tidy <-
   na.omit()
 
 write_csv(bouwman_2002_tbl5_tidy,
-            here("crop/nutrient/data/bouwman_2002_tbl5.csv"))
+            here(crop_nutrient, "raw/bouwman_2002_tbl5.csv"))
 ```

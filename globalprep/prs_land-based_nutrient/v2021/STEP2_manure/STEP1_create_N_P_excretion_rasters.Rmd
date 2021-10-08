@@ -18,6 +18,14 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary 
+Creates rasters for all livestock system of 1) amount of N excreted in manure and 2) amount of P excreted in manure.
+
+## Data
+
+ - Animal farm location tifs from NCEAS Global Food project. 
+ - N/P excretion from FAOSTAT
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

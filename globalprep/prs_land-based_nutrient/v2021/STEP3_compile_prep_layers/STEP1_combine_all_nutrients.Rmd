@@ -18,6 +18,23 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Summary
+Grab all the relevant nutrient files and compile into a couple of summarized per year files, for manure and crops 
+
+ - Total P applied per year for manure 
+    - just leaching 
+ - Total P applied per year for crops 
+    - just leaching 
+ - Total P for crops and manure 
+   - leaching only 
+   
+ - Total N for manure 
+    - volatized
+    - Leaching 
+ - Total N for crops 
+    - volatized
+    - Leaching 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -38,22 +55,6 @@ source(here(git_crop, "R/common_spatial.R")) # read in necessary spatial files
 
 ```
 
-    
-Grab all the relevant nutrient files and compile into a couple of summarized per year files, for manure and crops 
-
- - Total P applied per year for manure 
-    - just leaching 
- - Total P applied per year for crops 
-    - just leaching 
- - Total P for crops and manure 
-   - leaching only 
-   
- - Total N for manure 
-    - volatized
-    - Leaching 
- - Total N for crops 
-    - volatized
-    - Leaching 
 
 
 ```{r}
