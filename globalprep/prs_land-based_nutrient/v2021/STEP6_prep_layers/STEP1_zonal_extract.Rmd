@@ -49,7 +49,7 @@ prs_int_dir <- "/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2
 # Methods
 
 ```{r}
-save_loc_rasts <- file.path(dir_M, "git-annex/globalprep/prs_land-based_nutrient/v2021/output/final_layers")
+
 save_loc_data <- "globalprep/prs_land-based_nutrient/v2021"
 
 
@@ -361,7 +361,7 @@ myMergedData <-
   mutate(pressure_score = ifelse(is.na(pressure_score), 0, pressure_score))
 
 
-write.csv(myMergedData, file.path(here(), save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_updated.csv"), row.names=FALSE)
+write.csv(myMergedData, file.path(here(), save_loc_data, "output/cw_fertilizers_score_updated.csv"), row.names=FALSE)
 
 
 
@@ -418,7 +418,7 @@ myMergedData <-
   dplyr::arrange(rgn_id) %>%
   mutate(pressure_score = ifelse(is.na(pressure_score), 0, pressure_score))
 
-write.csv(myMergedData, file.path(here(), save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_3nm_updated.csv"), row.names=FALSE)
+write.csv(myMergedData, file.path(here(), save_loc_data, "output/cw_fertilizers_score_3nm_updated.csv"), row.names=FALSE)
 
 test <- myMergedData %>%
   left_join(rgns_eez)
@@ -470,7 +470,7 @@ for (year in 2009:2019){ # year = 2012
 }
 
 
-write.csv(data, file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/output/cw_fertilizers_trend_updated.csv"),
+write.csv(data, file.path(here(), "globalprep/prs_land-based_nutrient/v2021/output/cw_fertilizers_trend_updated.csv"),
           row.names=FALSE)
 ```
 
