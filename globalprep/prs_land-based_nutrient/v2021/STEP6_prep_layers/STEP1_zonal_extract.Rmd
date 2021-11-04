@@ -357,10 +357,11 @@ myMergedData <-
           lapply(list.files(file.path(here(), save_loc_data, "STEP6_prep_layers/eez_int"), pattern = "plume", full = TRUE), read.csv)) %>%
   filter(rgn_type == "eez") %>%
   dplyr::select(rgn_id, year, pressure_score=mean) %>%
-  dplyr::arrange(rgn_id)
+  dplyr::arrange(rgn_id) %>%
+  mutate(pressure_score = ifelse(is.na(pressure_score), 0, pressure_score))
 
 
-write.csv(myMergedData, file.path(save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_updated.csv"), row.names=FALSE)
+write.csv(myMergedData, file.path(here(), save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_updated.csv"), row.names=FALSE)
 
 
 
@@ -414,7 +415,8 @@ myMergedData <-
   do.call(rbind,
           lapply(list.files(file.path(here(), save_loc_data, "STEP6_prep_layers/3nm_int"), pattern = "plume", full = TRUE), read.csv)) %>%
   dplyr::select(rgn_id, year, pressure_score) %>%
-  dplyr::arrange(rgn_id)
+  dplyr::arrange(rgn_id) %>%
+  mutate(pressure_score = ifelse(is.na(pressure_score), 0, pressure_score))
 
 write.csv(myMergedData, file.path(here(), save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_3nm_updated.csv"), row.names=FALSE)
 
@@ -456,18 +458,19 @@ adj_trend_year <- as.numeric(min(trend_years))
 data <- data.frame()
 
 for (year in 2009:2019){ # year = 2012
-  trend <- read.csv(sprintf("globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/int/cw_fertilizers_trend_%s_new.csv", year))
+  trend <- read.csv(file.path(here(), sprintf("globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/int/cw_fertilizers_trend_%s_new.csv", year)))
   
   trend <- trend %>%
     mutate(year = year) %>%
     select(rgn_id, year, trend)
   
-  data <- rbind(data, trend)
+  data <- rbind(data, trend) %>%
+    mutate(trend = ifelse(is.na(trend), 0, trend))
   
 }
 
 
-write.csv(data, "globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/output/cw_fertilizers_trend_updated.csv",
+write.csv(data, file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/output/cw_fertilizers_trend_updated.csv"),
           row.names=FALSE)
 ```
 
@@ -475,7 +478,7 @@ write.csv(data, "globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/outp
 ## compare new and old trend values:
 
 ```{r}
-  old <- read.csv('globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_trend_2016_new.csv') %>%
+  old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_trend_2016_new.csv')) %>%
     dplyr::select(rgn_id, old_trend = trend)
 new <- read.csv(file.path(save_loc_data, 'STEP6_prep_layers/int/cw_fertilizers_trend_2016_new.csv')) %>%
   left_join(old, by="rgn_id") 
@@ -485,7 +488,7 @@ abline(0, 1, col="red")
 
 
 
-  old <- read.csv('globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_score_3nm_updated.csv') %>%
+  old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_score_3nm_updated.csv')) %>%
     filter(year == 2016) %>%
     dplyr::select(rgn_id, old_pressure = pressure_score)
 new <- read.csv(file.path(save_loc_data, 'STEP6_prep_layers/output/cw_fertilizers_score_3nm_updated.csv')) %>%
