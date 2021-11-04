@@ -83,7 +83,7 @@ do
    mkdir subsets/subset$i
   
    # move the tif files in batches of 10000 - NOTE CHANGE TO 10000 before running again gage
-   mv `ls | head -15` subsets/subset$i/
+   mv `ls | head -10000` subsets/subset$i/
   
    # mosaic subset 
    cd subsets/subset$i/

@@ -40,7 +40,7 @@ mkdir plumes/shp # make new shps folder
 
 ## navigate to the folder they were saved to which in my case is the prs_land-based_nutrient/v2021 folder
 
-cd /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints_retry/
+cd /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/pourpoints_FINAL/
 
 ## copy files to the new shp folder you just created
 

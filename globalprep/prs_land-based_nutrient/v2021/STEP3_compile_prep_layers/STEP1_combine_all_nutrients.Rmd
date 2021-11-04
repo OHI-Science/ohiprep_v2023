@@ -51,6 +51,7 @@ prep <- file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient
 git_crop <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP1_crop")
 git_compile <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP3_compile_prep_layers")
 
+
 source(here(git_crop, "R/common_spatial.R")) # read in necessary spatial files 
 
 ```
@@ -101,6 +102,9 @@ for(yr in years){
                             args = list(fun = sum, na.rm = TRUE))
 
 endCluster()
+
+
+dis_rast_area <- raster(file.path(prs_int_dir, "disagg_raster_area.tif"))
 
 
     names(parallel_sum) <- "tonnes_N"

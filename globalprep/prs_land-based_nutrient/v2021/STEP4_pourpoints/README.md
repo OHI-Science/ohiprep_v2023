@@ -11,6 +11,9 @@
  
 3. STEP3_fix_pourpoints.Rmd
  - Fixes pourpoints which were being masked out by the ocean mask in the plume model. 
+ 
+
+/archive contains scripts which will mosaic together separate runs from the same year, or filter out already plumed files from the final effluent shapefile, so that you can start the plume model from where you left off (if you stopped it in the middle).
 
 
 
