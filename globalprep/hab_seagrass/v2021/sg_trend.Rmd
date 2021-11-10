@@ -38,11 +38,11 @@ ohi_rasters()
 
 # Summary
 
-This script generates the trend of kelp for each OHI region for the latest year of data. We do this using trend data from Krumhansl et al. 2016, which calculated regional kelp trend values using Bayesian hierarchical linear models. We extract these trends per the Marine Ecoregions of the World (MEOW), and a take weighted area mean to get final trends per region represented in the paper. We then gapfill the remaining areas with kelp extent but no trends with georegional averages. 
 
+We use data from Short et al. 2011, Waycott et al. 2009, and the IUCN 2020 to determine the trends of seagrass for our OHI regions. First, we determine the population trends for seagrasses (increasing, stable, decreasing), based on Short and IUCN data. Then we replace the population trends with numerical values from Waycott et al. 2009. Following we gapfill missing trends first by species family average, and then by the global average if there is no species family average. Then, we calculate the trend per OHI region using a species distribution weighted mean. The final round of gapfilling we gapfill any region that has extent data but no trend data by the georegional average. 
 
 ## Updates from previous assessment
-We now calculate 
+
 
 
 ***
