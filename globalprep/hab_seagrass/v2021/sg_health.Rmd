@@ -39,11 +39,11 @@ regions_shape()
 
 # Summary
 
-This script generates the health condition of kelp for each OHI region for the latest year of data. We do this by assigning a global average to those regions with decreasing trends. Any region with a stable or increasing trend receives a condition of 1. 
+This script generates the health condition of seagrass for each OHI region for the latest year of data. We do this by assigning a global average to those regions with decreasing trends. Any region with a stable or increasing trend receives a condition of 1. 
 
 
 ## Updates from previous assessment
-This is an entirely new layer for the 2021 assessment! 
+Updated the health with more general values. 
 
 ***
 ## Data Source 
