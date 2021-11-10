@@ -17,7 +17,7 @@ output:
 
 https://cdnsciencepub.com/doi/10.1139/anc-2017-0001
 
-This script generates the condition of saltmarsh. Use this "25% decline estimate" meaning that the condition is 0.75 for each region. 
+This script generates the condition of saltmarsh. Based on the following references, global saltmarsh has decreased by 25-50% from historical extent (no idea of the timeframe this refers to) and there is an estimated 1-2% decrease every year. Given this, we will apply a condition of 0.75 globally (using the more conservatinve 25% decline estimate). 
 
 
 
@@ -26,14 +26,14 @@ This script generates the condition of saltmarsh. Use this "25% decline estimate
 ***
 ## Data Source 
 
-Li, X., Bellerby, R., Craft, C., Widney, S.E., 2018. Coastal wetland loss, consequences, and challenges for restoration. Anthropocene Coasts 1–15. https://doi.org/10.1139/anc-2017-0001
+Mcowen, C., Weatherdon, L., Bochove, J.-W., Sullivan, E., Blyth, S., Zockler, C., Stanwell-Smith, D., Kingston, N., Martin, C., Spalding, M., Fletcher, S., 2017. A global map of saltmarshes. BDJ 5, e11764. https://doi.org/10.3897/BDJ.5.e11764
 
 
 **Downloaded**: October 5, 2021
 
-**Description**:  
+**Description**: "Despite their importance, saltmarsh areas are declining around the world, having lost between 25% and 50% of their global historical coverage (Crooks et al. 2011, Duarte et al. 2008)."
 
-**Time range**: 
+**Time range**: NA
 
 
 ***
