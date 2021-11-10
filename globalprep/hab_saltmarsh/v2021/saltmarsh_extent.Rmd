@@ -19,21 +19,23 @@ This script generates the extent of saltmarsh for each OHI region.
 
 
 ## Updates from previous assessment
-Updating the data with newest version (version 7). 
+Updating the data with new dataset! 
 
 ***
 ## Data Source 
+
+**Reference**: Mcowen, C., Weatherdon, L., Bochove, J.-W., Sullivan, E., Blyth, S., Zockler, C., Stanwell-Smith, D., Kingston, N., Martin, C., Spalding, M., Fletcher, S., 2017. A global map of saltmarshes. BDJ 5, e11764. https://doi.org/10.3897/BDJ.5.e11764
 
 **Downloaded**: 03/09/2021
 
 **Description**:  
 Global Distribution of saltmarshes
-https://data.unep-wcmc.org/datasets/7
+https://data.unep-wcmc.org/datasets/43
 Reported at spatial cell scale. 
 
 This dataset shows the global distribution of saltmarshes, and is composed of two subsets of point and polygon occurence data. The data were compiled by UNEP World Conservation Monitoring Centre in collaboration with many collaborators (e.g. Frederick Short of the University of New Hampshire), organisations (e.g. the OSPAR Convention for the Northeast Atlantic sea), and projects (e.g. the European project Mediterranean Sensitive Habitats "Mediseh"), across the globe (full list available in "Metadata_saltmarsh.dbf").
 
-**Time range**: 1934-2020
+**Time range**: 1973-2015
 
 
 ***
