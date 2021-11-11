@@ -60,7 +60,7 @@ We use data from Short et al. 2011, Waycott et al. 2009, and the IUCN 2020 to de
 
 **Description**: Contains general population trends of seagrass species.
 
-**Time range**: 2011
+**Time range**: 1975 - 2010
 
 
 
