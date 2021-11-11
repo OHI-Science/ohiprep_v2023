@@ -24,6 +24,8 @@ Updating the data with newest version (version 7).
 ***
 ## Data Source 
 
+**Reference**: UNEP-WCMC, Short, F.T., 2005. Global Distribution of Seagrasses (version 7.1). Seventh update to the data layer used in Green and Short (2003). UNEP World Conservation Monitoring Centre, Cambridge, UK.
+
 **Downloaded**: 03/09/2021
 
 **Description**:  
