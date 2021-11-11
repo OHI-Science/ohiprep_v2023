@@ -41,6 +41,8 @@ FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquacultu
 
 ## Seafood Watch sustainability data
 
+Obtained upon request of SFW. 
+
 **Reference**: 
 https://www.seafoodwatch.org/-/m/sfw/pdf/whats%20new/complete%20recommendation%20list.pdf
 
