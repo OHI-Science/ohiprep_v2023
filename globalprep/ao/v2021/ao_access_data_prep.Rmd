@@ -23,6 +23,7 @@ editor_options:
 
 This script generates the "access" layer for the artisanal opportunities goal. This prep uses the UN sustainable development goal 14.b.1, "Degree of application of a legal/regulatory/policy/institutional framework which recognizes and protects access rights for small-scale fisheries (level of implementation: 1 lowest to 5 highest)". We will rescale the scores to be between 0 and 1, match to OHI regions, and gapfill based on larger regions within the data. 
 
+Link: https://www.fao.org/sustainable-development-goals/indicators/14b1/en/
 
 ## Updates from previous assessment
 New data source, SDG 14.b.1.
@@ -30,12 +31,15 @@ New data source, SDG 14.b.1.
 ***
 ## Data Source 
 
+**Reference**: Food and Agriculture Organization of the United Nations, 2020. Progress in the degree of implementation of international instruments to promote and protect small-scale fisheries, 2020.
+
 **Downloaded**: 6/25/2021
 
 **Description**: Progress by countries in the degree of application of a legal/regulatory/policy/institutional framework which recognizes and protects access rights for small-scale fisheries. It is a composite indicator based on FAO member country responses to the Code of Conduct for Responsible Fisheries (CCRF) survey questionnaire which is circulated by FAO every two years to members and IGOs and INGOs. This indicator is calculated on the basis of the efforts being made by countries to implement selected key provisions of the Voluntary Guidelines for Securing Sustainable Small-Scale Fisheries in the Context of Food Security and Poverty Eradication (SSF Guidelines), as reported in a given year of the survey. 
 
 **Time range**: 2018, 2020
 
+**Download link**: https://unstats.un.org/sdgs/UNSDG/IndDatabasePage ; Click "select indicators and country or area" and select indicator 14.b. Download all data for this indicator. 
 
 ***
 # Methods
