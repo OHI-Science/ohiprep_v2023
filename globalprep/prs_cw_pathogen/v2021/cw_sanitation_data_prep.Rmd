@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2019 - Clean Water - Pathogen Pollution: Preparing Sanitation data'
+title: 'OHI 2021 - Clean Water - Pathogen Pollution: Preparing Sanitation data'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -21,14 +21,14 @@ editor_options:
 
 # Summary
 
-This document describes the steps for preparing the pathogen pollution and pathogen pollution trend data layers for the 2019 global assessment.
+This document describes the steps for preparing the pathogen pollution and pathogen pollution trend data layers for the 2021 global assessment.
 
 The percentage of the population with access to improved sanitation facilities (World Health Organization and United Nations Children’s Fund, Joint Monitoring Programme, 2011) was used in combination with measurements of coastal population as a proxy for pathogens in coastal waters. Access to improved sanitation facilities is defined as the percentage of the population in a country with at least adequate access to disposal facilities that can effectively prevent human, animal, and insect contact with excreta. These data are a country-wide average (not specific to the coastal region). 
 
 # Updates from previous assessment
 Data source (WHO-UNICEF) now reports sanitation data for three different sectors: households, schools, and health care facilities. We decided to use the household data as it is most likely to include the greatest number of citizens of each region, and be most comparable with previous datasets. 
 
-WHO-UNICEF also changed how they report the percentages of the population with access to basic sanitation.  In previous years, some regions were reported with 100% of the population having basic access, which are now denoted as >99 in the raw data. We converted this value to 99.5% as there were other regions with 99%. The data now cover years 2000-2017, vs. last year's assessment which had data for 2000-2015.
+WHO-UNICEF also changed how they report the percentages of the population with access to basic sanitation.  In previous years, some regions were reported with 100% of the population having basic access, which are now denoted as >99 in the raw data. We converted this value to 99.5% as there were other regions with 99%. The data now cover years 2000-2020, vs. last year's assessment which had data for 2000-2017.
 
 Updates on our end: 
 
@@ -51,9 +51,9 @@ Definition of each variable according to the data source:
 # Data Source
 **Reference**: 
             https://washdata.org/data
-            Updated July 2019
+            Updated October 2021
 
-**Downloaded**: Downloaded 8/7/2019
+**Downloaded**: Downloaded 10/01/2021
 
 **Description**:  Percentage of the National population that has access to improved facilities that are not shared with other households (National, At a basic level).
 
@@ -61,7 +61,7 @@ Access to improved sanitation facilities is defined as the percentage of the pop
 
 **Native data resolution**: country-wide average (not specific to the coastal region)
 
-**Time range**: 2000 - 2017
+**Time range**: 2000 - 2020
 
 **Format**:  csv
 
