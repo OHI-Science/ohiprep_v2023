@@ -70,6 +70,9 @@ https://www.pnas.org/content/113/48/13785
 **Time range**: 1983 - 2012
 
 
+**Reference**: Spalding MD, Fox HE, Allen GR, Davidson N, Ferdaña ZA, Finlayson M, Halpern BS, Jorge MA, Lombana A, Lourie SA, Martin KD, McManus E, Molnar J, Recchia CA, Robertson J (2007) Marine Ecoregions of the World: a bioregionalization of coast and shelf areas. BioScience 57: 573-583.
+
+**Downloaded**: 5/11/2016
 
 ***
 # Methods
