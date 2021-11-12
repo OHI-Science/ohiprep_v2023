@@ -1,0 +1,59 @@
+---
+title: "explore_bbmsy"
+output: html_document
+---
+
+Exploring trends in B/Bmsy.
+
+```{r}
+library(here)
+library(tidyverse)
+library(broom)
+```
+
+```{r}
+key <- read_csv(here("globalprep/fis/v2021/output/fis_bbmsy_gf.csv"))
+scores <- read_csv(here("globalprep/fis/v2021/output/fis_bbmsy.csv"))
+catch <- read_csv(here("globalprep/fis/v2021/output/stock_catch.csv")) 
+
+bbmsy <- left_join(scores, key) %>%
+  filter(bmsy_data_source=="RAM") %>%
+  filter(is.na(RAM_gapfilled))
+
+head(bbmsy)
+
+bbmsy <- bbmsy %>%
+  select(stock_id, year, bbmsy) %>%
+  unique() 
+
+bbmsy_trends <- bbmsy %>%
+  group_by(stock_id) %>%
+  do(mdl = tidy(lm(bbmsy ~ year, data = .))) %>%
+  unnest(mdl)  #fitting a model per each goal and rgn_id
+  
+# data.frame(glance(data_lm, mdl))
+bbmsy_trends2 <- bbmsy_trends %>%
+  filter(term == "year") %>%
+  select(stock_id, term, estimate, p.value) %>%
+  data.frame() %>%
+  filter(estimate <= 2) %>%
+  filter(estimate >= -2)
+hist(bbmsy_trends2$estimate)
+
+```
+
+
+```{r,fig.show="hold", out.width="50%"}
+stocks <- unique(bbmsy$stock_id)
+
+for ( stock in stocks){ # stock <- stocks[1]
+    f <- ggplot(filter(bbmsy, stock_id==stock), aes(x=year, y = bbmsy)) +
+      geom_point() +
+      geom_line() +
+      xlim(c(2000, 2020)) +
+      labs(title=stock) +
+      theme_minimal() 
+    print(f)
+}
+
+```
