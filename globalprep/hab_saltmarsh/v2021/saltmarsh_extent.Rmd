@@ -44,7 +44,7 @@ This dataset shows the global distribution of saltmarshes, and is composed of tw
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 library(readr)      # for read_csv()
 library(raster)
 library(here)
@@ -349,7 +349,7 @@ write.csv(saltmarsh_area_final_gf, "data/extent_saltmarsh_gf.csv", row.names = F
 ```
 
 # Datacheck
-```{r}
+```{r, eval = FALSE}
 v6_saltmarsh_pts <- sf::st_read(dsn = file.path(dir_wcmc, "14_001_WCMC027_Saltmarsh_v6/01_Data"), layer = "WCMC027_Saltmarshes_Pt_v6")
 
 v6_saltmarsh_py <- sf::st_read(dsn = file.path(dir_wcmc, "14_001_WCMC027_Saltmarsh_v6/01_Data"), layer = "WCMC027_Saltmarshes_Py_v6")

@@ -64,7 +64,7 @@ This is a new layer to the 2021 assessment.
 2. Convert the B/Bmsy values to scores (cap them at 1.. we wont penalize for underharvesting).
 3. Take a catch weighted average of B/Bmsy scores for each region/year and gapfill those regions that are missing.
 
-```{r}
+```{r, eval = FALSE}
 library(tidyverse)
 library(here)
 source(here('workflow/R/common.R'))
@@ -73,7 +73,7 @@ source(here('workflow/R/common.R'))
 
 ## Join with the final B/Bmsy layer from the fis model, convert the B/Bmsy values to scores (this is done in functions.R for FIS subgoal, but we do it in the dataprep for AO), and take a catch weighted average of B/Bmsy scores for each region/year.
 
-```{r}
+```{r, eval = FALSE}
 fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2021/output/fis_bbmsy.csv"))
 
 catch_AO <- read_csv(file.path(here(), "globalprep/ao/v2021/intermediate/mean_catch.csv")) 
@@ -257,7 +257,7 @@ write.csv(score_data, here('globalprep/ao/v2021/output/ao_nind_scores.csv'), row
 
 Data check
 
-```{r}
+```{r, eval = FALSE}
 region_data()
 
 stk <- read.csv(here('globalprep/ao/v2021/output/ao_nind_scores.csv')) %>%

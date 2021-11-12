@@ -83,7 +83,7 @@ files <- list.files(dir_fao_data, pattern=glob2rx('*.csv'), full.names=TRUE)
 # files <- list.files(dir_fao_data, pattern=glob2rx('*.csv'), full.names=T)
 
 ## loop
-for (f in files){ # f = files[1]
+for (f in files){ # f = files[2]
   cat(sprintf('\n\n\n====\nfile: %s\n', basename(f)))
   
   

@@ -19,7 +19,7 @@ editor_options:
 ---
 
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval = FALSE}
 
 library(readr)      # for read_csv()
 library(raster)
@@ -88,7 +88,7 @@ Steps:
  - paper: https://www.pnas.org/content/113/48/13785#:~:text=The%20brown%20algae%20known%20as,of%20all%20continents%20except%20Antarctica.
  - code adapted from: https://github.com/kelpecosystems/global_kelp_time_series/blob/master/07_analysis_of_HLM_results/03_slope_maps.R
 
-```{r}
+```{r, eval = FALSE}
 
 ## read in the trend data 
 
@@ -142,7 +142,7 @@ st_write(trend_data_meow, file.path("/home/shares/ohi/git-annex/globalprep/hab_k
 ```
 
 **Then: rasterize and use zonal statistics to calculate the trend and amount of ecoregion area in each OHI region**
-```{r}
+```{r, eval = FALSE}
  # 2. Then: rasterize and use zonal statistics to calculate the trend and amount of ecoregion area in each region
 
 ## use a eez and 25mile inland raster; if no 25km inland use just EEZ
@@ -302,7 +302,7 @@ write.csv(zonal_combined_area_trends, file.path(dir_git, "int/kelp_trends_distri
 ```
 
 **Then: calculate the trend per each OHI region by taking the weighted area mean.**
-```{r}
+```{r, eval = FALSE}
  # 5. Then: calculate the trend per each OHI region by taking the weighted area mean and regular mean (and compare to see which makes more sense). 
  
 ## now lets calculate the trend based on a area weighted average
@@ -319,7 +319,7 @@ write.csv(trends_area_weighted, file.path(dir_git, "int/habitat_trend_kelp_weigh
 ```
 
 **Then: match to our extent data, and gapfill any region that has extent data but not trend data by georegion.**
-```{r}
+```{r, eval = FALSE}
 
  # 6. Then: match to our extent data, and gapfill any region that has extent data but not trend data by georegion. 
 

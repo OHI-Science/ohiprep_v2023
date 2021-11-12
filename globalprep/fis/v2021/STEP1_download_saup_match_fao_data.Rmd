@@ -77,7 +77,7 @@ cat_msg <- function(x, ...) {
 
 Use the SAUP API to download by eez production data. To do this, we need SAUP region id numbers. 
 
-```{r}
+```{r, eval = FALSE}
 ## this is the api link.. http://api.seaaroundus.org/api/v1/eez/tonnage/taxon/?format=csv&limit=10&sciname=false&region_id=
 
 ## we need to figure out all of their region_ids, paste them into a string with region_id = "" and run a for loop 10 countries at a time
@@ -185,7 +185,7 @@ sum(test$tonnes) # 104583995 # seems reasonable... i think Watson was something 
 
 Unzip high seas data from SAUP 
 
-```{r}
+```{r, eval = FALSE}
 ## I manually downloaded all of the high seas data from here: http://www.seaaroundus.org/data/#/search ; Search by "High Sea(s)", select each high seas region in the drop down, and download. Since SAUP limits you to downloading 6 regions at a time, and there are 18 high seas regions, you will have download 3 different zip files. For v2022, consider writing a for loop like above to download to save time.. if you feel like it. 
 
 ## unzip the files
@@ -226,7 +226,7 @@ sum(all_hs_df_2017$tonnes) # 3301944
 
 Download SAUP data by the FAO region - this will be used to obtain FAO ids for the high seas dataset downloaded above
 
-```{r}
+```{r, eval = FALSE}
 # http://api.seaaroundus.org/api/v1/fao/tonnage/eez/?format=csv&limit=10&sciname=false&region_id=18&region_id=48&region_id=34&region_id=27&region_id=21
 
 ## fao regions are 18, 48, 34, 27, 21, 47, 41, 31, 58, 57, 51, 37, 88, 77, 67, 61, 87, 81, 71
@@ -303,7 +303,7 @@ write.csv(all_fao_df, file.path("/home/shares/ohi/git-annex/globalprep/_raw_data
 
 Now obtain FAO ids for the high seas and the EEZ datasets. 
 
-```{r}
+```{r, eval = FALSE}
   
 saup_eez_fao <- st_read(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2016/SAU_EEZ_FAO/SAU_EEZ_FAO.shp")) %>%
   st_drop_geometry() %>% ## this is what I need

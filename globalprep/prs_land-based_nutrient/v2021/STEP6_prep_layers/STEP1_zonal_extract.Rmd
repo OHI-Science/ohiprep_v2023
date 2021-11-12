@@ -11,7 +11,7 @@ output:
     theme: cerulean
     highlight: haddock
     includes: 
-      in_header: '../../workflow/templates/ohi_hdr.html' 
+      in_header: '../../../../workflow/templates/ohi_hdr.html' 
   pdf_document:
     toc: true
 editor_options: 
@@ -48,7 +48,7 @@ prs_int_dir <- "/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2
 
 # Methods
 
-```{r}
+```{r, eval = FALSE}
 
 save_loc_data <- "globalprep/prs_land-based_nutrient/v2021"
 
@@ -62,7 +62,7 @@ rast_loc <- file.path(dir_M,
 
 ## Reproject and mask ocean raster to make consistent with standard OHI global region file
 
-```{r}
+```{r, eval = FALSE}
 files <- list.files(rast_loc, pattern = "pourpoints", full=TRUE)
 
 ## make an area raster and save it so that we don't have to do this over and over again in the loop
@@ -155,7 +155,7 @@ cellStats(test, "sum", progress = "text") # 16179348
 ## Reclassify 0's 
 However, to calculate the quantiles, we don't want any of the 0's that are way out in the high seas, or on land to effect those quantiles, so we need to remove them. 
 
-```{r}
+```{r, eval = FALSE}
 
 ## make all 0's NA
 files <- list.files(file.path(dir_M, "git-annex/globalprep/prs_land-based_nutrient/v2021/output/N_plume_masked"), 
@@ -178,7 +178,7 @@ reclassify(tmp, cbind(-Inf, 0, NA), right=TRUE, filename = file.path(dir_M,
 
 ## Calculate the 99th quantile to use as the reference level. 
  - v2021: I also took a look at the 99.9th and 99.99th quantiles
-```{r}
+```{r, eval = FALSE}
 
 ### Collect quantile data for regulars for the 99th quantile 
 
@@ -222,7 +222,7 @@ ref_point_fert <- as.numeric(as.character(ref_point$ref_point))
 ```
 
 ## Rescale the rasters to the 99th quantile reference point
-```{r}
+```{r, eval = FALSE}
 files <- list.files(file.path(dir_M, 'git-annex/globalprep/prs_land-based_nutrient/v2021/output/N_plume_no_zero'), 
                     full.names = TRUE)
 
@@ -311,7 +311,7 @@ plot(cn)
 
 ## extract by OHI zone
 
-```{r}
+```{r, eval = FALSE}
 
 par(mfrow=c(1,1))
 
@@ -427,7 +427,7 @@ test <- myMergedData %>%
 
 ## TREND calculations
 
-```{r}
+```{r, eval = FALSE}
 ## trend should be calculated on 3nm (not eez)
 
 trend_data <- read.csv(file.path(here(), save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_3nm_updated.csv"))
@@ -477,7 +477,7 @@ write.csv(data, file.path(here(), "globalprep/prs_land-based_nutrient/v2021/outp
 
 ## compare new and old trend values:
 
-```{r}
+```{r, eval = FALSE}
   old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_trend_2016_new.csv')) %>%
     dplyr::select(rgn_id, old_trend = trend)
 new <- read.csv(file.path(save_loc_data, 'STEP6_prep_layers/int/cw_fertilizers_trend_2016_new.csv')) %>%

@@ -86,7 +86,7 @@ land_ocean
 ```
 
 Read in GMW data and explore
-```{r}
+```{r, eval = FALSE}
 
 files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/wcmc_mangrove/01_Data/")
 
@@ -96,7 +96,7 @@ files_2 <- files[grepl(".shp", files) & !grepl(".xml", files)]
 
 Loop over all years of data and match their regions to OHI regions 
 
-```{r}
+```{r, eval = FALSE}
   
 for(i in 1:7){ ## there are 7 files 
  # i = 1
@@ -167,7 +167,7 @@ write.csv(zonal_sums_km2, file.path(here("globalprep/hab_mangrove/v2021/int", sp
 
 Save 2016 as most current year to use in global
 
-```{r}
+```{r, eval = FALSE}
 gmw_ohi_2016 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2016.csv"))) 
 
 gmw_ohi_2016 <- gmw_ohi_2016 %>%
@@ -180,7 +180,7 @@ write.csv(gmw_ohi_2016, file.path(here("globalprep/hab_mangrove/v2021/data/habit
 
 Datacheck: 
 
-```{r}
+```{r, eval = FALSE}
 gmw_2016 <- st_read(file.path(dir_wcmc, "01_Data/GMW_2016_v2.shp"))
 
 sum(st_area(gmw_2016))*0.000001 # 135927.3 km2

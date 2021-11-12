@@ -41,7 +41,7 @@ This is an entirely new layer for the 2021 assessment!
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 library(readr)      # for read_csv()
 library(raster)
 library(here)
@@ -82,7 +82,7 @@ To do this, we will calculate the estimated loss based on a 2% loss per year usi
 
 Any regions that have a negative trend will receive the condition calculated here. Any those that have stable or increasing trends will receive a condition of 1. 
 
-```{r}
+```{r, eval = FALSE}
 
 ## read in extent data
 

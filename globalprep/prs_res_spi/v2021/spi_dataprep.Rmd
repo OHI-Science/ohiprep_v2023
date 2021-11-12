@@ -46,7 +46,7 @@ https://www.socialprogress.org/index/global/methodology
 
 **Description**: Social Progress Index scores and components for countries.
 
-```{r setup, warning=FALSE, message = FALSE}
+```{r setup, warning=FALSE, message = FALSE, eval = FALSE}
 # load libraries, set directories
 library(ohicore)  #devtools::install_github('ohi-science/ohicore@dev')
 library(dplyr)
@@ -76,7 +76,7 @@ Organize data and gapfill missing countries that have incomplete data.  This ind
 The following gets all years of data.
 
 
-```{r}
+```{r, eval = FALSE}
 cats <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/SocialProgressIndex/d2020/spi_categories.csv')) %>%
   mutate(subcategory = gsub(" ", "", subcategory))
 
@@ -100,7 +100,7 @@ In this case, we use relationships between the subindicators to estimate missing
 
 ### Gapfill Basic Human Need (bhn) indicator 
 
-```{r}
+```{r, eval = FALSE}
 
 set.seed(227)
 bhn_subs <- all_spi %>%
@@ -186,7 +186,7 @@ summary(bhn_data)
 
 ### Gapfill Opportunity (op) indicator 
 
-```{r}
+```{r, eval = FALSE}
 
 set.seed(227)
 op_subs <- all_spi %>%
@@ -277,7 +277,7 @@ summary(op_data)
 
 ### Gapfill Foundations of Wellbeing (fw) indicator 
 
-```{r}
+```{r, eval = FALSE}
 
 set.seed(227)
 fw_subs <- all_spi %>%
@@ -367,7 +367,7 @@ fw_data <- fw_tmp_long %>%
 
 The next step averages the 3 indicators and identifies gapfilling. All the rows where all four indicators are missing `NA_tot = 4` will have an NA in the `score` column.
 
-```{r}
+```{r, eval = FALSE}
 
 spi_calc <- rbind(bhn_data, op_data, fw_data) %>%
   mutate(gapfill = paste(category, NA_tot, sep = "_")) %>%
@@ -404,7 +404,7 @@ write.csv(spi_calc, "int/Country_spi.csv", row.names=FALSE)
 
 ## Assign countries to OHI regions
 
-```{r}
+```{r, eval = FALSE}
 
 spi_calc <- read.csv("int/Country_spi.csv", stringsAsFactors = FALSE)
 
@@ -452,7 +452,7 @@ spi_rgn <- spi_rgn %>%
 # Compare to WGI
 
 WGI is a couple years behind the SPI, so we will use 2018 WGI for the 2019, 2020, and 2021 WGI There is a strong correlation betwen the WGI and SPI indicators.
-```{r}
+```{r, eval = FALSE}
 
 wgi <- read.csv('../../prs_res_wgi/v2020/output/wgi_res.csv') %>%
   select(rgn_id, year, wgi_score = resilience_score)
@@ -487,7 +487,7 @@ summary(mod)
 # Second round of gapfilling 
 In this case, UN geopolitical regions and WGI scores are used to estimate regions with no data.  Based on this analysis, a model that includes WGI data and r2 UN geopolitical regions is the best model to predict missing SPI values. 
 
-```{r}
+```{r, eval = FALSE}
 
 years <- data.frame(year = min(spi_rgn$year):max(spi_rgn$year))
 
@@ -555,7 +555,7 @@ length(unique(rgns_gf$rgn_id)) # should be 220 regions
 
 These regions will receive an NA for their score (when established population is < 3000 people). 
 
-```{r}
+```{r, eval = FALSE}
 low_pop()
 low_pop <- low_pop %>%
   filter(est_population < 3000 | is.na(est_population)) 
@@ -568,7 +568,7 @@ rgns_gf_uninhab <- rgns_gf %>%
 
 # Save final data
 
-```{r}
+```{r, eval = FALSE}
 #gf_2019 <- read_csv(file.path("../v2019/output/spi_gf.csv"))
 
 
@@ -592,7 +592,7 @@ write.csv(prs_data, "output/spi_prs.csv", row.names=FALSE)
 
 # Data check 
 
-```{r}
+```{r, eval = FALSE}
 ## Resilience comparison, filtered for 2020
 new_spi_res <- read_csv(file.path("output/spi_res.csv")) %>%
   filter(year == 2020) %>%

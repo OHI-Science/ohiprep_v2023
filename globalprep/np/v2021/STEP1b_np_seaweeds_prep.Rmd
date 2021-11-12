@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Natural Products: Ornamentals data prep'
+title: 'OHI 2021: Natural Products: Seaweeds data prep'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:

@@ -14,7 +14,7 @@ output:
 ---
 
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval = FALSE}
 
 library(readr)      # for read_csv()
 library(raster)
@@ -98,7 +98,7 @@ This is basically recreating the analysis done in Short et al. 2011: https://www
  
 
 ## Steps 1 - 3
-```{r}
+```{r, eval = FALSE}
 seagrasses <- st_read(file.path(dir_iucn, "SEAGRASSES.shp"))
 
 # mapview(head(seagrasses$geometry)) # take a look - this takes a couple of minutes to process
@@ -161,7 +161,7 @@ test999 <- st_drop_geometry(seagrasses_trends_gf) ## it worked
 ## Step 4: 
 Rasterize and use zonal statistics to calculate the trend and amount of species distribution area in each region.
 
-```{r}
+```{r, eval = FALSE}
 ## use a eez and 25mile inland raster; if no 25km inland use just EEZ
 ocean_25_mile <- raster(file.path("/home/shares/ohi/git-annex/globalprep/spatial/v2019/ocean_plus25mile_inland.tif"))
 
@@ -326,7 +326,7 @@ write.csv(zonal_combined_area_trends, "int/seagrass_trends_distributions_area_fi
 ## Step 5
 Calculate the trend using an area weighted mean per each region. Create a gapfilling flag based on the proportion of species trends that are gapfilled within a region. 
 
-```{r}
+```{r, eval = FALSE}
 ## now lets calculate the trend based on a area weighted average
 
 trends_area_weighted <- zonal_combined_area_trends %>%
@@ -377,7 +377,7 @@ write.csv(trends_gf_final, "int/trend_seagrass_gf_all_rgns.csv", row.names = FAL
 ## Step 6
 Match to our extent data, and gapfill any region that has extent data but not trend data by georegion. Any of the regions gapfilled here will be have a prop_gapfill = 1.
 
-```{r}
+```{r, eval = FALSE}
 
 ## now match to the regions which have extent data and gapfill
 
@@ -436,7 +436,7 @@ ggplot(trends_rgns_final, aes(trend)) +
   geom_histogram()
 ```
 
-```{r}
+```{r, eval = FALSE}
 
 seagrass_trend <- read_csv("data/habitat_trend_seagrass_updated.csv")
 

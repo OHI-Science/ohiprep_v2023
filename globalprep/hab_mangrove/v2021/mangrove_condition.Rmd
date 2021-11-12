@@ -46,7 +46,7 @@ Then for those countries which have extent data, but no health data, we will gap
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 library(readr)      # for read_csv()
 library(raster)
 library(here)
@@ -68,7 +68,7 @@ region_data()
 ```
 
 Read in mangrove condition data and wrangle for years 2005 and 1980
-```{r}
+```{r, eval = FALSE}
 fao_mangrove_raw <- read_csv(file.path(dir_fao_mangrove, "FAO_mangrove_data.csv"))
 
 fao_mangrove_wrangle <- fao_mangrove_raw %>%
@@ -176,7 +176,7 @@ write.csv(fao_mangrove_rgns_fixed, file.path(dir_git, "int/habitat_health_mangro
 
 Now match the health data to the extent data, and gapfill any missing health data by georegion. This will also exclude any regions that have health data but no extent data
 
-```{r}
+```{r, eval = FALSE}
 health <- read_csv(file.path(dir_git, "int/habitat_health_mangrove_all_raw.csv"))
 
 ## read in georegions data
@@ -239,7 +239,7 @@ write.csv(health, 'globalprep/hab_mangrove/v2021/data/habitat_health_mangrove_up
 
 Datacheck: compare to old health data
 
-```{r}
+```{r, eval = FALSE}
 old_health <- read_csv(file.path(here("globalprep/hab_mangrove/v2015/data/habitat_health_mangrove_updated.csv")))
 
 compare_habitat_health <- health %>%

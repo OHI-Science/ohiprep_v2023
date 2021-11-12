@@ -92,7 +92,7 @@ SAUP_d2021 <- file.path(dir_M, "git-annex/globalprep/fis/v2021")
 
 # Create lookup tables to match OHI region names to SAUP area_name (EEZ) 
 
-```{r}
+```{r, eval = FALSE}
 fao_eez_prod <- read.csv(file.path(SAUP_d2021, "eez_fao_ids_prod.csv"))
 fao_high_seas <- read.csv(file.path(SAUP_d2021, "high_seas_fao_ids_prod.csv"))
 
@@ -144,7 +144,7 @@ area_name_matched <- read_csv("int/area_name_lookup_manual.csv") # perfect
 
 # Join EEZ and high seas production to OHI lookup tables
 
-```{r}
+```{r, eval = FALSE}
 #### Join high seas fishing entities and split appropriate regions
 high_seas_matched <- read_csv("int/high_seas_regions_lookup.csv") # perfect
 fao_high_seas <- read.csv(file.path(SAUP_d2021, "high_seas_fao_ids_prod.csv"))
@@ -378,7 +378,7 @@ Look at which entries that don't have a Taxon key match. Search taxon in [Sea Ar
 
 **Note:** for v2022, all we will need to do is to grab v2021's taxon_key_v2021.csv, and use that as our taxonkey lookup df (i.e. the "taxon_key_SAUP_watson" dataframe)
 
-```{r}
+```{r, eval = FALSE}
 
 stock_rgn <- read.csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn.csv'))
 
@@ -871,7 +871,7 @@ write.csv(total_catch_FP, "output/FP_fis_catch.csv", row.names=FALSE)
 
 Check differences in data for food provision weights
 
-```{r}
+```{r, eval = FALSE}
 new <- read.csv("output/FP_fis_catch.csv")
 new_filt <- new %>% 
   #filter(stock_id_taxonkey == "Carangidae-31_400314") %>% 

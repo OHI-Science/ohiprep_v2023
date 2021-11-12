@@ -52,7 +52,7 @@ dir_git_old  <- file.path('~/github/ohiprep_v2021', "globalprep/hab_coral/v2012"
 Now match the old health data to the extent data, and gapfill any missing health data with georegion averages. This will also exclude any regions that have health data but no extent data. 
 
 
-```{r}
+```{r, eval = FALSE}
 health <- read_csv(file.path(dir_git_old, "data/habitat_health_coral_updated.csv"))
 
 health_old_gf <- read_csv(file.path(dir_git_old, "data/health_coral_gf.csv")) %>%
@@ -117,7 +117,7 @@ write.csv(health, 'globalprep/hab_coral/v2021/data/habitat_health_coral_updated.
 
 Datacheck: compare to old health data
 
-```{r}
+```{r, eval = FALSE}
 old_health <- read_csv(file.path(here("globalprep/hab_coral/v2012/data/habitat_health_coral_updated.csv")))
 
 compare_habitat_health <- health %>%

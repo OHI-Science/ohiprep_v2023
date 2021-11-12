@@ -52,7 +52,7 @@ https://data.unep-wcmc.org/pdfs/49/A_Modelled_Global_Distribution_of_the_Kelp_Bi
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 library(readr)      # for read_csv()
 library(raster)
 library(here)
@@ -79,7 +79,7 @@ land_ocean
 ```
 
 Read in kelp data and explore
-```{r}
+```{r, eval = FALSE}
 
 kelp_shp <- st_read(file.path(dir_kelp, "01_Data/Kelp UNEP.shp"))
 
@@ -90,7 +90,7 @@ mapview(head(kelp_shp))
 
 Match the data to OHI regions 
 
-```{r}
+```{r, eval = FALSE}
   
 kelp_moll <- st_transform(kelp_shp, crs = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
 

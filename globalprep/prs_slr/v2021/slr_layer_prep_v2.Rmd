@@ -143,7 +143,7 @@ closeAllConnections()
 ```
 
 Unzip the files you've just downloaded: 
-```{r}
+```{r, eval = FALSE}
 zipfiles <- list.files(file.path(dir_anx_aviso, paste0("d", scen_year)),
                        full.names = TRUE, pattern = "*nc.gz")
 for(zipfile in zipfiles){

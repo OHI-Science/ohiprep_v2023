@@ -47,7 +47,7 @@ Reported at spatial cell scale.
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 library(readr)      # for read_csv()
 library(raster)
 library(here)
@@ -68,7 +68,7 @@ region_data()
 
 ```
 
-```{r}
+```{r, eval = FALSE}
 gmw_ohi_2016 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2016.csv")))
 sum(gmw_ohi_2016$km2) # 136804.3
 
@@ -100,7 +100,7 @@ all_mangrove_extent <- rbind(gmw_ohi_1996, gmw_ohi_2007, gmw_ohi_2008, gmw_ohi_2
 
 
 Take an initial look at trend data and compare to old data
-```{r}
+```{r, eval = FALSE}
 ## look at Benin since it had a large increase mangrove cover between 2010 and 2015 and is an outlier 
 benin <- all_mangrove_extent %>%
   filter(rgn_id == 99)
@@ -158,7 +158,7 @@ plot(old$trend.x, old$trend.y, ylab="new trend", xlab="old trend") ## trend is w
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 
 #############################################
 ## Final formatting and save
@@ -208,7 +208,7 @@ write.csv(final_data,
 
 Final Formatting
 
-```{r}
+```{r, eval = FALSE}
 for(year in 2015:2016){ #year <- '2016'
 trend <- read.csv(sprintf('globalprep/hab_mangrove/v2021/int/habitat_trend_mangrove_d%s.csv', year))
 

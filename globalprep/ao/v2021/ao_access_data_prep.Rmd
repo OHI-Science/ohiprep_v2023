@@ -68,7 +68,7 @@ source(here('workflow/R/common.R'))
 
 ## Match raw data to OHI regions
 
-```{r}
+```{r, eval = F}
 
 ## read in data and wrangle
 
@@ -320,7 +320,7 @@ Steps to gapfill:
 
 
 ## Gapfilling exploration
-```{r}
+```{r, eval = F}
 gf_df <- all_rgns_data_df %>%
   pivot_wider(names_from = time_detail, values_from = score) %>%
   mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
@@ -346,7 +346,7 @@ sum(gf_df$complete_data)
 
 
 ## Gapfilling Step 1 and 2
-```{r}
+```{r, eval = F}
 
 ## Fill in the missing 2020 values with 2018 data
 
@@ -386,7 +386,7 @@ gf_2018_df <- all_rgns_data_df %>%
 
 
 ## Gapfilling Step 3
-```{r}
+```{r, eval = F}
 ## now fill gapfill places with no scores at all by larger regions... 
 
 # explore the larger regions 
@@ -489,7 +489,7 @@ nrow(cont_regions_join_gf) + nrow(int_regions_join_gf) + nrow(sub_regions_join_g
 
 
 ## Compile all gapfilled and non-gapfilled data
-```{r}
+```{r, eval = F}
 #### Bind the gapfilled datasets together #### 
 
 nodata_gf_final <- rbind(cont_regions_join_gf, sub_regions_join_gf, int_regions_join_gf)
@@ -518,7 +518,7 @@ hist(final_gf_df$value)
 
 ## Save the prepped data
 
-```{r}
+```{r, eval = F}
 ## save gapfilling flag dataset
 gf_flag_final <- final_gf_df %>%
   dplyr::select(rgn_id, year, gapfilled, method)
@@ -540,7 +540,7 @@ write.csv(final_data, file.path(here(), "globalprep/ao/v2021/output/sdg_14_b_1_a
 Lets compare to the old mora AO data. It is likely to be very dissimilar. 
 
 
-```{r}
+```{r, eval = F}
 
 region_data()
 mora_data <- read_csv(file.path(here(), "globalprep/res_mora_ao/v2013/data/r_mora_s4_2013a_updated.csv")) %>%
