@@ -24,7 +24,7 @@ This script takes the SAUP 2021 catch data, a list of fish oil/fish meal (FOFM) 
 
 ## Updates from previous assessment
 
-No methods updates. Just updated fisheries and RAM data.
+Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO bbmsy). Just updated fisheries and RAM data.
 
 ***
 
@@ -276,25 +276,8 @@ fis_bbmsy_gf <- read.csv(file.path(here(), "globalprep/fis/v2021/output/fis_bbms
 catch_FOFM <- read_csv(file.path(here(), "globalprep/np/v2021/int/mean_catch_FOFM.csv")) 
 
 
-## ignore this... we deleted underharvest penalty in v2021
-  # The following stocks are fished in multiple regions and often have high b/bmsy values
-  # Due to the underfishing penalty, this actually penalizes the regions that have the highest
-  # proportion of catch of these stocks.  
-  
-# high_bmsy_filter <- dplyr::filter(fis_bbmsy, bbmsy>1.5 & year == 2015) %>%
-#     dplyr::group_by(stock_id) %>%
-#     dplyr::summarise(n = dplyr::n()) %>%
-#     data.frame() %>%
-#     dplyr::filter(n>3)
-#   
-# high_bmsy <- high_bmsy_filter$stock_id
-   
-# b <- fis_bbmsy %>%
-#     dplyr::mutate(bbmsy = ifelse(stock_id %in% high_bmsy &
-#                              bbmsy > 1, 1, bbmsy))
-
 b <- fis_bbmsy %>%
-  dplyr::mutate(bbmsy = ifelse(bbmsy > 1 , 1, bbmsy))
+  dplyr::mutate(bbmsy = ifelse(bbmsy > 1 , 1, bbmsy)) # no underharvest penalty anymore! 
 
 c <- catch_FOFM %>%
     dplyr::mutate(stock_id_taxonkey = as.character(stock_id_taxonkey)) %>%
@@ -423,7 +406,7 @@ summary(score_data)
 write.csv(score_data, here('globalprep/np/v2021/output/np_fofm_scores.csv'), row.names = FALSE)
 
 
-old <- read_csv(here('globalprep/np/v2020/output/np_fofm_scores.csv')) 
+old <- read_csv(here('globalprep/np/v2021/archive/np_fofm_scores.csv')) 
 summary(old)
 
 new <- read_csv(here('globalprep/np/v2021/output/np_fofm_scores.csv'))
