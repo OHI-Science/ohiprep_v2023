@@ -163,10 +163,6 @@ For each stock:
  - If you are in-between-filling, you use linear approximation (zoo::na.approx) (i.e. you have 2005-2010 and 2016-2018... fill in 2011-2015 using na.approx)
  - To be included in this carry-over type gapfilling you have to have a maximum year of 2010 or greater (regardless of the number of years of data... so if you only have 1 year of data, for 2010, then that gets carried over all the way to 2018, or vice-versa)
 
-OLD Summary: 
-- There are 432 RAM stocks with at least 5 years of B/Bmsy data from 2005 to 2015. 
-- 289 of these stocks have at least 1 year of gapfilled data.  
-- A few of the predicted B/Bmsy values go below zero. We convert anything with a RAM B/Bmsy value < 0.000001475954 to 0.000001475954, which is the minimum observed B/Bmsy value in the data.
 
 ```{r gapfill, eval = FALSE}
 
