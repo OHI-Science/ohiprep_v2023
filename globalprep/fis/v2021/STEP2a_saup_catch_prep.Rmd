@@ -759,6 +759,9 @@ test <- mean_catch %>%
             sum_total = sum(mean_catch, na.rm = TRUE)) %>%
   mutate(fofm_percent = sum_fofm/sum_total) # around 30% per year are fofm... perfect.
 
+test <- mean_catch %>%
+  filter(rgn_id == 60)
+
 ```
 
 Check out the data
