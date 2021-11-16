@@ -40,9 +40,14 @@ Chrysophrys auratus,162,81,382948000000,NZSNAPNZ8,New Zealand snapper New Zealan
 Chrysophrys auratus,276,81,28081993.52,NZSNAPNZ7,New Zealand snapper New Zealand SNA 7
 Chrysophrys auratus,276,81,27959424.77,NZSNAPNZ8,New Zealand snapper New Zealand Area 8 (Auckland and Central West)
 Cleisthenes herzensteini,210,61,NA,PHFLOUNSOJ,Pointhead flounder Sea of Japan
+Cynoglossus spp,200,47,NA,SOLECWAAGO,Sole Central West Africa Angola
+Cynoglossus spp,193,34,NA,SOLECWAGNB-GIN,Sole Central West Africa Guinea Bissau-Guinea
+Cynoglossus spp,194,34,NA,SOLECWAGNB-GIN,Sole Central West Africa Guinea Bissau-Guinea
+Decapterus spp,96,34,NA,SCADSPPCWAGNB-LBR,Scad spp Central West Africa Guinea Bissau-Liberia
+Decapterus spp,97,34,NA,SCADSPPCWAGNB-LBR,Scad spp Central West Africa Guinea Bissau-Liberia
+Decapterus spp,193,34,NA,SCADSPPCWAGNB-LBR,Scad spp Central West Africa Guinea Bissau-Liberia
+Decapterus spp,194,34,NA,SCADSPPCWAGNB-LBR,Scad spp Central West Africa Guinea Bissau-Liberia
 Eopsetta grigorjewi,210,61,NA,RSFLOUNSOJ,Round nose flounder Sea of Japan
-Epinephelus flavolimbatus,135,31,44932328,YEGROUPGM,Yellowedge grouper Gulf of Mexico
-Epinephelus flavolimbatus,163,31,331298000000,YEGROUPGM,Yellowedge grouper Gulf of Mexico
 Epinephelus niveatus,110,31,16746976058,SNOWGROUPSATLC,Snowy grouper Southern Atlantic coast
 Epinephelus niveatus,163,21,24424401720,SNOWGROUPSATLC,Snowy grouper Southern Atlantic coast
 Epinephelus niveatus,163,31,293108000000,SNOWGROUPSATLC,Snowy grouper Southern Atlantic coast
@@ -61,9 +66,6 @@ Lepidopsetta polyxystra,163,67,465100000000,NRSOLEEBSAI,Northern rock sole Easte
 Lepidopsetta polyxystra,163,61,NA,NRSOLEGA,Northern rock sole Gulf of Alaska
 Lepidorhombus spp,180,27,NA,MEGSPPIVa-VIa,Megrim spp ICES 4a-6a
 Lepidorhombus spp,181,27,NA,MEGSPPIVa-VIa,Megrim spp ICES 4a-6a
-Loligo pealeii,163,21,140080000000,LISQUIDATLC,Longfin inshore squid Atlantic Coast
-Loligo pealeii,163,31,14383651638,LISQUIDATLC,Longfin inshore squid Atlantic Coast
-Loligo pealeii,218,21,5581498.444,LISQUIDATLC,Longfin inshore squid Atlantic Coast
 Loligo reynaudii,101,47,56409073.71,CHSQUIDSA,Cape Hope squid South Africa
 Loligo reynaudii,102,47,604767000000,CHSQUIDSA,Cape Hope squid South Africa
 Loligo reynaudii,267,47,2761094350,CHSQUIDSA,Cape Hope squid South Africa
@@ -78,6 +80,18 @@ Neoplatycephalus richardsoni,16,81,41207480971,TIGERFLATSE,Tiger flathead Southe
 Penaeus esculentus,16,57,NA,BTSHRIMPNAUST,Brown tiger shrimp Northern Australia
 Penaeus esculentus,16,71,NA,BTSHRIMPNAUST,Brown tiger shrimp Northern Australia
 Platycephalus conatus,16,57,205558000000,DEEPFLATHEADSE,Deepwater flathead Southeast Australia
+Sardinella spp,100,34,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,198,34,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,199,34,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,200,34,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,100,47,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,198,47,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,199,47,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,200,47,NA,SARDINCWAGAB-AGO,Sardinella Central West Africa Gabon-Angola
+Sardinella spp,96,34,NA,SARDINCWAGNB-LBR,Sardinella Central West Africa Guinea Bissau-Liberia
+Sardinella spp,97,34,NA,SARDINCWAGNB-LBR,Sardinella Central West Africa Guinea Bissau-Liberia
+Sardinella spp,193,34,NA,SARDINCWAGNB-LBR,Sardinella Central West Africa Guinea Bissau-Liberia
+Sardinella spp,194,34,NA,SARDINCWAGNB-LBR,Sardinella Central West Africa Guinea Bissau-Liberia
 Sardinops melanostictus,20,61,NA,PILCHTSST,Japanese sardine Tsushima Strait
 Sardinops melanostictus,73,61,NA,PILCHPJPN,Japanese sardine Pacific Coast of Japan
 Sardinops melanostictus,209,61,NA,PILCHTSST,Japanese sardine Tsushima Strait
@@ -101,11 +115,6 @@ Sebastes chlorostictus,163,77,98670070378,GRSPROCKNCAL,Greenspotted rockfish Nor
 Sebastes chlorostictus,163,77,91245173618,GRSPROCKSCAL,Greenspotted rockfish Southern Pacific Coast
 Sebastes chlorostictus,273,67,5416763.99,GRSPROCKNCAL,Greenspotted rockfish Northern Pacific Coast
 Sebastes chlorostictus,275,77,116206.2422,GRSPROCKNCAL,Greenspotted rockfish Northern Pacific Coast
-Sebastes diploproa,135,77,7827.088317,SNROCKPCOAST,Splitnose rockfish Pacific Coast
-Sebastes diploproa,163,77,189912000000,SNROCKPCOAST,Splitnose rockfish Pacific Coast
-Sebastes diploproa,275,77,154695.3982,SNROCKPCOAST,Splitnose rockfish Pacific Coast
-Sebastes elongatus,135,77,0.767144629,GRNSTROCKPCOAST,Greenstriped rockfish Pacific Coast
-Sebastes elongatus,163,77,91245173618,GRNSTROCKPCOAST,Greenstriped rockfish Pacific Coast
 Sebastes fasciatus,163,21,72700800365,ACADREDGOMGB,Acadian redfish Gulf of Maine / Georges Bank
 Sebastes fasciatus,218,21,35634234.65,ACADREDGOMGB,Acadian redfish Gulf of Maine / Georges Bank
 Sebastes levis,135,77,0.767144629,COWCODSCAL,Cowcod Southern California

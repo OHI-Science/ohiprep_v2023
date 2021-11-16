@@ -40,6 +40,14 @@ bbmsy_trends2 <- bbmsy_trends %>%
   filter(estimate >= -2)
 hist(bbmsy_trends2$estimate)
 
+test <- bbmsy %>%
+  group_by(stock_id) %>%
+  mutate(max_year = max(year)) %>%
+  ungroup() %>%
+  distinct(stock_id, max_year)
+
+hist(test$max_year)
+
 ```
 
 

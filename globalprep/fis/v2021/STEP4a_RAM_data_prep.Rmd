@@ -72,6 +72,7 @@ library(readr)
 library(sf)
 library(ggplot2)
 library(here) 
+library(zoo)
 
 ## highlight out when knitting
 setwd(here::here("globalprep/fis/v2021"))
@@ -140,15 +141,29 @@ ram_bmsy_new <- timeseries_values_views %>%
   filter(!is.na(ram_bmsy)) %>%
   dplyr::select(stockid, stocklong, year, ram_bmsy)
 
+
+test <- ram_bmsy_new %>%
+  filter(year >=2001, year <=2018) %>%
+  group_by(stockid) %>%
+  mutate(max_year = max(year)) %>%
+  ungroup() %>%
+  distinct(stockid, max_year) %>%
+  group_by(max_year) %>%
+  summarise(n())
+
+hist(test$max_year,breaks=17)
+
 ```
 
 ## Gapfill RAM data when there are missing years
 
 For each stock: 
-- Missing years are gapfilled using a linear regression model that includes data from 2001 to 2018 (2018 is the final year of SAUP data). To be included in the gapfilling, there have to be 5 or more years of B/Bmsy data occuring over the last 11 years of data, from 2005 to 2015.
-- We convert any predicted RAM B/Bmsy value less than the minimum observed B/Bmsy value to that the minimum observed value, as there are some negative predicted values.
+ - If you are upfilling you carry over the most recent years value (i.e. data only goes to 2016, you upfill 2017 and 2018 with the 2016 value)
+ - If you are back filling, you backfill using the value of the oldest most recent year (i.e. you only have values for 2016, 2017, and 2018... you give 2005-2015 the 2016 value)
+ - If you are in-between-filling, you use linear approximation (zoo::na.approx) (i.e. you have 2005-2010 and 2016-2018... fill in 2011-2015 using na.approx)
+ - To be included in this carry-over type gapfilling you have to have a maximum year of 2010 or greater (regardless of the number of years of data... so if you only have 1 year of data, for 2010, then that gets carried over all the way to 2018, or vice-versa)
 
-Summary: 
+OLD Summary: 
 - There are 432 RAM stocks with at least 5 years of B/Bmsy data from 2005 to 2015. 
 - 289 of these stocks have at least 1 year of gapfilled data.  
 - A few of the predicted B/Bmsy values go below zero. We convert anything with a RAM B/Bmsy value < 0.000001475954 to 0.000001475954, which is the minimum observed B/Bmsy value in the data.
@@ -167,80 +182,136 @@ ram_gf_check <- ram_bmsy_new %>%
 ram_bmsy_gf <- ram_bmsy_new %>%
   filter(year >= 2001 & year <= 2018) %>%   # 2017 corresponds to the final year of SAUP catch data
   group_by(stockid) %>%
+    mutate(max_year = max(year)) %>%
   mutate(years_data_2005_now = length(ram_bmsy[year >= 2005])) %>%
   mutate(years_data_2001_now = length(ram_bmsy[year >= 2001])) %>%
   ungroup() %>%
-  filter(years_data_2005_now >= 5)
+  filter(max_year >= 2010) %>%
+  group_by(stockid) %>%
+  mutate(diff_years = year - lag(year)) %>%
+  mutate(diff_years = ifelse(is.na(diff_years), 0, diff_years))
+ # filter(years_data_2005_now >= 5)
+
+in_between_stocks <- ram_bmsy_gf %>%
+  filter(diff_years >1)
+
+in_between_stocks_id <- unique(in_between_stocks$stockid)
+
+
+ram_bmsy_gf_2 <- ram_bmsy_gf %>%
+  dplyr::select(-diff_years)
+
 
 
 ## Get rows for stocks/years with no B/Bmsy (identified as NA B/Bmsy value for now)
-ram_bmsy_gf <- ram_bmsy_gf %>%
+ram_bmsy_gf_3 <- ram_bmsy_gf_2 %>%
   spread(year, ram_bmsy) %>% 
-  gather("year", "ram_bmsy", -stockid, -years_data_2005_now, -years_data_2001_now, - stocklong) %>%
-  mutate(year = as.numeric(year)) 
+  gather("year", "ram_bmsy", -stockid, -years_data_2005_now, -years_data_2001_now, -stocklong, -max_year) %>%
+  mutate(year = as.numeric(year)) %>%
+  dplyr::select(-years_data_2005_now, -years_data_2001_now)
 
 
-## gapfilling record keeping
-ram_bmsy_gf <- ram_bmsy_gf %>%   
-  mutate(gapfilled = NA) %>%
-  mutate(gapfilled = ifelse(years_data_2001_now == 18, gapfilled, 
-                            paste(18 - years_data_2001_now, "years gf", sep = " ")))
+ram_bmsy_gf_4 <- ram_bmsy_gf_3 %>%
+  filter(!(stockid %in% c(in_between_stocks_id)))
+
+
+ram_bmsy_gf_updown <- ram_bmsy_gf_4 %>%
+  mutate(ram_bmsy_gf = ram_bmsy) %>%
+  group_by(stockid) %>%
+  fill(ram_bmsy_gf, .direction = "downup") %>%
+  mutate(gapfilled = ifelse(!is.na(ram_bmsy), "none", "down/upfilling")) 
+
+
+ram_bmsy_gf_in_between <- ram_bmsy_gf_3 %>%
+  filter(stockid %in% c(in_between_stocks_id)) %>%
+  group_by(stockid) %>%
+  arrange(stockid, year)
+
+  
+## split and do this 3 times for each stock in a for loop 
+stocks <- unique(ram_bmsy_gf_in_between$stockid)
+
+ram_bmsy_gf_interpolate <- data.frame(stockid = NA, stocklong = NA, max_year = NA, year = NA, ram_bmsy = NA, ram_bmsy_gf = NA, gapfilled = NA)
+
+for(stock in stocks){
+  
+ # stock = stocks[1]
+  
+  filter_stock <- ram_bmsy_gf_in_between %>%
+    filter(stockid == stock)
+  
+  interpolate <- tibble(filter_stock, ram_bmsy_gf = na.approx(filter_stock$ram_bmsy, rule = 2), gapfilled = "linear interpolation")
+
+  ram_bmsy_gf_interpolate <- rbind(ram_bmsy_gf_interpolate, interpolate)
+    
+}
+
+## now fix the gapfilled column for the linear interpolation observations.. some of them need to be flagged as "upfilled" 
+ram_bmsy_gf_interpolate <- ram_bmsy_gf_interpolate %>%
+  filter(!is.na(stockid)) %>%
+  mutate(gapfilled = case_when(
+    stockid == "WPOLLNAVAR" & year %in% c(2014:2018) ~ "down/upfilling",
+    stockid == "WPOLLWBS" & year %in% c(2015:2018) ~ "down/upfilling",
+    TRUE ~ gapfilled
+  )) %>%
+  mutate(gapfilled = ifelse(!is.na(ram_bmsy), "none", gapfilled))
+
+
+ram_bmsy_gf_final <- rbind(ram_bmsy_gf_interpolate, ram_bmsy_gf_updown)
+
 
 ## see unique values of stocks
-tmp <- ram_bmsy_gf %>%
+tmp <- ram_bmsy_gf_final %>%
   dplyr::select(stockid, gapfilled) %>%
   unique()
 
 
 ## check out gapfilling stats
-length(tmp$gapfilled)  # 397 stocks with at least 5 years of data in past 11 years - v2019
-                      # 398 stocks with at least 5 years of data in past 11 years - v2020
-                      # 432 stocks with at least 5 years of data in past 11 years - v2021
-sum(table(tmp$gapfilled))  # 222 stocks have at least one year of B/Bmsy values gapfilled - v2019
-                          # 314 stocks have at least one year of B/Bmsy values gapfilled; this is because there is an additional year of data in RAM... 2016 - v2020
-# 289 stocks have at least one year of B/Bmsy values gapfilled; I assume this loss is because version 4.495 is more refined than the previous version - v2021
+table(tmp$gapfilled) # only 3 stocks use linear interpolation for some yeasr. 429 stocks are not gapfilled at all! 
+
+sum(table(tmp$gapfilled))  
+# 717 stocks have at least one year of bbmsy values after 2010
 
 
-## regression model for prediction for each stock
-ram_bmsy_gf <- ram_bmsy_gf %>%
-  group_by(stockid) %>%
-  do({
-    mod <- lm(ram_bmsy ~ year, data=.)  
-    ram_bmsy_predict <- predict(mod, newdata=.[c('year')])
-    data.frame(., ram_bmsy_predict)
-  }) %>%
-  ungroup()
-
-summary(ram_bmsy_gf) #1235 NAs for ram_bmsy
-sum(ram_bmsy_gf$ram_bmsy_predict < 0 )  # 50 of the predicted B/Bmsy values go below zero.  
-min(ram_bmsy_gf$ram_bmsy, na.rm = TRUE) #0.000001475954
-
-## We convert anything with a RAM BBmsy value < 0.000001475954 to 0.000001475954, which is the minimum observed B/Bmsy value in the data; add method documentation
-ram_bmsy_gf <- ram_bmsy_gf %>%
-  mutate(ram_bmsy_predict = ifelse(ram_bmsy_predict < 0.000001475954, 0.000001475954, ram_bmsy_predict)) 
+summary(ram_bmsy_gf_final)# should be no NAs
+sum(ram_bmsy_gf_final$ram_bmsy_gf < 0 )  # should be 0 
+min(ram_bmsy_gf_final$ram_bmsy_gf, na.rm = TRUE) #1.475954e-06
 
 ## gapfilling record keeping
-ram_bmsy_gf_final <- ram_bmsy_gf %>%
-  mutate(method = ifelse(is.na(ram_bmsy), paste0("lm, ", gapfilled), NA)) %>%
-  mutate(gapfilled = ifelse(is.na(ram_bmsy), "1", "0")) %>%
-  mutate(ram_bmsy = ifelse(is.na(ram_bmsy), ram_bmsy_predict, ram_bmsy)) %>%
-  dplyr::select(stockid, year, ram_bmsy, gapfilled, method) 
+ram_bmsy_gf_final_fin <- ram_bmsy_gf_final %>%
+  mutate(method = gapfilled) %>%
+  mutate(gapfilled = ifelse(method == "none", "0", "1")) %>%
+  dplyr::select(stockid, year, ram_bmsy = ram_bmsy_gf, gapfilled, method) 
 
-write.csv(ram_bmsy_gf_final, "int/ram_stock_bmsy_gf.csv", row.names=FALSE)
+write.csv(ram_bmsy_gf_final_fin, "int/ram_stock_bmsy_gf.csv", row.names=FALSE)
 
 ```
 
 Get a general idea of how well the model predicts missing data based on observed and model predicted values.  This model appears to do fairly well. 
 ```{r gf error est, eval=FALSE}
 
-plot(ram_bmsy_gf$ram_bmsy, ram_bmsy_gf$ram_bmsy_predict)
-abline(0,1, col="red")
 
-plot(log(ram_bmsy_gf$ram_bmsy), log(ram_bmsy_gf$ram_bmsy_predict))
-abline(0,1, col="red")
-
-mod <- lm(ram_bmsy ~ ram_bmsy_predict, data=ram_bmsy_gf)
+mod <- lm(ram_bmsy ~ ram_bmsy_gf, data=ram_bmsy_gf_final)
 summary(mod)
+
+# Call:
+# lm(formula = ram_bmsy ~ ram_bmsy_gf, data = ram_bmsy_gf_final)
+# 
+# Residuals:
+#        Min         1Q     Median         3Q        Max 
+# -3.296e-12  1.000e-16  5.000e-16  9.000e-16  1.233e-13 
+# 
+# Coefficients:
+#               Estimate Std. Error    t value Pr(>|t|)    
+# (Intercept) -5.679e-15  5.217e-16 -1.089e+01   <2e-16 ***
+# ram_bmsy_gf  1.000e+00  4.414e-18  2.266e+17   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 4.159e-14 on 6410 degrees of freedom
+#   (1310 observations deleted due to missingness)
+# Multiple R-squared:      1,	Adjusted R-squared:      1 
+# F-statistic: 5.133e+34 on 1 and 6410 DF,  p-value: < 2.2e-16
 
 ```
 
@@ -250,7 +321,7 @@ summary(mod)
 Identify the FAO/OHI regions where each RAM stock is located (fao and ohi regions are assigned to RAM Data in [STEP4b_fao_ohi_rgns.Rmd](https://mazu.nceas.ucsb.edu/rstudio/files/github/ohiprep_v2021/globalprep/fis/v2021/STEP4b_fao_ohi_rgns.html). **Run fao_ohi_rgns.Rmd now.**
 
 
-If there are many differences between RAM spatial file and RAM metadata, check the fao_ohi_rgns.Rmd prep again. 
+If there are many differences between RAM spatial file and RAM metadata, check the STEP4_fao_ohi_rgns.Rmd prep again. 
 
 
 ```{r final, eval = FALSE}
@@ -297,10 +368,10 @@ SAUP_sp <- read_csv(file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_ca
 
 
 # compare names - what's in RAM that's not in SAUP
-tmp <- data.frame(scientificname = sort(setdiff(ram_sp$scientificname, SAUP_sp$SAUP_scientificname))) # 47 species names
+tmp <- data.frame(scientificname = sort(setdiff(ram_sp$scientificname, SAUP_sp$SAUP_scientificname))) # 46 species names
 
 # compare names - what's in SAUP that's not in RAM
-tmp2 <- data.frame(scientificname = sort(setdiff(SAUP_sp$SAUP_scientificname, ram_sp$scientificname))) # 2070 species names.. unfortunately a lot.
+tmp2 <- data.frame(scientificname = sort(setdiff(SAUP_sp$SAUP_scientificname, ram_sp$scientificname))) # 2069 species names.. unfortunately a lot.
 
 write.csv(tmp, "int/unmatched_RAM_species.csv", row.names=FALSE)
 write.csv(tmp2, "int/SAUP_species_no_RAM.csv", row.names=FALSE)
@@ -377,5 +448,41 @@ write.csv(ram_data, "int/ram_bmsy.csv", row.names=FALSE)
 summary(ram_data)
 
 
+## check out Katsuwonus_pelamis-51 since this is one of the stocks that was problematic with the old gapfilling methods
+
+
+
 ram_2020 <- read_csv(file.path("../v2020/int/ram_bmsy.csv"))
+
+ram_old_2021 <- read_csv("archive/ram_bmsy.csv")
+
+ram_2021 <- read_csv("int/ram_bmsy.csv")
+
+check <- ram_2021 %>%
+  filter(stockid == "Katsuwonus_pelamis-51") %>%
+  arrange(rgn_id, year) 
+## this looks a lot better! I think this probably fixed the problem... I guess we will see when we plug into OHI global...
+
+
+check_2 <- ram_old_2021 %>%
+  filter(stockid == "Katsuwonus_pelamis-51") %>%
+  arrange(rgn_id, year) 
+
+
+plot(check$ram_bmsy, check_2$ram_bmsy) # makes sense
+
+
+compare <- ram_2021 %>%
+  left_join(ram_old_2021, by = c("rgn_id", "stockid", "stockid_ram", "stocklong", "year", "RAM_area_m2")) %>%
+  mutate(diff = ram_bmsy.x - ram_bmsy.y) %>%
+  filter(ram_bmsy.x < 2) %>%
+  filter(year %in% c(2016:2018))
+
+
+ggplot(compare, aes(x = ram_bmsy.y, y = ram_bmsy.x)) +
+  geom_point() +
+  geom_abline() +
+  labs(title = "old Ram methods vs new Ram methods", x = "old bmsy", y=  "new bmsy") +
+  theme_bw()
+
 ```
