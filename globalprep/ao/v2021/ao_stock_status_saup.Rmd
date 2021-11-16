@@ -86,8 +86,6 @@ test <- catch_AO %>%
 
 setdiff(rgns_eez$rgn_id, test$rgn_id)
 
-cat(paste(shQuote(one, type="cmd"), collapse=", "))
-
 cat(paste(shQuote(setdiff(rgns_eez$rgn_name, test$rgn_name), type = "cmd"), collapse = ","))
 cat(paste(shQuote(setdiff(rgns_eez$rgn_id, test$rgn_id), type = "cmd"), collapse = ","))
 
@@ -140,7 +138,7 @@ c <- catch_AO %>%
 
 
 ## read in fisheries mean catch so we can use to gapfill missing regions
-  fis_mean_catch <- read.csv("../../fis/v2021/int/mean_catch.csv") %>% 
+  fis_mean_catch <- read.csv("globalprep/fis/v2021/int/mean_catch.csv") %>% 
      dplyr::mutate(stock_id_taxonkey = as.character(stock_id_taxonkey)) %>%
     dplyr::mutate(taxon_key = sub('.*_', '', stock_id_taxonkey)) %>%
     dplyr::mutate(stock_id = sub('_[^_]*$', '', stock_id_taxonkey)) %>%
@@ -152,7 +150,7 @@ c <- catch_AO %>%
 
   # test <- fis_mean_catch %>%
   #   filter(region_id == 105)
-    
+
 b <- b %>%
     dplyr::mutate(bbmsy = as.numeric(bbmsy)) %>%
     dplyr::mutate(region_id = as.numeric(as.character(rgn_id))) %>%
@@ -185,7 +183,7 @@ b <- b %>%
   
   ###
   #  Estimate scores for taxa without b/bmsy values
-  # Median score of other fish in the region is the starting point
+  # Mean score of other fish in the region is the starting point
   # Then a penalty is applied based on the level the taxa are reported at
   ###
   
