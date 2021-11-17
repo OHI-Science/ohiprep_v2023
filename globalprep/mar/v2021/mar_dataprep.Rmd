@@ -74,6 +74,7 @@ source('mar_fxs.R') # functions specific to mariculture dealing with compound co
 source('../../../workflow/R/fao_fxn.R') # function for cleaning FAO files
 source('../../../workflow/R/common.R') # directory locations
 
+setwd(here("globalprep/mar/v2021"))
 ```
 
 
@@ -357,7 +358,8 @@ sw_sus <- sw_sus %>%
          escapes_score = 'C6Score',
          rec = 'Overall Recommendation'
          ) %>% 
-  dplyr::select(report_title, published_date, sw_species, genus, spp, fao_species, fda_species, country, state_territory, water_body, method, escapes_score, score, rec)
+  dplyr::select(report_title, published_date, sw_species, genus, spp, fao_species, fda_species, country, state_territory, water_body, method, escapes_score, score, rec) %>%
+  filter(!(method %in% c("Freshwater net pen")))
 
 ## Change species names using FAO species name (fao_species); if NA, use common name (sw_species)
 sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$sw_species)
@@ -461,7 +463,7 @@ table(sw_sus_rgn$match_type)
 **Assign a mediterraen bordering rgn id to each waterbody row**
 ```{r gf_sw_sp_w, eval = FALSE}
 ## Add a line for each country that borders each water body
-  # The only water body is the Mediterranean; add all countries that border it (source: https://www.medqsr.org/mediterranean-marine-and-coastal-environment#:~:text=Today%2021%20countries%2C%20with%20surface,Syria%2C%20Tunisia%2C%20and%20Turkey.)
+  # The only water body without a rgn is the Mediterranean; add all countries that border it (source: https://www.medqsr.org/mediterranean-marine-and-coastal-environment#:~:text=Today%2021%20countries%2C%20with%20surface,Syria%2C%20Tunisia%2C%20and%20Turkey.)
 
 ## filter for waterbody specific rows 
 sw_sus_rgn_water <- sw_sus_rgn %>%
@@ -568,6 +570,7 @@ mar_sw_sus <- mar_sw_sus %>%
 summary(mar_sw_sus)
 # 20595 out of 30938 total obs; ~66 without scores - a higher percentage than last year.. this is because there were some error species in the raw sfw data that have been fixed now (2021)
 
+20595/30938
 ```
 
 Gapfilling based on families and taxon_code
@@ -579,6 +582,7 @@ Steps:
  - Gapfill by average of the taxon_code 
  - Assign any Algae with the seaweeds score from SFW data (7.92)
  - Apply the global average to any remaining sustainability/escapes score NAs 
+ - Finally, we rescale the scores to the highest sustainabilty score, under the assumption that the highest score is the best sustainability currently out there, and should be given a score of 100. 
 
 ```{r sw-gapfill-categories, eval = FALSE}
 ## First we need to add a georegion column that we can group by later on. 
@@ -786,7 +790,8 @@ mar_harvest_tonnes_gf = mar_sw_sus_final %>%
 mar_sustainability_score = mar_sw_sus_final %>%
   mutate(year = 2021) %>% # 2021 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, taxa_code, sust_coeff = Sust) %>%
-  unique()
+  unique() %>%
+  mutate(sust_coeff = ifelse(sust_coeff > 0.7, 1, sust_coeff/0.77)) # rescale to the highest sust score
 
 anyDuplicated(mar_sustainability_score)
 
@@ -813,7 +818,8 @@ mar_sustainability_score_gf = mar_sw_sus_final %>%
 mar_sustainability_score = mar_sw_sus_final %>%
   mutate(year = 2021) %>% # Only 2021 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, species, sust_coeff = Sust) %>%
-  unique()
+  unique() %>% 
+    mutate(sust_coeff = ifelse(sust_coeff > 0.7, 1, sust_coeff/0.77)) # rescale to the highest sust score
 
 ## Saves the appropriate Sustainability Score file
 
