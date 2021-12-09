@@ -1,9 +1,30 @@
 ---
-title: "Untitled"
-output: html_document
+title: "OHI 2021 - Match Bouwman data"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
 ---
 
-Citation: Bouwman, A. F., A. H. W. Beusen, and G. Billen (2009), Human alteration of the global nitrogen and phosphorus soil balances for the period 1970 – 2050, Global Biogeochem. Cycles, 23, GB0A04, doi:10.1029/2009GB003576.
+# Summary
+
+Reads in the raw data from Bouwman et al. 2009 and preps it to match iso3c codes used in our analysis.
+
+## Datasource 
+
+**Reference**: Bouwman, A. F., A. H. W. Beusen, and G. Billen (2009), Human alteration of the global nitrogen and phosphorus soil balances for the period 1970 – 2050, Global Biogeochem. Cycles, 23, GB0A04, doi:10.1029/2009GB003576.
 
 ```{r}
 library(here)
@@ -12,8 +33,6 @@ library(vroom)
 library("readr")
 library(tabulizer)
 library(ohicore)
-
-
 
 source(here('workflow/R/common.R'))
 
@@ -300,3 +319,4 @@ bouwman_2002_tbl5_tidy <-
 write_csv(bouwman_2002_tbl5_tidy,
             here(crop_nutrient, "raw/bouwman_2002_tbl5.csv"))
 ```
+

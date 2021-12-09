@@ -138,7 +138,7 @@ write.csv(matched_area_names, "int/area_name_lookup_raw.csv", row.names = FALSE)
 
 area_name_matched <- read_csv("int/area_name_lookup_manual.csv") # perfect
 
-## gibraltar, monaco, oecussi ambeno are not included - will gapfill at the end.. assign them the scores of their admin regions (Spain, France, East Timor)
+## gibraltar, monaco, oecussi ambeno are not included - will gapfill at the end.. assign them the scores of their admin regions (Spain, France, East Timor (?))
 
 ```
 

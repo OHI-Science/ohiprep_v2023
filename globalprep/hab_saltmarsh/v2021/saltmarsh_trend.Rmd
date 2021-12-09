@@ -66,6 +66,9 @@ dir_git_old  <- file.path('~/github/ohiprep_v2021', "globalprep/hab_saltmarsh/v2
 
 ```
 
+
+Apply a global trend for each region.. not satisfying. 
+
 ```{r, eval = FALSE}
 ## read in extent data
 all <- read.csv(file.path(here("globalprep/hab_saltmarsh/v2021/data/habitat_extent_saltmarsh_updated.csv")))

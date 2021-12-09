@@ -19,6 +19,43 @@ editor_options:
 ---
 
 
+# Summary
+
+This script generates the trend of kelp for each OHI region for the latest year of data. We do this using trend data from Krumhansl et al. 2016, which calculated regional kelp trend values using Bayesian hierarchical linear models. We extract these trends per the Marine Ecoregions of the World (MEOW), and a take weighted area mean to get final trends per region represented in the paper. We then gapfill the remaining areas with kelp extent but no trends with georegional averages. 
+
+
+## Updates from previous assessment
+This is an entirely new layer for the 2021 assessment! 
+
+***
+## Data Sources 
+
+**Reference**: Krumhansl, K.A., Okamoto, D.K., Rassweiler, A., Novak, M., Bolton, J.J., Cavanaugh, K.C., Connell, S.D., Johnson, C.R., Konar, B., Ling, S.D., Micheli, F., Norderhaug, K.M., Pérez-Matus, A., Sousa-Pinto, I., Reed, D.C., Salomon, A.K., Shears, N.T., Wernberg, T., Anderson, R.J., Barrett, N.S., Buschmann, A.H., Carr, M.H., Caselle, J.E., Derrien-Courtel, S., Edgar, G.J., Edwards, M., Estes, J.A., Goodwin, C., Kenner, M.C., Kushner, D.J., Moy, F.E., Nunn, J., Steneck, R.S., Vásquez, J., Watson, J., Witman, J.D., Byrnes, J.E.K., 2016. Global patterns of kelp forest change over the past half-century. Proc Natl Acad Sci USA 113, 13785–13790. https://doi.org/10.1073/pnas.1606102113
+
+
+**Downloaded**: 05/18/2021
+
+**Description**: 
+"Kelp forests support diverse and productive ecological communities throughout temperate and arctic regions worldwide, providing numerous ecosystem services to humans. Literature suggests that kelp forests are increasingly threatened by a variety of human impacts, including climate change, overfishing, and direct harvest. We provide the first globally comprehensive analysis of kelp forest change over the past 50 y, identifying a high degree of variation in the magnitude and direction of change across the geographic range of kelps. These results suggest region-specific responses to global change, with local drivers playing an important role in driving patterns of kelp abundance. Increased monitoring aimed at understanding regional kelp forest dynamics is likely to prove most effective for the adaptive management of these important ecosystems."
+
+https://www.pnas.org/content/113/48/13785
+
+
+
+**Time range**: 1983 - 2012
+
+
+**Reference**: Spalding MD, Fox HE, Allen GR, Davidson N, Ferdaña ZA, Finlayson M, Halpern BS, Jorge MA, Lombana A, Lourie SA, Martin KD, McManus E, Molnar J, Recchia CA, Robertson J (2007) Marine Ecoregions of the World: a bioregionalization of coast and shelf areas. BioScience 57: 573-583.
+
+**Downloaded**: 5/11/2016
+
+
+***
+
+# Methods
+
+## Setup
+
 ```{r setup, include=FALSE, eval = FALSE}
 
 library(readr)      # for read_csv()
@@ -44,42 +81,10 @@ region_data()
 
 ```
 
-# Summary
-
-This script generates the trend of kelp for each OHI region for the latest year of data. We do this using trend data from Krumhansl et al. 2016, which calculated regional kelp trend values using Bayesian hierarchical linear models. We extract these trends per the Marine Ecoregions of the World (MEOW), and a take weighted area mean to get final trends per region represented in the paper. We then gapfill the remaining areas with kelp extent but no trends with georegional averages. 
-
-
-## Updates from previous assessment
-This is an entirely new layer for the 2021 assessment! 
-
-***
-## Data Source 
-
-**Reference**: Krumhansl, K.A., Okamoto, D.K., Rassweiler, A., Novak, M., Bolton, J.J., Cavanaugh, K.C., Connell, S.D., Johnson, C.R., Konar, B., Ling, S.D., Micheli, F., Norderhaug, K.M., Pérez-Matus, A., Sousa-Pinto, I., Reed, D.C., Salomon, A.K., Shears, N.T., Wernberg, T., Anderson, R.J., Barrett, N.S., Buschmann, A.H., Carr, M.H., Caselle, J.E., Derrien-Courtel, S., Edgar, G.J., Edwards, M., Estes, J.A., Goodwin, C., Kenner, M.C., Kushner, D.J., Moy, F.E., Nunn, J., Steneck, R.S., Vásquez, J., Watson, J., Witman, J.D., Byrnes, J.E.K., 2016. Global patterns of kelp forest change over the past half-century. Proc Natl Acad Sci USA 113, 13785–13790. https://doi.org/10.1073/pnas.1606102113
-
-
-**Downloaded**: 05/18/2021
-
-**Description**: 
-"Kelp forests support diverse and productive ecological communities throughout temperate and arctic regions worldwide, providing numerous ecosystem services to humans. Literature suggests that kelp forests are increasingly threatened by a variety of human impacts, including climate change, overfishing, and direct harvest. We provide the first globally comprehensive analysis of kelp forest change over the past 50 y, identifying a high degree of variation in the magnitude and direction of change across the geographic range of kelps. These results suggest region-specific responses to global change, with local drivers playing an important role in driving patterns of kelp abundance. Increased monitoring aimed at understanding regional kelp forest dynamics is likely to prove most effective for the adaptive management of these important ecosystems."
-
-https://www.pnas.org/content/113/48/13785
-
-
-
-**Time range**: 1983 - 2012
-
-
-**Reference**: Spalding MD, Fox HE, Allen GR, Davidson N, Ferdaña ZA, Finlayson M, Halpern BS, Jorge MA, Lombana A, Lourie SA, Martin KD, McManus E, Molnar J, Recchia CA, Robertson J (2007) Marine Ecoregions of the World: a bioregionalization of coast and shelf areas. BioScience 57: 573-583.
-
-**Downloaded**: 5/11/2016
-
-***
-# Methods
 
 Steps: 
 1. Read in the kelp trend data from Krumhansl et al. 2016 and join with our MEOW shapefile. 
-2. rasterize and use zonal statistics to calculate the trend and amount of ecoregion area in each OHI region**
+2. Rasterize and use zonal statistics to calculate the trend and amount of ecoregion area in each OHI region
 3. Calculate the trend per each OHI region by taking the weighted area mean.
 4. Match to our extent data, and gapfill any region that has extent data but not trend data by georegion.
 
@@ -127,7 +132,7 @@ write.csv(trends_df, file.path(dir_git, "int/krumhansl_trends.csv"), row.names =
 # read in ecoregion shp
 meow_rgns <- st_read(file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/meow/meow_ecos.shp"))
 
-mapview(meow_rgns)
+# mapview(meow_rgns)
 
 ## join together
 trend_data_meow <- meow_rgns %>%

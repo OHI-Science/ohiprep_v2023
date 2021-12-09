@@ -1,6 +1,9 @@
 # Land based agriculture nutrient pollution (manure and crops)
 
-For this OHI layer we map nutrient leaching stressor from manure and crops. Fertilizer use data is extracted from FAOSTAT and we allocate that spatially using MapSPAM crop area raster layers, taken from the Food Systems project at NCEAS (Halpern et al. 2021; "The cumulative environmental footprint of global food production"). Further, manure application from agriculture animals is extract FAOstat and we allocate that using animal farm area raster layers, taken from the Food Systems project at NCEAS (Halpern et al. 2021; "The cumulative environmental footprint of global food production"). Once these maps are created, we aggregate the nutrients to the pourpoints, and run them through the plume diffusion model so that the nutrients are spread into the ocean. 
+For this OHI layer we map nutrient leaching stressor from manure and crops. Fertilizer use data is extracted from FAOSTAT and we allocate that spatially using MapSPAM crop area raster layers, taken from the Food Systems project at NCEAS (Halpern et al. 2021 in review; "The cumulative environmental footprint of global food production"). Further, manure application from agriculture animals is extract FAOstat and we allocate that using animal farm area raster layers, taken from the Food Systems project at NCEAS (Halpern et al. 2021 in review; "The cumulative environmental footprint of global food production"). Once these maps are created, we aggregate the nutrients to the pourpoints, and run them through the plume diffusion model so that the nutrients are spread into the ocean. 
+
+Code in crop and manure folders adapted from, some files taken from: 
+Halpern et al. 2021 github: https://github.com/OHI-Science/food_systems
 
 ## Folders
 

@@ -13,10 +13,10 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/np_dataprep.html]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP2_np_weighting_prep.html]
 
 # Summary
-This analysis converts FAO commodities tonnes data for ornamentals, SAUP fisheries tonnes data for FOFM, and FAO mariculture tonnes data for seaweeds into a weighting scheme per each ohi region, based off of 5 year averages of tonnes and values (in usd) for each product. This weighting scheme will be applied to the scores when updating in ohi global. 
+This analysis converts FAO commodities tonnes data for ornamental fish trade, SAUP fisheries tonnes data for FOFM, and FAO mariculture tonnes data for seaweeds into a weighting scheme per each ohi region, based off of 5 year averages of tonnes and values (in usd) for each product. This weighting scheme will be applied to the scores to determine how much of each natural products layer affects the overall NP score when updating in ohi global. 
 
 
 ***
@@ -73,13 +73,13 @@ FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commoditi
 
 **Format**: CSV format 
 
-**Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here. 
+**Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here. We only use up to year == 2018.
 
 * DOI: 10.5281/zenodo.2542919
 
 
 **Reference**: [FAO Mariculture data](http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp)
-Release date: March 2020
+Release date: March 2021
 FAO Global Aquaculture Production Quantity 1950_2018
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
@@ -105,7 +105,7 @@ source(here('globalprep/np/v2021/R/np_fxn.R'))
   
 ## Methods
 
-Import prepped FAO commodities data set and find 5 year aaverage $USD / Tonne average value per product per region. Gapfill these based on the UN geopolitical region/global values. 
+Import prepped FAO commodities data set and find 5 year average $USD / Tonne average value per product per region. Gapfill these based on the UN geopolitical region/global values. 
 ```{r}
 ## read in the prepped FAO commodities data set 
 harvest_tonnes_usd <- read_csv("int/np_harvest_tonnes_usd.csv") %>%
@@ -120,7 +120,7 @@ region_data()
 
 rgns_eez <- rgns_eez %>%
   dplyr::select(rgn_id) %>%
-  filter(rgn_id != 213)
+  filter(rgn_id != 213) # filter out antarctica
 
 ## make a data frame with every region and every product
 products <- data.frame(product = c("seaweeds", "ornamentals", "fish_oil"))
@@ -304,7 +304,7 @@ check_fofm <- check %>%
   filter(product == "fish_oil")
 
 plot(check_fofm$new_weight, check_fofm$weight)
-abline(0,1, col="red") ## these change because of new SAUP fisheries data... 
+abline(0,1, col="red") ## these change because of new SAUP fisheries catch data... 
 
 ```
 

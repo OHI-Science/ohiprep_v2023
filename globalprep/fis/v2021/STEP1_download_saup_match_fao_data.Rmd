@@ -20,11 +20,13 @@ editor_options:
 
 # Summary
 
-This script downloads aggregated catch data from the Sea Around Us Project (SAUP). We will download 2 different data sets from this page: https://www.seaaroundus.org/data/#/search
+This script downloads aggregated catch data from the Sea Around Us Project (SAUP). We will download 3 different data sets from this page: https://www.seaaroundus.org/data/#/search
 
 1. Download region specific EEZ catch data.
 
 2. Download high seas catch data. 
+
+3. Download the FAO region catch data.. this is used to match saup region ids to the FAO regions
 
 We will assign FAO ids to each year/region/species record to the EEZs and high seas data. SAUP shared a lookup table with OHI (in v2016) that links SAUP EEZ region names and ids to the FAO region they are located in (some of the region names have changed, which required a bit of tinkering for v2021, but won't be a problem for future assessments). The proportional area of each EEZ within the FAO region was calculated for overlapping EEZs, so that we assign the correct amount of catch to EEZ/FAO region overlaps.
 
@@ -72,7 +74,7 @@ cat_msg <- function(x, ...) {
     message(x, ...)
   }
   return(invisible(NULL))
-}
+} # create function to spit out messages in loops
 ```
 
 Use the SAUP API to download by eez production data. To do this, we need SAUP region id numbers. 
@@ -125,7 +127,7 @@ bin <- getBinaryURL(full_url,
 
 con <- file(file.path(sprintf("/home/shares/ohi/git-annex/globalprep/_raw_data/SAUP/d2021/by_eez_zip_new/%s_saup_eez.zip", i)), open = "wb")
 
-writeBin(bin, con)
+writeBin(bin, con) # write each zip file of 10 regions from SAUP
 close(con)
 
   cat_msg('Processed  \n  ', i, 'of' , nrow(region_ids_281), region_id_string)
@@ -176,7 +178,7 @@ sum(all_df_ids_eez_final$tonnes) # 6129245230
 test <- all_df_ids_eez_final %>%
   filter(year == 2017)
 
-sum(test$tonnes) # 104583995 # seems reasonable... i think Watson was something like 111 million (including high seas)
+sum(test$tonnes) # 104583995 # seems reasonable... i think Watson data was something like 111 million (including high seas)
 
 
 

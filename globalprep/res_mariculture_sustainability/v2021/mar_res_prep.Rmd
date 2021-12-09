@@ -13,6 +13,8 @@ output:
     toc: true
 ---
 
+**NOTE: This layer was not added to the OHI yet. We will hopefully revise and add for v2022.**
+
 # Summary
 
 # Updates from previous assessment

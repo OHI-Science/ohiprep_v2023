@@ -19,7 +19,7 @@ editor_options:
 ---
 
 # Summary
-Map yearly nutrient leaching from crops using static crop farming location rasters taken from the Glboal Food Project : https://github.com/OHI-Science/food_systems/
+Map yearly nutrient leaching from crops using static crop farming location rasters taken from the Global Food Project (Halpern et al. 2021 in review): https://github.com/OHI-Science/food_systems/
 
 # Preamble
 ```{r setup, include = FALSE}

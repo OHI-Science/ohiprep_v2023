@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: combine_all_nutrients"
+title: "OHI 2021: Combine nutrient rasters"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -22,18 +22,18 @@ editor_options:
 Grab all the relevant nutrient files and compile into a couple of summarized per year files, for manure and crops 
 
  - Total P applied per year for manure 
-    - just leaching 
+    - only leaching files
  - Total P applied per year for crops 
-    - just leaching 
+    - only leaching files
  - Total P for crops and manure 
-   - leaching only 
+   - only leaching files
    
  - Total N for manure 
-    - volatized
-    - Leaching 
+    - volatized files together
+    - Leaching files together
  - Total N for crops 
-    - volatized
-    - Leaching 
+    - volatized files together
+    - Leaching files together
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -57,7 +57,8 @@ source(here(git_crop, "R/common_spatial.R")) # read in necessary spatial files
 ```
 
 
-
+Combine and save the appropriate files so that we have yearly volatilized rasters and yearly leaching files per each nutrient.
+ - make sure to run through this this with one nutrient and one year first... i.e. specify `nutrient <- "N"` and `yr <- 2005` and run line by line so you make sure to understand what is happening.
 ```{r}
 
 years <- as.character(c(2005:2019))
@@ -77,20 +78,20 @@ for(yr in years){
     if(nutrient == "N"){
       
     
-  n_leach_manure <- list.files(file.path(prep, "animal_farm_int/STEP7_total_N_leaching"), pattern = yr, full = TRUE)
+  n_leach_manure <- list.files(file.path(prep, "animal_farm_int/STEP7_total_N_leaching"), pattern = yr, full = TRUE) # list leached manure files
   
-  n_volt_manure <- list.files(file.path(prep, "animal_farm_int/STEP7_total_N_volatizing"), pattern = yr, full = TRUE)
+  n_volt_manure <- list.files(file.path(prep, "animal_farm_int/STEP7_total_N_volatizing"), pattern = yr, full = TRUE) # list volatilized manure files
   
   crop_pat <- paste0(".+leached_N_", yr)
  
-  leach_crop <- list.files(file.path(prep, "crop_predatalayers"), pattern = crop_pat, full = TRUE)
+  leach_crop <- list.files(file.path(prep, "crop_predatalayers"), pattern = crop_pat, full = TRUE) # list leach crop files
 
   crop_pat_volt <- paste0(".+volatilized_N_", yr)
-  volt_crop <- list.files(file.path(prep, "crop_predatalayers"), pattern = crop_pat_volt, full = TRUE)
+  volt_crop <- list.files(file.path(prep, "crop_predatalayers"), pattern = crop_pat_volt, full = TRUE) # list leach crop volatilized files
 
   
   ## Now save a file for just crops leached N
-    all_nutrients_stack <- stack(leach_crop)
+    all_nutrients_stack <- stack(leach_crop) 
 
     rasterOptions(todisk = FALSE)
 
@@ -293,7 +294,8 @@ endCluster()
 ```
 
 
-Calculate total nutrient application per year for manure and crops
+Calculate total nutrient application per year for manure and crops and save to dataframes (for checking).
+
 ```{r}
 
 ## Read manure leaching and volt N nutrient layers and manure leaching P nutrient layers and create a dataframe columns year, nutrient, total nutrient sum

@@ -13,6 +13,8 @@ output:
     toc: true
 ---
 
+This script combines the fisheries catch data with the mariculture production data to create the weights for how much of each score will affect the entire food provision score. 
+
 # Methods
 
 ```{r}

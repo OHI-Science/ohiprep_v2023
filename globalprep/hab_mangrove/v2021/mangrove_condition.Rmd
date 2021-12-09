@@ -22,7 +22,7 @@ editor_options:
 
 
 ## Updates from previous assessment
-Using a new dataset from global mangrove watch so we are going to gapfill the new regions that have been added to the mangrove extent data. 
+Using a new dataset from global mangrove watch for the extent, and since all regions which have extent need a condition, we are going to gapfill the new regions that have been added to the mangrove extent data. 
 
 ***
 ## Data Source 

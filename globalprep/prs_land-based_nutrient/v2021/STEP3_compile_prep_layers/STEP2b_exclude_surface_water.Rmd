@@ -20,7 +20,7 @@ editor_options:
 
 ## Summary
 
-Multiply our leaching and volatized rasters by the appropriate surfwater rasters to get an estimate of the amount of N that will reach the coast. See below for more instructions. 
+Multiply our leaching and volatized rasters by the appropriate surface water rasters to get an estimate of the amount of N that will reach the coast. See below for more instructions. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -53,7 +53,6 @@ Do this for:
 We could also do this for P, but we are excluding P for this analysis. 
 
 ```{r}
-#### STOPPED HERE SEP 29 ####
 
 ## load in the 1km surface and coast raster
 sw_reproj <- raster(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/surface_water_reproj.tif"))
@@ -191,7 +190,7 @@ write.csv(sum_df_all, file.path(git_compile, "int/all_nutrient_layers_sw_sums.cs
 
 ```
 
-3. Join the surface water nutrient layer sums with the total nutrient sums, and compare the percentages of each.
+3. Join the surface water nutrient layer sums with the total nutrient sums, and compare the percentages of each. Just for data checking funsies. 
 
 ```{r}
 surface_water_sums <- read.csv(file.path(git_compile, "int/all_nutrient_layers_sw_sums.csv"))

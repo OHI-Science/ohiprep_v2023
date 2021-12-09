@@ -112,14 +112,14 @@ test <- fis_bbmsy %>%
   filter(rgn_name %in% missing)
 
 setdiff(missing, unique(test$rgn_name)) # bouvet island is missing?
-## they do have b/bmsy data! Lets just use their overall b/bmsy scores (for industrial fishing), as their AO b/bsmy scores. 
+## they do have b/bmsy data! Lets just use their overall b/bmsy scores (for industrial fishing), as their AO b/bsmy scores.. not perfect, but better than nothing!
 
 test <- fis_bbmsy %>%
   filter(rgn_id == 105)
 
 test <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv") %>%
   filter(region_id == 105,
-         goal == "FIS") # bouvet has fisheries scores..
+         goal == "FIS") # bouvet has fisheries scores... so lets use that for their AO score
 
 ## First cap b/bmsy scores
 b <- fis_bbmsy %>%
@@ -155,7 +155,7 @@ b <- b %>%
     dplyr::mutate(bbmsy = as.numeric(bbmsy)) %>%
     dplyr::mutate(region_id = as.numeric(as.character(rgn_id))) %>%
     dplyr::mutate(year = as.numeric(as.character(year))) %>%
-    dplyr::mutate(stock_id = as.character(stock_id))
+    dplyr::mutate(stock_id = as.character(stock_id)) # fix some classes
   
   
   ####
@@ -178,7 +178,7 @@ b <- b %>%
   
   data_fis_final <- rbind(data_fis, gapfill_missing, fix_bouvet)
   
-  length(unique(data_fis_final$rgn_id)) # 220 regions perfect 
+  length(unique(data_fis_final$rgn_id)) # 220 regions ; perfect 
   
   
   ###

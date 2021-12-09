@@ -15,13 +15,14 @@ Here I will document how to run the plume model. Much of this was written by Gag
  
  ```
 # this is all done in the shell
+# NOTE: CHANGE THE USERNAME TO YOURS... don't use sgclawson.. it won't work for you.
 
 # After creating a new python env, I.e. py2: 
 
 conda activate py2
 
 cp /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/int/ocean_masks/ocean_mask_1km.tif /home/sgclawson/grassdata/ 
-## copy the ocean mask to your grassdata folder. The ocean mask is a raster where the land values are set to nan and the ocean values to 1.
+## copy the ocean mask to YOUR grassdata folder (meaning change the username...). The ocean mask is a raster where the land values are set to nan and the ocean values to 1.
 
 rm -r /home/sgclawson/grassdata/location # replace username with your home directory name
 

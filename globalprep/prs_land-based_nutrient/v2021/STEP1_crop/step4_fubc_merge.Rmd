@@ -17,6 +17,7 @@ pdf_document:
 editor_options: 
   chunk_output_type: console
 ---
+
 # Summary
 Merge the FAOSTAT data with the Bouwman and FUBC datasets
 

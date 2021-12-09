@@ -21,10 +21,9 @@ editor_options:
 [REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/prs_coral_harvest/v2021/prs_coral_harvest.html]
 
 # Summary
-This analysis converts FAO commodities data into data layers used to calculate OHI 2020 global coral harvest pressure.
+This analysis converts FAO commodities data into data layers used to calculate OHI 2021 global coral harvest pressure.
 
 # Updates from previous assessment
-This was previously not included in OHI global.
 New year of FAO data (1976-2018).  
 
 ***

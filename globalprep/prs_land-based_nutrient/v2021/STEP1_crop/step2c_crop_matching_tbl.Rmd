@@ -23,6 +23,7 @@ Make a table which outlines codes for the different types of crops represented i
 
 
 ## Setup
+
 ```{r setup, include = FALSE}
 # getting packages we want
 library(here)

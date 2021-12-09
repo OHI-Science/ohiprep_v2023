@@ -13,7 +13,7 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/np_dataprep.html]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1b_np_seaweeds_prep.Rmd]
 
 # Summary
 This analysis converts FAO mariculture data into one of the data layers used to calculate OHI 2021 global natural products (NP) scores. We will conduct the overall NP data prep on seaweeds, fish oil/fish meal (FOFM), and ornamentals, however, our final layer from this data prep will only consist of seaweeds.
@@ -47,7 +47,7 @@ Release date: August 3, 2020
 
 **Downloaded**: July 22, 2020
 
-**Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1.
+**Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1. There is only one value for seaweeds in the data... 0.67
 
 
 ***
@@ -281,7 +281,7 @@ write.csv(maric,"int/np_seaweeds_tonnes_weighting.csv", row.names = FALSE)
 
 ## Import data: Seafood Watch sustainability scores
 
-These data describe the sustainability country/species combinations. In cases where these data were not available for a specific county/species, we just used the seafood watch seaweed sustainability score (7.92) (this was all of the seaweed species listed). 
+These data describe the sustainability country/species combinations. In cases where these data were not available for a specific county/species, we just used the seafood watch seaweed sustainability score (6.72) (this was all of the seaweed species listed). 
 
 ```{r sw-scores, eval = FALSE}
 ## Load in Seafood Watch sustainability scores data from mazu:
@@ -366,7 +366,10 @@ mar_sw_sus <- maric %>%
 ```
 
 
-**Since there are no sustainability scores for any of the species listed, we will gapfill with the seafood watch "Seaweed (Global)" score, which is 7.92.**
+**Since there are no sustainability scores for any of the species listed, we will gapfill with the seafood watch "Seaweed (Global)" score, which is 6.72.**
+
+NOTE FOR v2022: Scale this score the the max in the seafood watch data, like we did for mariculture. 
+
 ```{r}
 mar_sw_sus <- mar_sw_sus %>%
   mutate(Sust = round(6.72/10,2)) %>% ## since none of the species match, we will give the general worldwide seaweed score from seafood watch (6.72)

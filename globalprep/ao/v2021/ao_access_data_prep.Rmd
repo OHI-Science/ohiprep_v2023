@@ -76,21 +76,21 @@ raw_data <- read_xlsx(file.path(here(), "globalprep/ao/v2021/raw/raw_sdg_14_data
   clean_names() ## Raw sdg data
 
 codes_raw <- read_xlsx(file.path(here(), "globalprep/ao/v2021/raw/raw_sdg_14_data.xlsx"), sheet = 3) %>%
-  clean_names() ## Shows what each of the codes means 
+  clean_names() ## Shows what each of the code means 
 
 ## Here is the link to the countries that fall under each code (saved in the "raw" folder as a csv): https://unstats.un.org/unsd/methodology/m49/
 
-region_info <- read_csv("raw/UNSD_Methodology.csv") %>%
+region_info <- read_csv("raw/UNSD_Methodology.csv") %>% ## this shows the different over arching regions for each country
   clean_names() %>%
   mutate(country_or_area = ifelse(country_or_area == "Bonaire", "Bonaire, Sint Eustatius and Saba", country_or_area)) %>%
-  mutate(country_or_area = ifelse(country_or_area == "Côte d’Ivoire", "Ivory Coast", country_or_area)) ## this shows the different over arching regions for each country
+  mutate(country_or_area = ifelse(country_or_area == "Côte d’Ivoire", "Ivory Coast", country_or_area)) 
 
 
 data_df <- raw_data %>%
   dplyr::select(geo_area_code, geo_area_name, time_detail, value, nature, observation_status, reporting_type, units) %>%
   filter(!(geo_area_code %in% c(344, 446))) %>% # filter out hongkong/macao, they are NA anyways
   left_join(region_info, by = c("geo_area_name" = "country_or_area")) %>%
-  filter(!(iso_alpha3_code %in% c("HK", "MO"))) %>% ## filter out macao and hong kong again 
+  filter(!(iso_alpha3_code %in% c("HK", "MO"))) %>% ## filter out macao and hong kong again... just to be sure
   dplyr::select(geo_area_code, geo_area_name, time_detail, value, region_code, region_name, sub_region_code, sub_region_name, intermediate_region_code, intermediate_region_name, iso_alpha3_code, small_island_developing_states_sids) ## Now we have a dataset with all of the information we need to begin 
 
 test <- data_df %>%
@@ -100,8 +100,9 @@ test <- data_df %>%
 # split the country codes into overarching geo regions and specific countries
 
 ## these are all the larger regions, like "Asia", "North America", etc. that will be used for gapfilling
-bigger_regions <- c(1, 2, 5, 9, 11, 13, 14, 15, 17, 18, 19, 21, 29, 30, 34, 35, 39, 53, 54, 61, 62, 135, 142, 143, 145, 150, 151, 154, 155, 199, 202, 419, 432, 485, 513, 514, 515, 518, 543, 722, 738, 746, 747, 753) ## these are all of the region codes for the larger regions 
+bigger_regions <- c(1, 2, 5, 9, 11, 13, 14, 15, 17, 18, 19, 21, 29, 30, 34, 35, 39, 53, 54, 61, 62, 135, 142, 143, 145, 150, 151, 154, 155, 199, 202, 419, 432, 485, 513, 514, 515, 518, 543, 722, 738, 746, 747, 753) 
 
+ # rescale scores into decimals between 0 and 1
 data_rescale_df <- data_df %>%
   mutate(region_type = ifelse(geo_area_code %in% bigger_regions, "larger region", "country")) %>%
   mutate(score = case_when(
@@ -127,7 +128,7 @@ setdiff(rgns_eez$rgn_name, test$geo_area_name)
 ## it looks like we are missing quite a few... however, many of these are name mis-matches or regions that need to be split. We will fix these below.
 ```
 
-Use the name2rgn function to fix some of the name mismatches. Additionally, we will manually split some regions. 
+Use the name2rgn function to fix some of the name mismatches. Additionally, we will manually split some regions. There is proably a better way to do this... if next year wants to take the time to do it. 
 
 Name to region function (in OHI core package) reports regions that don't have a match in OHI region list. Here we report certain reported regions at a higher spatial scale, based on the listed regions in the error message. 
 
@@ -178,7 +179,7 @@ match_country_data_df <- name_2_rgn(df_in = country_region_df,
                        fld_name='geo_area_name', 
                        flds_unique=c('time_detail'))
 
-## removed: Aland (not OHI),Bonaire Sint Saba (fixed above), Channel Islands (fixed above), "Eswatini (not OHI), French southern territories (fixed above), Isle of man (not OHI), North Macedonia (land locked), Saint Barthelemy (not OHI), Palestine (not OHI), UMI (fixed above) - perfect! 
+## removed: Aland (not OHI),Bonaire Sint Saba (fixed above), Channel Islands (fixed above), Eswatini (not OHI), French southern territories (fixed above), Isle of man (not OHI), North Macedonia (land locked), Saint Barthelemy (not OHI), Palestine (not OHI), UMI (fixed above) - perfect! 
 
 
 ## fix duplicates
@@ -262,7 +263,7 @@ sort(setdiff(rgns_eez$rgn_name, all_rgns_data_df$rgn_name))
 #  [6] "Canary Islands" - same as spain        "Clipperton Island" (uninhabited)     "Macquarie Island" (uninhabited)     "Madeira" - same as portugal               "Oecussi Ambeno"       
 # [11] "Prince Edward Islands" "Tristan da Cunha"     
 
-## None of these are located in the raw UN data. I we will have to manually assign them the appropriate regions by googling. 
+## None of these are located in the raw UN data. I we will have to manually assign them the appropriate larger regions by googling. 
 
 remaining_rgns <- data.frame(
   geo_area_name = c("Andaman and Nicobar", "Ascension", "Azores", "Canary Islands", "Madeira", "Oecussi Ambeno", "Prince Edward Islands", "Tristan da Cunha"), 
@@ -293,7 +294,7 @@ all_rgns_data_df <- rbind(all_rgns_data_df, match_remaining)
 
 sort(setdiff(rgns_eez$rgn_name, all_rgns_data_df$rgn_name))
 
-# [1] "Antarctica"        "Bouvet Island"     "Clipperton Island" "Macquarie Island"  - perfect
+# [1] "Antarctica"        "Bouvet Island"     "Clipperton Island" "Macquarie Island"  - perfect .. these places are uninhabited anyways
 
 ```
 
@@ -537,7 +538,7 @@ write.csv(final_data, file.path(here(), "globalprep/ao/v2021/output/sdg_14_b_1_a
 
 ## Datacheck
 
-Lets compare to the old mora AO data. It is likely to be very dissimilar. 
+Lets compare to the old mora AO data. It is likely to be very dissimilar. Next year will be much more similar.
 
 
 ```{r, eval = F}
@@ -574,7 +575,7 @@ ggplot(compare_2018, aes(x = value.y, y = value.x)) +
   labs(title = "AO Mora vs. SDG 14.b.1 values", x = "old value", y=  "new value") +
   theme_bw()
 
-## doesnt look great since the SDG data is essentially categorical, but it is more up-to-date
+## doesn't look great since the SDG data is essentially categorical, but it is more up-to-date
 
 ```
 

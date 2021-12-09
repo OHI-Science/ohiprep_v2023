@@ -1,3 +1,2 @@
-# Saved this from: neptune_data:model/GL-NCEAS-Resilience_v2013a/data
 
-However, this isn't where the data were generated...need to find original source.
+This layer wasn't added to the OHI yet... hopefully next year. 

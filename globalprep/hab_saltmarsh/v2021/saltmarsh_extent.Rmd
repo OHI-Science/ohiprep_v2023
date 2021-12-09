@@ -165,7 +165,7 @@ print(nrow(sm_subset_py)) ## how many rows does our new dataframe have now?
 }
 
 
-save_incase <- sm_subset_py ## save another in our enviro just in case
+save_incase <- sm_subset_py ## save another in our enviro just in case we accidentally over write it...
 
 ## save our progress 
 st_write(sm_subset_py, file.path(dir_M, "git-annex/globalprep/hab_saltmarsh/v2021/int/saltmarsh_extent_regions_py.shp"), overwrite = TRUE) ## save to mazu so we don't lose all of that work

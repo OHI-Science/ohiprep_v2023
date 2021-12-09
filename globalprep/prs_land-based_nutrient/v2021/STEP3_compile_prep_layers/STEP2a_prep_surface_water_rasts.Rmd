@@ -21,7 +21,7 @@ editor_options:
 ## Summary
 
 Create rasters which describe: 
- - Areas within 1km of surface waters (rivers and lakes) and within 1km of the coast. This will be used to multiply by our leaching estimates. Taken from the (Wastewater project)[https://github.com/OHI-Science/wastewater]
+ - Areas within 1km of surface waters (rivers and lakes) and within 1km of the coast. This will be used to multiply by our leaching estimates. Taken from the [Tuholske et al 2021; Wastewater project](https://github.com/OHI-Science/wastewater)
  - Proportion of area within cells that are surface waters and 1km away from the coast. This will be used to multiply by our volatilization estimates. Taken from the [food systems project](https://github.com/OHI-Science/food_systems)
 
 ```{r setup, include=FALSE}

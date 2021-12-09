@@ -13,7 +13,7 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2020/globalprep/np/v2020/np_dataprep.html]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1a_np_ornamentals_prep.html]
 
 # Summary
 This analysis converts FAO commodities data into data layers used to calculate OHI 2021 global natural products scores. We will conduct this data prep on the commodities seaweed, fish oil, and ornamentals, so that we can produce $ values for weighting later on, however, our final layer (saved to the output folder) from this data prep will only consist of ornamental fish. This will also calculate a sustainability layer based off of risk and exposure for ornamental fishing. 
@@ -371,13 +371,11 @@ Score harvest (tonnes and usd) relative to peaks. Output values as .csvs. Perfor
 
 ```{r}
 
-#buffer  <-  0.35 # 35% buffer (from OHI Methods)
 
 ## Find peak harvest per region-product and apply conservative buffer (scale down)
 ## Find max USD value over the last 10 years 
 peak_prod <- roll_prod %>%
     group_by(rgn_id, product) %>%
-    #mutate(tonnes_peak = max(tonnes, na.rm=T)  * (1 - buffer)) %>%
     mutate(tonnes_peak = max(tonnes, na.rm=T)) %>%
     ungroup() 
 

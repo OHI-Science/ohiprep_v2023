@@ -142,7 +142,7 @@ region_data()
 df <- read_csv(file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn_taxa.csv')) %>%
   left_join(rgns_eez)
 
-# they all have ohi or fao regions; however there are only 197 regions with artisanal or subsistence catch in the SAUP data..
+# they all have ohi or fao regions; however there are only 197 regions with artisanal or subsistence catch in the SAUP data.
 ```
 
 ***
@@ -258,7 +258,7 @@ mean_catch_toolbox <- mean_catch %>%
 write.csv(mean_catch_toolbox, "intermediate/mean_catch.csv", row.names=FALSE) ## save the total mean catch csv for reference if needed
 
 
-length(unique(mean_catch_toolbox$rgn_id)) # only 196 regions... I suspect we will gapfill the missing regions...
+length(unique(mean_catch_toolbox$rgn_id)) # only 196 regions... We will gapfill the missing regions...
 
 old <- read.csv("intermediate/mean_catch_watson.csv")
 

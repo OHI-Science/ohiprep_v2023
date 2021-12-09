@@ -19,7 +19,7 @@ editor_options:
 ---
 
 
-[REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2021/globalprep/prs_land-based_nutrient/v2021/STEP1_pourpoints_prep.Rmd)
+[REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2021/globalprep/prs_land-based_nutrient/v2021/STEP4_pourpoints/STEP1_pourpoints_prep.Rmd)
 
 
 # Summary

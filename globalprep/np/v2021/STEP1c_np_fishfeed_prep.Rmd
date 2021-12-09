@@ -18,13 +18,15 @@ editor_options:
   chunk_output_type: console
 ---
 
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1c_np_fishfeed_prep.html]
+
 # Summary
 
 This script takes the SAUP 2021 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
 
 ## Updates from previous assessment
 
-Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO bbmsy). Just updated fisheries and RAM data.
+Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO bbmsy). Updated fisheries and RAM data.
 
 ***
 
@@ -62,7 +64,7 @@ Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO b
 
 **Native data resolution**: stock (fish stock, species and region specific)
 
-**Time range**: 1950 - 2016
+**Time range**: 1950 - 2018
 
 **Format**: CSV format 
 
@@ -104,7 +106,7 @@ Froehlich, H.E., Jacobsen, N.S., Essington, T.E., Clavelle, T., and Halpern, B.S
 
 They identify 238 forage fish species which account for >99% of forage fish catches in 2012.
 
-31 million tons per year of captured forage fish (since 1980).
+~31 million tons per year of captured forage fish (since 1980).
 
 Get the list of forage fish used for FOFM:
 
@@ -207,7 +209,7 @@ test <- catch_fishfeed %>%
 
 # Step 2 
 
-## Multiply by 0.90 to reflect the amount going to feed/oils
+## Multiply by 0.90 to reflect the amount going to feed/oils, and not the amount going to human consumption (that is accounted for in food provision)
 
 Justification from the [Froelich et al. 2018](https://www.nature.com/articles/s41893-018-0077-1#Sec11): "Currently, it is estimated about 10% of forage fish enter the human diet directly, but the notoriously tiny-boned fish are labour intensive (thus expensive) to process for human consumption, are the foundation of several industries and thus jobs (creating inertia to change) and are not the preferred fish type for most people."
 
@@ -303,6 +305,9 @@ b <- b %>%
   #  *************NOTE *****************************
   #  These values can be altered
   #  ***********************************************
+
+## The upper limit can be deleted, since we already cap pedscores at 1 anyways. We still want to keep the lower buffer.
+
   alpha <- 0.5
   beta <- 0.25
   lowerBuffer <- 0.95

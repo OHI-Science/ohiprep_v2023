@@ -5,4 +5,4 @@ for the 2021 assessment. The tenth assessment of OHI!
 
 For more information about the Ocean Health Index global assessment see: http://ohi-science.org/ohi-global/
 
-Here is a link describing file organization: http://ohi-science.org/ohiprep_v2018/src/dataOrganization_SOP
+Here is a link describing file organization: http://ohi-science.org/ohiprep_v2021/Reference/SOP_dataOrganization/dataOrganization_SOP.html

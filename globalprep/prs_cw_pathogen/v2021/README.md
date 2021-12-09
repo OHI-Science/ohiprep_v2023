@@ -5,7 +5,7 @@ This folder describes the methods used to prepare pathogen data for the global O
 More information about the clean waters goal is available [here](http://ohi-science.org/goals/#clean-waters).
 
 
-Information about calculation see [here](https://rawgit.com/OHI-Science/ohiprep_v2018/master/globalprep/prs_cw_pathogen/v2018/cw_sanitation_data_prep.html)
+Information about calculation see [here](https://rawgit.com/OHI-Science/ohiprep_v2021/master/globalprep/prs_cw_pathogen/v2021/cw_sanitation_data_prep.html)
 
 
 ## Layers Created
