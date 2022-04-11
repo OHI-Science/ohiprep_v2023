@@ -1,0 +1,433 @@
+---
+title: "Philosophy and models of the Ocean Health Index"
+output: html_document
+---
+
+Work together to answer these questions.  
+
+All the information you need should be in the OHI Methods [document](https://raw.githack.com/OHI-Science/ohi-global/published/documents/methods/Supplement.html#2_the_theory_of_ohi).
+
+I will be around to answer any questions...so don't hesitate to get clarification, extra guidance, or request hints!
+
+### OHI score models and data
+1. What is the difference between a goal's "status" and "score"?
+
+The "status" is the current state of the goal relative to a reference point. Whereas the score of the goal is the averarge of the stauts and the likely future status.
+
+<br>
+<br>
+
+2. If a region's food provision goal has the following values, what would its food provision score be?
+
+Predicted future status: 80
+
+Current status: 60  
+
+The food provision goal score would be 70  
+
+<br>
+
+```{r food-provision-score}
+future <- 80
+current <- 60
+score <- (future + current) / 2
+```
+
+<br>
+
+3. Given the following data, what would this region's Index score be?
+
+Goal/subgoal  | Abbreviation   | Score
+------------- | -------------- | -------------
+Artisanal Fishing Opportunity | AO | 90
+Habitat | HAB | 50
+Species Condition | SPP | 30
+Carbon Storage | CS | 20
+Clean Waters | CW | 95
+Coastal Livelihoods and Economies | LE | 60
+Coastal Protection | CP | 80
+Food Provision | FP | 85
+Natural Products | NP | 100
+Sense of Place | SP | 10
+Tourism and Recreation | TR | 50
+
+
+NOTE: The abbreviations for subgoals have 3 letters and goals have 2 letters.
+
+```{r calc-index-score}
+## Input the 9 goal scores as variables:
+ao <- 90
+cs <- 20
+cw <- 95
+le <- 60
+cp <- 80
+fp <- 85
+np <- 100
+sp <- 10
+tr <- 50
+
+## Calculate the goal scores for BD from the subgoals:
+hab <- 50
+spp <- 30
+bd <- (hab + spp) / 2 #find the average
+
+## Input codes and scores into a table:
+goal_scores <- data.frame(goal = c("ao","bd","cs","cw","le","cp","fp","np","sp","tr"),
+                          score = c(ao,bd,cs,cw,le,cp,fp,np,sp,tr))
+
+## Find the index scoree (average of the goal scores)
+mean(goal_scores$score)
+```
+**Answer** The index score is 63  
+
+4. Fill in the missing values.  
+
+NOTE: Pressure and resilience must be multiplied by 0.01.  Trend and status are not modified.  I think we should probably change the way report trend (or, alternatively, pressures/resilience) so they are treated consistently.
+
+<br>
+<br>
+
+Dimension | Scenario 1 | Scenario 2
+---------- | ---------- | ---------
+Score      |     71.3      | 77.5
+Current status |  75 | 75
+Predicted future status | 67.65 |  80
+Trend | 0.10 | 0.10
+Pressure | 100 | 50
+Resilience | 50 | 50
+
+
+QUESTION: How did a pressure change from 100 to 50 affect the final score?  Was this a larger or smaller effect than you would have expected?
+
+ANSWER: A change in pressure from 100 to 50 increased the final score by 6 points. I think this is a little less than I expected given the pressures doubled. However, as the trend is twice as important as the pressures and resilience, it makes sense that the change isn't very dramatic.  
+
+```{r missing-values}
+## Function to calculate predicted future status:
+## From OHI methods equation where t=trend, p=pressure, r=resilience, b=beta, status=current status
+calc_future <- function(t,p,r,b=0.67,status){
+  future_status = (1 + (b * t) + ((1-b) * ((0.01*r)-(0.01*p)))) * status
+}
+test <- calc_future(t = 0.1, p = 50, r = 50, status = 75) #should equal 80 -- good
+
+## Function for calculating scores:
+score <- function(current, future){
+  goal_score = (current + future) / 2
+}
+
+## Scenario 1 - future status and then goal score:  
+future <- calc_future(t = 0.1, p = 100, r = 50, status = 75)
+score1 <- score(current = 75, future = future)
+
+## Scenario 2 - goal score
+score2 <- score(current = 75, future = 80)
+
+
+```
+
+<br>
+<br>
+
+### Humans as part of the ecosystem
+<br>
+
+5. To calculate the Fishery subgoal, we:
+
+a. Obtain B/Bmsy  scores for each stock that is harvested.   B/Bmsy is defined as: the ratio of observed biomass to the biomass that would provide maximum sustainable yield. When B/BMSY = 1, then biomass equals BMSY. If B/BMSY falls below 1, biomass is too low to provide maximum sustainable yield. For example, if B/BMSY = 0.5, then biomass is only 50% of that needed for maximum sustainable yield. (from: http://www.catchshareindicators.org/wp-content/uploads/2013/12/NE_Biomass_Feb-2014.pdf)
+
+b. Convert B/Bmsy into a stock status score that ranges from 0-1, with one reflecting a perfect score.  The relationship between B/Bmsy values and stock status scores looks like this:
+
+![](figures/fis_bbmsy_2_score.jpg)
+
+c. Take some sort of average of the stock status scores within each region (for the global we use a geometric mean weighted by catch).
+
+QUESTION: B/Bmsy scores greater than 1 indicate the stock is doing well!  Given this, why are B/Bmsy scores > 1.05 penalized (i.e., stock status score is less than 1)? 
+
+ANSWER: These scores are likely punished because the fishery is underharvesting, which means that the fishery could be providing more food to the fishers than it is. As the Ocean Health Index fishery subgoal is part of food provision, the highest scores should be given only to fisheries that are sustainably harvesting as much as they can and an underharvested fishery could be doing better than it is.    
+
+<br>
+<br>
+
+### Gapfilling
+6. Imagine you are calculating OHI scores for 10 regions.  The data you can find for an economic variable that is used to calculate the status of one of the goals looks like this:
+
+rgn_id   | data
+-------- | -------
+1        | 72
+2        | 74
+3        | 80
+4        | 70
+5        | NA
+6        | NA
+7        | 71
+8        | 75
+9        | 76
+10       | 76
+
+QUESTION: Should the missing values (NA is a missing value in R) remain missing?  If so, why?
+
+Or, should you try to estimate the missing values?  If so, how might you go about estimating them?
+
+ANSWER: The data should be filled and not left missing. This is because in order for scores to be compared, every region must have a value for every data layer. Excluding a layer for a particular location because of lacking data may result in changes in ocean health being driven more by data availability than by actual differences in ocean health. There are different methods that can be used for filling gaps when data is missing: averaging values for closely related groups, spatial or temporal interpolation, and predictive models. The specific type of gapfilling used in a particular analysis is likely to be context dependent.    
+
+<br>
+<br>
+
+### Goal status and trend
+<br>
+
+7. Read the methods section for the Lasting Special Places subgoal: https://raw.githack.com/OHI-Science/ohi-global/published/global_supplement/Supplement.html#592_lasting_special_places_(subgoal_of_sense_of_place)
+
+The information in this section describes how status and trend are calculated for this goal, it also includes the data used to calculate the pressure and resilience dimensions.
+
+QUESTION: What is the reference point for this subgoal?
+
+ANSWER: The reference point for this subgoal is protection of 30% of a country's waters and coastlines.  
+
+Explore the links to the pressures and resilience data layers.
+
+Follow this link to the functions.R file in ohi-global: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/functions.R
+
+Find the Lasting Special Places function.  See if you can reconcile the model described in the Methods with the code. (NOTE: Just aim for a large picture overview...at this point you do not need to understand every step….or even most of this)
+
+```{r model-lsp-subgoal}
+
+## Here is the model to calculate the lasting special places subgoal. 
+## I'm going to annotate it in big picture chunks using ##
+
+LSP <- function(layers) {
+  scen_year <- layers$data$scenario_year
+  
+  ## specify reference point values
+  ref_pct_cmpa <- 30
+  ref_pct_cp <- 30
+  
+  ## finding the total area of coastal and marine waters for each region
+  total_area <-
+    rbind(layers$data$rgn_area_inland1km,
+          layers$data$rgn_area_offshore3nm) %>% #total offshore/inland areas
+    dplyr::select(region_id = rgn_id, area, layer) %>%
+    tidyr::spread(layer, area) %>%
+    dplyr::select(region_id,
+           area_inland1km = rgn_area_inland1km,
+           area_offshore3nm = rgn_area_offshore3nm)
+  
+  ## find the area of protected areas in coastal and marine waters and join these data sets together
+  offshore <-
+    AlignDataYears(layer_nm = "lsp_prot_area_offshore3nm", layers_obj = layers) %>%
+    dplyr::select(region_id = rgn_id,
+           year = scenario_year,
+           cmpa = a_prot_3nm)
+  inland <-
+    AlignDataYears(layer_nm = "lsp_prot_area_inland1km", layers_obj = layers) %>%
+    dplyr::select(region_id = rgn_id,
+           year = scenario_year,
+           cp = a_prot_1km)
+  
+  
+  # ry_offshore <-  layers$data$lsp_prot_area_offshore3nm %>%
+  #   select(region_id = rgn_id, year, cmpa = a_prot_3nm)
+  # ry_inland <- layers$data$lsp_prot_area_inland1km %>%
+  #   select(region_id = rgn_id, year, cp = a_prot_1km)
+  #
+  lsp_data <- full_join(offshore, inland, by = c("region_id", "year"))
+  
+  ## Changing NA values to 0 for any missing values in the protected area data and finding the total protected area
+  ## by adding up protected coastal areas and protected marine areas
+  # fill in time series for all regions
+  lsp_data_expand <-
+    expand.grid(region_id = unique(lsp_data$region_id),
+                year = unique(lsp_data$year)) %>%
+    dplyr::left_join(lsp_data, by = c('region_id', 'year')) %>%
+    dplyr::arrange(region_id, year) %>%
+    dplyr::mutate(cp = ifelse(is.na(cp), 0, cp),
+           cmpa = ifelse(is.na(cmpa), 0, cmpa)) %>%
+    dplyr::mutate(pa     = cp + cmpa)
+  
+  ## Adding the total coastal and marine area the data set and calculating the percent of coastal areas that are protected and the percent of marine areas that are protected 
+  ## Calculate status by comparing the percent of coastal and marine areas that are protected to the reference point
+  # get percent of total area that is protected for inland1km (cp) and offshore3nm (cmpa) per year
+  # and calculate status score
+  status_data <- lsp_data_expand %>%
+    dplyr::full_join(total_area, by = "region_id") %>%
+    dplyr::mutate(
+      pct_cp    = pmin(cp   / area_inland1km   * 100, 100),
+      pct_cmpa  = pmin(cmpa / area_offshore3nm * 100, 100),
+      status    = (pmin(pct_cp / ref_pct_cp, 1) + pmin(pct_cmpa / ref_pct_cmpa, 1)) / 2
+    ) %>%
+    dplyr::filter(!is.na(status))
+  
+  ## Calculating the status for the specific assessment year 
+  # extract status based on specified year
+  
+  r.status <- status_data %>%
+    dplyr::filter(year == scen_year) %>%
+    dplyr::mutate(score = status * 100) %>%
+    dplyr::select(region_id, score) %>%
+    dplyr::mutate(dimension = "status")
+  
+  # calculate trend
+  
+  trend_years <- (scen_year - 4):(scen_year)
+  
+  r.trend <-
+    CalculateTrend(status_data = status_data, trend_years = trend_years)
+  
+  
+  ## Reference Point Accounting
+  WriteRefPoint(
+    goal = "LSP",
+    method = paste0(
+      ref_pct_cmpa,
+      "% marine protected area; ",
+      ref_pct_cp,
+      "% coastal protected area"
+    ),
+    ref_pt = "varies by area of region's eez and 1 km inland"
+  )
+  ## Reference Point End  
+  
+  # return scores
+  scores <- dplyr::bind_rows(r.status, r.trend) %>%
+    mutate(goal = "LSP")
+  return(scores[, c('region_id', 'goal', 'dimension', 'score')])
+}
+```
+
+<br>
+<br>
+
+8. The trend for the Tourism and Recreation goal for the United States is -0.15.  Describe what this means.
+
+The trend is the proportional change in status predicted to occur in five years, based on the current status. If the trend is -0.15 this means that the Tourism and Recreation status in the U.S. is expected to decline by 15% in 5 years.   
+<br>
+<br>
+
+9. We are going to walk through a trend calculation.  If R is installed on your computer, follow along.
+
+Status data for a region's Tourism and Recreation goal:
+
+Year  | Status
+------ | ----------
+2010  | 72
+2011  | 71
+2012  | 72
+2013  | 73
+2014  | 77
+2015  | 80
+2016  | 82
+
+*STEP 1* Estimate the average change per year using a linear regression model
+
+![](figures/trend_lm.jpg)
+```{r avg-change}
+year <- 2012:2016 #5 years
+status <- c(72,73,77,80,82) #corresponding status
+
+trend_model <- lm(status ~ year)
+```
+
+
+The 0.027 value is the slope estimate, which is the average change in status per year estimated by the linear model.
+
+
+*STEP 2* Obtain proportional change by dividing the slope estimate by the earliest status value used in the linear model:
+```{r proportional-change}
+prop_change <- 0.027/0.72
+```
+proportional change = 0.0375
+
+
+There has been nearly a 4% increase in status per year.
+
+*STEP 3* The goal is to predict the change in 5 years, so we multiply the yearly proportional change by 5:
+```{r multiply}
+five_yr_change = prop_change * 5
+```
+Five year change = 0.1875  
+
+Status is predicted to increase about 19% in 5 years.
+
+In 2021, status is predicted to be (ignoring pressure/resilience dimensions):
+
+```{r calc-trend}
+trend <- 82 * (1 + five_yr_change)
+```
+82 * (1 + 0.1875) = 97
+
+QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?
+
+QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?
+
+ANSWER: One assumption of using this type of method is that the trend is linear and that the status over the past five years is a significant predictor of the future status. There may be circumstances in which five years of data is not avialble, or some larger advances were done that make one or two years of past data not comparable to other years of past data.     
+
+<br>
+<br>
+
+### Goal pressure and resilience
+<br>
+
+10. The pressure dimension plays a relatively small role in goal scores (see figure 4.1), but it takes a lot of effort to prepare the data!
+
+The final pressure dimension is calculated for each region and goal using a function from the ohicore package.  The function requires several pieces of information:
+
+a. A data layer for each pressure layer describing the magnitude of the pressure on a scale of 0-1.  For example, here is the sea surface temperature pressure layer (low pressures are good and high pressures are bad): https://github.com/OHI-Science/ohiprep_v2019/blob/gh-pages/globalprep/prs_sst/v2016/output/sst_updated.csv
+
+b. Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2).  The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change).  Each pressure data layer is assigned to a category in this file: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv
+
+QUESTION: How many climate change pressures are there?   
+ANSWER: There are four climate change pressures: sea surface temperature, ocean acidification, uv radiation, and sea level rise  
+
+c. Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others.  The relationship between the goals and the pressure variables is described here: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv
+
+QUESTION: Which pressure layers affect the FIS  subgoal?  How many regulatory pressure layers are there?  How many social layers are there?  Which is more important: Ecological or Social pressures?   
+
+ANSWER: Fisheries subgoal is affected by the following pressure layers:  
+ - Chemical pollution (po_chemicals)  
+ - Nutrient pollution (po_nutrients)  
+ - Nonindigenous species (sp_alien)
+ - Genetic escapes (sp_genetic)
+ - Subtidal softbottom habitat destruction (hd_subtidal_sb)  
+ - Subtidal hardbottom habitat destruction (hd_subtidal_hb)  
+ - Intertidal habitat destruction (hd_intertidal)  
+ - High bycatch due to commerical fishing (fp_com_hb)  
+ - Low bycatch due to commerical fishing (fp_com_lb)  
+ - High bycatch due to artisinal fishing (fp_art_hb)  
+ - Low bycatch due to artisinal fishing (fp_art_lb)  
+ - Weakness of governance (ss_wgi)  
+ - Weakness of social progress (ss_spi)
+ 
+ There are 20 ecologiical pressure layers and 2 social pressure layers. While all of the pressures are weighted equally, the fisheries subgoal has more ecological pressures than social pressures. 
+
+QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
+ANSWER:  Coastal protection is calculated based on habitats and the different pressures may affect habitats differently, so by having these different elements the pressures can be applied more accurately.  
+
+NOTE: It is convention to add a superscript to the pressure name that describes its category:
+* po=pollution
+* hd=habitat destruction
+* sp=alien species
+* fp=fishing pressure
+* cc=climate change
+
+<br>
+<br>
+
+11.  Similar to the pressures dimension, resilience plays a relatively small role in goal scores (see figure 4.1) but still takes a lot of effort.
+
+The final resilience dimension is calculated for each region and goal using a function from the ohicore package.  The function requires several pieces of information:
+
+a. A data layer for each pressure layer describing the magnitude of the pressure on a scale of 0-1. For example, here is the Social Progress Index layer (low resilience is bad and high resilience is good): https://github.com/OHI-Science/ohiprep_v2019/blob/gh-pages/globalprep/prs_res_spi/v2017/output/spi_res.csv
+
+b. The resilience dimension includes two major categories: Ecological and Social (Figure 4.3). Ecological resilience has two subcategories: Ecosystem and Regulatory.  Regulatory is comprised of the same 5 subcomponents as the Ecological *pressures*: pollution, alien species, habitat destruction, fishing, and climate change.  There is also a “goal” specific subcomponent.   Each resilience data layer is assigned to a category in this file: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/resilience_categories.csv
+
+c. The relationship between goals and resilience is described here: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/resilience_matrix.csv
+<br>
+<br>
+
+### Data layers
+<br>
+
+12. Explore table 7.0.1 and describe where the links take you.
+
+<br>
+Each of the links in the layers column takes you a description of that layer as found on the ohi-science/ohi-global webpage. In each description there is a link to the csv file, a description of the data, and the units for data. The links labeled "data prep" in the description column take you a page that further explains the datasets and includes links to where the data can be downloaded.   
+<br>
