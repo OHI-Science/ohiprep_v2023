@@ -16,7 +16,7 @@ While you are working at your computer at NCEAS, you receive a frantic call from
 
 THEY NEED HELP!
 
-"No problem" you say, "I'll get Julie or Melanie or Gage"...but they are no where to be found!
+"No problem" you say, "I'll get Melanie or Gage"...but they are no where to be found!
 
 "Hold on, I'll get Jamie or Casey or Courtney"...but they are also gone.
 
@@ -162,7 +162,7 @@ summary(scores)
 
 ### Plot
 
-*Project* Create a scatterplot that compares 2012 and 2019 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
+*Project* Create a scatterplot that compares 2012 and 2021 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
 
 *Answer* Write your answer here!
 
