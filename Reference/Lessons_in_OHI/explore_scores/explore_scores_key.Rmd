@@ -1,5 +1,5 @@
 ---
-title: "Learning about OHI scores 2020 key"
+title: "Learning about OHI scores 2022 key"
 output: html_document
 ---
 
@@ -48,11 +48,13 @@ scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/dra
 
 ### Region explore
 
-*Question* Why are there N=222 regions (see code below)...aren't there supposed to be 220?
+*Question* Why are there N=222 regions (see code below)...aren't there supposed to be 220? Can you make this data more human readable by including the full goal name (vs. the 2 letter abbreviation) and the country name.
 
-*Hint 1* Here is a link to the official region list: https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv
+*Hint 1* Here is a link to the official region list (the rgn_id column in this file matches the region_id column in the scores data): https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv
 
-*Hint 2* Which region has all NA values for scores?
+*Hint 2* Here is a table that includes goal names: https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv
+
+*Hint 3* Which region has all NA values for scores?
 
 *Answer* This includes region 0 (the overall ohi global scores), and region 213 (antarctica, not included in global assessment)
 
@@ -263,4 +265,14 @@ library(plotly)
 ggplotly(scatter)
 ```
 
+
+Create a plot that shows the distribution (e.g., histogram or barplot or ??) of *Index* scores of all countries.
+
+```{r across year plot}
+
+## Code to create a plot showing distribution of country Index scores
+
+
+
+```
 
