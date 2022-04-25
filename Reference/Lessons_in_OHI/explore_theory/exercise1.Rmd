@@ -48,7 +48,7 @@ NOTE: The abbreviations for subgoals have 3 letters and goals have 2 letters.
 
 4. Fill in the missing values.  
 
-NOTE: Pressure and resilience must be multiplied by 0.01.  Trend and status are not modified.  I think we should probably change the way report trend (or, alternatively, pressures/resilience) so they are treated consistently.
+NOTE: Pressure and resilience must be multiplied by 0.01.  Trend and status are not modified. 
 
 
 Dimension | Scenario 1 | Scenario 2

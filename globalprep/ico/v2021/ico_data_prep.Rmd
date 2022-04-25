@@ -127,7 +127,7 @@ Get all pages and bind into total species list, using the IUCN API.
 
 ``` {r get_spp_info, eval= F}
 
-api_file <- file.path(dir_server, 'api_key_gc.csv')
+api_file <- file.path(dir_server, 'api_key_gc.csv') ## this is the api key that we need to use to access the files in the api
 api_key <- scan(api_file, what = 'character') 
 
 # file path to save species list that is scraped from the web.
@@ -246,7 +246,7 @@ For each of these species, use the IUCN API to gather a list of countries in whi
 # 
 # ico_spp_countries <- read_csv(here("globalprep/ico/v2019/int/ico_spp_countries.csv"))
 
-################ workaround 
+################ workaround because above was not working anymore
 
 ## v2020 workaround - The following code is a work around that saves each species as a temp file in a new tmp folder then binds them together to form the full species list
 

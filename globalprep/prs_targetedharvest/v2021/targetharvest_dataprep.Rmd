@@ -71,7 +71,7 @@ This includes the FAO capture production data and a list of the "target" species
 ## FAO capture production data - all columns being parsed as characters and producing error in one column, but not sure which? (read.csv might help avoid this error?)
 fis_fao_raw <-  read_csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_capture/d2021/Global_capture_production_Quantity_1950-2019.csv'))
 
-# species list - used same raw files from v2020
+# List of species included as cetaceans or marine turtles (this probably won't change at all)
 sp2grp <-  read_csv(here('globalprep/prs_targetedharvest/v2021/raw/species2group.csv')) %>%
   dplyr::filter(incl_excl == 'include') %>%
   dplyr::select(target, species); head(sp2grp)
