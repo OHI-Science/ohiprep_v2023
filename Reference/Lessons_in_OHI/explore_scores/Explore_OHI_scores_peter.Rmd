@@ -108,7 +108,7 @@ unique(scores$goal)
 
 *Question* There are 6 dimensions reported in this dataset (future, pressures, resilience, score, status, and trend).  When I look at the number of records in each of these categories, I notice that there are more "score" values reported than "status" values (see working space below). Given that scores are calculated using status, it seems like these should have the same number of records. Can you figure out what is going on here. Is something going wrong?  
 
-*Answer* 
+*Answer* The difference between the number of `score` and `status` values is explained by the `Index` values which are `score` values calculated based on all the goals and thus don't have a status associated with them.
 
 ```{r, include=FALSE}
 ## Working space
