@@ -46,7 +46,10 @@ https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv
 
 ```{r, include=FALSE}
 # load in latest OHI global data
-scores <- read.csv(here("Reference/Lessons_in_OHI/explore_scores/scores.csv"))
+# using read.csv(here()) that requires the data to be in the proj:
+#scores <- read.csv(here("Reference/Lessons_in_OHI/explore_scores/scores.csv"))
+# reading in directly from github:
+scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv")
 
 ```
 
@@ -133,7 +136,7 @@ head(usa) # region_id = 163
 *Answer* 10 goals of OHI assessments are abbreviated with 2 letters, which indicates that they are the 10 main goals, and the 8 sub-goals are indicated by 3 letters. An example of a main goal is "Biodiversity", which is abbreviated as "BD", and this goal has 2 sub-goals: "Habitat" and "Species", which are abbreviated with 3 letters each as "HAB" and "SPP", respectively. There is also a value of "Index" within the `goals` variable, which makes up the 19th unique goal value. 
 
 ```{r, include=FALSE}
-# determine the number of distinct goals in the joined data to comfirm it is indeed 19
+# determine the number of distinct goals in the joined data to confirm it is indeed 19
 n_distinct(scores_regions_goals$goal) # 19
 
 # determine unique goal values in the joined data
@@ -152,18 +155,38 @@ index_goal
 
 *Question* There are 6 dimensions reported in this dataset (future, pressures, resilience, score, status, and trend).  When I look at the number of records in each of these categories, I notice that there are more "score" values reported than "status" values (see working space below). Given that scores are calculated using status, it seems like these should have the same number of records. Can you figure out what is going on here. Is something going wrong?  
 
-*Answer* Write your answer here!
+*Answer* The difference of 2442 rows for these dimensions is explained by the 2442 rows within the `Index` goal that are associated with the `score` dimension. Since the only dimensions associated with `Index` are `score` and `future`, and the rows associated with each are equal, I infer that `Index` is the result of a calculation that includes these both these dimensions or at least the `score` dimension as an input.
 
 ```{r, include=FALSE}
-# explore the unique values of the dimension 
+# explore the unique values of the dimension variable
+unique(scores_regions_goals$dimension)
 
-# unique(scores$dimension)
-# table(scores$dimension)
-# 
-# table(scores$goal)
-# table(scores$goal, scores$dimension)
+# check how many rows of each dimension are present
+unique(scores$dimension)
+table(scores$dimension)
 
+#table(scores$goal)
+#table(scores$goal, scores$dimension)
 
+# check how many rows of each dimension are present (in a different way, in just 1 df)
+dimensions_explore <- scores_regions_goals %>% 
+  group_by(dimension) %>% 
+  summarize(n())
+
+# check number of rows that are different between score and status
+46398 - 43956 # 2442
+
+unique(scores_regions_goals$goal) # explore the index goal as I am not familiar with it
+
+index_goal <- scores_regions_goals %>% 
+  filter(goal == "Index")
+nrow(index_goal) # 4884
+
+unique(index_goal$dimension) # there are only "future" and "score" in the dimension column for the "index" goal, meaning there are no index for the dimension "status", so index might be the result of a calculation that includes status
+
+index_goal_score <- index_goal %>% 
+  filter(dimension == "score")
+nrow(index_goal_score) # 2442
 ```
 
 
@@ -173,11 +196,27 @@ index_goal
 
 *Hint* Include only dimension = score, and year = 2021, and cut region_id = 0.
 
-*Answer* Write your answer here!
+*Answer* The goal with the most NA values for scores in 2021 is carbon storage (`CS`). The subgoal with the most NA values is mariculture (`MAR`). I guess that carbon storage has the most NA values for score in 2021 because many countries may *not*  have ever had or currently have the habitats that are assessed for this goal: mangroves, tidal marshes and seagrasses. If these countries did historically or currently do have these habitats, they are at least not present in the data we are using to assess this goal.
+
+The goals with the fewest NA values (with Antarctica included) are `BD`, `CW`, `FP`, and `SP`. The subgoals with the fewest NA values are `FIS`, `HAB`, `ICO`, `LSP`, and `SPP`. When you remove Antarctica, these goals are not listed amongst those that have NA values. The biodiversity goal probably has no NA values because the data for the species subgoal mostly came from IUCN Red List of Threatened Species, which I would hope and assume is updated very regularly and is comprehensive for many if not all countries. Furthermore, the methodology for the other subgoal, habitats, explains that "a significant amount of pre-processing of the habitat data was needed to fill data gaps and resolve data quality issues" so the gaps that initially existed were filled to the best of OHI's ability before the score was calculated. The other goals and subgoals without missing values also probably had comprehensive data or had NA values filled in before the score was calculated.
 
 ```{r, include=FALSE}
-## Working space
-
+# filter data to only include 2021 and count the number of na values for score, grouping by goal
+na_2021 <- scores_regions_goals %>% 
+  filter(year == 2021,
+         dimension == "score",
+         region_id != 0,
+         # remove Antarctica from the regions
+         region_id != 213) %>%
+  # select only certain rows to make the dataframe easier to interpret
+  select(goal, dimension, region_id, score, year) %>%
+  # add col for TRUE/FALSE depending on if the score is NA
+  mutate(na_value = is.na(score)) %>%
+  # we only are interested in na values
+  filter(na_value == TRUE) %>% 
+  group_by(goal) %>% 
+  # count the total occurrences of na scores by country
+  summarise(total_na_scores = n())
 
 ```
 
