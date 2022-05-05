@@ -8,6 +8,9 @@ output: html_document
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(here)
+library(tidyverse)
+library(arsenal)
 ```
 
 
@@ -42,8 +45,8 @@ https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv
 *Note* There are scores for 2022, you can ignore these. These are just here as a placeholder until we calculate new ones for 2022 (they are the 2021 scores). 
 
 ```{r, include=FALSE}
-## Working space
-scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv")
+# load in latest OHI global data
+scores <- read.csv(here("Reference/Lessons_in_OHI/explore_scores/scores.csv"))
 
 ```
 
@@ -57,36 +60,69 @@ scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/dra
 
 *Hint 3* Which region has all NA values for scores?
 
+*Answer* Antarctica has all NA values for score. This region is not included in the assessment, as noted in the 'Notes' column, which explains why there is 1 extra values The `regions` data starts at index 1 for the `regions_id` values, and the `scores` data starts at index 0 for the `regions_id` values. This explains why there is 1 extra value for `region_id` than expected.
+
 ```{r, include=FALSE}
-## Working space
-regions <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv")
-goals <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv")
+# read in regions_list.csv data
+regions <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv") %>%
+  # rgn_id column = region_id column in scores data, so rename column here to match
+  rename(region_id = rgn_id)
 
-scores_full <- scores %>% 
-  left_join(regions, by = c("region_id" = "rgn_id")) %>% 
-  left_join(goals, by = c("goal" = "Abbreviation"))
+# read in the ten_goals.csv
+goals <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv") %>% 
+  rename(goal = Abbreviation)
 
-num_rgns <- length(unique(scores_full$region_id))
+# join scores data to regions data
+scores_regions <- full_join(scores, regions)
 
-all_na_rgn <- scores_full %>% 
-  group_by(region_id, rgn_name) %>% 
-  summarise(score = mean(score, na.rm = T)) %>% 
-  filter(is.na(score)) %>% 
-  pull(rgn_name)
-  
-usa <- scores_full %>% 
-  filter(rgn_name == "United States") %>% 
-  pull(region_id) %>% 
-  unique()
+# join the goals data to joined data
+scores_regions_goals <- full_join(scores_regions, goals)
+
+# determine which country has all NA for "score" column
+na_by_rgn <- scores_regions_goals %>% 
+  group_by(rgn_name, score) %>%
+  summarize() %>% 
+  filter(all(is.na(score)))
+# Antarctica
+
+# explore why there are 2 extra regions by comparing the vectors of the region_id columns in the regions & scores data
+# confirm that 222 unique region_id values are present in the joined data
+n_distinct(scores_regions_goals$region_id) # 222
+
+# determine all unique values for region_id
+unique(scores_regions_goals$region_id)
+
+# do any of the region_id's have notes?
+unique(scores_regions_goals$Notes) # one value for Notes indicates that at least 1 row is a region that is not included in the global assessment
+
+not_inc <- scores_regions_goals %>% 
+  filter(Notes == "Not included in global assessment")
+head(not_inc) # Antarctica is the country that is not included
+
+# explore unique region_id values in the independent data frames with this variable (regions and scores)
+# regions:
+unique(regions$region_id) # starts at index 1
+n_distinct(regions$region_id) # 221 unique id values
+
+# scores:
+unique(scores$region_id) # starts at index 0
+n_distinct(scores$region_id) # 222 unique values
+
+diff_id <- setdiff(scores$region_id, regions$region_id)
+diff_id # value of 0 is the difference between these vectors
 ```
 
-*Answer* Write your answer here!
-
-The region that has all NA values for scores is `r all_na_rgn`. There is also a note that says Antartica is not included in the global assessment. I also see there is a region 0 in the scores data but it does not have any metadata in the regions data frame.
-
 *Question* Which region id corresponds to the United States?
+*Answer* region id 163 corresponds to the United States
 
-The region id that corresponds to the United States is `r usa`
+```{r}
+# determine the region id for the United States
+usa <- scores_regions_goals %>% 
+  filter(rgn_name == "United States")
+
+head(usa) # region_id = 163
+```
+
 
 ### Goal explore
 
@@ -94,19 +130,23 @@ The region id that corresponds to the United States is `r usa`
 
 *Hint 1* Review the methods doc here: https://raw.githack.com/OHI-Science/ohi-global/published/documents/methods/Supplement.html
 
-*Answer* Write your answer here!
-
-At first it looked like the file from the hint above lists only the 10 goals. Looking at the github repo, the other file in that folder "Subgoal_Descriptions.csv" has 8 Subgoals listed. Together these two files have all 18, and presumably the 19th would be NA values. I then realized that there is a column `goal` and a column `Goal` and the little g goal had 19 values. These would be the 10 primary goals, 8 subgoals, and the Index itself.
+*Answer* 10 goals of OHI assessments are abbreviated with 2 letters, which indicates that they are the 10 main goals, and the 8 sub-goals are indicated by 3 letters. An example of a main goal is "Biodiversity", which is abbreviated as "BD", and this goal has 2 sub-goals: "Habitat" and "Species", which are abbreviated with 3 letters each as "HAB" and "SPP", respectively. There is also a value of "Index" within the `goals` variable, which makes up the 19th unique goal value. 
 
 ```{r, include=FALSE}
-## Working space
-sub_goals <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/Subgoal_Descriptions.csv")
+# determine the number of distinct goals in the joined data to comfirm it is indeed 19
+n_distinct(scores_regions_goals$goal) # 19
 
-length(unique(scores_full$goal))
+# determine unique goal values in the joined data
+goal_ids <- unique(scores_regions_goals$goal)
+goal_ids
 
-length(unique(goals$Goal))
-length(unique(sub_goals$Subgoal))
+# determine which rows have "index" for the goal
+index_goal <- scores_regions_goals %>% 
+  filter(goal == "Index")
+index_goal
+
 ```
+
 
 ### Dimension explore
 
@@ -114,16 +154,15 @@ length(unique(sub_goals$Subgoal))
 
 *Answer* Write your answer here!
 
-The index goals adds another 2442 values, the exact difference between scores and status. The index score is calculated differently than the other goals.
-
 ```{r, include=FALSE}
-## Working space
+# explore the unique values of the dimension 
 
-unique(scores$dimension)
-table(scores$dimension)
+# unique(scores$dimension)
+# table(scores$dimension)
+# 
+# table(scores$goal)
+# table(scores$goal, scores$dimension)
 
-table(scores$goal)
-table(scores$goal, scores$dimension)
 
 ```
 
@@ -136,23 +175,10 @@ table(scores$goal, scores$dimension)
 
 *Answer* Write your answer here!
 
-The top goal with missing scores in 2021 is carbon storage and the top subgoal is mariculture. The lack of data for mariculture makes sense as many places may not have any mariculture. There are many with no missing scores, likely due to these goals being widespread with available data.
-
 ```{r, include=FALSE}
 ## Working space
-na_count_by_rgn <- scores_full %>% 
-  filter(dimension == "score",
-         region_id > 0, region_id != 213,
-         year == 2021) %>% 
-  group_by(goal) %>% 
-  summarise(na_n = sum(is.na(score))) %>% 
-  # filter(na_n >0) %>% 
-  arrange(desc(na_n))
 
-na_count_by_rgn %>% 
-  head(10)
-na_count_by_rgn %>% 
-  tail(10)
+
 ```
 
 
@@ -164,24 +190,12 @@ na_count_by_rgn %>%
 
 *Answer* Write your answer here!
 
-The score would be 85 which is found by taking the average of the future status and the status. 
-
 ```{r, include=FALSE}
 ## Working space
 
-scores_full$dimension %>% unique()
 
-scores_summary <- scores_full %>% 
-  filter(region_id == 63, 
-         goal == "AO",
-         dimension %in% c("future", "status", "score"),
-         year == 2012) %>% 
-  group_by(dimension, year) %>% 
-  summarise(score_summary = mean(score)) %>% 
-  arrange(year)
-scores_summary
-round((scores_summary$score_summary[1] + scores_summary$score_summary[3])/2,2) == scores_summary$score_summary[2]
 ```
+
 
 ### Metadata
 
@@ -189,29 +203,18 @@ round((scores_summary$score_summary[1] + scores_summary$score_summary[3])/2,2) =
 
 Write it in the following table.  NOTE: Knit the document to see if the table is formatting correctly (but don't bother if you do not know how to knit a document or if you are running into errors!).
 
+Variable   | Description                  | Values
+---------- | ---------------------------- | ------------------------------
+goal       |                              |
+dimension  |                              | 
+region_id  |                              | 
+score      |                              |          
+year       |  Scenario year               | 2012 to 2022
 
-```{r echo = FALSE}
+
+```{r, include=FALSE}
 ## Working space
-dplyr::tibble(
-  Variable = c(
-    "goal", 
-    "dimension", 
-    "region_id", 
-    "score", 
-    "year"),
-  Description = c(
-    "10 publicly held goals and 8 subgoals, along with the index itself",
-    "Dimensions used to calculate OHI goal scores",
-    "Global regions defined by each contries EEZ",
-    "index scores for each goal",
-    "Scenario year"),
-  Values = c(
-    list(unique(scores_full$goal)),
-    list(unique(scores_full$dimension)),
-    paste(min(scores_full$region_id, na.rm = T), "to", max(scores_full$region_id, na.rm = T)),
-    paste(min(scores_full$score, na.rm = T), "to", max(scores_full$score, na.rm = T)),
-    paste(min(scores_full$year, na.rm = T), "to", max(scores_full$year, na.rm = T)))
-) %>% DT::datatable()
+
 ```
 
 
@@ -221,18 +224,11 @@ dplyr::tibble(
 
 *Answer* Write your answer here!
 
-My plot is hard to interpret but it looks generally like some areas have increased artisinal opportunities over time. 
-
 ```{r, include=FALSE}
 ## Working space
-scores_comp <- scores_full %>% 
-  filter(year %in% c(2012, 2021),
-         goal == "AO", 
-         score >0)
-idx_scores <- scores_full %>% 
-  filter(
-    goal == "Index" 
-    )
+
+
+
 ```
 
 
@@ -241,11 +237,7 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 ```{r across year plot}
 
 ## Code to create a plot showing distribution of country Index scores
-ggplot(data = scores_comp, aes(x = region_id, y = score, color = region_id)) +
-  geom_point() +
-  facet_wrap(~year)
 
-ggplot(data = idx_scores, aes(x = score, fill = region_id)) +
-  geom_histogram(bins = 100)
+
+
 ```
-
