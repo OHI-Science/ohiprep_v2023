@@ -126,16 +126,25 @@ length(scores$dimension[scores$dimension == "score"]) - length(scores$dimension[
 
 ### Missing data
 
-*Question* Figure out which goals/subgoals have the most NA values for scores in 2021.  Which ones have the least? Can you discern any reason why some goals have lots of missing values and others do not?
+*Question* Figure out which goals/subgoals have the most NA values for scores in 2021. Which ones have the least? Can you discern any reason why some goals have lots of missing values and others do not?
 
 *Hint* Include only dimension = score, and year = 2021, and cut region_id = 0.
 
-*Answer* Write your answer here!
+*Answer* The table printed below shows the goals and subgoals with the most missing score values in 2021 - the top culprtis being CS and NP for goals, and MAR for subgoals. The half not shown below have zero missing values. The goals and subgoals with the most missing values seems like they might be more difficult to get reliable data for in particular regions. 
+
 
 ```{r, include=FALSE}
 ## Working space
 
 
+most_na <- scores_regions_goals %>% 
+  filter(dimension == "score" & year == 2021 & region_id != 0 & region_id != 213) %>% 
+  filter(is.na(score)) %>% 
+  group_by(goal) %>% 
+  count() %>% 
+  ungroup()
+
+slice_max(most_na, order_by = n, n = nrow(most_na))
 ```
 
 
@@ -145,12 +154,14 @@ length(scores$dimension[scores$dimension == "score"]) - length(scores$dimension[
 
 *Hint* Isolate the future, status, and score values for one region and one goal and see if you can identify a pattern.
 
-*Answer* Write your answer here!
+*Answer* Based on isolating one region and one goal, it looks like current status and future status are averaged to get the score, so the score for the goal in question would be 85.
 
 ```{r, include=FALSE}
 ## Working space
 
-
+colombia <- scores_regions_goals %>% 
+  filter(rgn_name == "Colombia" & goal == "BD" & dimension %in% c("status", "score", "future")) %>% 
+  select(dimension, score, year, goal)
 ```
 
 
@@ -162,16 +173,25 @@ Write it in the following table.  NOTE: Knit the document to see if the table is
 
 Variable   | Description                  | Values
 ---------- | ---------------------------- | ------------------------------
-goal       |                              |
-dimension  |                              | 
-region_id  |                              | 
-score      |                              |          
-year       |  Scenario year               | 2012 to 2022
+goal       | Goal or subgoal abbreviation | AO, BD, CP, CS, CW, ECO, FIS, FP, HAB, ICO, Index, LE, LIV, LSP, MAR, NP, SP, SPP, TR
+dimension  | Component of score           | future, pressures, resilience, score, status, trend
+region_id  | Unique region identifier     | 0 to 250
+score      | Numerical value of dimension | -1 to 100         
+year       | Scenario year                | 2012 to 2022
 
 
 ```{r, include=FALSE}
 ## Working space
 
+scores$goal %>% 
+  unique()
+
+scores$dimension %>% 
+  unique()
+
+range(scores$region_id)
+
+range(scores$score, na.rm = TRUE)
 ```
 
 
@@ -179,13 +199,17 @@ year       |  Scenario year               | 2012 to 2022
 
 *Project* Create a scatterplot that compares 2012 and 2021 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
 
-*Answer* Write your answer here!
+*Answer* It's hard to tell exactly from this plot, but it looks like there is a higher concentration of regions that scored at or above 90 in 2021 compared to 2012.
 
 ```{r, include=FALSE}
 ## Working space
 
+AO <- scores_regions_goals %>% 
+  filter(goal == "AO" & dimension == "score" & year %in% c(2012, 2021))
 
-
+ggplot(AO, aes(x = region_id, y = score, color = score)) + 
+  geom_point() +
+  facet_wrap("year")
 ```
 
 
@@ -196,5 +220,13 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 ## Code to create a plot showing distribution of country Index scores
 
 
+index <- scores %>% 
+  filter(goal == "Index" & dimension == "score" & year == 2022)
 
+ggplot(index, aes(x = score)) + 
+  geom_histogram()
 ```
+
+
+
+
