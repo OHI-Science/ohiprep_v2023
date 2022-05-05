@@ -136,16 +136,17 @@ table(scores$goal, scores$dimension)
 
 *Answer* Write your answer here!
 
-The top regions with missing scores are Antarctica followed by several islands. Antarctica makes sense as it is not included in the assessment. Islands also make sense because they are likely small and could possibly be uninhabited. Many have no missing scores and they tend to be larger countries. I think the biggest reason is likely due to populatin size and resources, but I could see how some missing scores could also be from data availability.
+The top goal with missing scores in 2021 is carbon storage and the top subgoal is mariculture. The lack of data for mariculture makes sense as many places may not have any mariculture. There are many with no missing scores, likely due to these goals being widespread with available data.
 
 ```{r, include=FALSE}
 ## Working space
 na_count_by_rgn <- scores_full %>% 
   filter(dimension == "score",
-         region_id > 0,
+         region_id > 0, region_id != 213,
          year == 2021) %>% 
-  group_by(rgn_name) %>% 
+  group_by(goal) %>% 
   summarise(na_n = sum(is.na(score))) %>% 
+  # filter(na_n >0) %>% 
   arrange(desc(na_n))
 
 na_count_by_rgn %>% 
@@ -163,12 +164,24 @@ na_count_by_rgn %>%
 
 *Answer* Write your answer here!
 
+The score would be 85 which is found by taking the average of the future status and the status. 
+
 ```{r, include=FALSE}
 ## Working space
 
+scores_full$dimension %>% unique()
 
+scores_summary <- scores_full %>% 
+  filter(region_id == 63, 
+         goal == "AO",
+         dimension %in% c("future", "status", "score"),
+         year == 2012) %>% 
+  group_by(dimension, year) %>% 
+  summarise(score_summary = mean(score)) %>% 
+  arrange(year)
+scores_summary
+round((scores_summary$score_summary[1] + scores_summary$score_summary[3])/2,2) == scores_summary$score_summary[2]
 ```
-
 
 ### Metadata
 
@@ -176,18 +189,29 @@ na_count_by_rgn %>%
 
 Write it in the following table.  NOTE: Knit the document to see if the table is formatting correctly (but don't bother if you do not know how to knit a document or if you are running into errors!).
 
-Variable   | Description                  | Values
----------- | ---------------------------- | ------------------------------
-goal       |                              |
-dimension  |                              | 
-region_id  |                              | 
-score      |                              |          
-year       |  Scenario year               | 2012 to 2022
 
-
-```{r, include=FALSE}
+```{r echo = FALSE}
 ## Working space
-
+dplyr::tibble(
+  Variable = c(
+    "goal", 
+    "dimension", 
+    "region_id", 
+    "score", 
+    "year"),
+  Description = c(
+    "10 publicly held goals and 8 subgoals, along with the index itself",
+    "Dimensions used to calculate OHI goal scores",
+    "Global regions defined by each contries EEZ",
+    "index scores for each goal",
+    "Scenario year"),
+  Values = c(
+    list(unique(scores_full$goal)),
+    list(unique(scores_full$dimension)),
+    paste(min(scores_full$region_id, na.rm = T), "to", max(scores_full$region_id, na.rm = T)),
+    paste(min(scores_full$score, na.rm = T), "to", max(scores_full$score, na.rm = T)),
+    paste(min(scores_full$year, na.rm = T), "to", max(scores_full$year, na.rm = T)))
+) %>% DT::datatable()
 ```
 
 
@@ -197,11 +221,18 @@ year       |  Scenario year               | 2012 to 2022
 
 *Answer* Write your answer here!
 
+My plot is hard to interpret but it looks generally like some areas have increased artisinal opportunities over time. 
+
 ```{r, include=FALSE}
 ## Working space
-
-
-
+scores_comp <- scores_full %>% 
+  filter(year %in% c(2012, 2021),
+         goal == "AO", 
+         score >0)
+idx_scores <- scores_full %>% 
+  filter(
+    goal == "Index" 
+    )
 ```
 
 
@@ -210,7 +241,11 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 ```{r across year plot}
 
 ## Code to create a plot showing distribution of country Index scores
+ggplot(data = scores_comp, aes(x = region_id, y = score, color = region_id)) +
+  geom_point() +
+  facet_wrap(~year)
 
-
-
+ggplot(data = idx_scores, aes(x = score, fill = region_id)) +
+  geom_histogram(bins = 100)
 ```
+
