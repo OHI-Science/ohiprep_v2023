@@ -220,19 +220,25 @@ na_2021 <- scores_regions_goals %>%
 
 ```
 
-
 ### Scores
 
 *Question* If we have a goal with a future status of 80 and status of 90...what is the score?  
 
 *Hint* Isolate the future, status, and score values for one region and one goal and see if you can identify a pattern.
 
-*Answer* Write your answer here!
+*Answer* The overall score is the equally weighted average of future and status scores.
 
 ```{r, include=FALSE}
-## Working space
+# unique(scores_regions_goals$dimension)
 
+future_status_score <- scores_regions_goals %>%
+  filter(dimension %in% c("future", "status", "score")) %>% 
+  group_by(goal, dimension) %>% 
+  summarise(avg = mean(score, na.rm = TRUE))
+# seems like the average of the future and status scores result in the overall score
 
+# use the first goal, AO, as a use case to cheeck this hypothesis
+(74.914138 + 75.388657) / 2 # yep it is the 
 ```
 
 
@@ -242,17 +248,28 @@ na_2021 <- scores_regions_goals %>%
 
 Write it in the following table.  NOTE: Knit the document to see if the table is formatting correctly (but don't bother if you do not know how to knit a document or if you are running into errors!).
 
+Define variables to read into table when knitting:
+```{r}
+goals <- unique(scores_regions_goals$goal)
+dimensions <- unique(scores_regions_goals$dimension)
+min_region_id <- min(scores_regions_goals$region_id)
+max_region_id <- max(scores_regions_goals$region_id)
+min_score <- min(scores_regions_goals$score)
+max_score <- max(scores_regions_goals$score)
+```
+
+
 Variable   | Description                  | Values
 ---------- | ---------------------------- | ------------------------------
-goal       |                              |
-dimension  |                              | 
-region_id  |                              | 
-score      |                              |          
+goal       |  ocean benefits delivered to humans, OHI has 10 goals, 4 of which have 2 subgoals.                            | `r goals`
+dimension  |  describes the category of the subscores that contributes to the overall score                             | `r dimensions`
+region_id  |  unique numeric code that identifies each geographic region (country or territory)                             | `r min_region_id` - `r max_region_id`
+score      |  numeric score for goal, region, year, and dimension                             | `r min_score` - `r max_score`         
 year       |  Scenario year               | 2012 to 2022
 
 
 ```{r, include=FALSE}
-## Working space
+# 
 
 ```
 
