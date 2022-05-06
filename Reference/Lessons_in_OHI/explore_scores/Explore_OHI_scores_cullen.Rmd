@@ -255,15 +255,10 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 
 ```{r across year plot}
 ## Code to create a plot showing distribution of country Index scores
-ggplot(data = scores_comp, aes(x = region_id, y = score, color = region_id)) +
+ggplot(data = scores_comp, aes(x = region_id, y = score, color = score)) +
   geom_point() +
   facet_wrap(~year)+
   geom_hline(aes(yintercept = mean_score)) +
-  theme_minimal()
-
-ggplot(data = idx_scores, aes(x = score)) +
-  geom_histogram(bins = 100, aes(y=..density..), fill = "dodgerblue2", color = "black") +
- geom_density(alpha=.2, fill="#FF6666") +
   theme_minimal()
 ```
 
@@ -279,6 +274,14 @@ ggplot(data = scores_comp, aes(x = score, y = factor(year))) +
   theme_minimal() +
   theme(legend.position = "none")
 ```
+
+```{r }
+ggplot(data = idx_scores, aes(x = score)) +
+  geom_histogram(bins = 100, aes(y=..density..), fill = "dodgerblue2", color = "black") +
+ geom_density(alpha=.2, fill="#FF6666") +
+  theme_minimal()
+```
+
 
 ```{r }
 library(ggridges)
