@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-## loading packages.. you might need to install them first
+## loading packages
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -51,6 +51,8 @@ scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/dra
 
 *Question* Why are there N=222 regions (see code below)...aren't there supposed to be 220? Can you make this data more human readable by including the full goal name (vs. the 2 letter abbreviation) and the country name.
 
+*Answer* The two extra regions are Antarctica (213) and region 0 which represents global scores.
+
 *Hint 1* Here is a link to the official region list (the rgn_id column in this file matches the region_id column in the scores data): https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv
 
 *Hint 2* Here is a table that includes goal names: https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv
@@ -61,19 +63,24 @@ scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/dra
 
 
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
+
+# Confirming number of regions
 length(unique(scores$region_id))
 
+# Reading in additional datasets
 regions <-  read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv")
 goals <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv")
 
+# Joining "scores" with "regions" and "goals"
 scores_regions_goals <- scores %>% 
   left_join(regions, by = c("region_id" = "rgn_id")) %>% 
   left_join(goals, by = c("goal" = "Abbreviation"))
 
+# Finding region with all NA score values
 scores_regions_goals %>% 
-  group_by(region_id) %>% 
+  group_by(region_id, rgn_name) %>% 
   summarize(mean_score = mean(score, na.rm = TRUE)) %>% 
   filter(is.na(mean_score))
 ```
@@ -92,13 +99,14 @@ Region id 163 corresponds to the United States.
 
 *Hint 1* Review the methods doc here: https://raw.githack.com/OHI-Science/ohi-global/published/documents/methods/Supplement.html
 
-*Answer* This includes all goals, subgoals, and the Index score. The abbreviations with 2 letters correspond to the 10 main goals and the three letter abbreviations correspond to subgoals.
+*Answer* The 19 values in the `goal` columns include all goals, subgoals, and the Index score. The abbreviations with 2 letters correspond to the 10 main goals and the three letter abbreviations correspond to subgoals.
 
 
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
 
+# Finding number of goal types and printing their unique values
 length(unique(scores$goal))
 unique(scores$goal)
 ```
@@ -108,9 +116,9 @@ unique(scores$goal)
 
 *Question* There are 6 dimensions reported in this dataset (future, pressures, resilience, score, status, and trend).  When I look at the number of records in each of these categories, I notice that there are more "score" values reported than "status" values (see working space below). Given that scores are calculated using status, it seems like these should have the same number of records. Can you figure out what is going on here. Is something going wrong?  
 
-*Answer* The difference between the number of `score` and `status` values is explained by the `Index` values which are `score` values calculated based on all the goals and thus don't have a status associated with them.
+*Answer* The difference between the number of `score` and `status` values is explained by the `Index` values which are `score` values calculated based on all the goals and thus don't have a `status` associated with them. 
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
 
 # unique(scores$dimension)
@@ -121,6 +129,9 @@ table(scores$goal, scores$dimension)
 
 # Calculating difference between "score" instances and "status" instances
 length(scores$dimension[scores$dimension == "score"]) - length(scores$dimension[scores$dimension == "status"])
+
+# Calculating number of "Index" scores
+length(scores$goal[scores$goal == "Index" & scores$dimension == "score"])
 ```
 
 
@@ -130,13 +141,13 @@ length(scores$dimension[scores$dimension == "score"]) - length(scores$dimension[
 
 *Hint* Include only dimension = score, and year = 2021, and cut region_id = 0.
 
-*Answer* The table printed below shows the goals and subgoals with the most missing score values in 2021 - the top culprtis being CS and NP for goals, and MAR for subgoals. The half not shown below have zero missing values. The goals and subgoals with the most missing values seems like they might be more difficult to get reliable data for in particular regions. 
+*Answer* The table printed below shows the goals and subgoals with the most missing score values in 2021 - the top culprtis being Carbon Storage for goals, and Mariculture for subgoals. The half not shown below have zero missing values. The goals and subgoals with the most missing values seems like they might be more difficult to get the necessary data for particular regions. In the case of Mariculture, many regions don't have any mariculture at all so it makes sense that many of the values would be missing.
 
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
 
-
+# Finding number of NA score values by region
 most_na <- scores_regions_goals %>% 
   filter(dimension == "score" & year == 2021 & region_id != 0 & region_id != 213) %>% 
   filter(is.na(score)) %>% 
@@ -156,12 +167,15 @@ slice_max(most_na, order_by = n, n = nrow(most_na))
 
 *Answer* Based on isolating one region and one goal, it looks like current status and future status are averaged to get the score, so the score for the goal in question would be 85.
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
 
+# Isolating "status", "score", and "future" dimensions for Biodiversity in Colombia
 colombia <- scores_regions_goals %>% 
   filter(rgn_name == "Colombia" & goal == "BD" & dimension %in% c("status", "score", "future")) %>% 
   select(dimension, score, year, goal)
+
+head(colombia)
 ```
 
 
@@ -183,6 +197,8 @@ year       | Scenario year                | 2012 to 2022
 ```{r, include=FALSE}
 ## Working space
 
+# Printing out values from dataframe to populate table above
+
 scores$goal %>% 
   unique()
 
@@ -199,17 +215,27 @@ range(scores$score, na.rm = TRUE)
 
 *Project* Create a scatterplot that compares 2012 and 2021 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
 
-*Answer* It's hard to tell exactly from this plot, but it looks like there is a higher concentration of regions that scored at or above 90 in 2021 compared to 2012.
+*Answer* It looks like scores have very slightly increased, which the mean values for each year confirm. There appears to be a higher concentration of regions that scored at or above 90 in 2021 compared to 2012.
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
 
-AO <- scores_regions_goals %>% 
-  filter(goal == "AO" & dimension == "score" & year %in% c(2012, 2021))
+# Subset dataset to only "AO" scores for 2012 and 2021
+AO_scores <- scores %>% 
+  filter(goal == "AO" & dimension == "score" & year %in% c(2012, 2021) & region_id != 0) %>% 
+  group_by(year) %>% 
+  mutate(mean_score = mean(score, na.rm = TRUE))
 
-ggplot(AO, aes(x = region_id, y = score, color = score)) + 
+# Plotting faceted scatterplot to compare values between years
+ggplot(AO_scores, aes(x = region_id, y = score, color = score)) + 
   geom_point() +
-  facet_wrap("year")
+  facet_wrap("year") +
+  geom_line(aes(y = mean_score), color = "red") + # horizontal lines showing mean scores for each year
+  labs(title = "Artisinal Fishing Opportunities scores by region in 2012 and 2021",
+       x = "Region ID",
+       y = "AO Score") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
@@ -217,14 +243,43 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 
 ```{r across year plot}
 
-## Code to create a plot showing distribution of country Index scores
+## Code to create a plot showing distribution of country "Index" scores
 
-
+# Subset dataset to only "Index" scores for all years
 index <- scores %>% 
-  filter(goal == "Index" & dimension == "score" & year == 2022)
+  filter(goal == "Index" & dimension == "score" & year != 2022)
 
+# Plot distribution of "Index" scores over all years
 ggplot(index, aes(x = score)) + 
-  geom_histogram()
+  geom_histogram(aes(y =..density..),
+                 binwidth = 0.5,
+                 color = "black",
+                 fill = "cyan",
+                 alpha = 0.3,
+                 size = 0.2) +
+  geom_density() +
+  labs(title = "Distribution of Index scores from 2012 to 2021",
+       x = "Index Score",
+       y = "Frequency") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+  
+
+# Plot distribution of "Index" scores faceted by year
+ggplot(index, aes(x = score)) + 
+  geom_histogram(aes(y =..density..),
+                 binwidth = 0.5,
+                 fill = "cyan",
+                 color = "black",
+                 size = 0.1,
+                 alpha = 0.5) +
+  geom_density(size = 0.2) +
+  facet_wrap(~year) +
+  labs(title = "Distribution of Index scores from 2012 to 2021",
+       x = "Index Score",
+       y = "Frequency") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
