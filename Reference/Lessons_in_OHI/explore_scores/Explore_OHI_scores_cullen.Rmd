@@ -266,6 +266,20 @@ ggplot(data = idx_scores, aes(x = score)) +
  geom_density(alpha=.2, fill="#FF6666") +
   theme_minimal()
 ```
+
+```{r}
+library(ggridges)
+ggplot(data = scores_comp, aes(x = score, y = factor(year))) +
+  geom_density_ridges(quantile_lines = TRUE, 
+                      quantiles = c(0.025, .5, 0.975), 
+                      aes(fill = year),
+                      alpha = 0.7) +
+  scale_fill_viridis_c(direction = -1) +
+  labs(y = "Year", x = "AO Score Distribution") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
 ```{r }
 library(ggridges)
 ggplot(data = idx_scores, aes(x = score, y = factor(year))) +
@@ -274,7 +288,7 @@ ggplot(data = idx_scores, aes(x = score, y = factor(year))) +
                       aes(fill = year),
                       alpha = 0.7) +
   scale_fill_viridis_c(direction = -1) +
-  labs(y = "Year", x = "Index Score Distributions") +
+  labs(y = "Year", x = "Index Score Distribution") +
   theme_minimal() +
   theme(legend.position = "none")
 ```
