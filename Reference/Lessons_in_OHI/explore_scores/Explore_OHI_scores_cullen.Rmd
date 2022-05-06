@@ -59,8 +59,14 @@ scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/dra
 
 ```{r, include=FALSE}
 ## Working space
-regions <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv")
-goals <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv")
+regions <- read.csv(
+  paste0("https://raw.githubusercontent.com/",
+         "OHI-Science/ohi-global/draft/eez/spatial/",
+         "regions_list.csv"))
+goals <- read.csv(
+  paste0("https://raw.githubusercontent.com/",
+         "OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/",
+         "ten_goals.csv"))
 
 scores_full <- scores %>% 
   left_join(regions, by = c("region_id" = "rgn_id")) %>% 
@@ -100,10 +106,12 @@ At first it looked like the file from the hint above lists only the 10 goals. Lo
 
 ```{r, include=FALSE}
 ## Working space
-sub_goals <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/Subgoal_Descriptions.csv")
+sub_goals <- read.csv(
+  paste0("https://raw.githubusercontent.com/",
+         "OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/",
+         "Subgoal_Descriptions.csv"))
 
 length(unique(scores_full$goal))
-
 length(unique(goals$Goal))
 length(unique(sub_goals$Subgoal))
 ```
@@ -146,7 +154,6 @@ na_count_by_rgn <- scores_full %>%
          year == 2021) %>% 
   group_by(goal) %>% 
   summarise(na_n = sum(is.na(score))) %>% 
-  # filter(na_n >0) %>% 
   arrange(desc(na_n))
 
 na_count_by_rgn %>% 
@@ -168,7 +175,6 @@ The score would be 85 which is found by taking the average of the future status 
 
 ```{r, include=FALSE}
 ## Working space
-
 scores_full$dimension %>% unique()
 
 scores_summary <- scores_full %>% 
@@ -214,7 +220,6 @@ dplyr::tibble(
 ) %>% DT::datatable()
 ```
 
-
 ### Plot
 
 *Project* Create a scatterplot that compares 2012 and 2021 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
@@ -229,12 +234,17 @@ scores_comp <- scores_full %>%
   filter(year %in% c(2012, 2021),
          goal == "AO", 
          dimension == "score",
-         region_id > 0) %>% 
+         region_id > 0,
+         region_id != 213) %>% 
   group_by(year) %>% 
   mutate(mean_score = mean(score, na.rm = T))
 idx_scores <- scores_full %>% 
   filter(
-    goal == "Index" 
+    goal == "Index", 
+    dimension == "score" ,
+    region_id > 0,
+    region_id != 213,
+    year != 2022
     )
 mean(filter(scores_comp, year == 2012)$score, na.rm = T)
 mean(filter(scores_comp, year == 2021)$score, na.rm = T)
@@ -245,12 +255,53 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 
 ```{r across year plot}
 ## Code to create a plot showing distribution of country Index scores
-ggplot(data = scores_comp, aes(x = region_id, y = score, color = region_id)) +
+ggplot(data = scores_comp, aes(x = region_id, y = score, color = score)) +
   geom_point() +
   facet_wrap(~year)+
-  geom_hline(aes(yintercept = mean_score))
+  geom_hline(aes(yintercept = mean_score)) +
+  theme_minimal()
+```
 
-ggplot(data = idx_scores, aes(x = score, fill = region_id)) +
-  geom_histogram(bins = 100)
+```{r}
+library(ggridges)
+ggplot(data = scores_comp, aes(x = score, y = factor(year))) +
+  geom_density_ridges(quantile_lines = TRUE, 
+                      quantiles = c(0.025, .5, 0.975), 
+                      aes(fill = year),
+                      alpha = 0.7) +
+  scale_fill_viridis_c(direction = -1) +
+  labs(y = "Year", x = "AO Score Distribution") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r }
+ggplot(data = idx_scores, aes(x = score)) +
+  geom_histogram(bins = 100, aes(y=..density..), fill = "dodgerblue2", color = "black") +
+ geom_density(alpha=.2, fill="#FF6666") +
+  theme_minimal()
+```
+
+
+```{r }
+library(ggridges)
+ggplot(data = idx_scores, aes(x = score, y = factor(year))) +
+  geom_density_ridges(quantile_lines = TRUE, 
+                      quantiles = c(0.025, .5, 0.975), 
+                      aes(fill = year),
+                      alpha = 0.7) +
+  scale_fill_viridis_c(direction = -1) +
+  labs(y = "Year", x = "Index Score Distribution") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r fig.width=6, fig.height=5}
+ggplot(idx_scores, aes(x = score, y = factor(year), fill = 0.5 - abs(0.5 - stat(ecdf)))) +
+  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) +
+  scale_fill_viridis_c(direction = -1)+
+  labs(y = "Year", x = "Index Score Distribution", fill = NULL) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 
