@@ -262,8 +262,8 @@ head(usa) # region_id = 163</code></pre>
 dimensions &lt;- unique(scores_regions_goals$dimension)
 min_region_id &lt;- min(scores_regions_goals$region_id)
 max_region_id &lt;- max(scores_regions_goals$region_id)
-min_score &lt;- min(scores_regions_goals$score)
-max_score &lt;- max(scores_regions_goals$score)</code></pre>
+min_score &lt;- min(scores_regions_goals$score, na.rm = TRUE)
+max_score &lt;- max(scores_regions_goals$score, na.rm = TRUE)</code></pre>
 <table>
 <colgroup>
 <col width="14%" />
@@ -291,17 +291,17 @@ max_score &lt;- max(scores_regions_goals$score)</code></pre>
 <tr class="odd">
 <td>region_id</td>
 <td>unique numeric code that identifies each geographic region (country or territory)</td>
-<td>0 - 250</td>
+<td>Range: 0 to 250</td>
 </tr>
 <tr class="even">
 <td>score</td>
 <td>numeric score for goal, region, year, and dimension</td>
-<td>NA - NA</td>
+<td>Range: -1 to 100</td>
 </tr>
 <tr class="odd">
 <td>year</td>
 <td>Scenario year</td>
-<td>2012 to 2022</td>
+<td>Range: 2012 to 2022</td>
 </tr>
 </tbody>
 </table>
