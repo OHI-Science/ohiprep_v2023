@@ -229,12 +229,17 @@ scores_comp <- scores_full %>%
   filter(year %in% c(2012, 2021),
          goal == "AO", 
          dimension == "score",
-         region_id > 0) %>% 
+         region_id > 0,
+         region_id != 213) %>% 
   group_by(year) %>% 
   mutate(mean_score = mean(score, na.rm = T))
 idx_scores <- scores_full %>% 
   filter(
-    goal == "Index" 
+    goal == "Index", 
+    dimension == "score" ,
+    region_id > 0,
+    region_id != 213,
+    year != 2022
     )
 mean(filter(scores_comp, year == 2012)$score, na.rm = T)
 mean(filter(scores_comp, year == 2021)$score, na.rm = T)
@@ -248,9 +253,12 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 ggplot(data = scores_comp, aes(x = region_id, y = score, color = region_id)) +
   geom_point() +
   facet_wrap(~year)+
-  geom_hline(aes(yintercept = mean_score))
+  geom_hline(aes(yintercept = mean_score)) +
+  theme_minimal()
 
-ggplot(data = idx_scores, aes(x = score, fill = region_id)) +
-  geom_histogram(bins = 100)
+ggplot(data = idx_scores, aes(x = score)) +
+  geom_histogram(bins = 100, aes(y=..density..), fill = "dodgerblue2", color = "black") +
+ geom_density(alpha=.2, fill="#FF6666") +
+  theme_minimal()
 ```
 
