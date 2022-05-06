@@ -221,29 +221,34 @@ dplyr::tibble(
 
 *Answer* Write your answer here!
 
-My plot is hard to interpret but it looks generally like some areas have increased artisinal opportunities over time. 
+My plot is hard to interpret but it looks generally like some areas have increased artisinal opportunities over time. The mean values are very close and  
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ## Working space
 scores_comp <- scores_full %>% 
   filter(year %in% c(2012, 2021),
          goal == "AO", 
-         score >0)
+         dimension == "score",
+         region_id > 0) %>% 
+  group_by(year) %>% 
+  mutate(mean_score = mean(score, na.rm = T))
 idx_scores <- scores_full %>% 
   filter(
     goal == "Index" 
     )
+mean(filter(scores_comp, year == 2012)$score, na.rm = T)
+mean(filter(scores_comp, year == 2021)$score, na.rm = T)
 ```
 
 
 Create a plot that shows the distribution (e.g., histogram or barplot or ??) of *Index* scores of all countries.
 
 ```{r across year plot}
-
 ## Code to create a plot showing distribution of country Index scores
 ggplot(data = scores_comp, aes(x = region_id, y = score, color = region_id)) +
   geom_point() +
-  facet_wrap(~year)
+  facet_wrap(~year)+
+  geom_hline(aes(yintercept = mean_score))
 
 ggplot(data = idx_scores, aes(x = score, fill = region_id)) +
   geom_histogram(bins = 100)
