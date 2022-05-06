@@ -12,6 +12,8 @@ library(here)
 library(tidyverse)
 library(arsenal)
 library(patchwork)
+library(gridExtra)
+#library(ggridges) # decided to make faceted histogram for last plot rather than using geom_density_ridges()
 ```
 
 
@@ -156,7 +158,7 @@ index_goal
 
 *Question* There are 6 dimensions reported in this dataset (future, pressures, resilience, score, status, and trend).  When I look at the number of records in each of these categories, I notice that there are more "score" values reported than "status" values (see working space below). Given that scores are calculated using status, it seems like these should have the same number of records. Can you figure out what is going on here. Is something going wrong?  
 
-*Answer* The difference of 2442 rows for these dimensions is explained by the 2442 rows within the `Index` goal that are associated with the `score` dimension. Since the only dimensions associated with `Index` are `score` and `future`, and the rows associated with each are equal, I infer that `Index` is the result of a calculation that includes these both these dimensions or at least the `score` dimension as an input.
+*Answer* The difference of 2442 rows for these dimensions is explained by the 2442 rows within the `Index` goal that are associated with the `score` dimension. Since the only dimensions associated with `Index` are `score` and `future`, and the rows associated with each are equal, I infer that `Index` is the result of a calculation that includes these both the `status` and `future` dimensions.
 
 ```{r, include=FALSE}
 # explore the unique values of the dimension variable
@@ -197,9 +199,9 @@ nrow(index_goal_score) # 2442
 
 *Hint* Include only dimension = score, and year = 2021, and cut region_id = 0.
 
-*Answer* The goal with the most NA values for scores in 2021 is carbon storage (`CS`). The subgoal with the most NA values is mariculture (`MAR`). I guess that carbon storage has the most NA values for score in 2021 because many countries may *not*  have ever had or currently have the habitats that are assessed for this goal: mangroves, tidal marshes and seagrasses. If these countries did historically or currently do have these habitats, they are at least not present in the data we are using to assess this goal.
+*Answer* The goal with the most NA values for scores in 2021 is carbon storage (`CS`). The subgoal with the most NA values is mariculture (`MAR`). I guess that carbon storage has the most NA values for `score` in 2021 because many countries may *not*  have ever had or currently have the habitats that are assessed for this goal: mangroves, tidal marshes and seagrasses. If these countries did historically or currently do have these habitats, they are at least not present in the data we are using to assess this goal. For mariculture, perhaps some countries do not have this industry or we cannot access data on this metric because of availability. I should read the mariculture methodology to clarify this. 
 
-The goals with the fewest NA values (with Antarctica included) are `BD`, `CW`, `FP`, and `SP`. The subgoals with the fewest NA values are `FIS`, `HAB`, `ICO`, `LSP`, and `SPP`. When you remove Antarctica, these goals are not listed amongst those that have NA values. The biodiversity goal probably has no NA values because the data for the species subgoal mostly came from IUCN Red List of Threatened Species, which I would hope and assume is updated very regularly and is comprehensive for many if not all countries. Furthermore, the methodology for the other subgoal, habitats, explains that "a significant amount of pre-processing of the habitat data was needed to fill data gaps and resolve data quality issues" so the gaps that initially existed were filled to the best of OHI's ability before the score was calculated. The other goals and subgoals without missing values also probably had comprehensive data or had NA values filled in before the score was calculated.
+The goals with the fewest NA values (with Antarctica included, each of them have 1 NA value) are `BD`, `CW`, `FP`, and `SP`. The subgoals with the fewest NA values are `FIS`, `HAB`, `ICO`, `LSP`, and `SPP`. When you remove Antarctica, these goals are not listed amongst those that have NA values. The biodiversity goal probably has no NA values with Antarctica excluded because the data for the species subgoal mostly came from IUCN Red List of Threatened Species, which I would hope and assume is updated very regularly and is comprehensive for many if not all countries. Furthermore, the methodology for the other subgoal, habitats, explains that "a significant amount of pre-processing of the habitat data was needed to fill data gaps and resolve data quality issues" so the gaps that initially existed were filled to the best of OHI's ability before the score was calculated. The other goals and subgoals without missing values also probably had comprehensive data or had NA values filled in before the score was calculated.
 
 ```{r, include=FALSE}
 # filter data to only include 2021 and count the number of na values for score, grouping by goal
@@ -218,7 +220,6 @@ na_2021 <- scores_regions_goals %>%
   group_by(goal) %>% 
   # count the total occurrences of na scores by country
   summarise(total_na_scores = n())
-
 ```
 
 ### Scores
@@ -274,13 +275,13 @@ year       |  Scenario year               | Range: 2012 to 2022
 
 *Project* Create a scatterplot that compares 2012 and 2021 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
 
-*Answer* Write your answer here!
+*Answer* I produced scatterplots for 2012 and 2021 scores for the artisanal opportunities goal and marked each year's mean with a horizontal line. Taking the difference of means between the years reveals that the score increased by a small margin of 0.15455. 
 
 ```{r, echo=FALSE}
 # filter data for AO goal for all years
 ao <- scores_regions_goals %>% 
   filter(goal == "AO",
-         # remove region_id of 0 because that is not associated with a region
+         # remove region_id of 0 because that is not associated with a particular region
          region_id != 0,
          # only focus on overall score, rather than including future or other dimensions
          dimension == "score")
@@ -290,65 +291,103 @@ ao_2012_plot_data <- ao %>%
   filter(year == 2012) %>% 
   group_by(region_id)
 
-# prep data to take mean for 2012
-mean_2012_data <- ao_2012_plot_data %>% 
-  ungroup()
-# take mean for 2012
-mean_2012 <- mean(mean_2012_data$score, na.rm = TRUE)
-
 # prep 2021 data to plot
 ao_2021_plot_data <- ao %>% 
   filter(year == 2021) %>% 
   group_by(region_id)
 
+# prep data to take mean for 2012
+mean_2012_data <- ao_2012_plot_data %>% 
+  ungroup()
 # prep data to take mean for 2021
 mean_2021_data <- ao_2021_plot_data %>% 
   ungroup()
+
+# take mean for 2012
+mean_2012 <- mean(mean_2012_data$score, na.rm = TRUE)
 # take mean for 2021
 mean_2021 <- mean(mean_2021_data$score, na.rm = TRUE)
 
-# produce scatter plots for score by year
+# take difference of means
+mean_2021 - mean_2012 # 0.15455
+
+# produce individual scatter plots for ao score by year
 plot_2012 <- ggplot(data = ao_2012_plot_data, aes(x = region_id, y = score)) + 
   geom_point(aes(fill = score), pch = 21 , size = 2.5, colour = "firebrick") +
   geom_hline(yintercept = mean_2012,
               size = 0.7,
              color = "black",
              linetype = "dotdash") +
+  labs(title = "Artisinal Opportunties Score by Region (2012 and 2021)",
+       x = "Region ID",
+       y = "Score")
+
+plot_2021 <- ggplot(data = ao_2021_plot_data, aes(x = region_id, y = score)) +
+  geom_point(aes(fill = score), pch = 21 , size = 2.5, colour = "firebrick") +
+  geom_hline(yintercept = mean_2021,
+              size = 0.7,
+             color = "black",
+             linetype = "dotdash") +
   labs(x = "Region ID",
-       y = "Score") +
-  facet_wrap(year)
+       y = "Score")
 
-plot_2012
-
-
-#+
-  # geom_text(aes(y = mean_2021,
-  #               label = "Mean Score",
-  #               y = mean_2012), 
-  #           angle = 0, 
-  #           vjust = 1.3, 
-  #           size = 3,
-  #           color = "black")
-
-
-#geom_hline(yintercept, linetype, color, size)
-
-#geom_hline(mapping = NULL, data = NULL, stat = "hline",
-#    position = "identity", show_guide = FALSE, ...)
-
-#plot_2021 <- ggplot(data = ao_2021_plot_data, aes(x = region_id, y = score)) + 
-#  geom_point(aes(fill = score), pch = 21 , size = 2.5, colour = "firebrick")
-
-plot_2012 + plot_2021
+plot_2012 / plot_2021
+  
+# try to get only 1 legend
+#+ 
+  #plot_layout(guides = "collect") 
+  #scale_colour_continuous(limits = range(c(ao_2012_plot_data$score, ao_2021_plot_data$score)))
 ```
-
 
 Create a plot that shows the distribution (e.g., histogram or barplot or ??) of *Index* scores of all countries.
 
 ```{r across year plot}
-
 ## Code to create a plot showing distribution of country Index scores
 
+# confirm that 2022 is included (we do not want this included because these are just repeats of the 2021 scores)
+unique(scores_regions_goals$year) # 2022 is included
+# remind myself of the dimensions
+unique(scores_regions_goals$dimension)
 
+index_data <- scores_regions_goals %>% 
+  # exclude 2022 because those scores have not been calculated yet
+  filter(year != 2022,
+         goal == "Index",
+         # only focus on overall score, rather than including future or other dimensions
+         dimension == "score",
+         # remove region_id of 0 because that is not associated with a particular region
+         region_id != 0)
+
+ggplot(index_data, aes(x = score)) +
+  geom_histogram(position="identity", 
+                 color = "firebrick", 
+                 alpha = 0.2, 
+                 bins = 20) +
+  labs(x = "Index Score",
+       y = "Count",
+       title = "OHI Index Score Distributions: 2012 - 2021") +
+  theme(axis.title.x = element_text(color = "black", size = 11, face = "bold"),
+         axis.text.x = element_text(face = "bold", color = "black", size = 10),
+         axis.title.y = element_text(color = "black", size = 11, face = "bold"),
+         axis.text.y = element_text(face = "bold", color = "black", size = 10),
+         plot.title = element_text(color="black", size = 15, face = "bold"),
+         panel.border = element_rect(colour = "black", fill = NA, size = 2)) +
+    facet_wrap(. ~ year, 
+               ncol = 5) +
+  #scale_fill_manual(values = c("forestgreen","chocolate1","brown","palevioletred", "purple4", "aquamarine", "coral1", "goldenrod1", "magenta2", "azure2")) +
+  theme(legend.position = "none",
+        # add color to the boxes that show the year associated with each histogram
+      strip.background = element_rect(colour = "black",
+                                    fill = "#FFFFA7"))
+               #aes(color = year))
 
 ```
+
+
+
+
+
+
+
+
+
