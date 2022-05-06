@@ -279,3 +279,12 @@ ggplot(data = idx_scores, aes(x = score, y = factor(year))) +
   theme(legend.position = "none")
 ```
 
+```{r fig.width=6, fig.height=5}
+ggplot(idx_scores, aes(x = score, y = factor(year), fill = 0.5 - abs(0.5 - stat(ecdf)))) +
+  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) +
+  scale_fill_viridis_c(direction = -1)+
+  labs(y = "Year", x = "Index Score Distribution", fill = NULL) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
