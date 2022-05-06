@@ -11,6 +11,7 @@ library(ggplot2)
 library(here)
 library(tidyverse)
 library(arsenal)
+library(patchwork)
 ```
 
 
@@ -248,14 +249,14 @@ future_status_score <- scores_regions_goals %>%
 
 Write it in the following table.  NOTE: Knit the document to see if the table is formatting correctly (but don't bother if you do not know how to knit a document or if you are running into errors!).
 
-Define variables to read into table when knitting:
+Define variables to read into table when knitting (chunk needs to render before table below):
 ```{r}
 goals <- unique(scores_regions_goals$goal)
 dimensions <- unique(scores_regions_goals$dimension)
 min_region_id <- min(scores_regions_goals$region_id)
 max_region_id <- max(scores_regions_goals$region_id)
-min_score <- min(scores_regions_goals$score)
-max_score <- max(scores_regions_goals$score)
+min_score <- min(scores_regions_goals$score, na.rm = TRUE)
+max_score <- max(scores_regions_goals$score, na.rm = TRUE)
 ```
 
 
@@ -263,15 +264,10 @@ Variable   | Description                  | Values
 ---------- | ---------------------------- | ------------------------------
 goal       |  ocean benefits delivered to humans, OHI has 10 goals, 4 of which have 2 subgoals.                            | `r goals`
 dimension  |  describes the category of the subscores that contributes to the overall score                             | `r dimensions`
-region_id  |  unique numeric code that identifies each geographic region (country or territory)                             | `r min_region_id` - `r max_region_id`
-score      |  numeric score for goal, region, year, and dimension                             | `r min_score` - `r max_score`         
-year       |  Scenario year               | 2012 to 2022
+region_id  |  unique numeric code that identifies each geographic region (country or territory)                             | Range: `r min_region_id` to `r max_region_id`
+score      |  numeric score for goal, region, year, and dimension                             | Range: `r min_score` to `r max_score`         
+year       |  Scenario year               | Range: 2012 to 2022
 
-
-```{r, include=FALSE}
-# 
-
-```
 
 
 ### Plot
@@ -280,11 +276,70 @@ year       |  Scenario year               | 2012 to 2022
 
 *Answer* Write your answer here!
 
-```{r, include=FALSE}
-## Working space
+```{r, echo=FALSE}
+# filter data for AO goal for all years
+ao <- scores_regions_goals %>% 
+  filter(goal == "AO",
+         # remove region_id of 0 because that is not associated with a region
+         region_id != 0,
+         # only focus on overall score, rather than including future or other dimensions
+         dimension == "score")
+
+# prep 2012 data to plot: filter data into separate df's for 2012 and 2021 years
+ao_2012_plot_data <- ao %>% 
+  filter(year == 2012) %>% 
+  group_by(region_id)
+
+# prep data to take mean for 2012
+mean_2012_data <- ao_2012_plot_data %>% 
+  ungroup()
+# take mean for 2012
+mean_2012 <- mean(mean_2012_data$score, na.rm = TRUE)
+
+# prep 2021 data to plot
+ao_2021_plot_data <- ao %>% 
+  filter(year == 2021) %>% 
+  group_by(region_id)
+
+# prep data to take mean for 2021
+mean_2021_data <- ao_2021_plot_data %>% 
+  ungroup()
+# take mean for 2021
+mean_2021 <- mean(mean_2021_data$score, na.rm = TRUE)
+
+# produce scatter plots for score by year
+plot_2012 <- ggplot(data = ao_2012_plot_data, aes(x = region_id, y = score)) + 
+  geom_point(aes(fill = score), pch = 21 , size = 2.5, colour = "firebrick") +
+  geom_hline(yintercept = mean_2012,
+              size = 0.7,
+             color = "black",
+             linetype = "dotdash") +
+  labs(x = "Region ID",
+       y = "Score") +
+  facet_wrap(year)
+
+plot_2012
 
 
+#+
+  # geom_text(aes(y = mean_2021,
+  #               label = "Mean Score",
+  #               y = mean_2012), 
+  #           angle = 0, 
+  #           vjust = 1.3, 
+  #           size = 3,
+  #           color = "black")
 
+
+#geom_hline(yintercept, linetype, color, size)
+
+#geom_hline(mapping = NULL, data = NULL, stat = "hline",
+#    position = "identity", show_guide = FALSE, ...)
+
+#plot_2021 <- ggplot(data = ao_2021_plot_data, aes(x = region_id, y = score)) + 
+#  geom_point(aes(fill = score), pch = 21 , size = 2.5, colour = "firebrick")
+
+plot_2012 + plot_2021
 ```
 
 
