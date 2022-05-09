@@ -200,8 +200,8 @@ pre code {
 <p><em>Hint 1</em> Here is a link to the official region list (the rgn_id column in this file matches the region_id column in the scores data): <a href="https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv" class="uri">https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv</a></p>
 <p><em>Hint 2</em> Here is a table that includes goal names: <a href="https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv" class="uri">https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/metadata_documentation/ohi_model/tables/ten_goals.csv</a></p>
 <p><em>Hint 3</em> Which region has all NA values for scores?</p>
-<p><em>Answer</em> Antarctica has all NA values for score. This region is not included in the assessment, as noted in the ‘Notes’ column, which explains why there is 1 extra values The <code>regions</code> data starts at index 1 for the <code>regions_id</code> values, and the <code>scores</code> data starts at index 0 for the <code>regions_id</code> values. This explains why there is 1 extra value for <code>region_id</code> than expected.</p>
-<p><em>Question</em> Which region id corresponds to the United States? <em>Answer</em> region id 163 corresponds to the United States</p>
+<p><em>Answer</em> Antarctica has all <code>NA</code> values for score. This region is not included in the assessment, as noted in the <code>Notes</code> column, which explains 1 extra value of the 2 extra values. These days, Antarctica is treated as an OHI+ region. Additionally, the <code>regions</code> dataset starts at index 1 for the <code>region_id</code> values, and the <code>scores</code> data starts at index 0 for the <code>region_id</code> values. This explains the other 1 extra value for <code>region_id</code> than expected. This index of 0 for <code>regions_id</code> represents the overall calculated global score.</p>
+<p><em>Question</em> Which region id corresponds to the United States? <em>Answer</em> <code>region_id</code> 163 corresponds to the United States.</p>
 <pre class="r"><code># determine the region id for the United States
 usa &lt;- scores_regions_goals %&gt;% 
   filter(rgn_name == &quot;United States&quot;)
@@ -233,12 +233,12 @@ head(usa) # region_id = 163</code></pre>
 <h3>Goal explore</h3>
 <p><em>Question </em> When I look at the number of goals, N=19 show up….I thought there were supposed to be 10 goals!!! Can you explain what all these are? Also, why do some of the goal abbreviations have 2 letters and others 3 letters?</p>
 <p><em>Hint 1</em> Review the methods doc here: <a href="https://raw.githack.com/OHI-Science/ohi-global/published/documents/methods/Supplement.html" class="uri">https://raw.githack.com/OHI-Science/ohi-global/published/documents/methods/Supplement.html</a></p>
-<p><em>Answer</em> 10 goals of OHI assessments are abbreviated with 2 letters, which indicates that they are the 10 main goals, and the 8 sub-goals are indicated by 3 letters. An example of a main goal is “Biodiversity”, which is abbreviated as “BD”, and this goal has 2 sub-goals: “Habitat” and “Species”, which are abbreviated with 3 letters each as “HAB” and “SPP”, respectively. There is also a value of “Index” within the <code>goals</code> variable, which makes up the 19th unique goal value.</p>
+<p><em>Answer</em> 10 goals of OHI assessments are abbreviated with 2 letters, which indicates that they are the 10 main goals, and the 8 sub-goals are indicated by 3 letters. An example of a main goal is “Biodiversity”, which is abbreviated as “BD”, and this goal has 2 sub-goals: “Habitat” and “Species”, which are abbreviated with 3 letters each as “HAB” and “SPP”, respectively. There is also a value of <code>Index</code> within the <code>goals</code> variable, which makes up the 19th unique goal value. The <code>Index</code> represents the score for that region based on all goals.</p>
 </div>
 <div id="dimension-explore" class="section level3">
 <h3>Dimension explore</h3>
 <p><em>Question</em> There are 6 dimensions reported in this dataset (future, pressures, resilience, score, status, and trend). When I look at the number of records in each of these categories, I notice that there are more “score” values reported than “status” values (see working space below). Given that scores are calculated using status, it seems like these should have the same number of records. Can you figure out what is going on here. Is something going wrong?</p>
-<p><em>Answer</em> The difference of 2442 rows for these dimensions is explained by the 2442 rows within the <code>Index</code> goal that are associated with the <code>score</code> dimension. Since the only dimensions associated with <code>Index</code> are <code>score</code> and <code>future</code>, and the rows associated with each are equal, I infer that <code>Index</code> is the result of a calculation that includes these both the <code>status</code> and <code>future</code> dimensions.</p>
+<p><em>Answer</em> The difference of 2442 rows for these dimensions is explained by the 2442 rows within the <code>Index</code> goal that are associated with the <code>score</code> dimension. Since the only dimensions associated with <code>Index</code> are <code>score</code> and <code>future</code>, and the rows associated with each are equal, I infer that <code>Index</code> is the result of a calculation that includes these both the <code>status</code> and <code>future</code> dimensions. I know that the <code>Index</code> represents the score for a given region based on all goals, but it does not include a status value itself.</p>
 </div>
 <div id="missing-data" class="section level3">
 <h3>Missing data</h3>
@@ -285,7 +285,7 @@ max_score &lt;- max(scores_regions_goals$score, na.rm = TRUE)</code></pre>
 </tr>
 <tr class="even">
 <td>dimension</td>
-<td>describes the category of the subscores that contributes to the overall score</td>
+<td>describes the category of the subscores that contributes to the goal score</td>
 <td>future, pressures, resilience, score, status, trend</td>
 </tr>
 <tr class="odd">
