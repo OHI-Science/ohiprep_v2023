@@ -138,7 +138,7 @@ The information in this section describes how status and trend are calculated fo
 
 QUESTION: What is the reference point for this subgoal?
 
-**Answer:** The reference point for this subgoal is 30% of area being protected. This includes the assumption that each country should protect the same amount of coastline proportional to the amount that they have. I do have reservations about philosophically accepting that assumption, but I can see how trying to account for country-level variation in coastal resources can get too complicated without such broad assumptions.
+**Answer:** The reference point for this subgoal is 30% of total area being protected. This includes the assumption that each country should protect the same amount of coastline proportional to the amount that they have. I do have reservations about philosophically accepting that assumption, but I can see how trying to account for country-level variation in coastal resources can get too complicated without such broad assumptions.
 
 Explore the links to the pressures and resilience data layers.
 
