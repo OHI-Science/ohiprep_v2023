@@ -66,7 +66,7 @@ scores <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/dra
 
 *Hint 3* Which region has all NA values for scores?
 
-*Answer* Antarctica has all NA values for score. This region is not included in the assessment, as noted in the 'Notes' column, which explains why there is 1 extra values The `regions` data starts at index 1 for the `regions_id` values, and the `scores` data starts at index 0 for the `regions_id` values. This explains why there is 1 extra value for `region_id` than expected.
+*Answer* Antarctica has all `NA` values for score. This region is not included in the assessment, as noted in the `Notes` column, which explains 1 extra value of the 2 extra values. These days, Antarctica is treated as an OHI+ region. Additionally, the `regions` dataset starts at index 1 for the `region_id` values, and the `scores` data starts at index 0 for the `region_id` values. This explains the other 1 extra value for `region_id` than expected. This index of 0 for `regions_id` represents the overall calculated global score. 
 
 ```{r, include=FALSE}
 # read in regions_list.csv data
@@ -119,7 +119,7 @@ diff_id # value of 0 is the difference between these vectors
 ```
 
 *Question* Which region id corresponds to the United States?
-*Answer* region id 163 corresponds to the United States
+*Answer* `region_id` 163 corresponds to the United States.
 
 ```{r}
 # determine the region id for the United States
@@ -129,14 +129,13 @@ usa <- scores_regions_goals %>%
 head(usa) # region_id = 163
 ```
 
-
 ### Goal explore
 
 *Question * When I look at the number of goals, N=19 show up....I thought there were supposed to be 10 goals!!! Can you explain what all these are? Also, why do some of the goal abbreviations have 2 letters and others 3 letters?  
 
 *Hint 1* Review the methods doc here: https://raw.githack.com/OHI-Science/ohi-global/published/documents/methods/Supplement.html
 
-*Answer* 10 goals of OHI assessments are abbreviated with 2 letters, which indicates that they are the 10 main goals, and the 8 sub-goals are indicated by 3 letters. An example of a main goal is "Biodiversity", which is abbreviated as "BD", and this goal has 2 sub-goals: "Habitat" and "Species", which are abbreviated with 3 letters each as "HAB" and "SPP", respectively. There is also a value of "Index" within the `goals` variable, which makes up the 19th unique goal value. 
+*Answer* 10 goals of OHI assessments are abbreviated with 2 letters, which indicates that they are the 10 main goals, and the 8 sub-goals are indicated by 3 letters. An example of a main goal is "Biodiversity", which is abbreviated as "BD", and this goal has 2 sub-goals: "Habitat" and "Species", which are abbreviated with 3 letters each as "HAB" and "SPP", respectively. There is also a value of `Index` within the `goals` variable, which makes up the 19th unique goal value. The `Index` represents the score for that region based on all goals. 
 
 ```{r, include=FALSE}
 # determine the number of distinct goals in the joined data to confirm it is indeed 19
@@ -158,7 +157,7 @@ index_goal
 
 *Question* There are 6 dimensions reported in this dataset (future, pressures, resilience, score, status, and trend).  When I look at the number of records in each of these categories, I notice that there are more "score" values reported than "status" values (see working space below). Given that scores are calculated using status, it seems like these should have the same number of records. Can you figure out what is going on here. Is something going wrong?  
 
-*Answer* The difference of 2442 rows for these dimensions is explained by the 2442 rows within the `Index` goal that are associated with the `score` dimension. Since the only dimensions associated with `Index` are `score` and `future`, and the rows associated with each are equal, I infer that `Index` is the result of a calculation that includes these both the `status` and `future` dimensions.
+*Answer* The difference of 2442 rows for these dimensions is explained by the 2442 rows within the `Index` goal that are associated with the `score` dimension. Since the only dimensions associated with `Index` are `score` and `future`, and the rows associated with each are equal, I infer that `Index` is the result of a calculation that includes these both the `status` and `future` dimensions. I know that the `Index` represents the score for a given region based on all goals, but it does not include a status value itself. 
 
 ```{r, include=FALSE}
 # explore the unique values of the dimension variable
@@ -240,7 +239,7 @@ future_status_score <- scores_regions_goals %>%
 # seems like the average of the future and status scores result in the overall score
 
 # use the first goal, AO, as a use case to cheeck this hypothesis
-(74.914138 + 75.388657) / 2 # yep it is the 
+(74.914138 + 75.388657) / 2 # yep 
 ```
 
 
@@ -264,7 +263,7 @@ max_score <- max(scores_regions_goals$score, na.rm = TRUE)
 Variable   | Description                  | Values
 ---------- | ---------------------------- | ------------------------------
 goal       |  ocean benefits delivered to humans, OHI has 10 goals, 4 of which have 2 subgoals.                            | `r goals`
-dimension  |  describes the category of the subscores that contributes to the overall score                             | `r dimensions`
+dimension  |  describes the category of the subscores that contributes to the goal score                             | `r dimensions`
 region_id  |  unique numeric code that identifies each geographic region (country or territory)                             | Range: `r min_region_id` to `r max_region_id`
 score      |  numeric score for goal, region, year, and dimension                             | Range: `r min_score` to `r max_score`         
 year       |  Scenario year               | Range: 2012 to 2022
