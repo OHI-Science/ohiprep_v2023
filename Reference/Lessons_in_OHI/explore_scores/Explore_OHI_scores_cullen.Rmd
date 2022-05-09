@@ -158,7 +158,7 @@ na_count_by_rgn <- scores_full %>%
 
 na_count_by_rgn %>% 
   head(10)
-na_count_by_rgn %>% 
+na_count_by_rgn %>% 5
   tail(10)
 ```
 
