@@ -12,7 +12,7 @@ I will be around to answer any questions...so don't hesitate to get clarificatio
 ### OHI score models and data
 1. What is the difference between a goal's "status" and "score"?
 
-**Answer:** The "status" is the current state of the goal (the year of the assessment) and the "score" is the combination of the current "status" and the "future" status, which are averaged equally. "future" and "status" are categorical values within the `dimension` variable. The "future" predicted status is the current status modified by variables (resilience, pressures, and trend) expected to influence future status. The trend covers 5 years and is twice as important as resilience and pressures when considering the calculation of the predicted "future" status.
+**Answer:** The "status" is the current state of the goal (the year of the assessment) and the "score" is the combination of the current "status" and the "future" status, which are averaged equally. "future" and "status" are categorical values within the `dimension` variable. The "future" predicted status is the current status modified by variables (resilience, pressures, and trend) expected to influence future status. The trend covers 5 years (the current year and 4 years in the past and predicting 5 years in the future by multiplying the linear regression slope by 5) and is twice as important as resilience and pressures when considering the calculation of the predicted "future" status.
 
 2. If a region's food provision goal has the following values, what would its food provision score be?
 
@@ -126,7 +126,7 @@ QUESTION: Should the missing values (NA is a missing value in R) remain missing?
 
 Or, should you try to estimate the missing values?  If so, how might you go about estimating them?
 
-**Answer:** The missing values should not remain missing because we need the index scores to be comparable, so we would not be able to include regions 5 and 6 in the analysis, but we also do not want to drop those regions if there is a reasonable way to interpret them because they will be included for other goals for which they do have data. Therefore, depending on what the goal is, we could interpolate using other regions that are similar economically and scale-wise (like comparing a country of similar population size as well as similar economy). Alternatively, we could fill these NA values with 0 if we are fairly certain that the reason we lack data is because regions 5 and 6 do not have that economic process present, but there is potential for that economic process to be executed. For example, if the economic goal we are dealing with is natural products, and regions 5 and 6 do have natural resoruces they could potentially sustainably harvest but do not, resulting in a lack of data, then they should get a score of 0 because they are not harvesting at all. 
+**Answer:** The missing values should not remain missing because we need the index scores to be comparable, so we would not be able to include regions 5 and 6 in the analysis, but we also do not want to drop those regions if there is a reasonable way to interpret them because they will be included for other goals for which they do have data. Therefore, depending on what the goal is, we could interpolate using other regions that are similar economically and scale-wise (like comparing a country of similar population size as well as similar economy). Alternatively, we could fill these NA values with 0 if we are fairly certain that the reason we lack data is because regions 5 and 6 do not have that economic process present, but there is potential for that economic process to be executed. For example, if the economic goal we are dealing with is natural products, and regions 5 and 6 do have natural resources they could potentially sustainably harvest but do not, resulting in a lack of data, then they should get a score of 0 because they are not harvesting at all. 
 
 
 ### Goal status and trend
@@ -146,12 +146,11 @@ Follow this link to the functions.R file in ohi-global: https://github.com/OHI-S
 
 Find the Lasting Special Places function.  See if you can reconcile the model described in the Methods with the code. (NOTE: Just aim for a large picture overview...at this point you do not need to understand every step….or even most of this)
 
-<br>
-<br>
+**Answer:** Looking at the model, I see that the `inland` and `offshore` areas are combined by `region_id` and `year`. The `AlignDataYears()` function is used to link the year data was collected to the appropriate scenario year for a data layer. This is important because data used in a scenario year was not necessarily collected that year, and the amount of lag years differs for goals. I also see that the NA values are replaced by 0. As Cullen, Peter, and I discussed this function, we considered that it would be interesting to try this function as-is on some data, then change the trend to be 4 or MORE years in the past using the same data (perhaps without converting NA values to 0, but rather ignoring NA values), and determine if the output is significantly different.
 
 8. The trend for the Tourism and Recreation goal for the United States is -0.15.  Describe what this means.
 
-Since the trend is negative, this means that US's score for Tourism and Recreation is decreasing over the 5 years that were evaluated to yield this trend. The manitude of 0.15 represents that the Tourism and Recreatoin goal score is changing by that much each year, over the 5 years.
+Since the trend is negative, this means that US's score for Tourism and Recreation is decreasing over the time period of the 5 most recent years (the scenario year and 4 years prior). To calculate the proportional change of -0.15, we divide the slope estimate by the status value of the earliest year of data used in the trend calculation. The earliest year is used as the baseline. The units are proportional change, ranging from -1 to 1. 
 
 
 9. We are going to walk through a trend calculation.  If R is installed on your computer, follow along.
@@ -169,6 +168,7 @@ Year  | Status
 2016  | 82
 
 *STEP 1* Estimate the average change per year using a linear regression model
+
 
 ![](figures/trend_lm.jpg)
 
@@ -192,10 +192,11 @@ In 2021, status is predicted to be (ignoring pressure/resilience dimensions):
 
 QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?
 
+**Answer:** We are assuming that the scenario year and the 4 prior years are the most indicative of the trend moving forward, meaning that this subset of the years is more accurate than using all prior years available. We also assume a linear trend with no time lag or limit (like carrying capacity). Furthermore, due to omitting any political information or biological information, we are assuming that policies and biological stochasticity or stability in this region are to remain similar for the next 5 years. By ignoring the pressure/resilience dimensions, we assume that they cancel each other out for the years considered. 
+
 QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?
 
-<br>
-<br>
+**Answer:** I can imagine we would not use 5 years of data to estimate trend if we do not have data for at least 1 year in the past 5 years, (but the years used to replace missing years cannot exceed 10 years in the past). Also, we do not use 5 years of data if we are calculating certain habitat trends within the Biodiversity goal (coral reefs, seagrasses/kelp, and saltmarshes). The methodology states that "Coral reef habitat trends were calculated on a per country basis, using all available data. For saltmarsh we apply a single global trend value for each region. For seagrasses and kelp we calculated trends on a per site basis." That means coral reefs are not restricted to 5 years of data, and it is not clear if saltmarshes and seagrasses and kelp trends are using all available data or just the last 5 years. On the other hand, 5 years is the limit for mangroves, sea ice, and soft bottom habitat. Additionally, many trends are calculated using 5 years, but each year is actually a rolling/moving average, so the prior years are systematically embedded in these values. 
 
 ### Goal pressure and resilience
 <br>
@@ -208,11 +209,22 @@ a. A data layer for each pressure layer describing the magnitude of the pressure
 
 b. Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2).  The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change).  Each pressure data layer is assigned to a category in this file: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv
 
-QUESTION: How many climate change pressures are there? 
+QUESTION: How many climate change pressures are there?
+
+**Answer:** There are 4 climate change pressures: cc_sst, cc_acid, cc_uv, cc_slr.
 
 c. Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others.  The relationship between the goals and the pressure variables is described here: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv
 
-QUESTION: Which pressure layers affect the FIS  subgoal?  How many regulatory pressure layers are there?  How many social layers are there?  Which is more important: Ecological or Social pressures? 
+QUESTION: Which pressure layers affect the FIS subgoal?  How many regulatory pressure layers are there?  How many social layers are there?  Which is more important: Ecological or Social pressures? 
+
+```{r}
+library(tidyverse)
+
+pressure <- read.csv("https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv")
+
+```
+
+
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
 
