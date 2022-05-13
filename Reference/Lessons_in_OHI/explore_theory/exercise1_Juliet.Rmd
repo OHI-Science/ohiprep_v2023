@@ -224,7 +224,20 @@ pressure <- read.csv("https://github.com/OHI-Science/ohi-global/blob/draft/eez/c
 
 ```
 
-
+**Answer:** The pressure layers affecting the FIS subgoal are:
+1. fp_art_hb
+2. fp_art_lb
+3. fp_com_hb
+4. fp_com_lb
+5. hd_intertidal
+6. hd_subtidal_hb
+7. hd_subtidal_sb
+8. po_chemicals
+9. po_nutrients
+10. sp_alien
+11. sp_genetic
+12. ss_spi
+13. ss_wgi
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
 
