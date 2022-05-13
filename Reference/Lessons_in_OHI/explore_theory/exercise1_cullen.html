@@ -180,13 +180,15 @@ pre code {
 <ol style="list-style-type: decimal">
 <li>What is the difference between a goal’s “status” and “score”?</li>
 </ol>
-<p><br> The status of a goal refers to the current state relative to the reference point. There is also a future status which is made up of three subdimensions, resilience, pressure, and trend. These three areas area projected five years in the future to predict the status at that point. The score is the average of the status scores. <br></p>
+<p>The status of a goal refers to the current state relative to the reference point. There is also a future status which is made up of three subdimensions, resilience, pressure, and trend. These three areas area projected five years in the future to predict the status at that point. The score is the average of the status scores.</p>
+<p><br> <br></p>
 <ol start="2" style="list-style-type: decimal">
 <li>If a region’s food provision goal has the following values, what would its food provision score be?</li>
 </ol>
 <p>Predicted future status: 80</p>
 <p>Current status: 60</p>
-<p><br> 70 <br></p>
+<p>The food provision score would be 70.</p>
+<p><br> <br></p>
 <ol start="3" style="list-style-type: decimal">
 <li>Given the following data, what would this region’s Index score be?</li>
 </ol>
@@ -320,7 +322,7 @@ score_1 &lt;- (current + pred_future_1)/2
 
 diff &lt;- score_2 - score_1</code></pre>
 <p>QUESTION: How did a pressure change from 100 to 50 affect the final score? Was this a larger or smaller effect than you would have expected?</p>
-<p><br> A pressure change from 100 to 50 increased the predicted future status by 5 points from it’s current status which increased the total score by 2.5 points. This is a smaller effect than I would expect for the overall score, but it seems to increase the predicted future status as I would expect. <br></p>
+<p>A pressure change from 100 to 50 increased the predicted future status by 5 points from it’s current status which increased the total score by 2.5 points. This is a smaller effect than I would expect for the overall score, but it seems to increase the predicted future status as I would expect. <br> <br></p>
 </div>
 <div id="humans-as-part-of-the-ecosystem" class="section level3">
 <h3>Humans as part of the ecosystem</h3>
@@ -334,7 +336,7 @@ diff &lt;- score_2 - score_1</code></pre>
 <li>Take some sort of average of the stock status scores within each region (for the global we use a geometric mean weighted by catch).</li>
 </ol>
 <p>QUESTION: B/Bmsy scores greater than 1 indicate the stock is doing well, but is underharvested! Given this, do you think we should penalize underharvesting? Why? Do you have any ideas for how we could account for underharvesting without unduly penalizing regions that are trying to let stocks recover?</p>
-<p><br> I think this is a complicated topic and is very hard to answer. For example, the squid fishery in California is seen as a sustainable fishery, yet the only reason it is “sustainable” is because we have all but eliminated their predators. Should we value only what we currently fish? Or should we stop fishing squid until seabass, dolphin, and sea lion populations increase sufficiently to eat the excess. Penalizing the country score is in my opinion too human centric and too focused on immediate uses. I think it fails to take into consideration the potential future increase in stocks that may increase the Bmsy and allow future humans to increase fishing effort in order to feed more people. Why not account for population increase? Why not value increased stocks? Perhaps humans in certain areas value tourism spawned from increased fishery stocks. <br></p>
+<p>I think this is a complicated topic and is very hard to answer. For example, the squid fishery in California is seen as a sustainable fishery, yet the only reason it is “sustainable” is because we have all but eliminated their predators. Should we value only what we currently fish? Or should we stop fishing squid until seabass, dolphin, and sea lion populations increase sufficiently to eat the excess. Penalizing the country score is in my opinion too human centric and too focused on immediate uses. I think it fails to take into consideration the potential future increase in stocks that may increase the Bmsy and allow future humans to increase fishing effort in order to feed more people. Why not account for population increase? Why not value increased stocks? Perhaps humans in certain areas value tourism spawned from increased fishery stocks. <br> <br></p>
 </div>
 <div id="gapfilling" class="section level3">
 <h3>Gapfilling</h3>
@@ -393,7 +395,7 @@ diff &lt;- score_2 - score_1</code></pre>
 </table>
 <p>QUESTION: Should the missing values (NA is a missing value in R) remain missing? If so, why?</p>
 <p>Or, should you try to estimate the missing values? If so, how might you go about estimating them?</p>
-<p><br> I think that the missing values should be evaluated for the potential to fill them. I think it could make sense to impute values through several methods depending on the goal we are evaluating and the amount of available data. For instance, a regional mean would make sense if there are several regions with similar ecological and spatial attributes. Other dataset that might be spatial rasters could use something like Krieging to interpolate missing values. I can also see a case being made for certain goals to fill missing values with 0 if you were able to make assumptions about the region in question, like an uninhabited island getting a 0 filled for mariculture or fishing. <br></p>
+<p>I think that the missing values should be evaluated for the potential to fill them. I think it could make sense to impute values through several methods depending on the goal we are evaluating and the amount of available data. For instance, a regional mean would make sense if there are several regions with similar ecological and spatial attributes. Other dataset that might be spatial rasters could use something like Krieging to interpolate missing values. I can also see a case being made for certain goals to fill missing values with 0 if you were able to make assumptions about the region in question, like an uninhabited island getting a 0 filled for mariculture or fishing. <br> <br></p>
 </div>
 <div id="goal-status-and-trend" class="section level3">
 <h3>Goal status and trend</h3>
@@ -411,7 +413,7 @@ diff &lt;- score_2 - score_1</code></pre>
 <ol start="8" style="list-style-type: decimal">
 <li>The trend for the Tourism and Recreation goal for the United States is -0.15. Describe what this means.</li>
 </ol>
-<p><br> <br></p>
+<p>This means that either tourism is decreasing, sustainability is decreasing, or possibly both. <br> <br></p>
 <ol start="9" style="list-style-type: decimal">
 <li>We are going to walk through a trend calculation. If R is installed on your computer, follow along.</li>
 </ol>
@@ -465,7 +467,9 @@ diff &lt;- score_2 - score_1</code></pre>
 <p>Status is predicted to increase about 19% in 5 years.</p>
 <p>In 2021, status is predicted to be (ignoring pressure/resilience dimensions): 82 * (1 + 0.1875) = 97</p>
 <p>QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?</p>
+<p>We are assuming that the trend is linear which may not be the case. There could have been recent changes that improved the score temporarily but those changes could be temporary or possibly reversed in the near future. This also assumes that resilience is equal to pressure, which could change rapidly.</p>
 <p>QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?</p>
+<p>Certain goals may lack enough recent data.</p>
 <p><br> <br></p>
 </div>
 <div id="goal-pressure-and-resilience" class="section level3">
@@ -480,10 +484,21 @@ diff &lt;- score_2 - score_1</code></pre>
 <li><p>Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2). The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change). Each pressure data layer is assigned to a category in this file: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv</a></p></li>
 </ol>
 <p>QUESTION: How many climate change pressures are there?</p>
+<p>There are 4 climate change pressures.</p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others. The relationship between the goals and the pressure variables is described here: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv</a></li>
 </ol>
 <p>QUESTION: Which pressure layers affect the FIS subgoal? How many regulatory pressure layers are there? How many social layers are there? Which is more important: Ecological or Social pressures?</p>
+<pre class="r"><code>library(tidyverse)
+df &lt;- read_csv(&quot;https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressures_matrix.csv&quot;)
+df %&gt;% filter(goal == &quot;FIS&quot;) %&gt;% 
+  select(where(~!any(is.na(.)))) %&gt;% 
+  select(-goal) %&gt;% 
+  names()</code></pre>
+<pre><code>##  [1] &quot;po_chemicals&quot;   &quot;po_nutrients&quot;   &quot;sp_alien&quot;       &quot;sp_genetic&quot;    
+##  [5] &quot;hd_subtidal_sb&quot; &quot;hd_subtidal_hb&quot; &quot;hd_intertidal&quot;  &quot;fp_com_hb&quot;     
+##  [9] &quot;fp_com_lb&quot;      &quot;fp_art_lb&quot;      &quot;fp_art_hb&quot;      &quot;ss_wgi&quot;        
+## [13] &quot;ss_spi&quot;</code></pre>
 <p>QUESTION: Some goals, like Coastal Protection, have multiple “elements”. Why?</p>
 <p>NOTE: It is convention to add a superscript to the pressure name that describes its category: * po=pollution * hd=habitat destruction * sp=alien species * fp=fishing pressure * cc=climate change</p>
 <p><br> <br></p>
