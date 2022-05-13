@@ -180,15 +180,13 @@ pre code {
 <ol style="list-style-type: decimal">
 <li>What is the difference between a goal’s “status” and “score”?</li>
 </ol>
-<p>The status of a goal refers to the current state relative to the reference point. There is also a future status which is made up of three subdimensions, resilience, pressure, and trend. These three areas area projected five years in the future to predict the status at that point. The score is the average of the status scores.</p>
-<p><br> <br></p>
+<p><strong><code>Status</code> refers to the goal’s current status and <code>score</code> is the average of the goal’s <code>status</code> (current status) and <code>future</code> (predicted future status).</strong></p>
 <ol start="2" style="list-style-type: decimal">
 <li>If a region’s food provision goal has the following values, what would its food provision score be?</li>
 </ol>
 <p>Predicted future status: 80</p>
 <p>Current status: 60</p>
-<p>The food provision score would be 70.</p>
-<p><br> <br></p>
+<p><strong>The region’s food provision goal in this instance would be 70.</strong></p>
 <ol start="3" style="list-style-type: decimal">
 <li>Given the following data, what would this region’s Index score be?</li>
 </ol>
@@ -259,10 +257,11 @@ pre code {
 </tbody>
 </table>
 <p>NOTE: The abbreviations for subgoals have 3 letters and goals have 2 letters.</p>
-<p><br></p>
-<pre class="r"><code>(90 + (50 + 30)/2 + 20 + 95 + 60 + 80 + 85 + 100 + 10 + 50)/10</code></pre>
+<pre class="r"><code>BD &lt;- (50 + 30) / 2 
+
+(90 + BD + 20 + 95 + 60 + 80 + 85 + 100 + 10 + 50) / 10</code></pre>
 <pre><code>## [1] 63</code></pre>
-<p><br></p>
+<p><strong>This regions index score would be 63</strong></p>
 <ol start="4" style="list-style-type: decimal">
 <li>Fill in the missing values.</li>
 </ol>
@@ -308,25 +307,24 @@ pre code {
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>current &lt;- 75
-pred_future_2 &lt;- 80
-score_2 &lt;- (current + pred_future_2)/2
+<pre class="r"><code>res &lt;- 50
+pres &lt;- 100
+trend &lt;- 0.1
 
-trend &lt;- .1
-pressure &lt;- 100 * .01
-resilience &lt;- 50 * .01
-beta &lt;- 2/3
+pres_diff &lt;- (res - pres) * .01
 
-pred_future_1 &lt;- ((1 + beta * trend) + ((1 - beta) * (resilience - pressure))) * current 
-score_1 &lt;- (current + pred_future_1)/2
-
-diff &lt;- score_2 - score_1</code></pre>
+scen_future &lt;- (1 + (pres_diff * 1/3) + (trend * 2/3)) * 75
+scen_future</code></pre>
+<pre><code>## [1] 67.5</code></pre>
 <p>QUESTION: How did a pressure change from 100 to 50 affect the final score? Was this a larger or smaller effect than you would have expected?</p>
-<p>A pressure change from 100 to 50 increased the predicted future status by 5 points from it’s current status which increased the total score by 2.5 points. This is a smaller effect than I would expect for the overall score, but it seems to increase the predicted future status as I would expect. <br> <br></p>
+<p><strong>It decreased the final score quite a bit, although that’s about on par with what I would expect with such high pressure.</strong></p>
 </div>
 <div id="humans-as-part-of-the-ecosystem" class="section level3">
 <h3>Humans as part of the ecosystem</h3>
-<p><br> 5. To calculate the Fishery subgoal, we:</p>
+<p><br></p>
+<ol start="5" style="list-style-type: decimal">
+<li>To calculate the Fishery subgoal, we:</li>
+</ol>
 <ol style="list-style-type: lower-alpha">
 <li><p>Obtain B/Bmsy scores for each stock that is harvested. B/Bmsy is defined as: the ratio of observed biomass to the biomass that would provide maximum sustainable yield. When B/BMSY = 1, then biomass equals BMSY. If B/BMSY falls below 1, biomass is too low to provide maximum sustainable yield. For example, if B/BMSY = 0.5, then biomass is only 50% of that needed for maximum sustainable yield. (from: <a href="http://www.catchshareindicators.org/wp-content/uploads/2013/12/NE_Biomass_Feb-2014.pdf" class="uri">http://www.catchshareindicators.org/wp-content/uploads/2013/12/NE_Biomass_Feb-2014.pdf</a>)</p></li>
 <li><p>Convert B/Bmsy into a stock status score that ranges from 0-1, with one reflecting a perfect score. The relationship between B/Bmsy values and stock status scores looks like this:</p></li>
@@ -336,7 +334,8 @@ diff &lt;- score_2 - score_1</code></pre>
 <li>Take some sort of average of the stock status scores within each region (for the global we use a geometric mean weighted by catch).</li>
 </ol>
 <p>QUESTION: B/Bmsy scores greater than 1 indicate the stock is doing well, but is underharvested! Given this, do you think we should penalize underharvesting? Why? Do you have any ideas for how we could account for underharvesting without unduly penalizing regions that are trying to let stocks recover?</p>
-<p>I think this is a complicated topic and is very hard to answer. For example, the squid fishery in California is seen as a sustainable fishery, yet the only reason it is “sustainable” is because we have all but eliminated their predators. Should we value only what we currently fish? Or should we stop fishing squid until seabass, dolphin, and sea lion populations increase sufficiently to eat the excess. Penalizing the country score is in my opinion too human centric and too focused on immediate uses. I think it fails to take into consideration the potential future increase in stocks that may increase the Bmsy and allow future humans to increase fishing effort in order to feed more people. Why not account for population increase? Why not value increased stocks? Perhaps humans in certain areas value tourism spawned from increased fishery stocks. <br> <br></p>
+<p><strong>It makes sense to penalize underharvesting <em>if</em> there is an overall lack of food in the country—more specifically, if there is hunger associated with a true lack of food and not, for example, a situation like in the US where there is an abundance of food but our food system and general inequality create a lot of hunger. This would make calculating the score highly nuanced, though. In terms of accounting for stock recovery, perhaps data could be collected on whether or not regions are letting stocks recover and that could be factored into the score.</strong></p>
+<p><br> <br></p>
 </div>
 <div id="gapfilling" class="section level3">
 <h3>Gapfilling</h3>
@@ -394,8 +393,7 @@ diff &lt;- score_2 - score_1</code></pre>
 </tbody>
 </table>
 <p>QUESTION: Should the missing values (NA is a missing value in R) remain missing? If so, why?</p>
-<p>Or, should you try to estimate the missing values? If so, how might you go about estimating them?</p>
-<p>I think that the missing values should be evaluated for the potential to fill them. I think it could make sense to impute values through several methods depending on the goal we are evaluating and the amount of available data. For instance, a regional mean would make sense if there are several regions with similar ecological and spatial attributes. Other dataset that might be spatial rasters could use something like Krieging to interpolate missing values. I can also see a case being made for certain goals to fill missing values with 0 if you were able to make assumptions about the region in question, like an uninhabited island getting a 0 filled for mariculture or fishing. <br> <br></p>
+<p>Or, should you try to estimate the missing values? If so, how might you go about estimating them? <br> <strong>I think this would depend on the goal and what data are available. If regions with missing values are surrounded by comparable regions that do have data, then it would likely make sense to interpolate in some way, or if the score is one that could be reliably estimated using other available data then a regression or other model could be used. Values could be estimates via regional means, some form of spatial interpolation, or estimated using known characteristics of the region.</strong> <br></p>
 </div>
 <div id="goal-status-and-trend" class="section level3">
 <h3>Goal status and trend</h3>
@@ -405,7 +403,7 @@ diff &lt;- score_2 - score_1</code></pre>
 </ol>
 <p>The information in this section describes how status and trend are calculated for this goal, it also includes the data used to calculate the pressure and resilience dimensions.</p>
 <p>QUESTION: What is the reference point for this subgoal?</p>
-<p>30%</p>
+<p><strong>The reference point for Lasting Special Places is 30% of coastal area protected.</strong></p>
 <p>Explore the links to the pressures and resilience data layers.</p>
 <p>Follow this link to the functions.R file in ohi-global: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/functions.R" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/functions.R</a></p>
 <p>Find the Lasting Special Places function. See if you can reconcile the model described in the Methods with the code. (NOTE: Just aim for a large picture overview…at this point you do not need to understand every step….or even most of this)</p>
@@ -413,7 +411,7 @@ diff &lt;- score_2 - score_1</code></pre>
 <ol start="8" style="list-style-type: decimal">
 <li>The trend for the Tourism and Recreation goal for the United States is -0.15. Describe what this means.</li>
 </ol>
-<p>This means that either tourism is decreasing, sustainability is decreasing, or possibly both. <br> <br></p>
+<p><strong>This means that the TR goal score for the US is predicted to be 15% lower than it’s current score in five years. The trend is calculated using linear regression based on scores from the previous five years—the slope is divided by the earliest score value to arrive at the proportional trend.</strong></p>
 <ol start="9" style="list-style-type: decimal">
 <li>We are going to walk through a trend calculation. If R is installed on your computer, follow along.</li>
 </ol>
@@ -467,10 +465,9 @@ diff &lt;- score_2 - score_1</code></pre>
 <p>Status is predicted to increase about 19% in 5 years.</p>
 <p>In 2021, status is predicted to be (ignoring pressure/resilience dimensions): 82 * (1 + 0.1875) = 97</p>
 <p>QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?</p>
-<p>We are assuming that the trend is linear which may not be the case. There could have been recent changes that improved the score temporarily but those changes could be temporary or possibly reversed in the near future. This also assumes that resilience is equal to pressure, which could change rapidly.</p>
+<p><strong>We are assuming that the trend is linear. We are assuming the absence of acute future events that might have a large impact on score.</strong></p>
 <p>QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?</p>
-<p>Certain goals may lack enough recent data.</p>
-<p><br> <br></p>
+<p><strong>If the trend in the previous five years was clearly nonlinear or non-monotonic. If we are aware of some recent change or event that will likely have a high impact on the score in the near future. If all five years of data were not available or reliable.</strong></p>
 </div>
 <div id="goal-pressure-and-resilience" class="section level3">
 <h3>Goal pressure and resilience</h3>
@@ -484,21 +481,12 @@ diff &lt;- score_2 - score_1</code></pre>
 <li><p>Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2). The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change). Each pressure data layer is assigned to a category in this file: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv</a></p></li>
 </ol>
 <p>QUESTION: How many climate change pressures are there?</p>
-<p>There are 4 climate change pressures.</p>
+<pre class="r"><code>press_categories &lt;- read.csv(&quot;https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressure_categories.csv&quot;)</code></pre>
+<p><strong>4 climate change pressures</strong></p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others. The relationship between the goals and the pressure variables is described here: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv</a></li>
 </ol>
 <p>QUESTION: Which pressure layers affect the FIS subgoal? How many regulatory pressure layers are there? How many social layers are there? Which is more important: Ecological or Social pressures?</p>
-<pre class="r"><code>library(tidyverse)
-df &lt;- read_csv(&quot;https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressures_matrix.csv&quot;)
-df %&gt;% filter(goal == &quot;FIS&quot;) %&gt;% 
-  select(where(~!any(is.na(.)))) %&gt;% 
-  select(-goal) %&gt;% 
-  names()</code></pre>
-<pre><code>##  [1] &quot;po_chemicals&quot;   &quot;po_nutrients&quot;   &quot;sp_alien&quot;       &quot;sp_genetic&quot;    
-##  [5] &quot;hd_subtidal_sb&quot; &quot;hd_subtidal_hb&quot; &quot;hd_intertidal&quot;  &quot;fp_com_hb&quot;     
-##  [9] &quot;fp_com_lb&quot;      &quot;fp_art_lb&quot;      &quot;fp_art_hb&quot;      &quot;ss_wgi&quot;        
-## [13] &quot;ss_spi&quot;</code></pre>
 <p>QUESTION: Some goals, like Coastal Protection, have multiple “elements”. Why?</p>
 <p>NOTE: It is convention to add a superscript to the pressure name that describes its category: * po=pollution * hd=habitat destruction * sp=alien species * fp=fishing pressure * cc=climate change</p>
 <p><br> <br></p>

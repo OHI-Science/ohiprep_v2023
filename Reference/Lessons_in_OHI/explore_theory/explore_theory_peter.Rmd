@@ -148,15 +148,14 @@ Find the Lasting Special Places function.  See if you can reconcile the model de
 
 8. The trend for the Tourism and Recreation goal for the United States is -0.15.  Describe what this means.
 
-<br>
-<br>
+**This means that the TR goal score for the US is predicted to be 15% lower than it's current score in five years. The trend is calculated using linear regression based on scores from the previous five years---the slope is divided by the earliest score value to arrive at the proportional trend.**
 
 9. We are going to walk through a trend calculation.  If R is installed on your computer, follow along.
 
 Status data for a region's Tourism and Recreation goal:
 
 Year  | Status
------- | ----------
+----- | ----------
 2010  | 72
 2011  | 71
 2012  | 72
@@ -189,10 +188,12 @@ In 2021, status is predicted to be (ignoring pressure/resilience dimensions):
 
 QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?
 
+**We are assuming that the trend is linear. We are assuming the absence of acute future events that might have a large impact on score.**
+
 QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?
 
-<br>
-<br>
+**If the trend in the previous five years was clearly nonlinear or non-monotonic. If we are aware of some recent change or event that will likely have a high impact on the score in the near future. If all five years of data were not available or reliable.**
+
 
 ### Goal pressure and resilience
 <br>
@@ -206,6 +207,12 @@ a. A data layer for each pressure layer describing the magnitude of the pressure
 b. Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2).  The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change).  Each pressure data layer is assigned to a category in this file: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv
 
 QUESTION: How many climate change pressures are there? 
+
+```{r}
+press_categories <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressure_categories.csv")
+```
+
+**4 climate change pressures**
 
 c. Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others.  The relationship between the goals and the pressure variables is described here: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv
 

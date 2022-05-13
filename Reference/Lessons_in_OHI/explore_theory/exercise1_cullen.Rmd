@@ -12,8 +12,9 @@ I will be around to answer any questions...so don't hesitate to get clarificatio
 ### OHI score models and data
 1. What is the difference between a goal's "status" and "score"?
 
-<br>
 The status of a goal refers to the current state relative to the reference point. There is also a future status which is made up of three subdimensions, resilience, pressure, and trend. These three areas area projected five years in the future to predict the status at that point. The score is the average of the status scores. 
+
+<br>
 <br>
 
 2. If a region's food provision goal has the following values, what would its food provision score be?
@@ -22,8 +23,9 @@ Predicted future status: 80
 
 Current status: 60
 
+The food provision score would be 70.
+
 <br>
-70
 <br>
 
 3. Given the following data, what would this region's Index score be?
@@ -83,8 +85,8 @@ diff <- score_2 - score_1
 
 QUESTION: How did a pressure change from 100 to 50 affect the final score?  Was this a larger or smaller effect than you would have expected?
 
-<br>
 A pressure change from 100 to 50 increased the predicted future status by 5 points from it's current status which increased the total score by 2.5 points. This is a smaller effect than I would expect for the overall score, but it seems to increase the predicted future status as I would expect. 
+<br>
 <br>
 
 
@@ -102,8 +104,8 @@ c. Take some sort of average of the stock status scores within each region (for 
 
 QUESTION: B/Bmsy scores greater than 1 indicate the stock is doing well, but is underharvested!  Given this, do you think we should penalize underharvesting? Why? Do you have any ideas for how we could account for underharvesting without unduly penalizing regions that are trying to let stocks recover? 
 
-<br>
 I think this is a complicated topic and is very hard to answer. For example, the squid fishery in California is seen as a sustainable fishery, yet the only reason it is "sustainable" is because we have all but eliminated their predators. Should we value only what we currently fish? Or should we stop fishing squid until seabass, dolphin, and sea lion populations increase sufficiently to eat the excess. Penalizing the country score is in my opinion too human centric and too focused on immediate uses. I think it fails to take into consideration the potential future increase in stocks that may increase the Bmsy and allow future humans to increase fishing effort in order to feed more people. Why not account for population increase? Why not value increased stocks? Perhaps humans in certain areas value tourism spawned from increased fishery stocks.
+<br>
 <br>
 
 ### Gapfilling
@@ -126,8 +128,8 @@ QUESTION: Should the missing values (NA is a missing value in R) remain missing?
 
 Or, should you try to estimate the missing values?  If so, how might you go about estimating them?
 
-<br>
 I think that the missing values should be evaluated for the potential to fill them. I think it could make sense to impute values through several methods depending on the goal we are evaluating and the amount of available data. For instance, a regional mean would make sense if there are several regions with similar ecological and spatial attributes. Other dataset that might be spatial rasters could use something like Krieging to interpolate missing values. I can also see a case being made for certain goals to fill missing values with 0 if you were able to make assumptions about the region in question, like an uninhabited island getting a 0 filled for mariculture or fishing. 
+<br>
 <br>
 
 ### Goal status and trend
@@ -152,6 +154,7 @@ Find the Lasting Special Places function.  See if you can reconcile the model de
 
 8. The trend for the Tourism and Recreation goal for the United States is -0.15.  Describe what this means.
 
+This means that either tourism is decreasing, sustainability is decreasing, or possibly both.
 <br>
 <br>
 
@@ -193,7 +196,11 @@ In 2021, status is predicted to be (ignoring pressure/resilience dimensions):
 
 QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?
 
+We are assuming that the trend is linear which may not be the case. There could have been recent changes that improved the score temporarily but those changes could be temporary or possibly reversed in the near future. This also assumes that resilience is equal to pressure, which could change rapidly. 
+
 QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?
+
+Certain goals may lack enough recent data. 
 
 <br>
 <br>
@@ -211,9 +218,21 @@ b. Classifying the pressure category for each data layer. The pressure dimension
 
 QUESTION: How many climate change pressures are there? 
 
+There are 4 climate change pressures.
+
 c. Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others.  The relationship between the goals and the pressure variables is described here: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv
 
-QUESTION: Which pressure layers affect the FIS  subgoal?  How many regulatory pressure layers are there?  How many social layers are there?  Which is more important: Ecological or Social pressures? 
+QUESTION: Which pressure layers affect the FIS subgoal?  How many regulatory pressure layers are there?  How many social layers are there?  Which is more important: Ecological or Social pressures? 
+
+```{r message=F, warning=F}
+library(tidyverse)
+df <- read_csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressures_matrix.csv")
+df %>% filter(goal == "FIS") %>% 
+  select(where(~!any(is.na(.)))) %>% 
+  select(-goal) %>% 
+  names()
+```
+
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
 
