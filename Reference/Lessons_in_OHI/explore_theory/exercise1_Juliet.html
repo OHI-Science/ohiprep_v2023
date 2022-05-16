@@ -471,9 +471,9 @@ diff_score &lt;- round(diff_score, 2)</code></pre>
 <p>Status is predicted to increase about 19% in 5 years.</p>
 <p>In 2021, status is predicted to be (ignoring pressure/resilience dimensions): 82 * (1 + 0.1875) = 97</p>
 <p>QUESTION: What assumptions are we making by using this formulation of trend to calculate the likely future status?</p>
-<p><strong>Answer:</strong> We are assuming that the scenario year and the 4 prior years are the most indicative of the trend moving forward, meaning that this subset of the years is more accurate than using all prior years available. We also assume a linear trend with no time lag. Furthermore, due to omitting any political information or biological information, we are assuming that policies and biological stochasticity or stability in this region are to remain similar for the next 5 years. By ignoring the pressure/resilience dimensions, we assume that they cancel each other out for the years considered.</p>
+<p><strong>Answer:</strong> We are assuming that the scenario year and the 4 prior years are the most indicative of the trend moving forward, meaning that this subset of the years is more accurate than using all prior years available. We also assume a linear trend with no time lag or limit (like carrying capacity). Furthermore, due to omitting any political information or biological information, we are assuming that policies and biological stochasticity or stability in this region are to remain similar for the next 5 years. By ignoring the pressure/resilience dimensions, we assume that they cancel each other out for the years considered.</p>
 <p>QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?</p>
-<p><strong>Answer:</strong> I can imagine we would not use 5 years of data to estimate trend if we do not have data for at least 1 year in the past 5 years, (but the years used to replace missing years cannot exceed 10 years in the past). Also, we do not use 5 years of data if we are calculatingcertain habitat trends within the Biodiversity goal (coral reefs, seagrrasses/kelp, and saltmarshes). The methodology states that “Coral reef habitat trends were calculated on a per country basis, using all available data. For saltmarsh we apply a single global trend value for each region. For seagrasses and kelp we calculated trends on a per site basis.” That means coral reefs, saltmarshes, and seagrasses and kelp trends are not restricted to 5 years of data. On the other hand, 5 years is the limit for mangroves, sea ice, and soft bottom habitat. Additionally, many trends are calculated using 5 years, but each year is actually a rolling/moving average, so the prior years are systematically embedded in these values.</p>
+<p><strong>Answer:</strong> I can imagine we would not use 5 years of data to estimate trend if we do not have data for at least 1 year in the past 5 years, (but the years used to replace missing years cannot exceed 10 years in the past). Also, we do not use 5 years of data if we are calculating certain habitat trends within the Biodiversity goal (coral reefs, seagrasses/kelp, and saltmarshes). The methodology states that “Coral reef habitat trends were calculated on a per country basis, using all available data. For saltmarsh we apply a single global trend value for each region. For seagrasses and kelp we calculated trends on a per site basis.” That means coral reefs are not restricted to 5 years of data, and it is not clear if saltmarshes and seagrasses and kelp trends are using all available data or just the last 5 years. On the other hand, 5 years is the limit for mangroves, sea ice, and soft bottom habitat. Additionally, many trends are calculated using 5 years, but each year is actually a rolling/moving average, so the prior years are systematically embedded in these values.</p>
 </div>
 <div id="goal-pressure-and-resilience" class="section level3">
 <h3>Goal pressure and resilience</h3>
@@ -487,7 +487,7 @@ diff_score &lt;- round(diff_score, 2)</code></pre>
 <li><p>Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2). The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change). Each pressure data layer is assigned to a category in this file: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv</a></p></li>
 </ol>
 <p>QUESTION: How many climate change pressures are there?</p>
-<p><strong>Answer:</strong> There are 4 climate change pressures: cc_sst, cc_acid, cc_uv, cc_slr.</p>
+<p><strong>Answer:</strong> There are 4 climate change pressures: cc_sst (sea surface temperature), cc_acid (ocean acidification), cc_uv (UV radiation), cc_slr (sea level rise).</p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others. The relationship between the goals and the pressure variables is described here: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv</a></li>
 </ol>
@@ -507,9 +507,29 @@ diff_score &lt;- round(diff_score, 2)</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>pressure &lt;- read_csv(&quot;https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressures_matrix.csv&quot;) </code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   .default = col_double(),
+##   goal = col_character(),
+##   element = col_character(),
+##   element_name = col_character()
+## )
+## ℹ Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>pressure_FIS &lt;- pressure %&gt;% 
+  filter(goal == &quot;FIS&quot;) %&gt;% 
+  select(where(~ !any(is.na(.))))
+
+colnames(pressure_FIS)</code></pre>
+<pre><code>##  [1] &quot;goal&quot;           &quot;po_chemicals&quot;   &quot;po_nutrients&quot;   &quot;sp_alien&quot;      
+##  [5] &quot;sp_genetic&quot;     &quot;hd_subtidal_sb&quot; &quot;hd_subtidal_hb&quot; &quot;hd_intertidal&quot; 
+##  [9] &quot;fp_com_hb&quot;      &quot;fp_com_lb&quot;      &quot;fp_art_lb&quot;      &quot;fp_art_hb&quot;     
+## [13] &quot;ss_wgi&quot;         &quot;ss_spi&quot;</code></pre>
+<p><strong>Answer:</strong> The pressure layers affecting the FIS subgoal are “goal”, “po_chemicals”, po_nutrients”, “sp_alien”, “sp_genetic”, “hd_subtidal_sb”, “hd_subtidal_hb” “hd_intertidal” “fp_com_hb”, “fp_com_lb”, “fp_art_lb”, “fp_art_hb”, “ss_wgi”, and “ss_spi”. “fp_com_hb” is the most influential with a score of 3. This pressure layer represents high bycatch due to commercial fishing. By reading table 5.1, I learned that genetic escapes can come from fish or other aquaculture systems that are held in regions where the species are not native. The aquatic species can escape and become incipient invasive species. There are 2 social layers. I assume that the rest of the pressures are regulatory (pollution, habitat destruction, fishing pressure, alien species, and goal), so that leaves 12. Ecological and social pressures are weighted equally.</p>
 <p>QUESTION: Some goals, like Coastal Protection, have multiple “elements”. Why?</p>
-<p>NOTE: It is convention to add a superscript to the pressure name that describes its category: * po=pollution * hd=habitat destruction * sp=alien species * fp=fishing pressure * cc=climate change</p>
-<p><br> <br></p>
+<p>NOTE: It is convention to add a superscript to the pressure name that describes its category: * po = pollution * hd = habitat destruction * sp = alien species * fp = fishing pressure * cc = climate change * ss = social</p>
+<p><strong>Answer:</strong> Elements separate categories within certain goals, such as types of habitat that offer coastal protection. Each habitat (goal element) is ranked based on their protective strength. There are also elements within the livelihood goal. These elements can be weighted differently when we sum the pressures.</p>
 <ol start="11" style="list-style-type: decimal">
 <li>Similar to the pressures dimension, resilience plays a relatively small role in goal scores (see figure 4.1) but still takes a lot of effort.</li>
 </ol>
