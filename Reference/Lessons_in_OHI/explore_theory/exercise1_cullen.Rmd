@@ -232,9 +232,12 @@ df %>% filter(goal == "FIS") %>%
   select(-goal) %>% 
   names()
 ```
-
+ 
+There are two social layers, weakness of governance and weakness of social progress. I am not sure how to determine which layers are regulatory. The ecological and social pressures are equally important. 
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
+
+Some goals have multiple elements due to subcategories like different multiple habitat types. This helps to ensure every goal can be applied to every region. 
 
 NOTE: It is convention to add a superscript to the pressure name that describes its category:
 * po=pollution
@@ -242,6 +245,7 @@ NOTE: It is convention to add a superscript to the pressure name that describes 
 * sp=alien species
 * fp=fishing pressure
 * cc=climate change
+* ss=social  
 
 <br>
 <br>
