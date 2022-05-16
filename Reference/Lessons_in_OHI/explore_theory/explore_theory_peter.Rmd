@@ -257,7 +257,7 @@ Which is more important: Ecological or Social pressures?
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
 
-**Different pressures affect different habitats that are factored into the coastal protection score.**
+**The various pressures differently affect the habitats that are factored into the coastal protection score (i.e. mangroves, coral reefs, seagrasses, kelp forests, salt marshes, and coastal sea ice.**
 
 NOTE: It is convention to add a superscript to the pressure name that describes its category:
 * po=pollution
