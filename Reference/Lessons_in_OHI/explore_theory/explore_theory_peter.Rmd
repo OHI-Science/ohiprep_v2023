@@ -192,7 +192,7 @@ QUESTION: What assumptions are we making by using this formulation of trend to c
 
 QUESTION: Can you think of any scenarios when we would not use 5 years of data to estimate trend?
 
-**If the trend in the previous five years was clearly nonlinear or non-monotonic. If we are aware of some recent change or event that will likely have a high impact on the score in the near future. If all five years of data were not available or reliable.**
+**If the trend in the previous five years was clearly nonlinear or non-monotonic. If all five years of data were not available or reliable.**
 
 
 ### Goal pressure and resilience
@@ -209,16 +209,55 @@ b. Classifying the pressure category for each data layer. The pressure dimension
 QUESTION: How many climate change pressures are there? 
 
 ```{r}
-press_categories <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressure_categories.csv")
+pressure_categories <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressure_categories.csv")
 ```
 
 **4 climate change pressures**
 
 c. Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others.  The relationship between the goals and the pressure variables is described here: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv
 
-QUESTION: Which pressure layers affect the FIS  subgoal?  How many regulatory pressure layers are there?  How many social layers are there?  Which is more important: Ecological or Social pressures? 
+QUESTION: Which pressure layers affect the FIS subgoal?
+
+```{r}
+pressures_matrix <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressures_matrix.csv")
+
+fis_pressures_df <- pressures_matrix %>% 
+  filter(goal == "FIS" )
+
+fis_pressure_layers <- fis_pressures_df[, !is.na(fis_pressures_df)] %>% 
+  select(-c("goal", "element", "element_name")) %>% 
+  names()
+```
+
+**The following pressure layers affect the FIS subgoal: `r fis_pressure_layers`**
+
+How many regulatory pressure layers are there?
+
+```{r}
+pressures_matrix %>% 
+  select(-c("goal", "element", "element_name")) %>% 
+  ncol()
+```
+
+**I was unable to find where the designation "regulatory pressure layers" was defined.**
+
+How many social layers are there?
+
+```{r}
+pressures_matrix[, stringr::str_detect(names(pressures_matrix), "ss_")] %>% 
+  names()
+```
+
+**There are two social pressures layers: "Weakness of governance" and "Weakness of social progress".**
+
+Which is more important: Ecological or Social pressures? 
+
+**Social and ecological pressures are of equal importance.**
+
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
+
+**Different pressures affect different habitats that are factored into the coastal protection score.**
 
 NOTE: It is convention to add a superscript to the pressure name that describes its category:
 * po=pollution
