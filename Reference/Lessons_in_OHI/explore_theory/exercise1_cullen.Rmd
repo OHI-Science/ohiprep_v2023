@@ -47,10 +47,10 @@ Tourism and Recreation | TR | 50
 
 NOTE: The abbreviations for subgoals have 3 letters and goals have 2 letters.
 
-<br>
 ```{r}
 (90 + (50 + 30)/2 + 20 + 95 + 60 + 80 + 85 + 100 + 10 + 50)/10
 ```
+<br>
 <br>
 
 4. Fill in the missing values.  
@@ -154,7 +154,8 @@ Find the Lasting Special Places function.  See if you can reconcile the model de
 
 8. The trend for the Tourism and Recreation goal for the United States is -0.15.  Describe what this means.
 
-This means that either tourism is decreasing, sustainability is decreasing, or possibly both.
+This means that Tourism and Recreation is projected to be reduced by 15% in five years and either tourism is decreasing, sustainability is decreasing, or possibly both.
+
 <br>
 <br>
 
@@ -177,7 +178,6 @@ Year  | Status
 ![](figures/trend_lm.jpg)
 
 The 0.027 value is the slope estimate, which is the average change in status per year estimated by the linear model.
-
 
 *STEP 2* Obtain proportional change by dividing the slope estimate by the earliest status value used in the linear model:
 
