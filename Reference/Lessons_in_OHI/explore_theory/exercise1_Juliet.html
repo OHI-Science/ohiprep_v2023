@@ -487,7 +487,7 @@ diff_score &lt;- round(diff_score, 2)</code></pre>
 <li><p>Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2). The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change). Each pressure data layer is assigned to a category in this file: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv</a></p></li>
 </ol>
 <p>QUESTION: How many climate change pressures are there?</p>
-<p><strong>Answer:</strong> There are 4 climate change pressures: cc_sst, cc_acid, cc_uv, cc_slr.</p>
+<p><strong>Answer:</strong> There are 4 climate change pressures: cc_sst (sea surface temperature), cc_acid (ocean acidification), cc_uv (UV radiation), cc_slr (sea level rise).</p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Pressure x goal weighting. Pressures have little or no effect on some goals, but huge effects on others. The relationship between the goals and the pressure variables is described here: <a href="https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv" class="uri">https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressures_matrix.csv</a></li>
 </ol>
@@ -507,11 +507,29 @@ diff_score &lt;- round(diff_score, 2)</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>pressure &lt;- read.csv(&quot;https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv&quot;)</code></pre>
-<p><strong>Answer:</strong> The pressure layers affecting the FIS subgoal are: 1. fp_art_hb 2. fp_art_lb 3. fp_com_hb 4. fp_com_lb 5. hd_intertidal 6. hd_subtidal_hb 7. hd_subtidal_sb 8. po_chemicals 9. po_nutrients 10. sp_alien 11. sp_genetic 12. ss_spi 13. ss_wgi</p>
+<pre class="r"><code>pressure &lt;- read_csv(&quot;https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/conf/pressures_matrix.csv&quot;) </code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   .default = col_double(),
+##   goal = col_character(),
+##   element = col_character(),
+##   element_name = col_character()
+## )
+## ℹ Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>pressure_FIS &lt;- pressure %&gt;% 
+  filter(goal == &quot;FIS&quot;) %&gt;% 
+  select(where(~ !any(is.na(.))))
+
+colnames(pressure_FIS)</code></pre>
+<pre><code>##  [1] &quot;goal&quot;           &quot;po_chemicals&quot;   &quot;po_nutrients&quot;   &quot;sp_alien&quot;      
+##  [5] &quot;sp_genetic&quot;     &quot;hd_subtidal_sb&quot; &quot;hd_subtidal_hb&quot; &quot;hd_intertidal&quot; 
+##  [9] &quot;fp_com_hb&quot;      &quot;fp_com_lb&quot;      &quot;fp_art_lb&quot;      &quot;fp_art_hb&quot;     
+## [13] &quot;ss_wgi&quot;         &quot;ss_spi&quot;</code></pre>
+<p><strong>Answer:</strong> The pressure layers affecting the FIS subgoal are “goal”, “po_chemicals”, po_nutrients”, “sp_alien”, “sp_genetic”, “hd_subtidal_sb”, “hd_subtidal_hb” “hd_intertidal” “fp_com_hb”, “fp_com_lb”, “fp_art_lb”, “fp_art_hb”, “ss_wgi”, and “ss_spi”. “fp_com_hb” is the most influential with a score of 3. This pressure layer represents high bycatch due to commercial fishing. By reading table 5.1, I learned that genetic escapes can come from fish or other aquaculture systems that are held in regions where the species are not native. The aquatic species can escape and become incipient invasive species. There are 2 social layers. I assume that the rest of the pressures are regulatory (pollution, habitat destruction, fishing pressure, alien species, and goal), so that leaves 12. Ecological and social pressures are weighted equally.</p>
 <p>QUESTION: Some goals, like Coastal Protection, have multiple “elements”. Why?</p>
-<p>NOTE: It is convention to add a superscript to the pressure name that describes its category: * po=pollution * hd=habitat destruction * sp=alien species * fp=fishing pressure * cc=climate change</p>
-<p><br> <br></p>
+<p>NOTE: It is convention to add a superscript to the pressure name that describes its category: * po = pollution * hd = habitat destruction * sp = alien species * fp = fishing pressure * cc = climate change * ss = social</p>
+<p><strong>Answer:</strong> Elements separate categories within certain goals, such as types of habitat that offer coastal protection. Each habitat (goal element) is ranked based on their protective strength. There are also elements within the livelihood goal. These elements can be weighted differently when we sum the pressures.</p>
 <ol start="11" style="list-style-type: decimal">
 <li>Similar to the pressures dimension, resilience plays a relatively small role in goal scores (see figure 4.1) but still takes a lot of effort.</li>
 </ol>
