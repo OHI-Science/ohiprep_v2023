@@ -183,6 +183,12 @@ raster::raster(file.path(dir_M, sprintf("git-annex/globalprep/mar_prs_population
 stopCluster(cl)
 closeAllConnections()
 
+
+# test <- raster(file.path("/home/shares/ohi/git-annex/globalprep/mar_prs_population/v2020/int/human_density_2020_mol.tif"))
+# plot(test)
+# 
+# test2 <- raster::select(test)
+# plot(test2)
 ```
 
 ## Interpolate between Years
