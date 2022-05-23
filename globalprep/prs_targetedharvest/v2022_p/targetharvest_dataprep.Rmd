@@ -171,7 +171,7 @@ MISSING in the lookup the following species in target='whale'.
 
 ```{r, eval=FALSE}
 
-# pivot wider spread to expand years
+# pivot wider to expand years
 wide = target_spp %>%
   tidyr::pivot_wider(names_from = year, values_from = value) %>%
   dplyr::left_join(sp2grp, by = 'species'); head(wide)
