@@ -1,6 +1,6 @@
 ## Ocean Health Index: Pressure Targeted Harvest of Cetaceans and Marine Turtles 
 
-Information about calculation of [Targeted Harvest Pressure](http://ohi-science.github.io/ohiprep_v2021/globalprep/prs_targetedharvest/v2022/targetharvest_dataprep.html).
+Information about calculation of [Targeted Harvest Pressure](http://ohi-science.github.io/ohiprep_v2022/globalprep/prs_targetedharvest/v2022/targetharvest_dataprep.html).
 
 ## Layers Created
 * fao_targeted.csv
