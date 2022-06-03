@@ -26,11 +26,11 @@ This layer preparation script does the following for newly available SLR data.
 - Sets to zero all negative values, indicating decreases in mean sea level
 - Resamples raster to ~ 1km^2^ and reproject to Molleweide
 
-This process is completed entirely within this script. The raw data is downloaded externally and held on a server at NCEAS. Although the raw data is not provided, this script can be used on the data downloaded from Aviso [here](http://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/msla-mean-climatology.html). You will need to register with Aviso in order to get a username and password for data access.
+This process is completed entirely within this script. The raw data is downloaded externally and held on a server at NCEAS. Although the raw data is not provided, this script can be used on the data downloaded from Aviso [here](https://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/gridded-sea-level-anomalies-mean-and-climatology.html#c10358). You will need to register with Aviso in order to get a username and password for data access.
 
 # Updates from previous assessment
 
-One additional year of data, 2018, was added. 
+One additional year of data, 2019, was added. 
 
 ***
 
@@ -38,13 +38,13 @@ One additional year of data, 2018, was added.
 
 The source data are monthly mean sea level anomalies, in meters. These anomalies are calculated by subtracting the current absolute sea level for each month from the average sea level for that month calculated from 1993 - 2012.
 
-**Reference**: The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](http://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/msla-mean-climatology.html)  
+**Reference**: The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](https://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/gridded-sea-level-anomalies-mean-and-climatology.html#c10358)  
 **Downloaded**: August 10, 2021  
-**Description**: Monthly mean sea level anomaly (meters above mean sea level)   
+**Description**: Monthly mean sea level anomaly (meters above mean sea level) (msla_h)
 **Native data resolution**: 0.25 degree grid cells   
 **Time range**: January 1993 - December 2019
 **Format**: NetCDF   
-**Citation information**  The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](http://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/msla-mean-climatology.html)
+**Citation information**  The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](https://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/gridded-sea-level-anomalies-mean-and-climatology.html#c10358)
 
  
 ***
@@ -100,7 +100,7 @@ ocean <- raster(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif")
 
 ## Download the New Data
 
-These chunks can be used to download the data from AVISO. You will need an AVISO account to do this. If you want to view the files to see if a full previous year of data is available to download, go here: ftp://ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean
+These chunks can be used to download the data from AVISO. You will need an AVISO account to do this. If you want to view the files to see if a full previous year of data is available to download, go here: https://tds.aviso.altimetry.fr/thredds/catalog/dataset-duacs-climatology-global/delayed-time/monthly_mean/msla_h/catalog.html
 
 or here: ftp://yourlogin@ftp-access.aviso.altimetry.fr/climatology
 
