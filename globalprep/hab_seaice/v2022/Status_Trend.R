@@ -22,7 +22,7 @@ for (p in poles){
   ## pts = points data of OHI regions, NSIDC type of land cover, and data extracted from each NSIDC ice layer
   load(file = file.path(dir_M, 
                         sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce/%s/%s_rasters_points.rdata", 
-                                assessYear, p)))
+                                assess_year, p)))
   
   ## using the reference rasters ("l") for the north and south pole 
   r = raster(s,l) # select the "l" (i.e., reference) raster layer from the stack
@@ -44,7 +44,7 @@ for (p in poles){
   r.rgn[r.typ < 2] = NA # exclude: land(0), coast(1) from the regions
   
   ## plot data
-  png(file.path(here(), "globalprep/hab_seaice", assessYear, sprintf("int/%s_IceEdgeHabitat_overview.png",p)), width=w, height=h)
+  png(file.path(here(), "globalprep/hab_seaice", assess_year, sprintf("int/%s_IceEdgeHabitat_overview.png",p)), width=w, height=h)
   par(mfcol=c(2,2))
   plot(r.typ, col=rev(topo.colors(length(unique(r.typ)))), main="Pixel Type\n(0=land,1=coast,2=shore,3=water,4=hole)")
   plot(r.ice, col=tim.colors(64), main=sprintf("Ice Concentration (%s)",l))
@@ -204,9 +204,9 @@ for (p in poles){
   names(z.h.T)[names(z.h.T) == "zone"] = "rgn_id"    
   names(z.p.T)[names(z.p.T) == "zone"] = "rgn_id"
   
-  write.csv(z.h.T, file.path(here(), "globalprep/hab_seaice", assessYear, sprintf("int/%s_IceEdgeHabitat_ref%sto%s.csv", p, 
+  write.csv(z.h.T, file.path(here(), "globalprep/hab_seaice", assess_year, sprintf("int/%s_IceEdgeHabitat_ref%sto%s.csv", p, 
                            min(ref.years), max(ref.years))), row.names = FALSE)
-  write.csv(z.p.T, file.path(here(), "globalprep/hab_seaice", assessYear, sprintf("int/%s_IceShoreProtection_ref%sto%s.csv", p, 
+  write.csv(z.p.T, file.path(here(), "globalprep/hab_seaice", assess_year, sprintf("int/%s_IceShoreProtection_ref%sto%s.csv", p, 
                            min(ref.years), max(ref.years))), row.names = FALSE) 
   
 }

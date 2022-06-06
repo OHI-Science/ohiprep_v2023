@@ -165,9 +165,8 @@ E-mail: nsidc@nsidc.org
 Load all relevant libraries, establish/define parameters and commonly used pathnames. Manually change scenario and data years in file pathnames code chunk to reflect the most recent data (d) and current assessment year (v) in setup code chunk.
 
 ```{r setup, eval=FALSE}
-
 ## Install R packages where necessary
-pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here") # "fields" for colors in Status_Trend.R
+pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc") # "fields" for colors in Status_Trend.R
 new.pkg <- pkg[!(pkg %in% installed.packages())]
 if (length(new.pkg)){install.packages(new.pkg)}
 if (!("ohicore" %in% installed.packages())){devtools::install_github("ohi-science/ohicore")}
@@ -227,9 +226,9 @@ i.pym = 0
 Collects the data for each month/year from mazu and add to raster stack that is saved in tmp folder as: `n_rasters_points.rdata` or `s_rasters_points.rdata`. And, if it doesn't already exist, it converts the region shapefile into a raster points file. See `ObtainingData.R` script for more details.
 
 ```{r function 1: source obtaining data script, eval=FALSE}
-
+tic()
 source("ObtainingData.R") ## UPDATE some file paths with the correct assessment year in ObtainingData.R
-
+toc()
 ## should take ~30 minutes to completely run 
 
 ```
@@ -241,10 +240,10 @@ Using the data from the .rdata files created from Function 1 with the `Obtaining
 * Coastal Protection: `n_IceShoreProtection.csv`, `s_IceShoreProtection.csv`
 
 ```{r function 2: source status trend script, eval=FALSE}
-
+tic()
 ref.years <- 1979:2000
 source("Status_Trend.R") # calculates status and trend for shoreline ice and ice edge habitat
-
+toc()
 ```
 
 ## Final calculations and organization
@@ -331,13 +330,13 @@ abline(0, 1, col="red")
 ### let's compare the data year 2020 to data year 2019
 
 health_2020 <- health %>%
-  filter(year == current_year)
+  dplyr::filter(year == current_year-1)
 
 health_2019 <- ice_health_eez %>%
-  filter(year == last_year) %>%
+  dplyr::filter(year == last_year-1) %>%
   dplyr::select(-year, -health)
 
-health_old_new <- left_join(health_2020, health_2019)
+health_old_new <-  dplyr::left_join(health_2020, health_2019)
 
 plot(health_old_new$health_prev_assess, health_old_new$health)
 abline(0, 1, col="red") ## ok makes more sense to me now 
@@ -354,10 +353,10 @@ abline(0, 1, col="red")
 ### let's compare the data year 2020 to data year 2019
 
 trend_2020 <- trend %>%
-  filter(year == 2020)
+  filter(year == current_year -1)
 
 trend_2019 <- ice_trend_eez %>%
-  filter(year == 2019) %>%
+  filter(year == previous_year -1) %>%
   dplyr::select(-year, -trend)
 
 trend_old_new <- left_join(trend_2020, trend_2019)
