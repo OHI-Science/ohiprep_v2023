@@ -328,6 +328,32 @@ outlier_country <- long %>%
   dplyr::summarize(value = sum(value)) %>% 
   dplyr::filter(country == out_country, year >= 2000) 
 
+
+region_data() ## read in regions 
+
+
+new <- readr::read_csv(here("globalprep", "prs_targetedharvest", paste0('v', version_year), "output", "fao_targeted.csv")) %>% 
+  dplyr::filter(year == 2020) %>%
+  dplyr::select(-year)
+
+old <- readr::read_csv(here("globalprep", "prs_targetedharvest", paste0('v', version_year - 1), "output", "fao_targeted.csv")) %>%
+  dplyr::filter(year == common_year) %>%
+  dplyr::select(-year) %>%
+  dplyr::select(rgn_id, pressure_score_2019 = pressure_score) %>%
+  dplyr::left_join(new, by = c("rgn_id")) %>%
+  dplyr::rename(pressure_score_2020 = pressure_score) %>%
+  left_join(rgns_eez)
+  
+
+# Compare pressure_score between last year and this year's assessments
+compare_plot <- ggplot(data = old, aes(x = pressure_score_2019, y = pressure_score_2020, label = rgn_name)) +
+  geom_point() +
+  geom_abline(color = "red")
+
+plot(compare_plot)
+ggplotly(compare_plot)
+
+
 ```
 
 
