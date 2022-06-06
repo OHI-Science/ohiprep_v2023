@@ -122,7 +122,7 @@ If you don't want to go through the trouble of running the download process in R
 ```{r login_info, eval=FALSE}
 # This layer lags by 2 years unfortunately, since we need a full year of data. 
 
-## need AVISO username and password, define in console when prompted, don't save here!!
+## need AVISO username and password, define the following line of code in console (as is), then when prompted, enter the username and password string, don't save the login information here in the script
 ## if either password or username contain the @ symbol, replace with '%40' (percent-encoding for reserved characters)
 userpasswd <- readline("Type AVISO username and password, separated by colon no space:") 
 
@@ -137,20 +137,20 @@ year <- 2020 # data year to download; lags by 2 years, since 2021 only goes to m
 months <- str_pad(1:12, 2, pad = "0") #if they upload the rest just change the numbers here to reflect rest of months
 
 ## download data from FTP and collect each month/year in raster stack
-# if you are connecting through cyberduck, the following string is what you enter for the server
+## if you are connecting to the data source through cyberduck rather than this script, the following string is what you enter for the server
 url <- "ftp://ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h"
-ub <- sprintf("ftp://%s@%s", userpasswd, substr(url, 7, 87)) # here, substr extracts the url string characters 7 thru 87, which is everything in the object url after "ftp://"
+ub <- sprintf("ftp://%s@%s", userpasswd, substr(url, 7, 87)) # here, substr extracts the url string characters 7-87, which encompasses everything in the object url after "ftp://"
 # ub = "ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h"
 
 ## download is quite fast, takes less that 3 minutes for 12 files
 for (mo in months){ 
    #mo="01" # for testing
   
-  ## retrieve the data (compressed, gzipped files)
+  ## retrieve the data (compressed, gzipped files prior to 2020 data, and just .cv files starting with 2020 data)
   # sprintf() contains %s in two places, which represent the two spots that will get filled with the two strings specified in the following arguments `ub` and `mo`
-  u <- sprintf("%s/dt_global_allsat_msla_h_y2020_m%s.nc.gz", ub, mo)
+  u <- sprintf("%s/dt_global_allsat_msla_h_y2020_m%s.nc", ub, mo)
   # within dir_anx_aviso, create new folder for this scenario year of data so the following line runs, name the folder d20??
-  u_filename <- file.path(dir_anx_aviso, paste0("d", scen_year), substr(u, 115, 155)) #updated 2020 to include full filename
+  u_filename <- file.path(dir_anx_aviso, paste0("/d", scen_year, "/test/"), substr(u, 121, 153)) #updated script in 2020 to include full filename
   res <- httr::GET(u, write_disk(u_filename))
 }
 closeAllConnections()
@@ -158,22 +158,25 @@ closeAllConnections()
 # juliet's notes when trying to change code to pull files:
 
 # ub = path to folder from which we retreive data, which is the server path with userpasswd and folder that contains all files:
-# ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h
+# "ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h"
 
 # u = path to data file (which includes path to folder (ub)
-# ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h +
+# "ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h" +
 # /dt_global_allsat_msla_h_y2020_m +
 # mo (ranges from 01 -12) +
-# .nc.gz
+# .nc
 
 # check total number of characters in u to count backwards instead of counting forwards 
-#nchar("ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/dt_global_allsat_msla_h_y2020_m01.nc.gz") # 131
+#nchar("ftp://clawson%40nceas.ucsb.edu:pMfKED@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/dt_global_allsat_msla_h_y2020_m01.nc.gz") # 152
+
+#nchar("ftp://clawson%40nceas.ucsb.edu:pMfKED@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h") # 119
 
 # substr(u, 115, 155)) = _y2020_m01.nc.gz (for first month) meaning this is the subset of the string to be replaced or this is the subset of the string that becomes the filename in the folder? It is hard to tell because I am unsure if last year's fellow extracted the files via cyberduck or with this code, which might result in diff file names 
 
-# file.path: dir_M +
-# git-annex/globalprep/_raw_data/AVISO_slr/d2022/ +
-# _y2020_m01.nc.gz (for first month)
+# file.path:
+# "/home/shares/ohi/git-annex/globalprep/_raw_data/AVISO_slr"
+# "/d2022/test/" +
+# _y2020_m01.nc (for first month)
 
 # to pick up next shift: re-running userpasswrd to define in console right before running loop got rid of the error that said access denied, the error that resulted is  Error: Path exists and overwrite is FALSE, not sure how to fix that issue, might have to move current files (that were pulled from cyberduck) to other folder (within d2022 should be fine) so the file names are not in the directory the loop tries to populate
 # i am suspicious that the way i am running userpasswd in the console is wrong? I run it and then hit enter again and I think it works...
@@ -182,12 +185,13 @@ closeAllConnections()
 
 Unzip the files you've just downloaded: 
 ```{r, eval = FALSE}
-zipfiles <- list.files(file.path(dir_anx_aviso, paste0("d", scen_year)),
-                       full.names = TRUE, pattern = "*nc.gz")
-for(zipfile in zipfiles){
-  message("Unzipping file: ", zipfile)
-  R.utils::gunzip(zipfile, remove = TRUE, skip = TRUE)
-}
+# since the source changed the file types this year from nc.gz to just nc, we do not have to unzip them starting with 2022
+# zipfiles <- list.files(file.path(dir_anx_aviso, paste0("d", scen_year)),
+#                        full.names = TRUE, pattern = "*nc.gz")
+# for(zipfile in zipfiles){
+#   message("Unzipping file: ", zipfile)
+#   R.utils::gunzip(zipfile, remove = TRUE, skip = TRUE)
+# }
 ```
 
 
