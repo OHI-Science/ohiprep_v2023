@@ -30,7 +30,8 @@ This process is completed entirely within this script. The raw data is downloade
 
 # Updates from previous assessment
 
-One additional year of data, 2020, was added. 
+- One additional year of data, 2020, was added. 
+- The data source's file path changed slightly, so this script was updated for the file paths in `sprintf()` and `sub-str()`
 
 ***
 
@@ -89,7 +90,9 @@ scen_year <- 2022 # change to reflect assessment year!
 dir_anx_aviso <- file.path(dir_M, "git-annex/globalprep/_raw_data/AVISO_slr") # raw data file path
 dir_prs_slr <-  sprintf("%s/git-annex/globalprep/prs_slr/v%s", dir_M, scen_year)
 
-p4s_wgs84 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" # proj4string
+#p4s_wgs84 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" # proj4string, need 
+# might need to update crs string because switching from raster pkg to terra pkg and an error is resulting with terra::project() downstream
+
 cols <- rev(colorRampPalette(brewer.pal(9, "Spectral"))(255)) # rainbow color scheme for maps
 
 # new workflow this year, integrating the terra package instead of raster package
@@ -103,21 +106,32 @@ mollCRS <- CRS("+proj=moll") # mollweide projection
 ocean_raster <- raster::raster(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif"))
 # using terra package
 ocean_terra <- terra::rast(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif"))
+```
 
-# give the raster values before converting to a df (i THINK this is necessary for terra pkg)
-terra::values(ocean_terra) <- 1:ncell(ocean_terra)
+```{r}
+# check that raster() and rast() do the same thing
+ocean_raster
+
+plot(ocean_raster)
+```
+```{r}
+ocean_terra
+
+plot(ocean_terra)
 ```
 
 
 ## Download the New Data
 
-These chunks can be used to download the data from AVISO. You will need an AVISO account to do this. If you want to view the files to see if a full previous year of data is available to download, go here: https://tds.aviso.altimetry.fr/thredds/catalog/dataset-duacs-climatology-global/delayed-time/monthly_mean/msla_h/catalog.html
+These chunks can be used to download the data from AVISO. You will need an AVISO account to do this, it might take a few days for the account to be active, or use the account of a prior fellow.
+
+If you want to view the files to see if a full previous year of data is available to download, go here: https://tds.aviso.altimetry.fr/thredds/catalog/dataset-duacs-climatology-global/delayed-time/monthly_mean/msla_h/catalog.html
 
 or here: ftp://yourlogin@ftp-access.aviso.altimetry.fr/climatology
 
 And you will be prompted to either open up a FTP application, like Cyberduck, or to just plug in your username and password.
 
-If you don't want to go through the trouble of running the download process in R, you can do it manually by just click-and-drag between two cyberduck-2 browsers (I found this method to be much quicker and easier). 
+If you don't want to go through the trouble of running the download process in R, you can do it manually by just click-and-drag between two cyberduck-2 browsers. 
 
 ```{r login_info, eval=FALSE}
 # This layer lags by 2 years unfortunately, since we need a full year of data. 
@@ -125,12 +139,10 @@ If you don't want to go through the trouble of running the download process in R
 ## need AVISO username and password, define the following line of code in console (as is), then when prompted, enter the username and password string, don't save the login information here in the script
 ## if either password or username contain the @ symbol, replace with '%40' (percent-encoding for reserved characters)
 userpasswd <- readline("Type AVISO username and password, separated by colon no space:") 
-
 ```
 
-
+Define file paths for data download:
 ```{r download_data, eval=FALSE}
-
 ## there is a 'download_data.R' script in the Mazu raw data folder but that routine was not working for me...
 
 year <- 2020 # data year to download; lags by 2 years, since 2021 only goes to may as of now... v2022
@@ -140,17 +152,19 @@ months <- str_pad(1:12, 2, pad = "0") #if they upload the rest just change the n
 ## if you are connecting to the data source through cyberduck rather than this script, the following string is what you enter for the server
 url <- "ftp://ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h"
 ub <- sprintf("ftp://%s@%s", userpasswd, substr(url, 7, 87)) # here, substr extracts the url string characters 7-87, which encompasses everything in the object url after "ftp://"
-# ub = "ftp://userpasswd@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h"
+```
 
-## download is quite fast, takes less that 3 minutes for 12 files
+Pull monthly files from the source into the data directory:
+```{r}
+## download is quite fast, takes just a minute for 12 files
 for (mo in months){ 
    #mo="01" # for testing
   
-  ## retrieve the data (compressed, gzipped files prior to 2020 data, and just .cv files starting with 2020 data)
+  ## retrieve the data (compressed, gzipped files prior to 2020 data, and just .nc files starting with 2020 data)
   # sprintf() contains %s in two places, which represent the two spots that will get filled with the two strings specified in the following arguments `ub` and `mo`
   u <- sprintf("%s/dt_global_allsat_msla_h_y2020_m%s.nc", ub, mo)
   # within dir_anx_aviso, create new folder for this scenario year of data so the following line runs, name the folder d20??
-  u_filename <- file.path(dir_anx_aviso, paste0("/d", scen_year, "/test/"), substr(u, 121, 153)) #updated script in 2020 to include full filename
+  u_filename <- file.path(dir_anx_aviso, paste0("d", scen_year), substr(u, 121, 156)) # this directs the file into the correct data folder (d202?) and names the file with the value of substr(u, 121, 156)
   res <- httr::GET(u, write_disk(u_filename))
 }
 closeAllConnections()
@@ -165,27 +179,10 @@ closeAllConnections()
 # /dt_global_allsat_msla_h_y2020_m +
 # mo (ranges from 01 -12) +
 # .nc
-
-# check total number of characters in u to count backwards instead of counting forwards 
-#nchar("ftp://clawson%40nceas.ucsb.edu:pMfKED@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/dt_global_allsat_msla_h_y2020_m01.nc.gz") # 152
-
-#nchar("ftp://clawson%40nceas.ucsb.edu:pMfKED@ftp-access.aviso.altimetry.fr/climatology/global/delayed-time/monthly_mean/msla_h") # 119
-
-# substr(u, 115, 155)) = _y2020_m01.nc.gz (for first month) meaning this is the subset of the string to be replaced or this is the subset of the string that becomes the filename in the folder? It is hard to tell because I am unsure if last year's fellow extracted the files via cyberduck or with this code, which might result in diff file names 
-
-# file.path:
-# "/home/shares/ohi/git-annex/globalprep/_raw_data/AVISO_slr"
-# "/d2022/test/" +
-# _y2020_m01.nc (for first month)
-
-# to pick up next shift: re-running userpasswrd to define in console right before running loop got rid of the error that said access denied, the error that resulted is  Error: Path exists and overwrite is FALSE, not sure how to fix that issue, might have to move current files (that were pulled from cyberduck) to other folder (within d2022 should be fine) so the file names are not in the directory the loop tries to populate
-# i am suspicious that the way i am running userpasswd in the console is wrong? I run it and then hit enter again and I think it works...
-# note: I am not sure why this code ends the files in gz, they do not appear to end in gz on the website for any year, maybe when we pull the files in with this code it automatically converts them to gz, which results in the need to unzip in the next chunk?
 ```
 
-Unzip the files you've just downloaded: 
+Unzip the files you've just downloaded, if the data is prior to 2020:  
 ```{r, eval = FALSE}
-# since the source changed the file types this year from nc.gz to just nc, we do not have to unzip them starting with 2022
 # zipfiles <- list.files(file.path(dir_anx_aviso, paste0("d", scen_year)),
 #                        full.names = TRUE, pattern = "*nc.gz")
 # for(zipfile in zipfiles){
@@ -193,7 +190,7 @@ Unzip the files you've just downloaded:
 #   R.utils::gunzip(zipfile, remove = TRUE, skip = TRUE)
 # }
 ```
-
+2020 data is stored in the source as unzipped .nc files, so the above code chunk was not necessary. This is likely the case for future years.
 
 ## Data Prep
 
@@ -204,7 +201,7 @@ All NetCDF files for each month are rasterized.
 ```{r clip, eval=FALSE}
 
 ## d2016/msla_monthly_mean has data for 1993-2015
-## then include list.files for d2017 through the data folder for current scenario year
+## also include list.files for d2017 through the data folder for current scenario year
 nc_files <- c(list.files(file.path(dir_anx_aviso, "d2022"),
                        full.names = TRUE, pattern = ".nc"),
               list.files(file.path(dir_anx_aviso, "d2021"),
@@ -218,35 +215,80 @@ nc_files <- c(list.files(file.path(dir_anx_aviso, "d2022"),
               list.files(file.path(dir_anx_aviso, "d2016/msla_monthly_mean"),
                       full.names = TRUE, pattern = ".nc"))
 
+# Note: file paths within object nc_files is inconsistent across years due to how data is stored by the source:
+# files for years 1993 - 2015 are named as the following:
+# "/home/shares/ohi/git-annex/globalprep/_raw_data/AVISO_slr/d2016/msla_monthly_mean/dt_global_allsat_msla_h_y1993_m01.nc"
+# files for years 2016 - 2020 are named as the following:
+# "/home/shares/ohi/git-annex/globalprep/_raw_data/AVISO_slr/d2017/dt_global_allsat_msla_h_y2016_m12.nc"
+# but this is not an issue 
 ```
 
 The raw monthly data looks like this:
-
 ```{r test_plot_raw, eval=FALSE}
 # using raster package
 # removed axes = F arg
-plot_raster_pkg <- plot(raster(nc_files[3]), col = cols, 
+plot(raster(nc_files[3]), col = cols, 
      main = paste("Year", substr(nc_files[3], 90, 93), "Month", substr(nc_files[3], 96, 97)))
 
 # compare to rast() in the terra package
 # removed axes = F arg
-plot_rast_terra <- plot(rast(nc_files[3]), col = cols, 
+plot(rast(nc_files[3]), col = cols, 
      main = paste("Year", substr(nc_files[3], 90, 93), "Month", substr(nc_files[3], 96, 97))) 
 ```
+
 
 ```{r}
 # the rasters look the same, but let's compare the two rasters as dataframes and compare their values
 # compare ocean_raster to ocean_terra
-#ocean_raster_df <- as.data.frame(ocean_raster)
-#ocean_terra_df <- as.data.frame(ocean_terra)
+#raster_y2020_m03_df <- as.data.frame(raster_y2020_m03, xy = TRUE)
+# explore vaues
+#colnames(raster_y2020_m03_df)
+#unique(raster_y2020_m03_df$Averaged.Sea.Level.Anomalies.2020.03)
+# this col has a lot of NA's but does have a large range of real numeric values
+# determine how many NA's
+#sum(is.na(raster_y2020_m03_df$Averaged.Sea.Level.Anomalies.2020.03))
+
+#terra_y2020_m03_df <- as.data.frame(terra_y2020_m03, xy = TRUE)
+#sum(is.na(terra_y2020_m03_df$sla))
+
+# set fill scale limits based on raster values, from 0 to at least 1
+#ocean_terra_lim <- terra::minmax(ocean_terra)
 
 # maybe convert them to a matrix before a df
 # ocean_raster_matrix <- as.matrix(ocean_raster)
 # ocean_terra_matrix <- as.matrix(ocean_terra)
-# ocean_raster_df <- as.data.frame(ocean_raster)
-# ocean_terra_df <- as.data.frame(ocean_terra)
 ```
 
+```{r}
+# define the raster as an obj to compare between packages
+raster_y2020_m03 <- raster::raster(nc_files[3])
+
+# define the raster as an obj to compare between packages
+terra_y2020_m03 <- terra::rast(nc_files[3])
+
+raster_y2020_m03_df <- terra::as.data.frame(raster_y2020_m03, xy = TRUE, na.rm = FALSE)
+terra_y2020_m03_df <- terra::as.data.frame(terra_y2020_m03, xy = TRUE, na.rm = FALSE)
+
+true_false_df <- base::as.data.frame(raster_y2020_m03_df == terra_y2020_m03_df) # all values are NA or TRUE, no FALSE values in any column
+
+# determine if the values need to be set for both raster and terra before converting to a df
+#raster::values(raster_y2020_m03) <- 1:ncell(raster_y2020_m03)
+#terra::values(terra_y2020_m03) <- 1:ncell(terra_y2020_m03)
+
+#raster_y2020_m03_mtx <- as.matrix(raster_y2020_m03)
+#terra_y2020_m03_mtx <- as.matrix(terra_y2020_m03)
+
+#raster_y2020_m03_df <- as.data.frame(raster_y2020_m03, xy = TRUE)
+# explore vaues
+#colnames(raster_y2020_m03_df)
+#unique(raster_y2020_m03_df$Averaged.Sea.Level.Anomalies.2020.03)
+# this col has a lot of NA's but does have a large range of real numeric values
+# determine how many NA's
+#sum(is.na(raster_y2020_m03_df$Averaged.Sea.Level.Anomalies.2020.03))
+
+#terra_y2020_m03_df <- as.data.frame(terra_y2020_m03, xy = TRUE)
+#sum(is.na(terra_y2020_m03_df$sla))
+```
 
 The following code is used to:
 
@@ -258,25 +300,26 @@ The output is saved in the folder `int/msla_monthly`
 ```{r, eval = F}
 # THIS IS THE OLD WAY, USING RASTER::RASTER() INSTEAD OF TERRA::RAST()
 
-# registerDoParallel(10)
-# 
-# ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
-# foreach(file = nc_files) %dopar% {
-#   
-#   m_yr <- substr(file, nchar(file)-10, nchar(file)-3)
-#   
-#   ## read in month raster
-#   r <- raster(file) %>%
-#     rotate()
-#   
-#   ## define projection of the raster before reprojecting
-   raster::projection(r) <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-#   
-#   ## write raster to int folder in prs_slr
-#   fp <- sprintf("%s/int/msla_monthly/msla_monthly_%s.tif", dir_prs_slr, m_yr)
-#   writeRaster(r, filename = fp, overwrite = TRUE)
-# }
+registerDoParallel(10)
 
+ ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
+ foreach(file = nc_files) %dopar% {
+
+   m_yr <- substr(file, nchar(file)-10, nchar(file)-3)
+
+   ## read in month raster
+   r <- raster::raster(file) %>%
+     rotate()
+
+   ## define projection of the raster before reprojecting
+   raster::projection(r) <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+
+   ## write raster to int folder in prs_slr
+   fp <- sprintf("%s/int/msla_monthly/msla_monthly_%s.tif", dir_prs_slr, m_yr)
+   raster::writeRaster(r, filename = fp, overwrite = TRUE)
+ }
+# this chunk worked, but now I have to get the next chunk to work since we are transitioning from raster to terra
+# check on the many warnings that result from this chunk (check if they result from the terra approach too)
 ```
 
 ```{r, eval = F}
@@ -286,18 +329,19 @@ registerDoParallel(10)
 ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
 foreach(file = nc_files) %dopar% {
   
-  m_yr <- substr(file, nchar(file)-10, nchar(file)-3)
+  m_yr <- substr(file, nchar(file)-10, nchar(file)-3) # m_yr value example: "2015_m12"
   
   ## read in month raster
   r <- terra::rast(file) %>%
     rotate()
   
   ## define projection of the raster before reprojecting
+  new_crs <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
   terra::project(r, "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0") 
   
   ## write raster to int folder in prs_slr
-  fp <- sprintf("%s/int/msla_monthly/msla_monthly_%s.tif", dir_prs_slr, m_yr)
-  writeRaster(r, filename = fp, overwrite = TRUE)
+  fp <- sprintf("%s/int/msla_monthly/msla_monthly_%s.tif", dir_prs_slr, m_yr) 
+  terra::writeRaster(r, filename = fp, overwrite = TRUE)
 }
 
 ```
