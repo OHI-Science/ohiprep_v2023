@@ -1,0 +1,39 @@
+---
+title: "Prep gapfilling data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(here)
+
+set.seed(22774)
+
+tmp <- data.frame(country=c(1:100), 
+                  ecoregion=rep(c("A", "B"), each=50), 
+                  indicatorA = rnorm(100, 8, sd=1), 
+                  indicatorB = rnorm(100, 9, sd=0.5),
+                  indicatorC = c(rnorm(50, 2, sd=1), rnorm(50, 8, sd=0.5)))
+
+tmp <- tmp %>%
+  mutate(indicatorA = ifelse(indicatorA>10, 10, indicatorA),
+         indicatorB = ifelse(indicatorB>10, 10, indicatorB),
+         indicatorC = ifelse(indicatorC > 10, 10, indicatorC),
+         indicatorC = ifelse(indicatorC < 0, 0, indicatorC))
+
+
+NAs <- sample(1:100, 40, replace=FALSE)
+
+tmp$indicatorC[NAs] <- NA
+
+write_csv(tmp, here("Reference/gapfilling/gf_explore.csv"))
+
+```
+
+In this case, the index is calculated as the average of indicatorA, indicatorB, indicatorC.
+Try calculating the index without gapfilling the missing data. Explore the results by plotting.
+
+```{r}
+
+
+```
