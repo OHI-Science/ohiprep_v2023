@@ -85,7 +85,7 @@ __Option 1 - Python__
   
   - `mv ./*s.bin ./south`
   
-8. Your files should be in the correct place and you may proceed to the methods section of this 
+8. Your files should be in the correct place and you may proceed to the methods section of this workflow
 
 __Option 2 - Order Files__
 
@@ -166,7 +166,7 @@ Load all relevant libraries, establish/define parameters and commonly used pathn
 
 ```{r setup, eval=FALSE}
 ## Install R packages where necessary
-pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc") # "fields" for colors in Status_Trend.R
+pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc", "dplyr") # "fields" for colors in Status_Trend.R
 new.pkg <- pkg[!(pkg %in% installed.packages())]
 if (length(new.pkg)){install.packages(new.pkg)}
 if (!("ohicore" %in% installed.packages())){devtools::install_github("ohi-science/ohicore")}
@@ -192,7 +192,7 @@ These maps of the OHI regions were made by the PreparingSpatialFiles.R script. I
 
 The original polygon files are used from: git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2015. However, we use the `fasterize` package to rasterize the polygons and save them to: git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2020. 
 
-```{r define file path to ohi region maps (polygons)}
+```{r define file path to ohi region maps (polygons), eval=FALSE}
 maps <- file.path(dir_M, "git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_year)
 ```
 
@@ -227,10 +227,11 @@ Collects the data for each month/year from mazu and add to raster stack that is 
 
 ```{r function 1: source obtaining data script, eval=FALSE}
 tic()
-source("ObtainingData.R") ## UPDATE some file paths with the correct assessment year in ObtainingData.R
+## Previously (<2022) update to some file paths with the correct assessment year in ObtainingData.R was needed
+## Currently (2022) this is automatic from this script with `assess_year` variable
+source("ObtainingData.R") 
 toc()
 ## should take ~30 minutes to completely run 
-
 ```
 
 ## Function 2
@@ -317,7 +318,6 @@ write.csv(extent, "output/hab_ice_extent_eez.csv", row.names = FALSE) # save sea
 2. Pair with region names for sanity check.
 
 ```{r data checks, eval=FALSE}
-
 ## Health comparison
 health <- read.csv("output/hab_ice_health_eez.csv")
 ice_health_eez <- read.csv(sprintf("../%s/output/hab_ice_health_eez.csv", previous_year)) %>% # compare to last year's data
@@ -353,13 +353,13 @@ abline(0, 1, col="red")
 ### let's compare the data year 2020 to data year 2019
 
 trend_2020 <- trend %>%
-  filter(year == current_year -1)
+  dplyr::filter(year == (current_year - 1))
 
 trend_2019 <- ice_trend_eez %>%
-  filter(year == previous_year -1) %>%
+  dplyr::filter(year == last_year -1) %>%
   dplyr::select(-year, -trend)
 
-trend_old_new <- left_join(trend_2020, trend_2019)
+trend_old_new <- dplyr::left_join(trend_2020, trend_2019)
 
 plot(trend_old_new$trend_prev_assess, trend_old_new$trend)
 abline(0, 1, col="red") ## ok makes more sense to me now 
@@ -378,7 +378,7 @@ extent_2020 <- extent
 
 extent_2019 <- ice_extent_eez
 
-extent_old_new <- left_join(extent_2020, extent_2019)
+extent_old_new <- dplyr::left_join(extent_2020, extent_2019)
 
 plot(extent_old_new$km2_prev_assess, extent_old_new$km2)
 abline(0, 1, col="red") # extent doesn't change at all, because we use the same year for extent every year
@@ -403,21 +403,15 @@ data <- read.csv("output/hab_ice_health_eez.csv") %>%
 
 # health 
 bouv_health <- health_old_new %>%
-  filter(rgn_id == 105) %>%
-  mutate(diff = health - health_prev_assess) # +0.19 
+  dplyr::filter(rgn_id == 105) %>%
+  dplyr::mutate(diff = health - health_prev_assess) # +0.19 
 
 # trend 
 bouv_trend <- trend_old_new %>%
-  filter(rgn_id == 105) %>%
-  mutate(diff = trend - trend_prev_assess) # trend got worse 
+  dplyr::filter(rgn_id == 105) %>%
+  dplyr::mutate(diff = trend - trend_prev_assess) # trend got worse 
 
 ## checked against previous conditions, and it looks like Bouvet Island and Jan Mayen (our two largest increases for 2021) have pretty volatile condition scores year after year, so I think this is ok. Nothing went wrong in the data processing on our part. 
-
-
-
-
-
-
 ```
 
 ## Gapfill
