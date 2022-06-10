@@ -180,8 +180,7 @@ for (p in poles){
   ## Save stack of rasters and pts of shore as rdata file
   ######################################################################################################################
   
-  save_loc <- file.path(dir_M, 
-                        sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce/%s/%s_rasters_points.rdata", 
-                                assess_year, p))
+  save_loc <- file.path(
+    dir_M, sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce/%s/%s_rasters_points.rdata", assess_year, p))
   save(s, pts, file=save_loc)
 }
