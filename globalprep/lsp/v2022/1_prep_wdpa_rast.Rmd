@@ -19,7 +19,7 @@ pdf_document:
 # Summary
 
 * Setup WDPA shapefile for lasting special places by filtering out non-"Designated" protected areas, and filtering out "non-MPA programmatic management plans" (US protected areas that distort scores).
-* Rasterize the result using `fasterize::fasterize()` (not `gdal_rast2()` as in previous assessments) and save to disk using `writeRasterBlocks()` defined in this script.
+* Rasterize the result using `terra::resterize()` (`fasterize()` doesn't work with `SpatRaster` objects) and save to disk using `terra::writeRaster()` (this was formerly done with a function defined in the document: `writeRasterBlocks()` - as of now, it has not been updated to use `terra` functions and objects.)
 
 View lsp_data_prep.Rmd for full description of Lasting Special Places data preparation.
 
@@ -277,11 +277,15 @@ writeRasterBlocks <- function(rast, filename) {
 ```
 
 
-## Shapefile to Raster: `fasterize()`
+## Shapefile to Raster: `terra::rasterize()`
 
+2022:
+`terra::rasterize()` is used with two `SpatRaster` objects as input, followed by `terra::writeRaster()`.
+
+2021:
 `fasterize()` from the `fasterize` package takes advantage of Simple Features objects from the `sf` package, rather than objects from the `sp` package.  It is considerably faster; it returned a completed raster in ten minutes.  However, saving the very large (18GB) resulting raster proved problematic.  The `writeRasterBlocks()` function defined above helped get around that problem though still took over an hour to write the raster to disk.
 
-``` {r fasterize_wdpa, eval = FALSE}
+``` {r rasterize_wdpa, eval = FALSE}
 
 # library(sf)
 # library(fasterize) ### devtools::install_github('ecohealthalliance/fasterize')

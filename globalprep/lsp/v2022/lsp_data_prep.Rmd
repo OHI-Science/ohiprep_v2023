@@ -236,7 +236,7 @@ max_year <- max(c(stats_1km$year, stats_3nm$year, stats_eez$year), na.rm = TRUE)
 ### Determine total cells per region (n_cells_tot) and then a cumulative
 ### total of cells per region
   
-#region_data() #use this function to call rgns_eez, which is called below in the function "calc_areas()"
+region_data() #use this function to call rgns_eez, which is called below in the function "calc_areas()"
 
 calc_areas <- function(stats_df) {
   area_df <- stats_df %>%
@@ -390,7 +390,7 @@ status_3nm_new <- read_csv(file.path(dir_goal, 'output', 'lsp_prot_area_offshore
   filter(year == max(year)) %>%
   dplyr::select(rgn_id, pct_prot_3nm_new, status_3nm_new)
 
-status_3nm_old <- read_csv(file.path(dir_goal, '../v2020/output', 'lsp_prot_area_offshore3nm.csv')) %>%
+status_3nm_old <- read_csv(file.path(dir_goal, '../v2021/output', 'lsp_prot_area_offshore3nm.csv')) %>%
   full_join(read_csv(file.path(dir_goal, 'output', 'rgn_area_offshore3nm.csv')),
             by = 'rgn_id') %>%
   mutate(pct_prot_3nm_old = a_prot_3nm / area,
@@ -409,7 +409,7 @@ status_1km_new <- read_csv(file.path(dir_goal, 'output', 'lsp_prot_area_inland1k
   filter(year == max(year)) %>%
   dplyr::select(rgn_id, pct_prot_1km_new, status_1km_new)
 
-status_1km_old <- read_csv(file.path(dir_goal, '../v2020/output', 'lsp_prot_area_inland1km.csv')) %>%
+status_1km_old <- read_csv(file.path(dir_goal, '../v2021/output', 'lsp_prot_area_inland1km.csv')) %>%
   full_join(read_csv(file.path(dir_goal, 'output', 'rgn_area_inland1km.csv')),
             by = 'rgn_id') %>%
   mutate(pct_prot_1km_old = a_prot_1km / area,
@@ -418,14 +418,15 @@ status_1km_old <- read_csv(file.path(dir_goal, '../v2020/output', 'lsp_prot_area
   filter(year == max(year)) %>%
   dplyr::select(rgn_id, pct_prot_1km_old, status_1km_old)
 
+# Updated sequence to use pivot_longer() instead of gather()
 lsp_new_old <- status_3nm_new %>%
   full_join(status_3nm_old, by = c('rgn_id')) %>%
   full_join(status_1km_new, by = c('rgn_id')) %>%
   full_join(status_1km_old, by = c('rgn_id')) %>%
   mutate(status_old = (status_3nm_old + status_1km_old) / 2,
          status_new = (status_3nm_new + status_1km_new) / 2) %>%
-  gather(rgn, score_new, contains('new')) %>%
-  gather(rgn_old, score_old, contains('old')) %>% 
+  pivot_longer(cols = contains('new'), names_to = 'rgn', values_to = 'score_new') %>%
+  pivot_longer(cols = contains('old'), names_to = 'rgn_old', values_to = 'score_old') %>% 
   mutate(rgn = str_replace(rgn, '_new', ''),
          rgn_old = str_replace(rgn_old, '_old', ''),
          score_new = round(score_new, 3),
@@ -441,14 +442,14 @@ lsp_status_plot <- ggplot(lsp_new_old,
   geom_point(alpha = .6) +
   theme(legend.position = 'none') +
   geom_abline(slope = 1, intercept = 0, color = 'red') +
-  labs(x = 'LSP status v2020 (data through March 2020)',
-       y = 'LSP status v2021 (data through Jan 2021)',
-       title = 'Comparing LSP status: 2021 vs 2020') +
+  labs(x = 'LSP status v2021 (data through March 2021)',
+       y = 'LSP status v2022 (data through Jan 2022)',
+       title = 'Comparing LSP status: 2022 vs 2021') +
   facet_wrap( ~ rgn)
 
 lsp_status_plot #got rid of ggplotly
 
-ggsave(file.path(dir_goal, 'Figs/plot_v2020_v2021.png'), 
+ggsave(file.path(dir_goal, 'Figs/plot_v2021_v2022.png'), 
        plot = lsp_status_plot, height = 4.5, width = 6)
 
 x <- lsp_new_old %>%
@@ -456,9 +457,10 @@ x <- lsp_new_old %>%
   filter(rgn == 'status' & abs(diff) > 0.05) %>%
   mutate(abs_diff = abs(diff))
 
-write.csv(x, "output/major_changes_2021.csv" ) #added this so I could come back to it without rerunning everything
+write.csv(x, "output/major_changes_2022.csv" ) #added this so I could come back to it without rerunning everything
 ```
 
+Not sure what the purpose of the chunk below is?
 
 ```{r}
 
@@ -482,8 +484,7 @@ status_3nm_new <- read_csv(file.path(dir_goal, 'output', 'lsp_prot_area_offshore
 
 lsp_new_old <- status_3nm_new %>%
   full_join(status_1km_new, by = c('rgn_id', 'year')) %>%
-  mutate(
-         status_new = (status_3nm_new + status_1km_new) / 2)
+  mutate(status_new = (status_3nm_new + status_1km_new) / 2)
   
 ```
 
