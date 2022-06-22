@@ -19,7 +19,7 @@ pdf_document:
 # Summary
 
 * Setup WDPA shapefile for lasting special places by filtering out non-"Designated" protected areas, and filtering out "non-MPA programmatic management plans" (US protected areas that distort scores).
-* Rasterize the result using `fasterize::fasterize()` (not `gdal_rast2()` as in previous assessments) and save to disk using `writeRasterBlocks()` defined in this script.
+* Rasterize the result using `terra::resterize()` (`fasterize()` doesn't work with `SpatRaster` objects) and save to disk using `terra::writeRaster()` (this was formerly done with a function defined in the document: `writeRasterBlocks()` - as of now, it has not been updated to use `terra` functions and objects.)
 
 View lsp_data_prep.Rmd for full description of Lasting Special Places data preparation.
 
@@ -67,13 +67,13 @@ library(mapview)
 library(terra)
 # library(fasterize)
 
-source('http://ohi-science.org/ohiprep_v2020/workflow/R/common.R')
+source('http://ohi-science.org/ohiprep_v2022/workflow/R/common.R')
 
 goal     <- 'globalprep/lsp'
 scenario <- 'v2022'
 dir_goal_anx   <- file.path(dir_M, 'git-annex', goal, scenario) 
 dir_goal  <- file.path(here('globalprep', goal, scenario))
-dir_data <- file.path(dir_M, 'git-annex/globalprep', '_raw_data',
+dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data',
                       'wdpa_mpa', 'd2022', 'WDPA_Jun2022_Public_shp')
 
 
@@ -150,7 +150,7 @@ return(DF)
 wdpa_poly_list <- lapply(wdpa_list, myFunc)
 
 ## check to see if it worked
-test <- wdpa_poly_list[[1]] ## it did.. only 19 columns and little less observations 
+test <- wdpa_poly_list[[1]] ## it did.. only 19 columns and a bit fewer observations 
   
 
 ## now we need to unlist them, and write them to the appropriate folder
@@ -178,6 +178,7 @@ wdpa_poly_fix_2 <- wdpa_poly_list[[3]]
            driver = 'ESRI Shapefile'))
   
   rm('wdpa_poly_list') ### clean up memory
+  gc()
   
 
 ```
@@ -189,16 +190,16 @@ Transform ordered polygons to Mollweide and save as new polygons.
 ``` {r transform_poly}
 
 ## 2021: This also wouldnt save to mazu for some reason... try again next year. 
-shp_xformed_0 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_0') 
-shp_xformed_1 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_1') 
-shp_xformed_2 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_2') 
+shp_xformed_0 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_xformed_0') 
+shp_xformed_1 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_xformed_1') 
+shp_xformed_2 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_xformed_2') 
   
 
     
     message('loading wdpa polygons (filtered and ordered)')
-    shp_reorder_0 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_ordered_0')
-    shp_reorder_1 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_ordered_1')
-    shp_reorder_2 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_ordered_2')
+    shp_reorder_0 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_0')
+    shp_reorder_1 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_1')
+    shp_reorder_2 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_2')
     
     wdpa_poly_0 <- st_read(dsn = dirname(shp_reorder_0), 
                           layer = basename(shp_reorder_0),
@@ -230,7 +231,7 @@ st_crs(wdpa_poly_fix_0) ## it worked
 
 wdpa_poly_fix_1 <- wdpa_poly_list[[2]]  
 wdpa_poly_fix_2 <- wdpa_poly_list[[3]]  
-  
+
 
 ## Lets write the transformed files to Mazu
 
@@ -245,22 +246,20 @@ wdpa_poly_fix_2 <- wdpa_poly_list[[3]]
   
   ## This will likely take ~7 mins per file
   ## will receive A LOT of warnings, disregard these as you did above. You can look at the file size on mazu to check if it is done writing. Warnings will continue for awhile after it has completed writing to mazu. 
-  
-
 ```
 
-### Define some raster functions.
 
-Here we define `gdal_rast2()` function as a wrapper for `gdalUtils::gdal_rasterize()`, which has some clunky arguments.  This was originally written for OHIBC.
+### Define some raster functions.
 
 Here we also define `writeRasterBlocks()` to write out very large rasters chunk-by-chunk to avoid an issue in which `writeRaster()` fails due to inability to work with long vectors (over 2 billion elements?).
 
 ``` {r define_gdal_rast2}
 ## from OHIBC...
+# This function currently doesn't work with SpatRaster objects, but may not be necessary anymore - terra::writeRaster() handled everything well
 
 
 writeRasterBlocks <- function(rast, filename) {
-  bs <- blockSize(rast)
+  bs <- fileBlocksize(rast)
   rast <- writeStart(rast, filename, overwrite = TRUE)
   ptm <- proc.time()
   for (i in 1:bs$n) { # i <- 1
@@ -270,7 +269,7 @@ writeRasterBlocks <- function(rast, filename) {
     rast <- writeValues(rast, v, bs$row[i])
   }
   rast <- writeStop(rast)
-   #return(rast)
+  return(rast)
 }
 
 
@@ -278,37 +277,52 @@ writeRasterBlocks <- function(rast, filename) {
 ```
 
 
-## Shapefile to Raster: `fasterize()`
+## Shapefile to Raster: `terra::rasterize()`
 
+2022:
+`terra::rasterize()` is used with two `SpatRaster` objects as input, followed by `terra::writeRaster()`.
+
+2021:
 `fasterize()` from the `fasterize` package takes advantage of Simple Features objects from the `sf` package, rather than objects from the `sp` package.  It is considerably faster; it returned a completed raster in ten minutes.  However, saving the very large (18GB) resulting raster proved problematic.  The `writeRasterBlocks()` function defined above helped get around that problem though still took over an hour to write the raster to disk.
 
-``` {r fasterize_wdpa, eval = FALSE}
+``` {r rasterize_wdpa, eval = FALSE}
 
-library(sf)
-library(fasterize) ### devtools::install_github('ecohealthalliance/fasterize')
-rast_wdpa_file   <- file.path(dir_goal_anx, 'rast', 'wdpa_2021_moll_500m.tif') 
+# library(sf)
+# library(fasterize) ### devtools::install_github('ecohealthalliance/fasterize')
+rast_wdpa_file   <- file.path(dir_goal_anx, 'rast', 'wdpa_2122_moll_500m.tif') 
 
 if(!file.exists(rast_wdpa_file)) {
-shp_xformed_file_0 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_0') 
-shp_xformed_file_1 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_1') 
-shp_xformed_file_2 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_2') 
+shp_xformed_file_0 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_xformed_0.shp') 
+shp_xformed_file_1 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_xformed_1.shp') 
+shp_xformed_file_2 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_xformed_2.shp') 
   
-  ptm <- proc.time()
-  wdpa_poly_0 <- sf::st_read(dsn = dirname(shp_xformed_file_0),
-                           layer = basename(shp_xformed_file_0))
-  
-  wdpa_poly_1 <- sf::st_read(dsn = dirname(shp_xformed_file_1),
-                           layer = basename(shp_xformed_file_1))
-  
-  wdpa_poly_2 <- sf::st_read(dsn = dirname(shp_xformed_file_2),
-                           layer = basename(shp_xformed_file_2))
+  # ptm <- proc.time()
+  # wdpa_poly_0 <- sf::st_read(dsn = dirname(shp_xformed_file_0),
+  #                          layer = basename(shp_xformed_file_0))
+  # 
+  # wdpa_poly_1 <- sf::st_read(dsn = dirname(shp_xformed_file_1),
+  #                          layer = basename(shp_xformed_file_1))
+  # 
+  # wdpa_poly_2 <- sf::st_read(dsn = dirname(shp_xformed_file_2),
+  #                          layer = basename(shp_xformed_file_2))
+  # 
+
+    ptm <- proc.time()
+  # formerly these were read in with st_read in order to work with fasterize()
+  # now we're reading them in as SpatVectors to work with terra::rasterize()
+  wdpa_poly_0 <- vect(shp_xformed_file_0)
+  wdpa_poly_1 <- vect(shp_xformed_file_1)
+  wdpa_poly_2 <- vect(shp_xformed_file_2)
   
   wdpa_poly_all <- rbind(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)
   
   cat('elapsed: ', (proc.time() - ptm)[3])
-  ### ~1 min to read in each file
+  ### ~25s to read in each file
+  
+  rm("wdpa_poly_0", "wdpa_poly_1", "wdpa_poly_2")
+  gc()
 
-  rast_base <- raster::raster(file.path(dir_M, 'git-annex/globalprep/spatial/d2014',
+  rast_base <- terra::rast(file.path(dir_M, 'git-annex/globalprep/spatial/d2014',
                                 'data/rgn_mol_raster_500m',
                                 'rgn_inland1km_mol_500mcell.tif'))
   
@@ -323,48 +337,59 @@ shp_xformed_file_2 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_xformed_2')
   
   ## For any overlapping polygons, assign the oldest (minimum) status year to that area
   ptm <- proc.time()
-  rast_wdpa <- fasterize(wdpa_poly_all, rast_base, field = 'status_yr', fun = 'min')
-  cat('fasterize elapsed: ', (proc.time() - ptm)[3]) 
-  ### 358 - 403 seconds?! holy crap, if it rasterized properly...
-  #2019 fasterize elapsed 26 seconds... is this right? 
-  # 2021 45.006 seconds! 
+  rast_wdpa <- terra::rasterize(wdpa_poly_all, rast_base, field = 'status_yr', fun = 'min')
+  cat('rasterize elapsed: ', (proc.time() - ptm)[3]) 
+  # 2021 fasterize: 45.006 seconds!
+  # 2022 terra::rasterize: 876 seconds, not terrible but a lot slower than fasterize at the moment
+
   
   # ptm <- proc.time()
-  # raster::writeRaster(rast_wdpa, rast_wdpa_file)
-  # cat('writeRaster elapsed: ', (proc.time() - ptm)[3])
-  ### writeRaster failed on an issue with large vectors...
-  ### see below about writing block by block approach.
+  # x <- writeRasterBlocks(rast_wdpa, rast_wdpa_file)
+  # message('writeRaster elapsed: ', (proc.time() - ptm)[3])
+  # #~10 minutes
   
-  library(raster)
-  # rast <- rast_wdpa
-  # filename <- rast_wdpa_file
   ptm <- proc.time()
-  x <- writeRasterBlocks(rast_wdpa, rast_wdpa_file)
+  x <- writeRaster(rast_wdpa, rast_wdpa_file)
   message('writeRaster elapsed: ', (proc.time() - ptm)[3])
-  #~10 minutes
+  # 76 seconds!
 }
 
-check <- raster::raster(rast_wdpa_file)
-check2 <- raster::raster(file.path("/home/shares/ohi/git-annex/globalprep/lsp/v2020/rast/wdpa_2020_moll_500m.tif"))
+check <- terra::rast(rast_wdpa_file)
+check2 <- terra::rast(file.path("/home/shares/ohi/git-annex/globalprep/lsp/v2021/rast/wdpa_2021_moll_500m.tif"))
 ## they look almost exactly the same... good.
-
 ```
 
 ## Data Checking
 
-Compare shapfile 2019 v 2021.
+Compare shapefile 2021 v 2022.
 
 ```{r}
 
 library(sf)
 library(raster)
 
-## Read in as sf
-wdpa_sf_19 <- st_read(dsn = file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2019/shps"), layer = "WDPA_Apr2019_shp_ordered") 
+# 2021 data as SF
+shp_reorder_21_0 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/shps/WDPA_Feb2021_shp_ordered_0')
+shp_reorder_21_1 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/shps/WDPA_Feb2021_shp_ordered_0')
+shp_reorder_21_2 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/shps/WDPA_Feb2021_shp_ordered_0')
 
-shp_reorder_0 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_ordered_0')
-shp_reorder_1 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_ordered_1')
-shp_reorder_2 <- file.path(dir_data, 'shps', 'WDPA_Feb2021_shp_ordered_2')
+wdpa_poly_21_0 <- st_read(dsn = dirname(shp_reorder_21_0), 
+                          layer = basename(shp_reorder_21_0),
+                          stringsAsFactors = FALSE)
+wdpa_poly_21_1 <- st_read(dsn = dirname(shp_reorder_21_1), 
+                          layer = basename(shp_reorder_21_1),
+                          stringsAsFactors = FALSE)
+wdpa_poly_21_2 <- st_read(dsn = dirname(shp_reorder_21_2), 
+                          layer = basename(shp_reorder_21_2),
+                          stringsAsFactors = FALSE)
+
+wdpa_poly_all_21 <- rbind(wdpa_poly_21_0, wdpa_poly_21_1, wdpa_poly_21_2)
+
+
+# 2021 data as SF
+shp_reorder_0 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_0')
+shp_reorder_1 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_1')
+shp_reorder_2 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_2')
     
 wdpa_poly_0 <- st_read(dsn = dirname(shp_reorder_0), 
                           layer = basename(shp_reorder_0),
@@ -376,37 +401,22 @@ wdpa_poly_2 <- st_read(dsn = dirname(shp_reorder_2),
                           layer = basename(shp_reorder_2),
                           stringsAsFactors = FALSE)
 
-wdpa_poly_all_21 <- rbind(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)
-
-plot(wdpa_poly_all_21[1])
-plot(wdpa_sf_19[1])
+wdpa_poly_all_22 <- rbind(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)
 
 
-colnames(wdpa_poly_all_21)
+colnames(wdpa_poly_all_22)
 
-unique(wdpa_poly_all_21$orig_name)
+unique(wdpa_poly_all_22$orig_name)
 
 
-test <- wdpa_poly_all_21 %>%
+test <- wdpa_poly_all_22 %>%
   filter(parent_iso == "GBR") %>%
   filter(iso3 == "PCN")
 
 mapview(test)
 
-st_area(test) # 836075862002 m2 
-
-
-  rast_base <- raster::raster(file.path(dir_M, 'git-annex/globalprep/spatial/d2014',
-                                'data/rgn_mol_raster_500m',
-                                'rgn_inland1km_mol_500mcell.tif'))
-
-  rast_wdpa <- fasterize(test, rast_base, field = 'status_yr', fun = 'min')
-  
-  plot(rast_wdpa)
-  
-  rast_wdpa
-
+st_area(test) 
+# 2021 836075862002 m2 
+# 2022 841909966909 m2
 ```
-
-
 
