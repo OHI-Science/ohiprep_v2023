@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Jun 21 11:50:34 2022 by molitor" />
+<meta name="author" content="Compiled on Thu Jun 23 11:28:22 2022 by molitor" />
 
 
 <title>OHI 2022 - Pressure: Ultraviolet Radiation</title>
@@ -347,7 +347,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">OHI 2022 - Pressure: Ultraviolet Radiation</h1>
-<h4 class="author"><em>Compiled on Tue Jun 21 11:50:34 2022 by molitor</em></h4>
+<h4 class="author"><em>Compiled on Thu Jun 23 11:28:22 2022 by molitor</em></h4>
 
 </div>
 
@@ -384,6 +384,10 @@ div.tocify {
 <strong>Native Data Resolution</strong>: 1 degree<br />
 <strong>Values</strong>: Level-3 OMI Surface UV Irradiance and Erythemal Dose- OMUVBd<br />
 <strong>Time Range</strong>: Daily data from 2005 - 2021 (10/1/2004 through 06/21/2022, but only full years of data are used) <strong>Format</strong>: NetCDF HDF5 (.he5.nc) <strong>Downloaded</strong>: June 21, 2022</p>
+</div>
+<div id="data-citation-information" class="section level1">
+<h1>Data citation information</h1>
+<p>Jari Hovila, Antii Arola, and Johanna Tamminen (2013), OMI/Aura Surface UVB Irradiance and Erythemal Dose Daily L3 Global Gridded 1.0 degree x 1.0 degree V3, NASA Goddard Space Flight Center, Goddard Earth Sciences Data and Information Services Center (GES DISC), Accessed: June 21, 2022, 10.5067/Aura/OMI/DATA3009</p>
 <hr />
 </div>
 <div id="methods" class="section level1">
@@ -392,63 +396,68 @@ div.tocify {
 <h2>Setup</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>current_yr <span class="ot">&lt;-</span> <span class="dv">2022</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>current_yr <span class="ot">&lt;-</span> <span class="dv">2022</span>  <span class="do">############## UPDATE ME</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data_yr <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_yr)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Replacing this with librarian shelf which will search bioconductor </span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">## rhdf5 package for working with HDF5 files, from bioconductor: http://bioconductor.org/packages/release/bioc/html/rhdf5.html</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE)){</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   install.packages(&quot;BiocManager&quot;)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager::install()</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager::install(&quot;rhdf5&quot;)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(librarian)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>librarian<span class="sc">::</span><span class="fu">shelf</span>(</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  raster,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  terra,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  ncdf4,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  rgdal,</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  sf, </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  rhdf5, <span class="do">## From bioconductor</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  ggplot2,</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  RColorBrewer,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  foreach,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  doParallel,</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  dplyr,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  readr,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  stringr,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  httr,</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  lubridate,</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  googleVis,</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  animation,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  plotly</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">paste0</span>(<span class="st">&#39;http://ohi-science.org/ohiprep_v&#39;</span>, current_yr, <span class="st">&#39;/workflow/R/common.R&#39;</span>))</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="do">## File paths</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>raw_data_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV&quot;</span>, data_yr)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>int_sp_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/prs_uv&quot;</span>, data_yr, <span class="st">&quot;int&quot;</span>) <span class="co"># intermediate spatial data location</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>out_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/prs_uv&quot;</span>, data_yr, <span class="st">&quot;output&quot;</span>)</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="do">## years of data we are using for this data layer</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>yrs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2005</span><span class="sc">:</span>current_yr<span class="dv">-1</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>mths <span class="ot">&lt;-</span> <span class="fu">str_pad</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>days_full <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">358</span>, <span class="dv">7</span>)</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="do">## global ocean raster at 1km for resampling/projecting purposes</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>ocean <span class="ot">&lt;-</span> <span class="fu">raster</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;model/GL-NCEAS-Halpern2008/tmp/ocean.tif&quot;</span>))</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>ocean_shp <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/d2014/data&quot;</span>), <span class="at">layer =</span> <span class="st">&quot;regions_gcs&quot;</span>)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>land <span class="ot">&lt;-</span>  <span class="fu">filter</span>(ocean_shp, rgn_typ <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;land&quot;</span>, <span class="st">&quot;land-disputed&quot;</span>, <span class="st">&quot;land-noeez&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">st_geometry</span>()</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="do">## define mollweide projection CRS</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>mollCRS <span class="ot">&lt;-</span> <span class="fu">crs</span>(<span class="st">&quot;+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs&quot;</span>)</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="do">## define colors in spectral format for plotting rasters -- rainbow color scheme  </span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">colorRampPalette</span>(<span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Spectral&quot;</span>))(<span class="dv">255</span>))</span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>version_yr <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_yr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Replacing this with librarian shelf which will search bioconductor - v2022</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="do">## rhdf5 package for working with HDF5 files, from bioconductor: http://bioconductor.org/packages/release/bioc/html/rhdf5.html</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE)){</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   install.packages(&quot;BiocManager&quot;)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager::install()</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager::install(&quot;rhdf5&quot;)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(librarian)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>librarian<span class="sc">::</span><span class="fu">shelf</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  Biobase,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  rhdf5, <span class="do">## From bioconductor</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  raster,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  terra,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  ncdf4,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  rgdal,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  sf, </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  ggplot2,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  RColorBrewer,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  foreach,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  doParallel,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  dplyr,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  readr,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  stringr,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  httr,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  lubridate,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  googleVis,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  animation,</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  plotly,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  tictoc</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">paste0</span>(<span class="st">&#39;http://ohi-science.org/ohiprep_&#39;</span>, version_yr, <span class="st">&#39;/workflow/R/common.R&#39;</span>))</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="do">## File paths</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>raw_data_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV&quot;</span>, data_yr)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>int_sp_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/prs_uv&quot;</span>, version_yr, <span class="st">&quot;int&quot;</span>) <span class="co"># intermediate spatial data location</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>out_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/prs_uv&quot;</span>, version_yr, <span class="st">&quot;output&quot;</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="do">## years of data we are using for this data layer</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>yrs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2005</span><span class="sc">:</span>current_yr<span class="dv">-1</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>mths <span class="ot">&lt;-</span> <span class="fu">str_pad</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>days_full <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">358</span>, <span class="dv">7</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="do">## global ocean raster at 1km for resampling/projecting purposes</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>ocean <span class="ot">&lt;-</span> <span class="fu">raster</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;model/GL-NCEAS-Halpern2008/tmp/ocean.tif&quot;</span>))</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>ocean_shp <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/d2014/data&quot;</span>), <span class="at">layer =</span> <span class="st">&quot;regions_gcs&quot;</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>land <span class="ot">&lt;-</span>  ocean_shp <span class="sc">%&gt;%</span> </span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(, rgn_typ <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;land&quot;</span>, <span class="st">&quot;land-disputed&quot;</span>, <span class="st">&quot;land-noeez&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_geometry</span>()</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="do">## define mollweide projection CRS</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>mollCRS <span class="ot">&lt;-</span> <span class="fu">crs</span>(<span class="st">&quot;+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs&quot;</span>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="do">## define colors in spectral format for plotting rasters -- rainbow color scheme  </span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">colorRampPalette</span>(<span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Spectral&quot;</span>))(<span class="dv">255</span>))</span></code></pre></div>
 </div>
 <div id="downloading-the-netcdf-.he5.nc-files" class="section level2">
 <h2>Downloading the NetCDF (.he5.nc) Files</h2>
@@ -478,7 +487,12 @@ div.tocify {
 </ol>
 <ul>
 <li><p>Rename the file to <code>file_list.txt</code></p></li>
-<li><p>Place this file in <code>/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/&lt;version_year&gt;</code></p></li>
+<li><p>Make 2 new folders</p>
+<ul>
+<li><p><code>/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/&lt;version_year&gt;</code></p></li>
+<li><p>and a <code>/data</code> subfolder (See below)</p></li>
+</ul></li>
+<li><p>Place <code>file_list.txt</code> in <code>/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/&lt;version_year&gt;</code></p></li>
 </ul>
 <ol start="4" style="list-style-type: decimal">
 <li>Run the code below to download the data.</li>
@@ -486,371 +500,412 @@ div.tocify {
 <ul>
 <li>This will use the list and earthdata login info (username and password) to download the new data files into the raw data directory. The naming convention of the downloaded files: ‘OMI-Aura’ refers to the instrument, ‘L3’ means it is a level 3 data product, ‘OMUVBd’ is the measurement, the first date is when the data was recorded, the second date and time corresponds to modification/upload of the data.</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## need  username and password, define in console when prompted (or read from secure file), don&#39;t save here!!</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>usrname <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="st">&quot;Type earthdata username:&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pass <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="st">&quot;Type earthdata password:&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This took 103.5 minutes in 2019... </span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## read in file list .text, downloaded from earthdata &amp; saved in destination folder (same as raw_data_dir)</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>file_list_raw <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="fu">file.path</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV&quot;</span>, data_yr, <span class="st">&quot;file_list.txt&quot;</span>), <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">&quot;</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>file_list <span class="ot">&lt;-</span> file_list_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">url_str =</span> <span class="fu">as.character</span>(X1)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">check_netcdf =</span> <span class="fu">str_match</span>(url_str, <span class="at">pattern =</span> <span class="st">&quot;http.*OMI-Aura_L3-OMUVBd.*nc&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(check_netcdf)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(url_str) </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="do">## set up timekeeping for data download</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>t0 <span class="ot">=</span> <span class="fu">Sys.time</span>()</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>n.pym <span class="ot">=</span> <span class="fu">length</span>(file_list<span class="sc">$</span>url_str)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>i.pym <span class="ot">=</span> <span class="dv">0</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="do">## download the data</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(file_list)){</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#i = 1</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">=</span> <span class="fu">as.character</span>(file_list[i,])</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  name_raw_file <span class="ot">=</span> <span class="fu">substr</span>(url, <span class="dv">88</span>, <span class="dv">144</span>) </span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(raw_data_dir, <span class="st">&quot;data&quot;</span>, name_raw_file)) <span class="sc">!=</span> <span class="cn">TRUE</span>){</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> httr<span class="sc">::</span><span class="fu">GET</span>(url, <span class="fu">authenticate</span>(usrname, pass, <span class="at">type =</span> <span class="st">&quot;basic&quot;</span>), <span class="fu">verbose</span>(<span class="at">info =</span> <span class="cn">TRUE</span>, <span class="at">ssl =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  bin <span class="ot">=</span> <span class="fu">content</span>(x, <span class="st">&quot;raw&quot;</span>)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeBin</span>(bin, <span class="fu">file.path</span>(raw_data_dir, <span class="st">&quot;data&quot;</span>, name_raw_file)) <span class="co"># gnutls_handshake() failed: Handshake failed</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  i.pym <span class="ot">&lt;-</span> i.pym <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  min.done <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(<span class="fu">Sys.time</span>(), t0, <span class="at">units=</span><span class="st">&quot;mins&quot;</span>))</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  min.togo <span class="ot">&lt;-</span> (n.pym <span class="sc">-</span> i.pym) <span class="sc">*</span> min.done<span class="sc">/</span>i.pym</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">sprintf</span>(<span class="st">&quot;Retrieving %s of %s. Minutes done=%0.1f, to go=%0.1f&quot;</span>,</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>                i.pym, n.pym, min.done, min.togo)) <span class="co"># approx time remaining for data download</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sprintf</span>(<span class="st">&quot;Skipping %s of %s. Already done.&quot;</span>,</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>                i.pym, n.pym))</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="do">## tip: after downloading, check all .he5.nc files are about the same size i.e. they all downloaded properly/fully </span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co"># v2021: all look good </span></span></code></pre></div>
+<p>Create new folders for the raw data, intermediate files, and output files</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Added v2022</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">YEAR</span><span class="op">=</span>2023 <span class="co">###### UPDATE ME</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># make raw data folder for new year</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ./d<span class="va">$YEAR</span>/data</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># make new intermediate and output file folders</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/shares/ohi/git-annex/globalprep/prs_uv</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ./v<span class="va">$YEAR</span>/<span class="dt">{output</span><span class="op">,</span><span class="dt">int}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> v<span class="va">$YEAR</span>/int</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="dt">{annual_anomalies_diff</span><span class="op">,</span><span class="dt">rescaled</span><span class="op">,</span><span class="dt">weekly_climatologies</span><span class="op">,</span><span class="dt">weekly_means</span><span class="op">,</span><span class="dt">weekly_sd}</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## need  username and password, define in console when prompted (or read from secure file), don&#39;t save here!!</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>usrname <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="st">&quot;Type earthdata username: &quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pass <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="st">&quot;Type earthdata password: &quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This took 103.5 minutes in 2019... </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## This took like 6 hours in 2022 for some reason... You can leave this running after hours if need be, and it should keep going</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="do">## read in file list .text, downloaded from earthdata &amp; saved in destination folder (same as raw_data_dir)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>file_list_raw <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV&quot;</span>, data_yr, <span class="st">&quot;file_list.txt&quot;</span>), </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">&quot;</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>file_list <span class="ot">&lt;-</span> file_list_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">url_str =</span> <span class="fu">as.character</span>(X1)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">check_netcdf =</span> <span class="fu">str_match</span>(url_str, <span class="at">pattern =</span> <span class="st">&quot;http.*OMI-Aura_L3-OMUVBd.*nc&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(check_netcdf)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(url_str) </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="do">## set up timekeeping for data download</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>t0 <span class="ot">=</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>n.pym <span class="ot">=</span> <span class="fu">length</span>(file_list<span class="sc">$</span>url_str)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>i.pym <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">## download the data</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(file_list)){</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#i = 1</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">=</span> <span class="fu">as.character</span>(file_list[i,])</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  name_raw_file <span class="ot">=</span> <span class="fu">substr</span>(url, <span class="dv">88</span>, <span class="dv">144</span>) </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(raw_data_dir, <span class="st">&quot;data&quot;</span>, name_raw_file)) <span class="sc">!=</span> <span class="cn">TRUE</span>){</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">=</span> httr<span class="sc">::</span><span class="fu">GET</span>(url, <span class="fu">authenticate</span>(usrname, pass, <span class="at">type =</span> <span class="st">&quot;basic&quot;</span>), <span class="fu">verbose</span>(<span class="at">info =</span> <span class="cn">TRUE</span>, <span class="at">ssl =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    bin <span class="ot">=</span> <span class="fu">content</span>(x, <span class="st">&quot;raw&quot;</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">writeBin</span>(bin, <span class="fu">file.path</span>(raw_data_dir, <span class="st">&quot;data&quot;</span>, name_raw_file)) <span class="co"># gnutls_handshake() failed: Handshake failed</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    i.pym <span class="ot">&lt;-</span> i.pym <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    min.done <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(<span class="fu">Sys.time</span>(), t0, <span class="at">units=</span><span class="st">&quot;mins&quot;</span>))</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    min.togo <span class="ot">&lt;-</span> (n.pym <span class="sc">-</span> i.pym) <span class="sc">*</span> min.done<span class="sc">/</span>i.pym</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sprintf</span>(<span class="st">&quot;Retrieving %s of %s. Minutes done=%0.1f, to go=%0.1f&quot;</span>,</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>                  i.pym, n.pym, min.done, min.togo)) <span class="co"># approx time remaining for data download</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sprintf</span>(<span class="st">&quot;Skipping %s of %s. Already done.&quot;</span>,</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>                  i.pym, n.pym))</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="do">## tip: after downloading, check all .he5.nc files are about the same size i.e. they all downloaded properly/fully </span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="co"># v2021: all look good </span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 </div>
 <div id="create-rasters-from-netcdf-files" class="section level2">
 <h2>Create rasters from NetCDF files</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## list and check missing dates in NetCDF data files</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## list all files from raw data folder</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(raw_data_dir, <span class="st">&quot;data&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;OMI-Aura_L3-OMUVBd.*.he5.nc$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>) <span class="co"># netcdf not hdf</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> files[<span class="fu">substr</span>(files, <span class="dv">96</span>, <span class="dv">99</span>) <span class="sc">%in%</span> yrs] <span class="co"># select only files for yrs we want</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## check all days are there; should go from Oct 2004 through Dec 31 of last full year of data</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>files_df <span class="ot">&lt;-</span> files <span class="sc">%&gt;%</span> </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">fullname =</span> <span class="st">&quot;.&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># View(files_df)</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">post_modify_date =</span> <span class="fu">substr</span>(fullname, <span class="dv">111</span>, <span class="dv">119</span>),</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">substr</span>(fullname, <span class="dv">96</span>, <span class="dv">99</span>), </span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">mo =</span> <span class="fu">substr</span>(fullname, <span class="dv">101</span>, <span class="dv">102</span>), </span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">dy =</span> <span class="fu">substr</span>(fullname, <span class="dv">103</span>, <span class="dv">104</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">paste</span>(year, mo, dy, <span class="at">sep =</span> <span class="st">&quot;-&quot;</span>),</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">wk_of_yr =</span> lubridate<span class="sc">::</span><span class="fu">week</span>(<span class="fu">as_date</span>(date))) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, wk_of_yr) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nday_in_wk =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>check_ndays <span class="ot">&lt;-</span> files_df <span class="sc">%&gt;%</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, mo) <span class="sc">%&gt;%</span> <span class="co"># group_by(year) %&gt;% </span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">ndays =</span> <span class="fu">n</span>()) <span class="co">#%&gt;% # View(check_ndays)</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">#filter(ndays &lt; 28)</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="do">## For some reason June 2016 is missing 14 days (June 1-14, 2016).. I checked the website and those files don&#39;t exist. It is just a gap in the data. The rest seem ok. - v2021</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## list and check missing dates in NetCDF data files</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## list all files from raw data folder</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(raw_data_dir, <span class="st">&quot;data&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;OMI-Aura_L3-OMUVBd.*.he5.nc$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>) <span class="co"># netcdf not hdf</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> files[<span class="fu">substr</span>(files, <span class="dv">96</span>, <span class="dv">99</span>) <span class="sc">%in%</span> yrs] <span class="co"># select only files for yrs we want</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## check all days are there; should go from Oct 2004 through Dec 31 of last full year of data</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>files_df <span class="ot">&lt;-</span> files <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">fullname =</span> <span class="st">&quot;.&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># View(files_df)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">post_modify_date =</span> <span class="fu">substr</span>(fullname, <span class="dv">111</span>, <span class="dv">119</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">substr</span>(fullname, <span class="dv">96</span>, <span class="dv">99</span>), </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">mo =</span> <span class="fu">substr</span>(fullname, <span class="dv">101</span>, <span class="dv">102</span>), </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">dy =</span> <span class="fu">substr</span>(fullname, <span class="dv">103</span>, <span class="dv">104</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">paste</span>(year, mo, dy, <span class="at">sep =</span> <span class="st">&quot;-&quot;</span>),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">wk_of_yr =</span> lubridate<span class="sc">::</span><span class="fu">week</span>(<span class="fu">as_date</span>(date))) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, wk_of_yr) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nday_in_wk =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>check_ndays <span class="ot">&lt;-</span> files_df <span class="sc">%&gt;%</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, mo) <span class="sc">%&gt;%</span> <span class="co"># group_by(year) %&gt;% </span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">ndays =</span> <span class="fu">n</span>()) <span class="co">#%&gt;% # View(check_ndays)</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">#filter(ndays &lt; 28)</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="do">## For some reason June 2016 is missing 14 days (June 1-14, 2016).. I checked the website and those files don&#39;t exist. It is just a gap in the data. The rest seem ok. - v2021</span></span></code></pre></div>
 <div id="caluculate-weekly-means-and-standard-deviations" class="section level3">
 <h3>Caluculate Weekly Means and Standard Deviations</h3>
 <p>Calculate weekly means and standard deviations across all years:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## for every week in each year of the time series, calculate weekly mean and standard deviation</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">3</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## note: 2016 wk 22 has only 4 layers (4th layer all NAs) and length(days)=52; missing all week 23</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## note: so far some 2005 files appear to have been downloaded incorrectly... replace them manually or just retry download??</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span> (<span class="at">yr =</span> yrs) <span class="sc">%dopar%</span> { <span class="co"># j = 22; yr = 2016</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#yr = 2005; #j = 1</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  l <span class="ot">&lt;-</span> files[<span class="fu">substr</span>(files, <span class="dv">96</span>, <span class="dv">99</span>) <span class="sc">==</span> yr]</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  days_df <span class="ot">&lt;-</span> files_df <span class="sc">%&gt;%</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">==</span> yr) <span class="sc">%&gt;%</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(wk_of_yr, nday_in_wk) <span class="sc">%&gt;%</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> <span class="co"># select just distinct weeks with number of data days they contain</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">complete</span>(<span class="at">wk_of_yr =</span> <span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">53</span>)) <span class="sc">%&gt;%</span> <span class="co"># possible max 53 weeks</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">nday_in_wk =</span> <span class="fu">replace</span>(nday_in_wk, <span class="fu">is.na</span>(nday_in_wk), <span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="co"># zeros if no data</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">lag_nday =</span> <span class="fu">lag</span>(nday_in_wk),</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">lag_nday =</span> <span class="fu">replace</span>(lag_nday, <span class="fu">is.na</span>(lag_nday), <span class="dv">1</span>),</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">doy =</span> <span class="fu">cumsum</span>(lag_nday)) <span class="co"># day-of-year for start of each week of data</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  days <span class="ot">&lt;-</span> days_df<span class="sc">$</span>doy</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  weeks <span class="ot">&lt;-</span> days_df<span class="sc">$</span>wk_of_yr</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> weeks[<span class="sc">-</span><span class="fu">length</span>(weeks)]) { <span class="co"># print(days[j]:(days[j+1]-1)) # checking without foreach+dopar</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="do">## gapfill for weeks with 1 or fewer days using prev + subseq. weeks</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(days_df<span class="sc">$</span>nday_in_wk[j] <span class="sc">&lt;</span> <span class="dv">2</span>){</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      wk_files <span class="ot">&lt;-</span> l[days[j<span class="dv">-1</span>]<span class="sc">:</span>(days[j<span class="sc">+</span><span class="dv">2</span>]<span class="sc">-</span><span class="dv">1</span>)] <span class="co"># gapfilling</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      wk_files <span class="ot">&lt;-</span> l[days[j]<span class="sc">:</span>(days[j<span class="sc">+</span><span class="dv">1</span>]<span class="sc">-</span><span class="dv">1</span>)]</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    rasters <span class="ot">&lt;-</span> <span class="fu">raster</span>(wk_files[<span class="dv">1</span>], <span class="at">varname =</span> <span class="st">&quot;ErythemalDailyDose&quot;</span>)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> wk_files[<span class="sc">-</span><span class="dv">1</span>]){</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      r <span class="ot">&lt;-</span> <span class="fu">raster</span>(i, <span class="at">varname =</span> <span class="st">&quot;ErythemalDailyDose&quot;</span>)</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      rasters <span class="ot">&lt;-</span> <span class="fu">stack</span>(rasters, r)</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    uv_week <span class="ot">&lt;-</span> rasters</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    week <span class="ot">=</span> <span class="fu">str_pad</span>(weeks[j], <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>) </span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    week_mean <span class="ot">&lt;-</span> <span class="fu">calc</span>(uv_week, <span class="at">fun =</span> <span class="cf">function</span>(x) {<span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)},</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_means/weekly_means_%s_%s.tif&quot;</span>, </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>                                         int_sp_data, yr, week), <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    week_sd <span class="ot">&lt;-</span> <span class="fu">calc</span>(uv_week, <span class="at">fun =</span> <span class="cf">function</span>(x) {<span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)},</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_sd/weekly_sd_%s_%s.tif&quot;</span>, </span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>                                       int_sp_data, yr, week), <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    week_mean_sd <span class="ot">&lt;-</span> <span class="fu">overlay</span>(week_mean, week_sd, <span class="at">fun =</span> <span class="cf">function</span>(x, y) {x <span class="sc">+</span> y},</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                            <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_mean_sd/weekly_mean_sd_%s_%s.tif&quot;</span>, </span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                                               int_sp_data, yr, week), <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="do">## get weekly climatologies across all years in the time series</span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>names_weekly <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;weekly_means&quot;</span>), <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>match_weeks <span class="ot">&lt;-</span> <span class="fu">substr</span>(names_weekly, <span class="dv">87</span>, <span class="dv">92</span>) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="do">## check all weeks expected to be there are there</span></span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>names_weekly_df <span class="ot">&lt;-</span> names_weekly <span class="sc">%&gt;%</span> </span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">fullname =</span> <span class="st">&quot;.&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">yr =</span> <span class="fu">substr</span>(fullname, <span class="dv">82</span>, <span class="dv">85</span>),</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>         <span class="at">wk =</span> <span class="fu">substr</span>(fullname, <span class="dv">87</span>, <span class="dv">88</span>)) <span class="co"># View(names_weekly_df)</span></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> names_weekly_df <span class="sc">%&gt;%</span> <span class="co"># View(tmp)</span></span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(yr, wk) <span class="sc">%&gt;%</span></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(yr) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">maxwk =</span> <span class="fu">max</span>(wk))</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span>(<span class="at">i =</span> match_weeks) <span class="sc">%dopar%</span> {</span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>  w <span class="ot">=</span> names_weekly[(<span class="fu">substr</span>(names_weekly, <span class="dv">87</span>, <span class="dv">92</span>) <span class="sc">==</span> i)] <span class="sc">%&gt;%</span> <span class="fu">stack</span>()</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>  m   <span class="ot">&lt;-</span> <span class="fu">calc</span>(w, <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)}, </span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_week_%s&quot;</span>, int_sp_data, i),</span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>  sd  <span class="ot">&lt;-</span> <span class="fu">calc</span>(w, <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)}, </span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/sd_week_%s&quot;</span>, int_sp_data, i),</span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>  m_sd <span class="ot">&lt;-</span> <span class="fu">overlay</span>(m, sd, <span class="at">fun =</span> <span class="cf">function</span>(x, y){x <span class="sc">+</span> y},</span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>                  <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_sd_week_%s&quot;</span>, int_sp_data, i),</span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>                  <span class="at">overwrite =</span> <span class="cn">TRUE</span>) <span class="do">## climatologies based on mean &amp; sd of all years, additional year each assessment...</span></span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">## for every week in each year of the time series, calculate weekly mean and standard deviation</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">10</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="do">## note: 2016 wk 22 has only 4 layers (4th layer all NAs) and length(days)=52; missing all week 23</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="do">## note: so far some 2005 files appear to have been downloaded incorrectly... replace them manually or just retry download??</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span> (<span class="at">yr =</span> yrs) <span class="sc">%dopar%</span> { </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># yr = 2005 ## for testing</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Calculating weekly mean and SD for &quot;</span>, yr))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  l <span class="ot">&lt;-</span> files[<span class="fu">substr</span>(files, <span class="dv">96</span>, <span class="dv">99</span>) <span class="sc">==</span> yr]</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  days_df <span class="ot">&lt;-</span> files_df <span class="sc">%&gt;%</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">==</span> yr) <span class="sc">%&gt;%</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(wk_of_yr, nday_in_wk) <span class="sc">%&gt;%</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> <span class="co"># select just distinct weeks with number of data days they contain</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">complete</span>(<span class="at">wk_of_yr =</span> <span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">53</span>)) <span class="sc">%&gt;%</span> <span class="co"># possible max 53 weeks</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">nday_in_wk =</span> <span class="fu">replace</span>(nday_in_wk, <span class="fu">is.na</span>(nday_in_wk), <span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="co"># zeros if no data</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">lag_nday =</span> <span class="fu">lag</span>(nday_in_wk),</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">lag_nday =</span> <span class="fu">replace</span>(lag_nday, <span class="fu">is.na</span>(lag_nday), <span class="dv">1</span>),</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">doy =</span> <span class="fu">cumsum</span>(lag_nday)) <span class="co"># day-of-year for start of each week of data</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  days <span class="ot">&lt;-</span> days_df<span class="sc">$</span>doy</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  weeks <span class="ot">&lt;-</span> days_df<span class="sc">$</span>wk_of_yr</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> weeks[<span class="sc">-</span><span class="fu">length</span>(weeks)]) { <span class="co"># print(days[j]:(days[j+1]-1)) # checking without foreach+dopar</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    j <span class="ot">=</span> <span class="dv">1</span> <span class="do">## for testing</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="do">## gapfill for weeks with 1 or fewer days using prev + subseq. weeks</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(days_df<span class="sc">$</span>nday_in_wk[j] <span class="sc">&lt;</span> <span class="dv">2</span>){</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      wk_files <span class="ot">&lt;-</span> l[days[j<span class="dv">-1</span>]<span class="sc">:</span>(days[j<span class="sc">+</span><span class="dv">2</span>]<span class="sc">-</span><span class="dv">1</span>)] <span class="co"># gapfilling</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>      wk_files <span class="ot">&lt;-</span> l[days[j]<span class="sc">:</span>(days[j<span class="sc">+</span><span class="dv">1</span>]<span class="sc">-</span><span class="dv">1</span>)]</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    rasters <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(wk_files[<span class="dv">1</span>])</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> wk_files[<span class="sc">-</span><span class="dv">1</span>]){</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>      r <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(i)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>      rasters <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">c</span>(rasters, r))</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    uv_week <span class="ot">&lt;-</span> rasters</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    week <span class="ot">=</span> <span class="fu">str_pad</span>(weeks[j], <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>) </span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    week_mean <span class="ot">&lt;-</span> <span class="fu">calc</span>(uv_week, <span class="at">fun =</span> <span class="cf">function</span>(x) {<span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)},</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_means/weekly_means_%s_%s.tif&quot;</span>,</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>                                         int_sp_data, yr, week), <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    week_sd <span class="ot">&lt;-</span> <span class="fu">calc</span>(uv_week, <span class="at">fun =</span> <span class="cf">function</span>(x) {<span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)},</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_sd/weekly_sd_%s_%s.tif&quot;</span>,</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>                                       int_sp_data, yr, week), <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>    week_mean_sd <span class="ot">&lt;-</span> <span class="fu">overlay</span>(week_mean, week_sd, <span class="at">fun =</span> <span class="cf">function</span>(x, y) {x <span class="sc">+</span> y},</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>                            <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_mean_sd/weekly_mean_sd_%s_%s.tif&quot;</span>,</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>                                               int_sp_data, yr, week), <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## get weekly climatologies across all years in the time series</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>names_weekly <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;weekly_means&quot;</span>), <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>match_weeks <span class="ot">&lt;-</span> <span class="fu">substr</span>(names_weekly, <span class="dv">87</span>, <span class="dv">92</span>) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="do">## check all weeks expected to be there are there</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>names_weekly_df <span class="ot">&lt;-</span> names_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">fullname =</span> <span class="st">&quot;.&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">yr =</span> <span class="fu">substr</span>(fullname, <span class="dv">82</span>, <span class="dv">85</span>),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">wk =</span> <span class="fu">substr</span>(fullname, <span class="dv">87</span>, <span class="dv">88</span>)) <span class="co"># View(names_weekly_df)</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> names_weekly_df <span class="sc">%&gt;%</span> <span class="co"># View(tmp)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(yr, wk) <span class="sc">%&gt;%</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(yr) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">maxwk =</span> <span class="fu">max</span>(wk))</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span>(<span class="at">i =</span> match_weeks) <span class="sc">%dopar%</span> {</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  w <span class="ot">=</span> names_weekly[(<span class="fu">substr</span>(names_weekly, <span class="dv">87</span>, <span class="dv">92</span>) <span class="sc">==</span> i)] <span class="sc">%&gt;%</span> <span class="fu">stack</span>()</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  m   <span class="ot">&lt;-</span> <span class="fu">calc</span>(w, <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)}, </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_week_%s&quot;</span>, int_sp_data, i),</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  sd  <span class="ot">&lt;-</span> <span class="fu">calc</span>(w, <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)}, </span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/sd_week_%s&quot;</span>, int_sp_data, i),</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  m_sd <span class="ot">&lt;-</span> <span class="fu">overlay</span>(m, sd, <span class="at">fun =</span> <span class="cf">function</span>(x, y){x <span class="sc">+</span> y},</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>                  <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_sd_week_%s&quot;</span>, int_sp_data, i),</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>                  <span class="at">overwrite =</span> <span class="cn">TRUE</span>) <span class="do">## climatologies based on mean &amp; sd of all years, additional year each assessment...</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 </div>
 </div>
 <div id="compare-to-climatology" class="section level2">
 <h2>Compare to Climatology</h2>
 <p>Compare each week in each year to the climatology for that week. The climatology is equal to the mean plus one standard deviation.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## loop to calculate annual positive anomalies</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span> (<span class="at">i =</span> yrs) <span class="sc">%dopar%</span> {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  match_weeks <span class="ot">&lt;-</span> names_weekly_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(yr <span class="sc">==</span> i)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">=</span> <span class="fu">stack</span>()</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> match_weeks<span class="sc">$</span>wk) {</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    w_mean <span class="ot">=</span> <span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_means/weekly_means_%s_%s.tif&quot;</span>, int_sp_data, i, j)) <span class="co"># mean UV for week j, year i</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    w_anom <span class="ot">=</span> <span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_sd_week_%s.tif&quot;</span>, int_sp_data, j)) <span class="co"># week j climatology</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    count <span class="ot">=</span> <span class="fu">overlay</span>(w_mean, w_anom, <span class="at">fun =</span> <span class="cf">function</span>(x, y){<span class="fu">ifelse</span>(x <span class="sc">&gt;</span> y, <span class="dv">1</span>, <span class="dv">0</span>)}) <span class="co"># compare to average anomaly for that week</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    s <span class="ot">=</span> <span class="fu">stack</span>(s, count)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  year <span class="ot">=</span> <span class="fu">calc</span>(s, <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">sum</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)},</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/annual_anomalies_diff/annual_pos_anomalies_%s.tif&quot;</span>, int_sp_data, i),</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>) <span class="do">## each assessment get new year of data, another layer in this calculation...</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## loop to calculate annual positive anomalies</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span> (<span class="at">i =</span> yrs) <span class="sc">%dopar%</span> {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  match_weeks <span class="ot">&lt;-</span> names_weekly_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(yr <span class="sc">==</span> i)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">=</span> <span class="fu">stack</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> match_weeks<span class="sc">$</span>wk) {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    w_mean <span class="ot">=</span> <span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_means/weekly_means_%s_%s.tif&quot;</span>, int_sp_data, i, j)) <span class="co"># mean UV for week j, year i</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    w_anom <span class="ot">=</span> <span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_sd_week_%s.tif&quot;</span>, int_sp_data, j)) <span class="co"># week j climatology</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    count <span class="ot">=</span> <span class="fu">overlay</span>(w_mean, w_anom, <span class="at">fun =</span> <span class="cf">function</span>(x, y){<span class="fu">ifelse</span>(x <span class="sc">&gt;</span> y, <span class="dv">1</span>, <span class="dv">0</span>)}) <span class="co"># compare to average anomaly for that week</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    s <span class="ot">=</span> <span class="fu">stack</span>(s, count)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  year <span class="ot">=</span> <span class="fu">calc</span>(s, <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">sum</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)},</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/annual_anomalies_diff/annual_pos_anomalies_%s.tif&quot;</span>, int_sp_data, i),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>) <span class="do">## each assessment get new year of data, another layer in this calculation...</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="calculate-differences" class="section level2">
 <h2>Calculate Differences</h2>
 <p>Calculate the difference in total number of anomalies over a 5 year period compared to the first 5 years (2005-2009)</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;annual_anomalies_diff&quot;</span>), </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">pattern =</span> <span class="st">&quot;anomalies&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="do">## reference period is 2005-2009</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>ref <span class="ot">&lt;-</span> l[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">%&gt;%</span> <span class="fu">stack</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">calc</span>(., <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">sum</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)})</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ref, <span class="at">col =</span> cols, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">&quot;Total Number of Anomalies 2005-2009&quot;</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(land, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span>(<span class="at">i =</span> <span class="dv">2005</span><span class="sc">:</span>(<span class="fu">max</span>(yrs) <span class="sc">-</span> <span class="dv">4</span>)) <span class="sc">%dopar%</span> {</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calculate difference between total number of anomalies in recent and historical (2005-2009) time periods</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> i<span class="sc">:</span>(i <span class="sc">+</span> <span class="dv">4</span>)</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">stack</span>(l[<span class="fu">str_sub</span>(l, <span class="sc">-</span><span class="dv">8</span>, <span class="sc">-</span><span class="dv">5</span>) <span class="sc">%in%</span> y]) <span class="sc">%&gt;%</span> <span class="fu">sum</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  diff <span class="ot">&lt;-</span> s <span class="sc">-</span> ref</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">projection</span>(diff) <span class="ot">&lt;-</span> <span class="st">&quot;+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0&quot;</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeRaster</span>(diff, </span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/annual_anomalies_diff/annual_diff_%s_%s.tif&quot;</span>, </span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                                 int_sp_data, y[<span class="dv">1</span>], y[<span class="dv">5</span>]), </span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;annual_anomalies_diff&quot;</span>), </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">pattern =</span> <span class="st">&quot;anomalies&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="do">## reference period is 2005-2009</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ref <span class="ot">&lt;-</span> l[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">%&gt;%</span> <span class="fu">stack</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">calc</span>(., <span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">sum</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)})</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ref, <span class="at">col =</span> cols, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">&quot;Total Number of Anomalies 2005-2009&quot;</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(land, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span>(<span class="at">i =</span> <span class="dv">2005</span><span class="sc">:</span>(<span class="fu">max</span>(yrs) <span class="sc">-</span> <span class="dv">4</span>)) <span class="sc">%dopar%</span> {</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calculate difference between total number of anomalies in recent and historical (2005-2009) time periods</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> i<span class="sc">:</span>(i <span class="sc">+</span> <span class="dv">4</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">stack</span>(l[<span class="fu">str_sub</span>(l, <span class="sc">-</span><span class="dv">8</span>, <span class="sc">-</span><span class="dv">5</span>) <span class="sc">%in%</span> y]) <span class="sc">%&gt;%</span> <span class="fu">sum</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  diff <span class="ot">&lt;-</span> s <span class="sc">-</span> ref</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">projection</span>(diff) <span class="ot">&lt;-</span> <span class="st">&quot;+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0&quot;</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeRaster</span>(diff, </span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>              <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/annual_anomalies_diff/annual_diff_%s_%s.tif&quot;</span>, </span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                                 int_sp_data, y[<span class="dv">1</span>], y[<span class="dv">5</span>]), </span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="rescale" class="section level2">
 <h2>Rescale</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ref_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;annual_anomalies_diff&quot;</span>), </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;diff&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="do">## this says reference point is 41</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">read.csv</span>(<span class="st">&quot;../../supplementary_information/v2016/reference_points_pressures.csv&quot;</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">filter</span>(pressure <span class="sc">==</span> <span class="st">&quot;Ultraviolet Radiation Anomalies&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>             dplyr<span class="sc">::</span><span class="fu">select</span>(ref_point) <span class="sc">%&gt;%</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>             <span class="fu">as.numeric</span>(.<span class="sc">$</span>ref_point)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="do">## get the reference point (resc_num = rescale number, excludes baseline 2005_2009 tif)</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2006</span><span class="sc">:</span>(<span class="fu">max</span>(yrs) <span class="sc">-</span> <span class="dv">4</span>)){</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  max_yr <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">4</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">raster</span>(ref_files[<span class="fu">str_sub</span>(ref_files, <span class="sc">-</span><span class="dv">13</span>, <span class="sc">-</span><span class="dv">10</span>) <span class="sc">==</span> i]) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mask</span>(<span class="fu">as</span>(land, <span class="st">&quot;Spatial&quot;</span>), <span class="at">inverse =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">getValues</span>()</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  vals <span class="ot">&lt;-</span> <span class="fu">c</span>(vals, m)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>resc_num  <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">quantile</span>(vals, <span class="at">prob =</span> <span class="fl">0.9999</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># 42 for v2018; 46 for v2019, 49 for v2020, 47 for v2021</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="do">## rescale using reference point</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(file <span class="cf">in</span> ref_files){</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(file)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  the_name <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;.tif&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">basename</span>(file))</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">raster</span>(file) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">calc</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">ifelse</span>(x <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> resc_num, <span class="dv">1</span>, x<span class="sc">/</span>resc_num), <span class="dv">0</span>)}, </span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">file.path</span>(int_sp_data, <span class="fu">sprintf</span>(<span class="st">&quot;rescaled/%s_rescaled.tif&quot;</span>, the_name)),</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>resc_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;rescaled&quot;</span>), </span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                        <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;rescaled.tif&quot;</span>)</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="do">## resample to ocean raster scale (~1km) and then mask</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span>(<span class="at">i =</span> <span class="dv">2005</span><span class="sc">:</span>(<span class="fu">max</span>(yrs) <span class="sc">-</span> <span class="dv">4</span>)) <span class="sc">%dopar%</span> {</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  max_yr <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">4</span></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/prs_uv&quot;</span>, data_yr, <span class="st">&quot;output&quot;</span>, </span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">sprintf</span>(<span class="st">&quot;uv_%s_%s-2005_2009_mol_1km.tif&quot;</span>, i, max_yr))) <span class="sc">!=</span> <span class="cn">TRUE</span>){</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  mol1km_masked <span class="ot">&lt;-</span> resc_files[<span class="fu">str_sub</span>(resc_files, <span class="sc">-</span><span class="dv">22</span>, <span class="sc">-</span><span class="dv">19</span>) <span class="sc">==</span> i] <span class="sc">%&gt;%</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">raster</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">projectRaster</span>(<span class="at">crs =</span> mollCRS, <span class="at">over =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">&quot;ngb&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">resample</span>(ocean, <span class="at">method =</span> <span class="st">&quot;ngb&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mask</span>(ocean, </span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">file.path</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/prs_uv&quot;</span>, data_yr, <span class="st">&quot;output&quot;</span>, </span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">sprintf</span>(<span class="st">&quot;uv_%s_%s-2005_2009_mol_1km.tif&quot;</span>, i, max_yr)),</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>         <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sprintf</span>(<span class="st">&quot;Skipping %s to %s. Already done.&quot;</span>,</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>                i, max_yr))</span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ref_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;annual_anomalies_diff&quot;</span>), </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;diff&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="do">## this says reference point is 41</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">read.csv</span>(<span class="st">&quot;../../supplementary_information/v2016/reference_points_pressures.csv&quot;</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pressure <span class="sc">==</span> <span class="st">&quot;Ultraviolet Radiation Anomalies&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(ref_point) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(.<span class="sc">$</span>ref_point)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="do">## get the reference point (resc_num = rescale number, excludes baseline 2005_2009 tif)</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2006</span><span class="sc">:</span>(<span class="fu">max</span>(yrs) <span class="sc">-</span> <span class="dv">4</span>)){</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;%s&quot;</span>))</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  max_yr <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">4</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> ref_files[<span class="fu">str_sub</span>(ref_files, <span class="sc">-</span><span class="dv">13</span>, <span class="sc">-</span><span class="dv">10</span>) <span class="sc">==</span> i] <span class="sc">%&gt;%</span> </span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">rast</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">mask</span>(<span class="at">mask =</span> terra<span class="sc">::</span><span class="fu">vect</span>(land), <span class="at">inverse =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">values</span>()</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  vals <span class="ot">&lt;-</span> <span class="fu">c</span>(vals, m)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(i, <span class="st">&quot;took&quot;</span>, <span class="fu">round</span>((<span class="fu">as.numeric</span>(<span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;%s&quot;</span>)) <span class="sc">-</span> t) <span class="sc">/</span> <span class="dv">60</span>, <span class="dv">2</span>), <span class="st">&quot;minutes&quot;</span>))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>} </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 42 for v2018; 46 for v2019; 49 for v2020; 47 for v2021; X for v2022</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>resc_num  <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">quantile</span>(vals, <span class="at">prob =</span> <span class="fl">0.9999</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="do">## rescale using reference point</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(file <span class="cf">in</span> ref_files){</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(file)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  the_name <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;.tif&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">basename</span>(file))</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> file <span class="sc">%&gt;%</span> </span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">raster</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">calc</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">ifelse</span>(x <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> resc_num, <span class="dv">1</span>, x<span class="sc">/</span>resc_num), <span class="dv">0</span>)}, </span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">filename =</span> <span class="fu">file.path</span>(int_sp_data, <span class="fu">sprintf</span>(<span class="st">&quot;rescaled/%s_rescaled.tif&quot;</span>, the_name)),</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>resc_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;rescaled&quot;</span>), </span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>                        <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;rescaled.tif&quot;</span>)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="do">## resample to ocean raster scale (~1km) and then mask</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span>(<span class="at">i =</span> <span class="dv">2005</span><span class="sc">:</span>(<span class="fu">max</span>(yrs) <span class="sc">-</span> <span class="dv">4</span>)) <span class="sc">%dopar%</span> {</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;%s&quot;</span>))</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  max_yr <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">4</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/prs_uv&quot;</span>, version_yr, <span class="st">&quot;output&quot;</span>, </span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">sprintf</span>(<span class="st">&quot;uv_%s_%s-2005_2009_mol_1km.tif&quot;</span>, i, max_yr))) <span class="sc">!=</span> <span class="cn">TRUE</span>){</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>    mol1km_masked <span class="ot">&lt;-</span> resc_files[<span class="fu">str_sub</span>(resc_files, <span class="sc">-</span><span class="dv">22</span>, <span class="sc">-</span><span class="dv">19</span>) <span class="sc">==</span> i] <span class="sc">%&gt;%</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">raster</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">projectRaster</span>(<span class="at">crs =</span> mollCRS, <span class="at">over =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">&quot;ngb&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">resample</span>(ocean, <span class="at">method =</span> <span class="st">&quot;ngb&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mask</span>(ocean, </span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>           <span class="at">filename =</span> <span class="fu">file.path</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/prs_uv&quot;</span>, version_yr, <span class="st">&quot;output&quot;</span>, </span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">sprintf</span>(<span class="st">&quot;uv_%s_%s-2005_2009_mol_1km.tif&quot;</span>, i, max_yr)),</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>           <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(i, <span class="st">&quot;to&quot;</span>, max_yr, <span class="st">&quot;took&quot;</span>, <span class="fu">round</span>((<span class="fu">as.numeric</span>(<span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;%s&quot;</span>)) <span class="sc">-</span> t) <span class="sc">/</span> <span class="dv">60</span>, <span class="dv">2</span>), <span class="st">&quot;minutes&quot;</span>))</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sprintf</span>(<span class="st">&quot;Skipping %s to %s. Already done.&quot;</span>, i, max_yr))</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <hr />
 </div>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mol1km_masked <span class="ot">&lt;-</span> <span class="fu">list.files</span>(out_dir, <span class="at">pattern =</span> <span class="st">&quot;uv_.*_mol_1km.tif&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">raster</span>(mol1km_masked[<span class="fu">length</span>(mol1km_masked)])</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> cols, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">&quot;UV Pressure Layer </span><span class="sc">\n</span><span class="st"> OHI&quot;</span>, current_yr))</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mol1km_masked <span class="ot">&lt;-</span> <span class="fu">list.files</span>(out_dir, <span class="at">pattern =</span> <span class="st">&quot;uv_.*_mol_1km.tif&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">raster</span>(mol1km_masked[<span class="fu">length</span>(mol1km_masked)])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> cols, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">&quot;UV Pressure Layer</span><span class="sc">\n</span><span class="st">OHI&quot;</span>, current_yr))</span></code></pre></div>
 <div id="extract-data-for-each-region" class="section level2">
 <h2>Extract Data for Each Region</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## load raster/zonal data</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>zones <span class="ot">&lt;-</span> <span class="fu">raster</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/v2017/regions_eez_with_fao_ant.tif&quot;</span>))</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>rgn_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;~/github/ohi-global/eez/spatial/regions_list.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="do">## get raster data</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>rasts <span class="ot">&lt;-</span> <span class="fu">list.files</span>(out_dir, <span class="at">full =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;uv_.*_mol_1km.tif&quot;</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>pressure_stack <span class="ot">&lt;-</span> <span class="fu">stack</span>(rasts)</span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveGIF</span>({</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nlayers</span>(pressure_stack)){</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    n <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">&quot;UV Pressure %s&quot;</span>, </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">substr</span>(<span class="fu">names</span>(pressure_stack[[i]]), <span class="dv">4</span>, <span class="dv">12</span>))</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(pressure_stack[[i]], </span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">zlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="co"># don&#39;t forget to fix the zlimits</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> cols,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> n)}}, </span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ani.width =</span> <span class="dv">750</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ani.height =</span> <span class="dv">400</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">movie.name =</span> <span class="st">&quot;uv.gif&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## extract data for each region</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>regions_stats <span class="ot">&lt;-</span> <span class="fu">zonal</span>(pressure_stack, zones, <span class="at">fun =</span> <span class="st">&quot;mean&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">progress =</span> <span class="st">&quot;text&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">data.frame</span>()</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(regions_stats, <span class="st">&quot;int/uv_mean_rgn.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## load raster/zonal data</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>zones <span class="ot">&lt;-</span> <span class="fu">raster</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/v2017/regions_eez_with_fao_ant.tif&quot;</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>rgn_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;~/ohi-global/eez/spatial/regions_list.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>)</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="do">## check regions are all present or missing as expected</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(regions_stats<span class="sc">$</span>zone, rgn_data<span class="sc">$</span>rgn_id) <span class="co"># high seas and Antarctica</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 260    261    262    263    264    266    267    269    270    272    273    274    275    276    277 248100 248200 248300 248400</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 248500 248600 258410 258420 258431 258432 258441 258442 258510 258520 258600 258700 288100 288200 288300</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(rgn_data<span class="sc">$</span>rgn_id, regions_stats<span class="sc">$</span>zone) <span class="co"># Antarctica is 213</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">merge</span>(rgn_data, regions_stats, <span class="at">all.y =</span> <span class="cn">TRUE</span>, <span class="at">by.x =</span> <span class="st">&quot;rgn_id&quot;</span>, <span class="at">by.y =</span> <span class="st">&quot;zone&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">gather</span>(<span class="st">&quot;year&quot;</span>, <span class="st">&quot;pressure_score&quot;</span>, <span class="fu">starts_with</span>(<span class="st">&quot;uv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>) <span class="co"># filter out non OHI global regions</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>uv_data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">substring</span>(year, <span class="dv">9</span>, <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(year)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, year, pressure_score)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## visualize data using googleVis plot</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>plotData <span class="ot">&lt;-</span> uv_data <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_name, year, pressure_score)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>motion <span class="ot">=</span> <span class="fu">gvisMotionChart</span>(plotData, </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">idvar =</span> <span class="st">&quot;rgn_name&quot;</span>, </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">timevar =</span> <span class="st">&quot;year&quot;</span>) </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(motion)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(motion, <span class="at">file =</span> <span class="st">&quot;uv.html&quot;</span>)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="do">## save data layer</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>uv_data <span class="ot">&lt;-</span> uv_data <span class="sc">%&gt;%</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, pressure_score)</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(uv_data, <span class="st">&quot;output/uv.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>uv_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/uv.csv&quot;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> uv_data <span class="sc">%&gt;%</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span> <span class="co"># data years lag assessment yrs by 1</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year, <span class="at">new_pressure =</span> pressure_score) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/uv.csv&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>),</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">old_pressure =</span> pressure_score)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>plot_diff <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(old, <span class="fu">aes</span>(new_pressure, old_pressure, <span class="at">label =</span> rgn_id)) <span class="sc">+</span> </span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>()</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(plot_diff)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(old %&gt;% mutate(difference = new_pressure - old_pressure), aes(difference)) + geom_histogram(binwidth = 0.002)</span></span></code></pre></div>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="do">## get raster data</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>rasts <span class="ot">&lt;-</span> <span class="fu">list.files</span>(out_dir, <span class="at">full =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;uv_.*_mol_1km.tif&quot;</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>pressure_stack <span class="ot">&lt;-</span> <span class="fu">stack</span>(rasts)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveGIF</span>({</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nlayers</span>(pressure_stack)){</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    n <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">&quot;UV Pressure %s&quot;</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">substr</span>(<span class="fu">names</span>(pressure_stack[[i]]), <span class="dv">4</span>, <span class="dv">12</span>))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(pressure_stack[[i]], </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">zlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="co"># don&#39;t forget to fix the zlimits</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> cols,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> n)}}, </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ani.width =</span> <span class="dv">750</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ani.height =</span> <span class="dv">400</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">movie.name =</span> <span class="st">&quot;uv.gif&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## extract data for each region</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>regions_stats <span class="ot">&lt;-</span> <span class="fu">zonal</span>(pressure_stack, zones, <span class="at">fun =</span> <span class="st">&quot;mean&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">progress =</span> <span class="st">&quot;text&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>()</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(regions_stats, <span class="st">&quot;int/uv_mean_rgn.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="do">## check regions are all present or missing as expected</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(regions_stats<span class="sc">$</span>zone, rgn_data<span class="sc">$</span>rgn_id) <span class="co"># high seas and Antarctica</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 260    261    262    263    264    266    267    269    270    272    273    274    275    276    277 248100 248200 248300 248400</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 248500 248600 258410 258420 258431 258432 258441 258442 258510 258520 258600 258700 288100 288200 288300</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(rgn_data<span class="sc">$</span>rgn_id, regions_stats<span class="sc">$</span>zone) <span class="co"># Antarctica is 213</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">merge</span>(rgn_data, regions_stats, <span class="at">all.y =</span> <span class="cn">TRUE</span>, <span class="at">by.x =</span> <span class="st">&quot;rgn_id&quot;</span>, <span class="at">by.y =</span> <span class="st">&quot;zone&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">gather</span>(<span class="st">&quot;year&quot;</span>, <span class="st">&quot;pressure_score&quot;</span>, <span class="fu">starts_with</span>(<span class="st">&quot;uv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>) <span class="co"># filter out non OHI global regions</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>uv_data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">substring</span>(year, <span class="dv">9</span>, <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(year)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, year, pressure_score)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## visualize data using googleVis plot</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plotData <span class="ot">&lt;-</span> uv_data <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_name, year, pressure_score)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>motion <span class="ot">=</span> <span class="fu">gvisMotionChart</span>(plotData, </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">idvar =</span> <span class="st">&quot;rgn_name&quot;</span>, </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">timevar =</span> <span class="st">&quot;year&quot;</span>) </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(motion)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(motion, <span class="at">file =</span> <span class="st">&quot;uv.html&quot;</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="do">## save data layer</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>uv_data <span class="ot">&lt;-</span> uv_data <span class="sc">%&gt;%</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, pressure_score)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(uv_data, <span class="st">&quot;output/uv.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+</div>
+<div id="data-check" class="section level2">
+<h2>Data Check</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This top part was added in 2022 to help with data checks to be able to keep track of the </span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="do">## data year and which version year the plot is being generated from See conversation in </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="do">## https://github.com/OHI-Science/globalfellows-issues/issues/210 to understand why... maybe.</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="do">## mostly the point is to get nice plot axes</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>data_year_1 <span class="ot">&lt;-</span> current_yr <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>data_year_2 <span class="ot">&lt;-</span> current_yr <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>version_year_1 <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_yr <span class="sc">-</span> <span class="dv">0</span> )</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>version_year_2 <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_yr <span class="sc">-</span> <span class="dv">1</span> )</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>uv_data_1 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">paste0</span>(<span class="st">&quot;../&quot;</span>, version_year_1, <span class="st">&quot;/output/uv.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> data_year_1)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>uv_data_2 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">paste0</span>(<span class="st">&quot;../&quot;</span>,version_year_2, <span class="st">&quot;/output/uv.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> data_year_2)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>combined <span class="ot">&lt;-</span> uv_data_1 <span class="sc">%&gt;%</span> <span class="co"># data years lag assessment yrs by 1</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year, <span class="at">new_pressure =</span> pressure_score) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(uv_data_2, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">old_pressure =</span> pressure_score)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>plot_diff <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(combined, <span class="fu">aes</span>(new_pressure, old_pressure, <span class="at">label =</span> rgn_id)) <span class="sc">+</span> </span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;UV Pressure&quot;</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="fu">paste</span>(<span class="st">&quot;Data year&quot;</span>, data_year_1, <span class="st">&quot;-&quot;</span>, version_year_1),</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">paste</span>(<span class="st">&quot;Data year&quot;</span>, data_year_2, <span class="st">&quot;-&quot;</span>, version_year_2)) <span class="sc">+</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(plot_diff)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(combined %&gt;% mutate(difference = new_pressure - old_pressure), aes(difference)) + geom_histogram(binwidth = 0.002)</span></span></code></pre></div>
 <hr />
 </div>
-</div>
-<div id="citation-information" class="section level1">
-<h1>Citation information</h1>
-<p>Niilo Kalakoski, Panu Lahtinen, Jari Hovila (May 2016) OMI/Aura Surface UVB Irradiance and Erythemal Dose Daily L3 Global Gridded 1.0 degree x 1.0 degree V3, NASA Goddard Space Flight Center.</p>
 </div>
 
 

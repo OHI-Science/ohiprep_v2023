@@ -59,7 +59,7 @@ Jari Hovila, Antii Arola, and Johanna Tamminen (2013), OMI/Aura Surface UVB Irra
 ```{r setup, message = F, warning = F, eval=F}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
-current_yr <- 2022
+current_yr <- 2022  ############## UPDATE ME
 data_yr <- paste0("d", current_yr)
 version_yr <- paste0("v", current_yr)
 
@@ -156,7 +156,7 @@ __Steps:__
 
   - `/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/<version_year>`
 
-  - and a `/data` subfolder
+  - and a `/data` subfolder (See below)
 
 - Place `file_list.txt` in `/home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/<version_year>` 
 
@@ -164,17 +164,32 @@ __Steps:__
 
 - This will use the list and earthdata login info (username and password) to download the new data files into the raw data directory. The naming convention of the downloaded files: 'OMI-Aura' refers to the instrument, 'L3' means it is a level 3 data product, 'OMUVBd' is the measurement, the first date is when the data was recorded, the second date and time corresponds to modification/upload of the data.
 
+Create new folders for the raw data, intermediate files, and output files
+
+```{bash create new empty folders,eval=F}
+## Added v2022
+YEAR=2023 ###### UPDATE ME
+
+# make raw data folder for new year
+cd /home/shares/ohi/git-annex/globalprep/_raw_data/NASA_OMI_AURA_UV/
+mkdir -p ./d$YEAR/data
+# make new intermediate and output file folders
+cd /home/shares/ohi/git-annex/globalprep/prs_uv
+mkdir -p ./v$YEAR/{output,int}
+cd v$YEAR/int
+mkdir {annual_anomalies_diff,rescaled,weekly_climatologies,weekly_means,weekly_sd}
+```
+
+
 ```{r earthdata login info, eval = F}
 ## need  username and password, define in console when prompted (or read from secure file), don't save here!!
 usrname <- readline("Type earthdata username: ")
 pass <- readline("Type earthdata password: ")
 ```
 
-
 ```{r download the data, eval = F}
 ## This took 103.5 minutes in 2019... 
-## This took like 6 hours in 2022 for some reason...
-## I left it running after hours and it kept running
+## This took like 6 hours in 2022 for some reason... You can leave this running after hours if need be, and it should keep going
 tic()
 ## read in file list .text, downloaded from earthdata & saved in destination folder (same as raw_data_dir)
 file_list_raw <- read_delim(
@@ -497,7 +512,6 @@ plot(out, box = FALSE, col = cols, axes = FALSE, main = paste("UV Pressure Layer
 ## Extract Data for Each Region
 
 ```{r extract_region_data, eval=F}
-
 ## load raster/zonal data
 zones <- raster(file.path(dir_M, "git-annex/globalprep/spatial/v2017/regions_eez_with_fao_ant.tif"))
 rgn_data <- read.csv("~/ohi-global/eez/spatial/regions_list.csv") %>%
@@ -509,7 +523,6 @@ pressure_stack <- stack(rasts)
 ```
 
 ```{r gif, eval=F}
-
 saveGIF({
   for(i in 1:nlayers(pressure_stack)){
     n = sprintf("UV Pressure %s", 
@@ -524,7 +537,6 @@ saveGIF({
 ```
 
 ```{r extract_region_results, eval = F}
-
 ## extract data for each region
 regions_stats <- zonal(pressure_stack, zones, fun = "mean", na.rm = TRUE, 
                        progress = "text") %>% 
@@ -548,7 +560,6 @@ uv_data <- data %>%
 ```
 
 ```{r save_results, eval=F}
-
 ## visualize data using googleVis plot
 plotData <- uv_data %>%
   dplyr::select(rgn_name, year, pressure_score)
@@ -560,7 +571,6 @@ motion = gvisMotionChart(plotData,
 plot(motion)
 print(motion, file = "uv.html")
 
-
 ## save data layer
 uv_data <- uv_data %>%
   dplyr::select(rgn_id, year, pressure_score)
@@ -570,22 +580,37 @@ write.csv(uv_data, "output/uv.csv", row.names = FALSE)
 ## Data Check 
 
 ```{r compare_previous_year, eval=F}
+## This top part was added in 2022 to help with data checks to be able to keep track of the 
+## data year and which version year the plot is being generated from See conversation in 
+## https://github.com/OHI-Science/globalfellows-issues/issues/210 to understand why... maybe.
+## mostly the point is to get nice plot axes
 
-uv_data <- read.csv("output/uv.csv")
+data_year_1 <- current_yr - 1
+data_year_2 <- current_yr - 2
 
-old <- uv_data %>% 
-  filter(year == 2020) %>% # data years lag assessment yrs by 1
+version_year_1 <- paste0("v", current_yr - 0 )
+version_year_2 <- paste0("v", current_yr - 1 )
+
+uv_data_1 <- read.csv(paste0("../", version_year_1, "/output/uv.csv")) %>%
+  filter(year == data_year_1)
+uv_data_2 <- read.csv(paste0("../",version_year_2, "/output/uv.csv")) %>% 
+  filter(year == data_year_2)
+
+combined <- uv_data_1 %>% # data years lag assessment yrs by 1
   select(-year, new_pressure = pressure_score) %>% 
-  left_join(read.csv("../v2020/output/uv.csv") %>% filter(year == 2019),
-             by = c("rgn_id")) %>% 
+  left_join(uv_data_2, by = c("rgn_id")) %>% 
   rename(old_pressure = pressure_score)
 
-plot_diff <- ggplot(old, aes(new_pressure, old_pressure, label = rgn_id)) + 
+plot_diff <- ggplot(combined, aes(new_pressure, old_pressure, label = rgn_id)) + 
   geom_point() + 
-  geom_abline()
+  geom_abline() +
+  labs(title = "UV Pressure",
+       x = paste("Data year", data_year_1, "-", version_year_1),
+       y = paste("Data year", data_year_2, "-", version_year_2)) +
+  theme_minimal()
 ggplotly(plot_diff)
 
-# ggplot(old %>% mutate(difference = new_pressure - old_pressure), aes(difference)) + geom_histogram(binwidth = 0.002)
+# ggplot(combined %>% mutate(difference = new_pressure - old_pressure), aes(difference)) + geom_histogram(binwidth = 0.002)
 ```
 
 
