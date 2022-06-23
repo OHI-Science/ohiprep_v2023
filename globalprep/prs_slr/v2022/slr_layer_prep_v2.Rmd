@@ -109,7 +109,7 @@ mollCRS <- CRS("+proj=moll") # mollweide projection
 ocean <- terra::rast(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif"))
 ```
 
-```{r}
+```{r, eval=FALSE}
 plot(ocean)
 ```
 
@@ -148,7 +148,7 @@ ub <- sprintf("ftp://%s@%s", userpasswd, substr(url, 7, 87)) # here, substr extr
 ```
 
 Pull monthly files from the source into the data directory:
-```{r}
+```{r, eval=FALSE}
 ## download is quite fast, takes just a minute for 12 files
 for (mo in months){ 
    #mo="01" # for testing
@@ -199,33 +199,9 @@ nc_files <- c(list.files(file.path(dir_anx_aviso, "d2022"),
 
 The raw monthly data looks like this:
 ```{r test_plot_raw, eval=FALSE}
-# using raster package
 # removed axes = F argument
-#plot(raster::raster(nc_files[3]), col = cols, 
-#     main = paste("Year", substr(nc_files[3], 90, 93), "Month", substr(nc_files[3], 96, 97)))
-
-# compare to rast() in the terra package
-# removed axes = F arg
 plot(terra::rast(nc_files[3]), col = cols, 
      main = paste("Year", substr(nc_files[3], 90, 93), "Month", substr(nc_files[3], 96, 97))) 
-```
-
-```{r}
-# the rasters look the same, but let's compare the two rasters as dataframes and compare their values
-# define the rasters as objects to compare between packages
-raster_y2020_m03 <- raster::raster(nc_files[3])
-terra_y2020_m03 <- terra::rast(nc_files[3])
-
-# convert to df's
-raster_y2020_m03_df <- as.data.frame(raster_y2020_m03, xy = TRUE, na.rm = FALSE)
-terra_y2020_m03_df <- as.data.frame(terra_y2020_m03, xy = TRUE, na.rm = FALSE)
-# recode NaN to NA value
-terra_y2020_m03_df$sla[terra_y2020_m03_df$sla == "NaN"] <- NA
-
-true_false_df <- as.data.frame(raster_y2020_m03_df == terra_y2020_m03_df) # all values are NA or TRUE, no FALSE values in any column
-# count number of NA values in each df, they are the same!
-sum(is.na(raster_y2020_m03_df$Averaged.Sea.Level.Anomalies.2020.03)) # 433059
-sum(is.na(terra_y2020_m03_df$sla)) # 43059
 ```
 
 The following code is used to:
@@ -236,6 +212,7 @@ The following code is used to:
 The output is saved in the folder `int/msla_monthly`
 
 ```{r, eval = F}
+# original loop with raster package
 # registerDoParallel(10)
 # 
 #  ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
@@ -256,10 +233,9 @@ The output is saved in the folder `int/msla_monthly`
 #  }
 # this chunk worked, but now I have to get the next chunk to work since we are transitioning from raster to terra
 # check on the many warnings that result from this chunk (check if they result from the terra approach too)
-```
 
-```{r, eval = F}
 
+# attempt at converting the parallelized loop from raster to terra
 # registerDoParallel(10)
 # 
 # ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
@@ -289,11 +265,11 @@ The output is saved in the folder `int/msla_monthly`
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 tic()
-# do not run in parallel because it is not compatible with terra::project() (package might be updated in the future to accomodate parallelization)
+# do not run in parallel because it is not compatible with terra::project() (package might be updated in the future to accommodate parallelization)
 # rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
-# takes ~201-370 seconds to run
+# takes ~201-370 seconds to run (~6 minutes)
 
 for (i in seq_along(nc_files)){
   
@@ -390,9 +366,9 @@ annual_means <- list.files(file.path(dir_prs_slr, "int/msla_annual_mean"), full 
 # this threw the same error as the first chunk with `terra::project()` i tried to use foreach with terra: Error in x@ptr$nrow() : external pointer is not valid
 ```
 
-```{r}
+```{r, eval=FALSE}
 tic()
-# unparallelize loop because working with `terra::project()` and foreach threw the error "external pointer is not valid"
+# unparallelize loop because working with `terra::project()` and `foreach()` threw the error "external pointer is not valid"
 # total time for loop: 96 minutes
 for(i in seq_along(annual_means)) {  
 
@@ -409,7 +385,7 @@ for(i in seq_along(annual_means)) {
 toc()
 ```
 
-```{r}
+```{r, eval=FALSE}
 annual_mol <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol"), full = TRUE)
 foreach(file = annual_mol) %dopar% { # file = annual_mol[2]
   yr <- str_sub(file,-8,-5)
@@ -435,18 +411,18 @@ coastal_rasts <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol_coastal"
 ## takes a really long times; added foreach dopar to speed...
 ## doesn't really need to be recalcuated each year unless theres reason to believe source updated past years data
 ## script was updated in 2022 to convert from raster to terra, so terra functions were added to the following loop but not run because no reason to believe source updated past years data
-# registerDoParallel(8)
-# 
-# vals <- foreach(i = 1993:2015, .combine = c) %dopar% { # i = 1993
-#   coastal_rasts[which(str_sub(coastal_rasts, -8, -5) == i)] %>%
-#     #raster() %>%
-#     terra::rast() %>% 
-#     #getValues() %>%
-#     terra::values() %>% 
-#     na.omit()
-# }
-# 
-# ref_point_slr <- quantile(vals, 0.9999)
+registerDoParallel(8)
+
+vals <- foreach(i = 1993:2015, .combine = c) %dopar% { # i = 1993
+  coastal_rasts[which(str_sub(coastal_rasts, -8, -5) == i)] %>%
+    #raster() %>%
+    terra::rast() %>%
+    #getValues() %>%
+    terra::values() %>%
+    na.omit()
+}
+
+ref_point_slr <- quantile(vals, 0.9999)
 
 ## If not rerunning the above, use this (taken from v2019 reference point csv)
 ref_point_slr <- 0.335938483476639
@@ -480,6 +456,24 @@ Each annual raster is rescaled from 0 to 1 using the reference point. If a value
 ```{r rescale, eval = F}
 #registerDoParallel(10) # reregister if restarted session between parallel steps above and here
 
+# original parallelized loop with raster package from 2021 script
+# foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[26]
+#   yr <- str_sub(file, -8,-5)
+#   
+#   if(file.exists(sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr))){
+#     
+#     message("skipping")
+#   }else{
+#     
+#     raster::raster(file) %>%
+#     calc(fun = function(x){ifelse(x < 0, 0, x)}) %>% # set all negative values to 0
+#     calc(fun = function(x){ifelse(x > ref, 1, x/ref)}, # set equal to one if greater than ref, otherwise scale
+#          filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) 
+#   }
+# }
+
+
+# attempt at converting parallelized loop from raster to terra:
 # foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[26]
 #   yr <- str_sub(file, -8,-5)
 #   
@@ -495,8 +489,9 @@ Each annual raster is rescaled from 0 to 1 using the reference point. If a value
 #   }
 # }
 
+
 # unparallelize because foreach() did not work with terra
-# define functions outside of app()
+# first define functions outside of app()
 neg_vals <- function(x){ifelse(x < 0, 0, x)}
 greater_vals <- function(x){ifelse(x > ref, 1, x/ref)}
 
@@ -514,19 +509,7 @@ for(i in seq_along(coastal_rasts)) { # i = coastal_rasts[26]
          filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) 
   }
 }
-
-
 ```
-
-```{r}
-# check raster values
-test_rast <- terra::rast("/home/shares/ohi/git-annex/globalprep/prs_slr/v2022/output/slr_2020.tif")
-#plot(test_rast)
-#test_rast_df <- as.data.frame(test_rast, xy = TRUE, na.rm = TRUE)
-values(test_rast)
-terra::unique(test_rast)
-```
-
 
 
 # Results
@@ -540,10 +523,9 @@ plot(r, col = cols, axes = FALSE, box = FALSE, add = TRUE)
 r_new <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2)) 
 r_old <- terra::rast(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3)) 
 
-#rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s old data", scen_year - 2))
-#rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", scen_year - 2))
+rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s old data", scen_year - 2))
+rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", scen_year - 2))
 ```
-
 
 ```{r extract regions, eval = FALSE}
 
@@ -560,29 +542,10 @@ rgn_data <- read_sf(file.path(dir_M, "git-annex/globalprep/spatial/v2017"), "reg
   dplyr::filter(rgn_type == "eez") %>%
   dplyr::select(rgn_id = rgn_ant_id, rgn_name)
 
-#zones <- crop(zones, stack_slr[1:28])
-#cropped <- terra::rasterize(stack_slr, zones, "test")
-
 ## extract data for each region
 ## fyi takes awhile... about 2 hours for v2019.... 
 #terra::extent(stack_slr) <- terra::extent(zones)
-regions_stats <- zonal(stack_slr, zones, fun = "mean", na.rm = TRUE, progress = "text") %>% data.frame() # removed progress = "text" arg 
-
-raster <- terra::rast(rasts[1])
-#ext(raster)
-ext(zones)
-
-# iterate through layers of stack_slr to compute zonal statistics one by one
-for(i in seq_along(rasts)){
-  raster <- terra::rast(rasts[i])
-  region_stats <- terra::zonal(raster, zones, fun = "mean", na.rm = TRUE) %>% data.frame()
-
-
- # for (j in seq_along(rast_layer)){
- #   terra::zonal(rast_layer[i], zones, fun = "mean", na.rm = TRUE, as.raster = TRUE)
- # }
-}
-
+regions_stats <- zonal(stack_slr, zones, fun = "mean", na.rm = TRUE, progress = "text") %>% data.frame() 
 
 setdiff(regions_stats$zone, rgn_data$rgn_id) # High Seas regions are in there, makes sense....no land
 #[1] 260 261 262 263 264 266 267 269 270 272 273 274 275 276 277
@@ -600,7 +563,7 @@ regions_stats <- read_csv("output/slr.csv")
 
 ## visualize data
 plotData <- regions_stats %>%
-  left_join(rgn_data, by = "rgn_id") %>%
+  left_join(rgn_data, by = "rgn_id") %>% 
   dplyr::select(rgn_name, year, pressure_score) %>%
   dplyr::arrange(rgn_name, year) %>%
   data.frame()
@@ -611,14 +574,12 @@ print(Motion, file = "slr.html")
 
 ```
 
-
-
 ```{r compare, eval=FALSE}
 
 new_data <- read.csv("output/slr.csv") %>%
   dplyr::select(rgn_id, year, new_pressure_score = pressure_score)
 
-old <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 2)) %>%
+old <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 1)) %>%
   left_join(new_data, by = c("year", "rgn_id"))
 
 plot(old$pressure_score, old$new_pressure_score, ylab = "new score", xlab = "old score")
