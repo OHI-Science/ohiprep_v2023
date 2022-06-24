@@ -1,0 +1,9 @@
+dimension,code,description
+Nature,C,Country data
+Nature,N,Non-relevant
+Nature,"NA",Data nature not available
+Observation Status,A,Normal value
+Observation Status,O,Missing value
+Observation Status,V,Unvalidated value
+Reporting Type,G,Global
+Units,NUMBER,Number
