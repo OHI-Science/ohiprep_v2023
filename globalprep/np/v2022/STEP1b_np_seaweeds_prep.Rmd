@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Natural Products: Seaweeds data prep'
+title: 'OHI `r format(Sys.time(), "%Y")`: Natural Products: Seaweeds data prep'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -13,13 +13,14 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1b_np_seaweeds_prep.Rmd]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2022/globalprep/np/v2021/STEP1b_np_seaweeds_prep.Rmd]
 
 # Summary
-This analysis converts FAO mariculture data into one of the data layers used to calculate OHI 2021 global natural products (NP) scores. We will conduct the overall NP data prep on seaweeds, fish oil/fish meal (FOFM), and ornamentals, however, our final layer from this data prep will only consist of seaweeds.
+This analysis converts FAO mariculture data into one of the data layers used to calculate OHI `r format(Sys.time(), "%Y")` global natural products (NP) scores. We will conduct the overall NP data prep on seaweeds, fish oil/fish meal (FOFM), and ornamentals, however, our final layer from this data prep will only consist of seaweeds.
 
 # Updates from previous assessment
-New year of FAO mariculture data (1950-2019). 
+New year of FAO mariculture data (1950-2020). 
+Replaced deprecated functions (`replace_at()`, `spread()`, `gather()`)
 
 ***
 
@@ -30,22 +31,22 @@ New year of FAO mariculture data (1950-2019).
 **Reference**:      
 http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
 Release date: March 2021
-FAO Global Aquaculture Production Quantity 1950_2019
+FAO Global Aquaculture Production Quantity 1950_2020
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
-**Downloaded**:  April 29, 2021
+**Downloaded**:  April 25, 2022
 
 **Description**:  Quantity (tonnes) of mariculture for each country, species, year.
 
-**Time range**: 1950-2019 
+**Time range**: 1950-2020
 
 ## Seafood Watch sustainability data
 
 **Reference**: 
-https://www.seafoodwatch.org/-/m/sfw/pdf/whats%20new/complete%20recommendation%20list.pdf
-Release date: August 3, 2020
+https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf
+Release date: March 4, 2022
 
-**Downloaded**: July 22, 2020
+**Downloaded**: June 22, 2022
 
 **Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1. There is only one value for seaweeds in the data... 0.67
 
@@ -69,8 +70,8 @@ library(readr)
 ## Load FAO-specific user-defined functions
 source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO files
 source(here('workflow/R/common.R')) # directory locations
-source(here('globalprep/np/v2021/R/np_fxn.R'))
-source(here('globalprep/mar/v2021/mar_fxs.R')) # functions specific to mariculture dealing with compound countries
+source(here('globalprep/np/v2022/R/np_fxn.R'))
+source(here('globalprep/mar/v2022/mar_fxs.R')) # functions specific to mariculture dealing with compound countries
 ```
 
 # Import Raw Data: FAO Mariculture data
@@ -78,7 +79,7 @@ source(here('globalprep/mar/v2021/mar_fxs.R')) # functions specific to maricultu
 Mariculture production in tonnes.
 
 ```{r}
-mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2021/FAO_GlobalAquacultureProduction_Quantity_1950_2019.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
+mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2022/FAO_GlobalAquacultureProduction_Quantity_1950_2020.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
 ```
 
 # Wrangle: 
@@ -87,6 +88,7 @@ mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture
 
 Filter freshwater mariculture, make long format, and clean FAO codes.
 
+
 ```{r}
 mar <- mar %>%
   dplyr::select(-`Unit (Name)`) %>%
@@ -94,8 +96,8 @@ mar <- mar %>%
          FAO_name = `ASFIS species (Name)`, 
          fao = `FAO major fishing area (Name)`, 
          environment = `Environment (Name)`) %>%
-  rename_at(vars(matches("\\[")), ~ str_remove(., "\\[")) %>%
-  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]"))
+  rename_with(~ gsub("\\[", "", .)) %>%
+  rename_with(~ gsub("\\]", "", .))
 
 table(mar$environment)  
 
@@ -103,12 +105,15 @@ table(mar$environment)
 mar <- mar %>%
 filter(environment %in% c("Brackishwater", "Marine"))  
 
+# Change to latest *DATA* year
+latest_year <- "2020"
+
 ## Convert to long format and clean FAO codes:
 mar <- mar %>%
-  select(-Unit) 
-mar <- mar %>%
-  gather(key="year", value="value", num_range("",1950:2019)) %>%
-    fao_clean_data_new() 
+  select(-Unit) %>% 
+  pivot_longer(cols = "1950":latest_year, names_to = "year", values_to = "value") %>% 
+  fao_clean_data_new() 
+    
 ```
 
 ## Update seaweed species information
@@ -116,13 +121,13 @@ mar <- mar %>%
 Filter out seaweed species from 'raw/species_list.csv' (from 'globalprep/mar/v2020/raw'), rename columns, and assign proportions to "include" column determined by research of non-human food vs human food seaweed species cultivated in mariculture. For NP, we are only including non-human food seaweed species. Since some species are used for both non-human food and human food purposes, a proportion is assigned based on research and best guess.
 
 ```{r}
-## Read in 'species_list.csv' (originally from 'globalprep/mar/v2021/raw'). Filter for 'Taxon_code = AL' (only seaweed species). Rename 'exclude' columns to 'include' since we're now including seaweed species that were excluded in the MAR dataprep (not primarily used as human food). Therefore, "0" means exclude completely (0%), and "1" means include completely (100%). 
-seaweed_sp <- read.csv(file.path('../../mar/v2021/raw/species_list.csv'), stringsAsFactors=FALSE) %>% 
-  filter(Taxon_code == 'AL') %>% 
+## Read in 'species_list.csv' (originally from 'globalprep/mar/v2021/raw'). Filter for 'Taxon_code = AL' (only seaweed species). Rename 'exclude' columns to 'include' since we're now including seaweed species that were excluded in the MAR dataprep (not primarily used as human food). Therefore, "0" means exclude completely (0%), and "1" means include completely (100%).
+seaweed_sp <- read.csv(file.path('../../mar/v2021/raw/species_list.csv'), stringsAsFactors=FALSE) %>%
+  filter(Taxon_code == 'AL') %>%
   rename(include = exclude)
 
-## Save in 'globalprep/np/v2021/raw' as 'species_list_np_seaweeds.csv'.
-write.csv(seaweed_sp,"raw/species_list_np_seaweeds.csv", row.names = FALSE)
+## Save in 'globalprep/np/v2022/raw' as 'species_list_np_seaweeds.csv'.
+write.csv(seaweed_sp, "raw/species_list_np_seaweeds.csv", row.names = FALSE)
 ```
 
 
@@ -134,7 +139,7 @@ Update species name in the `raw/species_list_np_seaweeds_edited.csv` file with n
 
 
 ## Read in edited 'species_list_np_seaweeds_edited.csv'.
-seaweeds <- read.csv('raw/species_list_np_seaweeds.csv', stringsAsFactors = FALSE)
+seaweeds <- read.csv(here("globalprep/np/v2022/raw/species_list_np_seaweeds.csv"), stringsAsFactors = FALSE)
 
 seaweeds_sp <- seaweeds %>%
   select(FAO_name, include, alias, Taxon_code, family)
@@ -146,7 +151,7 @@ seaweed_np <- seaweeds_sp %>%
 
 spp_1 <- unique(sort(seaweed_np$FAO_name))
 rgn_1 <- unique(seaweed_np$country)
-# went from 45 species to 41 species (4 completely human food species removed) - v2021
+# went from 45 species to 40 species (5 completely human food species removed) - v2021
  
 ## Change names using species alias or FAO species name (global changes)
 seaweed_np$species <- ifelse(!is.na(seaweed_np$alias), seaweed_np$alias, seaweed_np$FAO_name) 
@@ -160,9 +165,9 @@ spp_2 <- unique(sort(seaweed_np$species))
 rgn_2 <- unique(seaweed_np$country)
 
 setdiff(spp_1, spp_2)
-# went from 41 species to 37 species (lost "Bright green nori", "Kelp nei", "Giant kelps nei", "Mozuku") due to no production values for those species - v2021
+# went from 40 species to 36 species (lost "Bright green nori", "Kelp nei", "Giant kelps nei", "Mozuku") due to no production values for those species - v2022
 setdiff(rgn_1, rgn_2)
-# went from 53 to 52 countries - this is ok... because the one we "lost" was an NA - v2021
+# went from 53 to 52 countries - this is ok... because the one we "lost" was an NA - v2022
 
 ## Eliminate country-species data with zero production throughout the time-series (1950-recent)
 seaweed_np <- seaweed_np %>%
@@ -184,16 +189,20 @@ seaweed_np <- seaweed_np %>%
 seaweed_np <- seaweed_np %>%
   mutate(country = ifelse(country=="Réunion", "Reunion", country)) %>%  # this one is hard to get right; v2020: last year it was "R\xe9union", but this year it was "Réunion" - not present in v2021 data
   mar_split()  # function in mar_fxs.R
-mar_rgn <- name_2_rgn(df_in = seaweed_np, 
+
+mar_rgn_all <- name_2_rgn(df_in = seaweed_np, 
                        fld_name='country', 
                        flds_unique=c('species', 'fao', 'environment', 'Taxon_code', 'year', 'include')) 
 ## Sum values of regions with multiple subregions
-mar_rgn <- mar_rgn %>%
+mar_rgn <- mar_rgn_all %>%
   group_by(fao, environment, species, year, Taxon_code, family, rgn_id, include) %>% 
   summarize(value = sum(value)) %>%
   ungroup()
 # went from 2979 to 2950 observations - v2020
 # went from 3150 to 3121 obs - v2021 - This is correct; Un. Sov. Soc. Rep. and Russian Federation were combined.
+# went from 3233 to 3173 obs - v2022 - Same as 2021 and Zanzibar / Tanzania were combined
+
+setdiff(mar_rgn$rgn_id, mar_rgn_all$rgn_id)
 ```
 
 **Take a look at the tidied data for a single year and region**
@@ -211,12 +220,17 @@ data.frame(filter(mar_rgn, rgn_id==182) %>%
 Checked to make sure that there weren't instances in which it made more sense to carry the previous year's data forward as a method of gapfilling. This didn't seem to be the case.
 
 ```{r}
-## Spread mar_rgn to create a value for every year-species-region (if missing it will be given a NA)
-mar_rgn_spread <- spread(mar_rgn, year, value)
-dim(mar_rgn_spread)
+## Pivot wider mar_rgn to create a value for every year-species-region (if missing it will be given a NA)
+mar_rgn_wide <- mar_rgn %>% 
+  pivot_wider(names_from = year, values_from = value)
+
+dim(mar_rgn_wide)
+
 ## Turn data frame back into long format
-mar_rgn_gf <- gather(mar_rgn_spread, "year", "value", num_range("",1950:2019)) %>% ## udpate year 
+mar_rgn_gf <- mar_rgn_wide %>% 
+  pivot_longer(cols = -(fao:include), names_to = "year", values_to = "value") %>% 
   arrange(rgn_id, species, year, Taxon_code, fao, environment) 
+
 ## NA values are converted to zero
 mar_rgn_gf <- mar_rgn_gf %>%
   mutate(year = as.numeric(as.character(year))) %>%
@@ -236,6 +250,7 @@ See how may NA values were converted to 0
 table(mar_rgn_gf$gap_0_fill)
 ## 382 of these out of 2299+382 cases had NA converted to 0 - v2020
 ## 422 of these out of 2448+442 cases had NA converted to 0 - v2021 - seems reasonable given the added year of production
+## 460 out of 2500+460 had NA converted to 0 - v2022
 ```
 
 Remove species-region-environment time series with less than four years of seaweeed mariculture production > 0 tonnes (assume these are not established seaweed mariculture programs).
@@ -273,7 +288,7 @@ Used to estimate total seaweed mariculture yield per country.
 ## Multiply "include" column by "value" column to find tonnes per region/year for each seaweed species
 maric <- maric %>% 
   mutate(tonnes = include*value)
-## Save in 'globalprep/np/v2020_new/int' as 'np_seaweeds_tonnes.csv' for weighting purposes later on
+## Save for weighting purposes later on
 write.csv(maric,"int/np_seaweeds_tonnes_weighting.csv", row.names = FALSE)
 ```
 
@@ -285,7 +300,7 @@ These data describe the sustainability country/species combinations. In cases wh
 
 ```{r sw-scores, eval = FALSE}
 ## Load in Seafood Watch sustainability scores data from mazu:
-sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2021/Seafood-Watch_aquaculture-recs_May-2021.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2022/SFW_Aquaculture_ratings_062222.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 head(sw_sus)
 ```
 
@@ -309,9 +324,10 @@ sw_sus <- sw_sus %>%
          country = 'Countries',
          state_territory = 'CountrySubs',
          method = 'Methods',
-         score = 'Overall Score',
+         score = 'AssessmentScore',
          escapes_score = 'C6Score',
-         rec = 'Overall Recommendation'
+         # Column ↓ formerly called "Overall Recommendation" - chose to stick with the same naming convention - v2022
+         rec = 'AssessmentColor'
          ) %>% 
   dplyr::select(report_title, published_date, sw_species, genus, spp, fao_species, fda_species, country, state_territory, water_body, method, escapes_score, score, rec)
 
@@ -351,7 +367,8 @@ sw_sus_rgn <- name_2_rgn(df_in = sw_sus_df,
 ## Re-add NA countries
 sw_sus_rgn <- bind_rows(sw_sus_rgn, sw_sus_no_rgn) %>%
   unique()
-  # Back to 254 obs.
+  # 254 obs - v2021
+  # 273 obs - v2022 - new obs for Norway, China, Taiwan, Japan, etc.
 ```
 
 
@@ -448,29 +465,30 @@ Datacheck:
 ## compare the harvest
 
 ## in particular, saint lucia's score increased a lot in 2021
+## Less drastic increase in 2022 ~22 tons
 
 ## Compare yield data for Saint Lucia
-np_old <- read.csv("../v2020/output/np_seaweed_harvest_tonnes.csv") %>% 
-  filter(rgn_id == 122, year == 2018) %>% 
+np_old <- read.csv("../v2021/output/np_seaweed_harvest_tonnes.csv") %>% 
+  filter(rgn_id == 122, year == 2019) %>% 
   select(rgn_id, taxa_code, tonnes)
 np_new <- read.csv("output/np_seaweed_harvest_tonnes.csv") %>% 
-  filter(rgn_id == 122, year == 2019) %>% 
+  filter(rgn_id == 122, year == 2020) %>% 
   select(rgn_id, taxa_code, tonnes)
 
 yield <- np_old %>% 
-  full_join(np_new, by = c("rgn_id","taxa_code")); View(yield) ## the production increased by ~80 tonnes 
+  full_join(np_new, by = c("rgn_id","taxa_code")); View(yield) ## the production increased by ~22 tonnes 
 
 
 ## Compare yield data for Vietnam - Vietnam score decreased
-np_old <- read.csv("../v2020/output/np_seaweed_harvest_tonnes.csv") %>% 
-  filter(rgn_id == 207, year == 2018) %>% 
+np_old <- read.csv("../v2021/output/np_seaweed_harvest_tonnes.csv") %>% 
+  filter(rgn_id == 207, year == 2019) %>% 
   select(rgn_id, taxa_code, year, tonnes)
 np_new <- read.csv("output/np_seaweed_harvest_tonnes.csv") %>% 
-  filter(rgn_id == 207, year == 2019) %>% 
+  filter(rgn_id == 207, year == 2020) %>% 
   select(rgn_id, taxa_code, year, tonnes)
 
 yield <- np_old %>% 
-  full_join(np_new, by = c("rgn_id","taxa_code")); View(yield) ## the production increased by ~80 tonnes 
+  full_join(np_new, by = c("rgn_id","taxa_code")); View(yield) 
 
 
 
