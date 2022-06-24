@@ -316,7 +316,7 @@ stopifnot(sum(duplicated(h_prod[ , c('rgn_id', 'product', 'year')])) == 0)
 
 ## Quick Data Check
 
-Look at wide format with all commmodities and product subtotal (where commodity column value is "Z_TOTAL"), compared with the input data prior to summing.
+Look at wide format with all commodities and product subtotal (where commodity column value is "Z_TOTAL"), compared with the input data prior to summing.
 
 ```{r}
 
