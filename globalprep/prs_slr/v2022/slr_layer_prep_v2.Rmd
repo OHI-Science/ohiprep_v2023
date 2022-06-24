@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021 - Sea Level Rise Pressure Layer'
+title: "OHI `r format(Sys.Date(), '%Y')` - Sea Level Rise Pressure Layer"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -403,7 +403,7 @@ plot(terra::rast(file.path(dir_prs_slr, "int/msla_annual_mol_coastal/msla_annual
 
 The reference point is the 99.99th quantile of the entire data distribution from 1993 - 2015. (This value has been updated due to changes in the source data, previously was 0.246225 m, currently is 0.3359385 m).
 
-```{r ref, eval = F}
+```{r ref, eval=FALSE}
 
 coastal_rasts <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol_coastal"), pattern = "tif", full.names = TRUE)
 
@@ -453,7 +453,7 @@ ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "202
 
 Each annual raster is rescaled from 0 to 1 using the reference point. If a value is greater than the reference point, it is automatically given a value of 1.
 
-```{r rescale, eval = F}
+```{r rescale, eval=FALSE}
 #registerDoParallel(10) # reregister if restarted session between parallel steps above and here
 
 # original parallelized loop with raster package from 2021 script
@@ -527,7 +527,7 @@ rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s old data", sce
 rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", scen_year - 2))
 ```
 
-```{r extract regions, eval = FALSE}
+```{r extract regions, eval=FALSE}
 
 ## raster/zonal data, zones tifs created & spatial rgn updated in 2017
 slr_loc <- file.path(dir_prs_slr, "output")
