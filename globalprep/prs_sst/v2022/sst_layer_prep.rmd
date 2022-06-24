@@ -87,7 +87,7 @@ dir_output  <- file.path(dir_M, "git-annex/globalprep/prs_sst/v2022/output")
 ohi_rasters()
 regions_shape()
 
-yrs <- 1982:2021
+# yrs <- 1982:2021
 
 cols <- rev(colorRampPalette(brewer.pal(11, 'Spectral'))(255)) # rainbow color scheme
 land <- regions %>% subset(rgn_type %in% c("land", "land-disputed", "land-noeez"))
@@ -189,10 +189,11 @@ writeRaster(parallel_sd, filename = file.path(dir_int, sprintf("sd_sst_week_%s.t
 
 }
 
-registerDoParallel(8)
+# when running this overnight I tried bumping up the number of cores to greater than 5 and ran into errors several times adjusting the number until I returned the number of cores to 5 and then it ran error free... 
+registerDoParallel(5)
 combine_fun = function(x){sum(x, na.rm = TRUE)} # takes raster stack object as x arg
 
-yrs <- 1988:2021
+yrs <- 1999:2021
 
 ## calculate annual positive anomalies; ~17 minutes per year with 5 cores
 for(j in yrs){
