@@ -250,67 +250,66 @@ rgns_data <- match_country_data %>%
   dplyr::left_join(rgns_eez) %>%
   dplyr::select(1:9) 
 
-
-
-
-
-
-
 ## There is still a region "Kiribati" which needs to be split. For some reason, trying to do so with match2rgn does not work. 
 ## Line Islands (Kiribati) == Kiribati, Phoenix Islands (Kiribati) == Kiribati, Gilbert Islands (Kiribati) == Kiribati
 ## filter for these regions in country_df and prep so they match rgns_data
-
-deleted_rgns <- country_df %>%
-  dplyr::filter(geo_area_name %in% c("Kiribati"))
-
 ## so what we have to do is:
-# Split "Kiribati" into "Line Islands (Kiribati)" and "Phoenix Islands (Kiribati)", Gilbert Islands (Kiribati)
-
-## Split Kiribati 
-kiribati_split <- deleted_rgns %>%
+## Split "Kiribati" into "Line Islands (Kiribati)" and "Phoenix Islands (Kiribati)", Gilbert Islands (Kiribati)
+kiribati_split <- country_df %>%
   dplyr::filter(geo_area_name %in% c("Kiribati")) %>%
-  dplyr::mutate(geo_area_name = ifelse(
-    geo_area_name == "Kiribati", 
-    "Line Islands (Kiribati), Phoenix Islands (Kiribati), Gilbert Islands (Kiribati)", 
-    geo_area_name)) %>%
-  tidyr::separate_rows(geo_area_name, sep = ", ")
-
-
-## Now rbind all fixes together 
-all_deleted_fixes <- kiribati_split %>%
+  dplyr::mutate(
+    geo_area_name = stringr::str_replace_all(
+      string = geo_area_name, 
+      pattern = "Kiribati", 
+      replacement = "Line Islands (Kiribati), Phoenix Islands (Kiribati), Gilbert Islands (Kiribati)")) %>%
+  tidyr::separate_rows(geo_area_name, sep = ", ") %>%
   dplyr::left_join(rgns_eez, by = c("geo_area_name" = "rgn_name")) %>% 
   dplyr::select(
     region_name, sub_region_name, intermediate_region_name, region_type, rgn_id, 
-    "rgn_name" = "geo_area_name", time_detail, score, small_island_developing_states_sids) 
-
+    rgn_name = geo_area_name, time_detail, score, small_island_developing_states_sids) 
 
 ## now bind with the rgns_data from before (the data that didnt need to be fixed)
-all_rgns_data_df <- rbind(rgns_data, all_deleted_fixes) %>%
+all_rgns_data <- rbind(rgns_data, kiribati_split) %>%
   filter(rgn_name != "Kiribati") # filter out original kiribati
 
-
 ## Now lets look to see what OHI regions are still missing 
-sort(setdiff(rgns_eez$rgn_name, all_rgns_data_df$rgn_name))
+sort(setdiff(rgns_eez$rgn_name, all_rgns_data$rgn_name))
 
-#  [1] "Andaman and Nicobar"   "Antarctica" (dont need this one)            "Ascension"             "Azores"                "Bouvet Island" (uninhabited, dont include)       
-#  [6] "Canary Islands" - same as spain        "Clipperton Island" (uninhabited)     "Macquarie Island" (uninhabited)     "Madeira" - same as portugal               "Oecussi Ambeno"       
-# [11] "Prince Edward Islands" "Tristan da Cunha"     
+# "Andaman and Nicobar"  (include)
+# "Antarctica"           (don't include, not in OHI) 
+# "Ascension"            (include)
+# "Azores"               (include)
+# "Bouvet Island"        (don't include, uninhabited)       
+# "Canary Islands"       (include, same as Spain) 
+# "Clipperton Island"    (don't include, uninhabited) 
+# "Macquarie Island"     (don't include, uninhabited)
+# "Madeira"              (include, same as Portugal)
+# "Oecussi Ambeno"       (include)
+# "Prince Edward Islands"(include)
+# "Tristan da Cunha"     (include)
 
 ## None of these are located in the raw UN data. I we will have to manually assign them the appropriate larger regions by googling. 
 
-remaining_rgns <- data.frame(
-  geo_area_name = c(
-    "Andaman and Nicobar", "Ascension", "Azores", "Canary Islands", "Madeira",
-    "Oecussi Ambeno", "Prince Edward Islands", "Tristan da Cunha"), 
-  region_name = c("Asia", "Africa", "Europe","Europe", "Europe", "Asia", "Americas", "Africa"), 
-  sub_region_name = c("South-eastern Asia", NA, "Western Europe", "Southern Europe", "Southern Europe", "South-eastern Asia", "Northern America", NA), 
-  intermediate_region_name = c(NA, "Western Africa", NA, NA, NA, NA, NA, NA),
+remaining_rgns <- data.frame(            
+                        geo_area_name = c("Andaman and Nicobar",
+                                          "Ascension","Azores","Canary Islands",
+                                          "Madeira","Oecussi Ambeno",
+                                          "Prince Edward Islands","Tristan da Cunha"),
+                          region_name = c("Asia","Africa","Europe",
+                                          "Europe","Europe","Asia","Americas",
+                                          "Africa"),
+                      sub_region_name = c("South-eastern Asia",NA,
+                                          "Western Europe","Southern Europe",
+                                          "Southern Europe","South-eastern Asia",
+                                          "Northern America",NA),
+             intermediate_region_name = c(NA,"Western Africa",NA,NA,
+                                          NA,NA,NA,NA),
   small_island_developing_states_sids = c("x", "x", NA, NA, NA, "x", NA, "x")) %>%
   dplyr::mutate(region_type = "country",
                 score = NA) %>%
   tidyr::crossing(time_detail = c(2018, 2020))
 
-
+data.frame(
 ## Now run the match2rgn function to get OHI regions
 
 match_remaining <- name_2_rgn(df_in = remaining_rgns, 
@@ -321,11 +320,11 @@ match_remaining <- name_2_rgn(df_in = remaining_rgns,
 
 ## Now join with final dataset
 
-all_rgns_data_df <- rbind(all_rgns_data_df, match_remaining)
+all_rgns_data <- rbind(all_rgns_data, match_remaining)
 
 ## Now check to see what OHI regions are missing (should be uninhabited regions)
 
-sort(setdiff(rgns_eez$rgn_name, all_rgns_data_df$rgn_name))
+sort(setdiff(rgns_eez$rgn_name, all_rgns_data$rgn_name))
 
 # [1] "Antarctica"        "Bouvet Island"     "Clipperton Island" "Macquarie Island"  - perfect .. these places are uninhabited anyways
 
@@ -353,7 +352,7 @@ c. Gapfill with continental regions
 ## Gapfilling exploration
 
 ```{r, eval = F}
-gf_df <- all_rgns_data_df %>%
+gf_df <- all_rgns_data %>%
   pivot_wider(names_from = time_detail, values_from = score) %>%
   mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
          no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
@@ -385,7 +384,7 @@ sum(gf_df$complete_data)
 gf_2020_rgns <- gf_df %>%
   filter(no_2020 == 1)
 
-gf_2020_df <- all_rgns_data_df %>%
+gf_2020_df <- all_rgns_data %>%
   filter(rgn_id %in% c(gf_2020_rgns$rgn_id)) %>%
   mutate(score_gf = score) %>%
   group_by(rgn_id) %>%
@@ -402,7 +401,7 @@ gf_2020_df <- all_rgns_data_df %>%
 gf_2018_rgns <- gf_df %>%
   filter(no_2018 == 1)
 
-gf_2018_df <- all_rgns_data_df %>%
+gf_2018_df <- all_rgns_data %>%
   filter(rgn_id %in% c(gf_2018_rgns$rgn_id)) %>%
   mutate(score_gf = score) %>%
   group_by(rgn_id) %>%
@@ -445,7 +444,7 @@ region_tidy_df <- region_df %>%
 gf_nodata_rgns <- gf_df %>%
   filter(no_data == 1)
 
-gf_nodata_df <- all_rgns_data_df %>%
+gf_nodata_df <- all_rgns_data %>%
   filter(rgn_id %in% c(gf_nodata_rgns$rgn_id)) 
 
 unique(gf_nodata_df$rgn_id) # 103 regions - perfect
@@ -535,7 +534,7 @@ gapfilled_obs <- rbind(cont_regions_join_gf, sub_regions_join_gf, int_regions_jo
 complete_data_rgns <- gf_df %>%
   filter(complete_data == 1) 
 
-final_gf_df <- all_rgns_data_df %>%
+final_gf_df <- all_rgns_data %>%
   filter(rgn_id %in% c(complete_data_rgns$rgn_id)) %>%
   mutate(gapfilled = 0,
          method = NA) %>%
