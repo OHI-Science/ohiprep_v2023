@@ -16,10 +16,11 @@ output:
 [REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1a_np_ornamentals_prep.html]
 
 # Summary
-This analysis converts FAO commodities data into data layers used to calculate OHI 2021 global natural products scores. We will conduct this data prep on the commodities seaweed, fish oil, and ornamentals, so that we can produce $ values for weighting later on, however, our final layer (saved to the output folder) from this data prep will only consist of ornamental fish. This will also calculate a sustainability layer based off of risk and exposure for ornamental fishing. 
+This analysis converts FAO commodities data into data layers used to calculate OHI `r format(Sys.time(), "%Y")` global natural products scores. We will conduct this data prep on the commodities seaweed, fish oil, and ornamentals, so that we can produce $ values for weighting later on, however, our final layer (saved to the output folder) from this data prep will only consist of ornamental fish. This will also calculate a sustainability layer based off of risk and exposure for ornamental fishing. 
 
 # Updates from previous assessment
-New year of FAO data (2018).
+New year of FAO data (2019).
+Replaced deprecated functions (`replace_at()`, `spread()`, `gather()`)
 
 ***
 
