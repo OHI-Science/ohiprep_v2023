@@ -354,7 +354,6 @@ Data type 3: 103 regions with no data for 2018 or 2020
 Data type 4: 58 regions with complete data 
 Data type 5: 44 larger regions like "Asia", "East Africa", etc
 
-
 Steps to gapfill:
 
 1. Gapfill data type 1 with the 2018 values
@@ -369,26 +368,40 @@ c. Gapfill with continental regions
 
 ```{r, eval = F}
 gf_df <- all_rgns_data %>%
-  tidyr::pivot_wider(names_from = time_detail, values_from = score) %>%
-  dplyr::mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
-         no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
-         no_data = ifelse(is.na(`2020`) & is.na(`2018`), 1, 0),
-         complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) %>%
-  dplyr::filter(rgn_id <= 250)
+  dplyr::group_by(rgn_name) %>% 
+  dplyr::mutate(
+    has_data = ifelse(!is.na(score), 1, 0),
+    data_completness = paste(sum(has_data), "/", n())) %>% 
+  tidyr::fill(score, .direction = "updown") %>% 
+  dplyr::mutate(
+    gapfilled = dplyr::case_when(
+      has_data == 0 & !is.na(score) ~ 1,
+      TRUE ~ 0),
+    method = dplyr::case_when(
+      sum(has_data) == n() ~ "No gapfill needed",
+      gapfilled == 1 ~ "Used closest year score", 
+      TRUE ~ as.character(NA)
+    )
+    )
+  
 
-test <- gf_df %>%
-  dplyr::filter(no_data == 1)
-
-sum(gf_df$complete_data)
+#   tidyr::pivot_wider(names_from = time_detail, values_from = score) %>%
+#   dplyr::mutate(
+#     no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
+#     no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
+#     no_data = ifelse(is.na(`2020`) & is.na(`2018`), 1, 0),
+#     complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) %>%
+#   dplyr::filter(rgn_id <= 250)
+# 
+# test <- gf_df %>%
+#   dplyr::filter(no_data == 1)
+# 
+# sum(gf_df$complete_data)
 
 ## 35 regions with 2018 but no 2020
 ## 21 with 2020 but no 2018
 ## 103 regions with no data for 2018 or 2020
 ## 58 regions with complete data 
-
-35 + 21 + 103 + 58 # 217
-
-217*2 #434
 ```
 
 ## Gapfilling Step 1 and 2
@@ -396,36 +409,36 @@ sum(gf_df$complete_data)
 ```{r, eval = F}
 ## Fill in the missing 2020 values with 2018 data
 
-gf_2020_rgns <- gf_df %>%
-  dplyr::filter(no_2020 == 1)
-
-gf_2020_df <- all_rgns_data %>%
-  dplyr::filter(rgn_id %in% c(gf_2020_rgns$rgn_id)) %>%
-  dplyr::mutate(score_gf = score) %>%
-  dplyr::group_by(rgn_id) %>%
-  dplyr::do(tidyr::fill(., score_gf, .direction = "down")) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
-  dplyr::mutate(method = ifelse(is.na(score), "Used prior year score", NA)) %>%
-  dplyr::select(-score) %>%
-  dplyr::mutate(score = score_gf) %>%
-  dplyr::select(-score_gf)
-
-## fill in the missing 2018 values with 2020 values
-gf_2018_rgns <- gf_df %>%
-  dplyr::filter(no_2018 == 1)
-
-gf_2018_df <- all_rgns_data %>%
-  dplyr::filter(rgn_id %in% c(gf_2018_rgns$rgn_id)) %>%
-  dplyr::mutate(score_gf = score) %>%
-  dplyr::group_by(rgn_id) %>%
-  dplyr::do(tidyr::fill(., score_gf, .direction = "updown")) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
-  dplyr::mutate(method = ifelse(is.na(score), "Used later year score", NA)) %>%
-  dplyr::select(-score) %>%
-  dplyr::mutate(score = score_gf) %>%
-  dplyr::select(-score_gf)
+# gf_2020_rgns <- gf_df %>%
+#   dplyr::filter(no_2020 == 1)
+# 
+# gf_2020_df <- all_rgns_data %>%
+#   dplyr::filter(rgn_id %in% c(gf_2020_rgns$rgn_id)) %>%
+#   dplyr::mutate(score_gf = score) %>%
+#   dplyr::group_by(rgn_id) %>%
+#   dplyr::do(tidyr::fill(., score_gf, .direction = "down")) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
+#   dplyr::mutate(method = ifelse(is.na(score), "Used prior year score", NA)) %>%
+#   dplyr::select(-score) %>%
+#   dplyr::mutate(score = score_gf) %>%
+#   dplyr::select(-score_gf)
+# 
+# ## fill in the missing 2018 values with 2020 values
+# gf_2018_rgns <- gf_df %>%
+#   dplyr::filter(no_2018 == 1)
+# 
+# gf_2018_df <- all_rgns_data %>%
+#   dplyr::filter(rgn_id %in% c(gf_2018_rgns$rgn_id)) %>%
+#   dplyr::mutate(score_gf = score) %>%
+#   dplyr::group_by(rgn_id) %>%
+#   dplyr::do(tidyr::fill(., score_gf, .direction = "updown")) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
+#   dplyr::mutate(method = ifelse(is.na(score), "Used later year score", NA)) %>%
+#   dplyr::select(-score) %>%
+#   dplyr::mutate(score = score_gf) %>%
+#   dplyr::select(-score_gf)
 
 ```
 
@@ -434,27 +447,30 @@ gf_2018_df <- all_rgns_data %>%
 ```{r, eval = F}
 ## now fill gapfill places with no scores at all by larger regions... 
 
-# explore the larger regions 
+## explore the larger regions 
 region_wide_df <- region_df %>%
   dplyr::select(geo_area_code, geo_area_name, time_detail, region_type, score) %>% 
-  pivot_wider(names_from = time_detail, values_from = score) %>%
+  tidyr::pivot_wider(names_from = time_detail, values_from = score) %>%
   dplyr::mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
-         no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
-         complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) 
+                no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
+                complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) 
 
 ## there are a couple larger regions with no 2020 data, so we will gapfill those backwards
 region_tidy_df <- region_df %>%
   dplyr::select(geo_area_code, geo_area_name, time_detail, region_type, score) %>%
   dplyr::group_by(geo_area_code) %>%
-  dplyr::do(tidyr::fill(., score, .direction = "down")) %>%
+  tidyr::fill(score, .direction = "down") %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(geo_area_name = ifelse(geo_area_name == "South-Eastern Asia", "South-eastern Asia", geo_area_name)) ## correct a typo
-
+  dplyr::mutate( ## correct a typo
+    geo_area_name = stringr::str_replace_all(
+      string = geo_area_name, 
+      pattern = "South-Eastern Asia", 
+      replacement =  "South-eastern Asia"))
 
 ## filter for regions we haven't gapfilled yet
 
 gf_nodata_rgns <- gf_df %>%
-  dplyr::filter(no_data == 1)
+  dplyr::filter(is.na(method))
 
 gf_nodata_df <- all_rgns_data %>%
   dplyr::filter(rgn_id %in% c(gf_nodata_rgns$rgn_id)) 
@@ -462,7 +478,6 @@ gf_nodata_df <- all_rgns_data %>%
 unique(gf_nodata_df$rgn_id) # 103 regions - perfect
 
 ## now we will filter for "intermediate regions" and gapfill that way. If any remain after gapfilling by "intermediate region" we will filter for "sub_region" and gapfill using those values. If any remain after those steps, we will gapfill using larger "region_name" (these are the continents). And finally if there are still NAs, use the global "world" value. 
-
 
 ##### Intermediate region gapfilling, Step 3a. #####
 int_regions <- gf_nodata_df %>%
@@ -535,7 +550,7 @@ nrow(cont_regions_join_gf) + nrow(int_regions_join_gf) + nrow(sub_regions_join_g
 
 ## Compile all gapfilled and non-gapfilled data
 
-```{r, eval = F}
+```{r eval=F}
 #### Bind the gapfilled datasets together #### 
 
 nodata_gf_final <- rbind(cont_regions_join_gf, sub_regions_join_gf, int_regions_join_gf)
@@ -568,7 +583,6 @@ gf_flag_final <- final_gf_df %>%
   readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao_gf.csv"))
 
 ## save value dataset
-
 final_data <- final_gf_df %>%
   dplyr::select(rgn_id, year, value) %>% 
   readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao.csv"))
@@ -579,6 +593,10 @@ final_data <- final_gf_df %>%
 Lets compare to last years AO data. It is likely to be very similar if not exact.
 
 ```{r, eval = F}
+## This section is checking if we get the same values as last year 
+## This is primarily to see if the API change worked in v2022 
+## and if we got the same data as last year
+## The next section is for checking on the changes from last year to this
 version_year_new <- paste0("v", current_year - 0 )
 version_year_old <- paste0("v", current_year - 1 )
 
@@ -635,3 +653,42 @@ plotly::ggplotly(plot_diff, tooltip = c("as.factor(year)", "rgn_id", "x", "y"))
 ## rgn_id = 159 is Johnston Atoll
 ```
 
+```{r, eval = F}
+
+old_data_2 <- old_data %>%
+  dplyr::filter(year == current_year - 2) %>% # Every two years
+  dplyr::mutate(version = version_year_old)
+
+new_data_2 <- new_data %>%
+  dplyr::filter(year == current_year) %>% 
+  dplyr::mutate(version = version_year_new)
+
+data_year_old = max(old_data_2$year)
+data_year_new = max(new_data_2$year)
+
+compare_2 <- rbind(new_data_2, old_data_2) %>% 
+  dplyr::distinct(.keep_all = T) %>% 
+  tidyr::pivot_wider(id_cols = rgn_name, names_from = version, values_from = value) %>%
+  dplyr::mutate(difference = !!rlang::sym(version_year_old) - !!rlang::sym(version_year_new))
+
+## look at countries that changed from last year to this year
+compare_diff_2 <- compare_2 %>% 
+  dplyr::filter(difference != 0)
+
+plot_diff <- 
+  ggplot2::ggplot(
+    compare_2, 
+    ggplot2::aes(
+      x = !!rlang::sym(version_year_old), 
+      y = !!rlang::sym(version_year_new),
+      text = rgn_name)) +
+  ggplot2::geom_jitter(width = 0.025, height = .025) +
+  ggplot2::geom_abline() +
+  ggplot2::labs(
+    title = paste0("SDG 14.b.1 values (", version_year_old, " vs. ", version_year_new, ")"), 
+    x = paste(data_year_old, "data from", version_year_old), 
+    y = paste(data_year_new, "data from", version_year_new)) +
+  ggplot2::theme_bw() 
+
+plotly::ggplotly(plot_diff, tooltip = c("rgn_name", "x", "y"))
+```
