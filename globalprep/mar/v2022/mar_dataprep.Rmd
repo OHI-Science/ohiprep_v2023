@@ -20,6 +20,8 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 
 * New year of FAO mariculture yield data for 2020.
 * Updated sustainability scores from seafood watch.
+* Updated code for new column names from seafood watch data.
+* Updated depreciated functions (`spread()` and `gather()`).
 
 ***
 
@@ -44,7 +46,7 @@ FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquacultu
 Obtained upon request of SFW. 
 
 **Reference**: 
-https://www.seafoodwatch.org/-/m/sfw/pdf/whats%20new/complete%20recommendation%20list.pdf
+https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf
 
 **Downloaded**: April 25, 2022
 
@@ -85,7 +87,6 @@ Mariculture production in tonnes.
 ```{r import-data, eval = FALSE}
 # for scen_year 2022, Gage already downloaded mar production data to git_annex
 mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2022/FAO_GlobalAquacultureProduction_Quantity_1950_2020.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
-
 ```
 
 # Wrangle: 
@@ -113,7 +114,6 @@ mar <- mar %>%
 filter(environment %in% c("Brackishwater", "Marine"))  
 
 ## Convert to long format and clean FAO codes:
-## For some reason, I can't provide the data range in gather programatically!
 mar <- mar %>%
   select(-Unit) 
 
@@ -121,7 +121,8 @@ mar <- mar %>%
   pivot_longer(cols = "1950":"2020",
                names_to = "year",
                values_to = "value") %>% 
-  fao_clean_data_new()
+  fao_clean_data_new() 
+# the value column represents the harvest quantity (units are in tonnes or not documented)
 ```
 
 ## Update species names
@@ -137,27 +138,26 @@ mar_sp <- read.csv('raw/species_list.csv', stringsAsFactors=FALSE) %>%
 new.spp <- setdiff(mar$FAO_name, mar_sp$FAO_name)
 new.spp # Check: if dim has 0 rows it means all match
 ## If there is a list of species, hand check species_list.csv to see whether to keep (exclude seaweeds and species harvested for ornamental/medicinal).  
-## This is outlined in issue #8 and issue #81 for reference. You need to add the species output from this (new.spp) to species_list.csv and fill out the corresponding information. I.e. add FAO_name, exclude (whether to include in assessment or not. If they are only harvested for medicinal purposes, do not include, or not eaten by humans do not include), alias, Taxon_code (categories defined in the README in the /raw folder), and family (general family from google) to species_list.csv. There are also two notes columns that we have in there. Because seaweeds are generally used for both human and non-human consumption, we quantify whether to exclude or not for seaweed species as proportions. For example, if a seaweed species is 80% used for non-human consumption, we would exclude 80% of the harvest (exlude = 0.8). However, for fish species, we only classify as 0 or 1. 
-
+## This is outlined in issues #8, #81, and #241 for reference. You need to add the species output from this (new.spp) to species_list.csv and fill out the corresponding information. I.e. add FAO_name, exclude (whether to include in assessment or not. If they are only harvested for medicinal purposes, do not include, or not eaten by humans do not include), alias, Taxon_code (categories defined in the README in the /raw folder), and family (general family from google) to species_list.csv. There are also two notes columns that we have in there. Because seaweeds are generally used for both human and non-human consumption, we quantify whether to exclude or not for seaweed species as proportions. For example, if a seaweed species is 80% used for non-human consumption, we would exclude 80% of the harvest (exlude = 0.8). However, for fish species, we only classify as 0 or 1. 
 
 ### NOTE: if the list of species to add is huge, and it is unmanagable to do by hand, see the mar_dataprep.Rmd in the v2020 folder, and it will have code to use Taxize. Otherwise just do it by hand, because taxize is a pain, and most of them won't be found in taxize anyways... 
-  
+
 ## REMOVE SPECIES not relevant to mariculture goal (i.e., non-food species)
 mar <- mar %>% left_join(mar_sp, by="FAO_name") 
 
 ## Filters out species that should be excluded from the MAR subgoal Searches for column name "exclude"
-  
 mar <- mar %>% filter(exclude < 1)
 
 ## create an "include" column (1-exclude) 
- 
 mar <- mar %>%
    mutate(include = 1-exclude)
- 
+
 ## Change names using species alias or FAO species name (global changes)
+# creates a new column populated with the alias for the species if there is an alias, or the FAO_name if there is no alias present
 mar$species <- ifelse(!is.na(mar$alias), mar$alias, mar$FAO_name) 
 
 ## Multiply value by proportion of harvest to include (include column)
+# value column is 
 mar <- mar %>%
   mutate(value_include = value*include)
 
@@ -175,7 +175,7 @@ mar <- mar %>%
 
 
 
-## Sum production values for each group to account for duplicate rows after name change (remove NA values)
+## Sum production values for each group to account for duplicate rows after name change (and remove NA values)
 mar <- mar %>%
   filter(!is.na(value_include)) %>%
   group_by(country, fao, environment, species, year, Taxon_code, family) %>% 
@@ -240,18 +240,16 @@ For example: Production of blue shrimp in Maine starts in 1983 -- don't include 
 Checked to make sure that there weren't instances in which it made more sense to carry the previous year's data forward as a method of gapfilling. This didn't seem to be the case.
 
 ```{r gapfill-missing-0, eval = FALSE}
-
 ## Spread mar_rgn to create a value for every year-species-region (if missing it will be given a NA)
-mar_rgn_spread <- spread(mar_rgn, year, value)
+mar_rgn_spread <- pivot_wider(mar_rgn, names_from = year, values_from = value)
 dim(mar_rgn_spread)
 
 ## Turn data frame back into long format
-mar_rgn_gf <- gather(mar_rgn_spread, "year", "value", num_range("",1950:2019)) %>%
-  arrange(rgn_id, species, year, Taxon_code, family, fao, environment) 
+mar_rgn_gf <- pivot_longer(mar_rgn_spread, cols = num_range("",1950:2020), names_to = "year", values_to = "value") %>% arrange(rgn_id, species, year, Taxon_code, family, fao, environment)
 
 ## NA values are converted to zero.
 mar_rgn_gf <- mar_rgn_gf %>%
-  mutate(year = as.numeric(as.character(year))) %>%
+  mutate(year = as.numeric(year)) %>%
   mutate(value_w_0 = ifelse(is.na(value), 0, value)) %>%
   group_by(fao, environment, species, Taxon_code, family, rgn_id) %>% 
   mutate(cum_value = cumsum(value_w_0)) %>%
@@ -260,18 +258,18 @@ mar_rgn_gf <- mar_rgn_gf %>%
   mutate(gap_0_fill = ifelse(is.na(value), "NA_to_zero", "0")) %>% # Record gapfill
   mutate(value = ifelse(is.na(value), 0, value)) %>% # Finally, convert all NAs in original column to 0
   select(-cum_value, -value_w_0)
-
 ```
 
-See how may NA values were converted to 0
+Check how may NA values were converted to 0
 
 ```{r table-NA-0, eval = FALSE}
 
 table(mar_rgn_gf$gap_0_fill)
 ## 3790 of these out of 27810+3790 cases had NA values converted to 0 - 2018 assessment
 ## 3763 of these out of 28694+4291 cases had NA values converted to 0 - 2019 assessment
-## 5932  of these out of 29305 +5932  cases had NA values converted to 0 - 2020 assessment
-## 6441  of these out of 30170 + 6441  cases had NA values converted to 0 - 2021 assessment
+## 5932 of these out of 29305 +5932 cases had NA values converted to 0 - 2020 assessment
+## 6441 of these out of 30170 + 6441 cases had NA values converted to 0 - 2021 assessment
+## 7037 of these out of 30975 + 7037 cases had NA values converted to 0 - 2022 assessment
 
 ```
 
@@ -288,7 +286,7 @@ mar_rgn_gf = mar_rgn_gf %>%
 
 ```
 
-Add a unique identifier per cultivated stock that describes each species, fao region, and environment grouping.
+Add a unique identifier per cultivated stock that describes each species, region, and environment grouping.
 
 ```{r add-identifier, eval = FALSE}
 
@@ -310,10 +308,7 @@ Used to estimate total mariculture yield per country.
 Saves the Mariculture-FP file 
 
 ```{r save-mariculture-yield, eval = FALSE}
-
-
  write.csv(maric, 'output/MAR_FP_data.csv', row.names=FALSE)
-
 ```
 
 
@@ -326,11 +321,13 @@ These data describe the sustainability country/species combinations. In cases wh
 ```{r sw-scores, eval = FALSE}
 
 ## Load in Seafood Watch sustainability scores data from mazu:
-sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2021/Seafood-Watch_aquaculture-recs_May-2021.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2022/SFW_Aquaculture_ratings_062222.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 
 head(sw_sus)
 
-old_sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2020/Seafood-Watch_aquaculture-recs_July-2020.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+old_sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2021/Seafood-Watch_aquaculture-recs_May-2021.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+
+# oldest <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability/d2021/Seafood-Watch_aquaculture-recs_May-2021.csv'), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 
 ```
 
@@ -341,6 +338,18 @@ old_sw_sus <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/seafood_
 Rename columns to match with MAR data and fill in species column
 
 ```{r tidy_sw-sus, eval = FALSE}
+# juliet's notes to delete:
+# cur_cols <- sort(colnames(sw_sus))
+# cur_cols # 57
+# old_cols <- sort(colnames(oldest))
+# old_cols # 55
+# intersect(cur_cols, old_cols) 
+# setdiff(cur_cols, old_cols) #
+# setdiff(old_cols, cur_cols)
+# 
+# head(sw_sus$AssessmentColor, 10)
+# head(oldest$'Overall Recommendation', 10)
+
 
 ## Rename columns
 sw_sus <- sw_sus %>%
@@ -355,9 +364,9 @@ sw_sus <- sw_sus %>%
          country = 'Countries',
          state_territory = 'CountrySubs',
          method = 'Methods',
-         score = 'Overall Score',
+         score = 'AssessmentScore', # in 2021 was 'Overall Score', in 2022 changed to 'AssessmentScore'
          escapes_score = 'C6Score',
-         rec = 'Overall Recommendation'
+         rec = 'AssessmentColor' # in 2021 was 'Overall Recommendation', in 2022 changed to AssessmentColor
          ) %>% 
   dplyr::select(report_title, published_date, sw_species, genus, spp, fao_species, fda_species, country, state_territory, water_body, method, escapes_score, score, rec) %>%
   filter(!(method %in% c("Freshwater net pen")))
