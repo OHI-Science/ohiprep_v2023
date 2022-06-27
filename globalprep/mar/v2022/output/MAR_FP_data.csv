@@ -21924,15 +21924,15 @@
 182,"Sea belt","Atlantic, Northeast","Marine",2008,0.51,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2009,0.16,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2010,0,"AL","Algae","NA_to_zero",798
-182,"Sea belt","Atlantic, Northeast","Marine",2011,0.00700000000000001,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2011,0.007,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2012,0.03,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2013,0,"AL","Algae","NA_to_zero",798
-182,"Sea belt","Atlantic, Northeast","Marine",2014,0.0800000000000001,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2014,0.08,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2015,5e-04,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2016,0,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2017,0.0195,"AL","Algae","0",798
-182,"Sea belt","Atlantic, Northeast","Marine",2018,0.0825000000000001,"AL","Algae","0",798
-182,"Sea belt","Atlantic, Northeast","Marine",2019,0.00700000000000001,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2018,0.0825,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2019,0.007,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2020,0,"AL","Algae","NA_to_zero",798
 182,"Sea mussels nei","Atlantic, Northeast","Marine",1950,2100,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Atlantic, Northeast","Marine",1951,2800,"BI","Mytilidae","0",799
@@ -22004,19 +22004,19 @@
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2012,4479.1,"BI","Mytilidae","0",800
 182,"Sea mussels nei","Atlantic, Northeast","Marine",2013,157481,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2013,4531,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2014,215206.06,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2014,215206.1,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2014,5242.49,"BI","Mytilidae","0",800
 182,"Sea mussels nei","Atlantic, Northeast","Marine",2015,218000,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2015,7307.61,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2016,210105.44,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2016,210105.4,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2016,5750,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2017,235345.18,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2017,235345.2,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2017,6440,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2018,278707.76,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2018,278707.8,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2018,5092.8,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2019,223304.16,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2019,223304.2,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2019,4890.77,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2020,199408.36,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2020,199408.4,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2020,5057.76,"BI","Mytilidae","0",800
 182,"Seabasses nei","Mediterranean and Black Sea","Marine",2004,517,"F","Serranidae","0",801
 182,"Seabasses nei","Mediterranean and Black Sea","Marine",2005,0,"F","Serranidae","0",801
@@ -24597,25 +24597,25 @@
 196,"Snappers nei","Atlantic, Eastern Central","Marine",2019,0,"F","Lutjanidae","NA_to_zero",907
 196,"Snappers nei","Atlantic, Eastern Central","Marine",2020,0,"F","Lutjanidae","NA_to_zero",907
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2001,104.8,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2002,78.6000000000001,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2002,78.6,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2003,41.7,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2004,39.4,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2005,42.8,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2006,19,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2007,6.37500000000001,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2007,6.375,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2008,1.65,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2009,2.0575,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2010,1.28,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2011,6.21000000000001,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2012,9.04000000000001,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2011,6.21,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2012,9.04,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2013,20.08,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2014,53.3,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2015,58.4,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2016,0.115,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2017,2.6,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2018,12.9,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2019,9.66000000000001,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2020,8.97000000000001,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2019,9.66,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2020,8.97,"AL","Algae","0",908
 202,"Giant tiger prawn","Indian Ocean, Western","Brackishwater",2006,59,"SH","Penaeidae","0",909
 202,"Giant tiger prawn","Indian Ocean, Western","Brackishwater",2007,32,"SH","Penaeidae","0",909
 202,"Giant tiger prawn","Indian Ocean, Western","Brackishwater",2008,202,"SH","Penaeidae","0",909
@@ -25557,7 +25557,7 @@
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2004,294,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2005,380,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2006,570,"AL","Algae","0",944
-206,"Elkhorn sea moss","Pacific, Western Central","Marine",2007,860.000000000001,"AL","Algae","0",944
+206,"Elkhorn sea moss","Pacific, Western Central","Marine",2007,860,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2008,1060,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2009,1330,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2010,2000,"AL","Algae","0",944
@@ -25567,7 +25567,7 @@
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2014,2453.32,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2015,2607.603,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2016,2059.89,"AL","Algae","0",944
-206,"Elkhorn sea moss","Pacific, Western Central","Marine",2017,2029.6558,"AL","Algae","0",944
+206,"Elkhorn sea moss","Pacific, Western Central","Marine",2017,2029.656,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2018,1740.832,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2019,1881.1,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2020,1820.61,"AL","Algae","0",944
