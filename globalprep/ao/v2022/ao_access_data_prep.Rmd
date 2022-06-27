@@ -15,7 +15,7 @@ output:
 pdf_document:
   toc: true
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 # Summary
@@ -50,6 +50,10 @@ Link: https://www.fao.org/sustainable-development-goals/indicators/14b1/en/
 
 ``` {r setup, message = FALSE, warning = FALSE, eval=F}
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message = FALSE, warning = FALSE)
+if (!require(ohicore)){
+  devtools::install_github('ohi-science/ohicore@dev')
+  library(ohicore)
+}
 if (!require(librarian)){
   install.packages("librarian")
   library(librarian)
@@ -58,36 +62,38 @@ librarian::shelf(
   tidyverse,
   here,
   janitor,
-  jsonlite
-)
-# devtools::install_github('ohi-science/ohicore@dev')
-library(ohicore) 
-
+  jsonlite,
+  plotly
+) 
 ### directory paths and relevant files
 source(here::here('workflow', 'R', 'common.R'))
 ```
 
 ## Match raw data to OHI regions
 
-API query builder: https://unstats.un.org/SDGAPI/swagger/#/
+API query builder: https://unstats.un.org/SDGAPI/swagger/
 
 ```{r eval = F}
+### Update me!
+current_year <- 2022
+version_year <- paste0("v", current_year)
+
 ### This is the list of UN M49 codes for regional groupings (not countries)
-### These will be used for gapfilling purposes
-### https://en.wikipedia.org/wiki/UN_M49
-## 830 is considered region by UN, we call it country and split it to islands later
+### These will be used for gapfilling purposes. More info: https://en.wikipedia.org/wiki/UN_M49
+### 830 is Channel Islands - considered region by UN, we call it country and split it to islands later
+### 57 is Micronesia - a region but will be treated as a country and split
 regions <- c(
   1, 2, 5, 9, 11, 13, 14, 15, 17, 18,
-  19, 21, 29, 30, 34, 35, 39, 53, 54, 57, 
-  61, 62, 127, 135, 142, 143, 145, 150, 151, 154, 
-  155, 199, 202, 223, 419, 432, 485, 513, 514, 515, 
-  518, 543, 722, 738, 746, 747, 753)
+  19, 21, 29, 30, 34, 35, 39, 53, 54, 61, 
+  62, 127, 135, 142, 143, 145, 150, 151, 154, 155,
+  199, 202, 223, 419, 432, 485, 513, 514, 515, 518,
+  543, 722, 738, 746, 747, 753
+)
             
-
 ## Here is the link to the countries that fall under each code (saved in the "raw" folder as a csv): 
 ## https://unstats.un.org/unsd/methodology/m49/
 ## this shows the different over arching regions for each country
-region_info <- here::here("globalprep", "ao", "v2022", "raw", "un_region_info_keep.csv") %>% 
+region_info <- here::here("globalprep", "ao", version_year, "raw", "un_region_info_keep.csv") %>% 
   readr::read_csv(col_types = cols(`M49 Code` = col_integer())) %>% 
   janitor::clean_names() %>%
   dplyr::mutate(
@@ -119,7 +125,6 @@ clean_data <- api_get_indicator_data$data %>%
     region_type = case_when(
       geo_area_code %in% regions ~ "region",
       TRUE ~ "country")) %>%
-   # dplyr::select(geo_area_code, geo_area_name, time_detail, value) %>% 
   dplyr::filter(!(geo_area_code %in% c(344, 446))) %>% # filter out hongkong/macao, they are NA anyways
   dplyr::left_join(dplyr::select(region_info, -country_or_area), by = c("geo_area_code" = "m49_code")) %>% 
   dplyr::select(region_type, geo_area_code, geo_area_name, time_detail, value, score, region_code, 
@@ -129,25 +134,40 @@ clean_data <- api_get_indicator_data$data %>%
 
 ## save a large region data frame for use
 region_df <- clean_data %>%
-  filter(region_type == "region") 
+  dplyr::filter(region_type == "region") 
 
 ## make sure no region has more than 3 observations (2018, 2020, 2022) 
 test_1 <- clean_data %>%
-  group_by(geo_area_name) %>%
-  summarise(n()) 
+  dplyr::group_by(geo_area_name) %>%
+  dplyr::summarise(dplyr::n()) 
 
 ## Now lets check which OHI regions we are missing, so that we can gapfill them later on. We want a score for every OHI region
 test_2 <- clean_data %>%
-  filter(region_type == "country")
+  dplyr::filter(region_type == "country")
 
-## load rgns_eez from common.R
-region_data()
+region_data() ## load rgns_eez from common.R
 
-## Find the differnces between OHI regions and UN regions
+## Find the differences between OHI regions and UN regions
 setdiff(rgns_eez$rgn_name, test_2$geo_area_name)
 
 ## it looks like we are missing quite a few... 63 in v2022
 ## however, many of these are name mis-matches or regions that need to be split. We will fix these below.
+```
+
+```{r}
+### not quite what we need I think, but maybe useful with more exploration - v2022
+### Perhaps try to integrate in future workflows
+# url_regions <- "https://unstats.un.org/SDGAPI/v1/sdg/GeoArea/Tree"
+# api_get_geoarea_tree <- jsonlite::fromJSON(url_regions) 
+# 
+# un_regions <- api_get_geoarea_tree %>% 
+##   filter(geoAreaName == "World (total) by SDG regions") %>%
+#   unnest() %>% # unnest the tree structure *3 into a dataframe
+#   unnest() %>% 
+#   unnest() %>% 
+#   select(-children) %>% 
+#   clean_names() %>% 
+#   filter(geo_area_code3 %in% clean_data$geo_area_code)
 ```
 
 Use the name2rgn function to fix some of the name mismatches. Additionally, we will manually split some regions. There is probably a better way to do this... if next year wants to take the time to do it. 
@@ -209,20 +229,24 @@ match_country_data <- ohicore::name_2_rgn(
   fld_name='geo_area_name', 
   flds_unique=c('time_detail'))
 
-## v2021 - v2022 matches as well
-## removed: Aland (not OHI), Bonaire Sint Saba (fixed above), Channel Islands (fixed in new data), Eswatini (not OHI), French southern territories (fixed above), Isle of man (not OHI), North Macedonia (land locked), Saint Barthelemy (not OHI), Palestine (not OHI), USMOI (fixed above) - perfect! 
+## v2021 & v2022 
+## removed: 
+## Aland Islands     (not OHI), 
+## Bonaire Sint Saba (fixed above), 
+## Channel Islands   (fixed with API data), 
+## Eswatini          (not OHI), 
+## French southern   (fixed above), 
+## Isle of man       (not OHI), 
+## North Macedonia   (land locked),
+## Saint Barthelemy  (not OHI), 
+## Palestine         (not OHI), 
+## USMOI             (fixed above) 
+## perfect! 
 
 ## removed landlocked countries ie. Afghanistan, Andorra... Zimbabwe
 
-## fix duplicates
-
-# DUPLICATES found. Consider using collapse2rgn to collapse duplicates (function in progress).
-
-# v2022 there are fewer than v2021 due to channel islands not needing to be split
-# v2022 Micronesia  and Micronesia (Federated States of) disappeared too...
-# # A tibble: 7 × 1
-#   geo_area_name               
-#   <chr>                       
+# v2022 there are fewer than v2021 due to Channel Islands not needing to be split
+#   geo_area_name                      
 # 1 China                       
 # 2 Guadeloupe                  
 # 3 Guam                        
@@ -230,6 +254,8 @@ match_country_data <- ohicore::name_2_rgn(
 # 5 Northern Mariana Islands    
 # 6 Puerto Rico                 
 # 7 United States Virgin Islands
+# 8 Micronesia				
+# 9 Micronesia (Federated States of)
 
 ## deal with the duplicates - v2022 this brought from 636 rows to 624 rows
 fix_dups <- match_country_data %>%
@@ -250,9 +276,7 @@ rgns_data <- match_country_data %>%
   dplyr::select(1:9) 
 
 ## There is still a region "Kiribati" which needs to be split. For some reason, trying to do so with match2rgn does not work. 
-## Line Islands (Kiribati) == Kiribati, Phoenix Islands (Kiribati) == Kiribati, Gilbert Islands (Kiribati) == Kiribati
-## filter for these regions in country_df and prep so they match rgns_data
-## so what we have to do is:
+## filter for these regions in country_df and prep so they match rgns_data. What we have to do is:
 ## Split "Kiribati" into "Line Islands (Kiribati)" and "Phoenix Islands (Kiribati)", Gilbert Islands (Kiribati)
 kiribati_split <- country_df %>%
   dplyr::filter(geo_area_name %in% c("Kiribati")) %>%
@@ -269,7 +293,7 @@ kiribati_split <- country_df %>%
 
 ## now bind with the rgns_data from before (the data that didnt need to be fixed)
 all_rgns_data <- rbind(rgns_data, kiribati_split) %>%
-  filter(rgn_name != "Kiribati") # filter out original kiribati
+  dplyr::filter(rgn_name != "Kiribati") # filter out original kiribati
 
 ## Now lets look to see what OHI regions are still missing 
 sort(setdiff(rgns_eez$rgn_name, all_rgns_data$rgn_name))
@@ -304,7 +328,8 @@ remaining_rgns <- dplyr::tibble(
              intermediate_region_name = c(NA,"Western Africa",NA,NA,NA,NA,NA,NA),
   small_island_developing_states_sids = c("x", "x", NA, NA, NA, "x", NA, "x")) %>%
   dplyr::mutate(region_type = "country", score = NA) %>%
-  tidyr::crossing(time_detail = c(2018, 2020))
+  # tidyr::crossing(time_detail = c(2018, 2020))
+  tidyr::crossing(time_detail = unique(all_rgns_data$time_detail))
 
 ## Now run the match2rgn function to get OHI regions
 match_remaining <- name_2_rgn(df_in = remaining_rgns, 
@@ -329,7 +354,6 @@ Data type 3: 103 regions with no data for 2018 or 2020
 Data type 4: 58 regions with complete data 
 Data type 5: 44 larger regions like "Asia", "East Africa", etc
 
-
 Steps to gapfill:
 
 1. Gapfill data type 1 with the 2018 values
@@ -344,26 +368,40 @@ c. Gapfill with continental regions
 
 ```{r, eval = F}
 gf_df <- all_rgns_data %>%
-  tidyr::pivot_wider(names_from = time_detail, values_from = score) %>%
-  dplyr::mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
-         no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
-         no_data = ifelse(is.na(`2020`) & is.na(`2018`), 1, 0),
-         complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) %>%
-  dplyr::filter(rgn_id <= 250)
+  dplyr::group_by(rgn_name) %>% 
+  dplyr::mutate(
+    has_data = ifelse(!is.na(score), 1, 0),
+    data_completness = paste(sum(has_data), "/", n())) %>% 
+  tidyr::fill(score, .direction = "updown") %>% 
+  dplyr::mutate(
+    gapfilled = dplyr::case_when(
+      has_data == 0 & !is.na(score) ~ 1,
+      TRUE ~ 0),
+    method = dplyr::case_when(
+      sum(has_data) == n() ~ "No gapfill needed",
+      gapfilled == 1 ~ "Used closest year score", 
+      TRUE ~ as.character(NA)
+    )
+    )
+  
 
-test <- gf_df %>%
-  dplyr::filter(no_data == 1)
-
-sum(gf_df$complete_data)
+#   tidyr::pivot_wider(names_from = time_detail, values_from = score) %>%
+#   dplyr::mutate(
+#     no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
+#     no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
+#     no_data = ifelse(is.na(`2020`) & is.na(`2018`), 1, 0),
+#     complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) %>%
+#   dplyr::filter(rgn_id <= 250)
+# 
+# test <- gf_df %>%
+#   dplyr::filter(no_data == 1)
+# 
+# sum(gf_df$complete_data)
 
 ## 35 regions with 2018 but no 2020
 ## 21 with 2020 but no 2018
 ## 103 regions with no data for 2018 or 2020
 ## 58 regions with complete data 
-
-35 + 21 + 103 + 58 # 217
-
-217*2 #434
 ```
 
 ## Gapfilling Step 1 and 2
@@ -371,36 +409,36 @@ sum(gf_df$complete_data)
 ```{r, eval = F}
 ## Fill in the missing 2020 values with 2018 data
 
-gf_2020_rgns <- gf_df %>%
-  dplyr::filter(no_2020 == 1)
-
-gf_2020_df <- all_rgns_data %>%
-  dplyr::filter(rgn_id %in% c(gf_2020_rgns$rgn_id)) %>%
-  dplyr::mutate(score_gf = score) %>%
-  dplyr::group_by(rgn_id) %>%
-  dplyr::do(tidyr::fill(., score_gf, .direction = "down")) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
-  dplyr::mutate(method = ifelse(is.na(score), "Used prior year score", NA)) %>%
-  dplyr::select(-score) %>%
-  dplyr::mutate(score = score_gf) %>%
-  dplyr::select(-score_gf)
-
-## fill in the missing 2018 values with 2020 values
-gf_2018_rgns <- gf_df %>%
-  dplyr::filter(no_2018 == 1)
-
-gf_2018_df <- all_rgns_data %>%
-  dplyr::filter(rgn_id %in% c(gf_2018_rgns$rgn_id)) %>%
-  dplyr::mutate(score_gf = score) %>%
-  dplyr::group_by(rgn_id) %>%
-  dplyr::do(tidyr::fill(., score_gf, .direction = "updown")) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
-  dplyr::mutate(method = ifelse(is.na(score), "Used later year score", NA)) %>%
-  dplyr::select(-score) %>%
-  dplyr::mutate(score = score_gf) %>%
-  dplyr::select(-score_gf)
+# gf_2020_rgns <- gf_df %>%
+#   dplyr::filter(no_2020 == 1)
+# 
+# gf_2020_df <- all_rgns_data %>%
+#   dplyr::filter(rgn_id %in% c(gf_2020_rgns$rgn_id)) %>%
+#   dplyr::mutate(score_gf = score) %>%
+#   dplyr::group_by(rgn_id) %>%
+#   dplyr::do(tidyr::fill(., score_gf, .direction = "down")) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
+#   dplyr::mutate(method = ifelse(is.na(score), "Used prior year score", NA)) %>%
+#   dplyr::select(-score) %>%
+#   dplyr::mutate(score = score_gf) %>%
+#   dplyr::select(-score_gf)
+# 
+# ## fill in the missing 2018 values with 2020 values
+# gf_2018_rgns <- gf_df %>%
+#   dplyr::filter(no_2018 == 1)
+# 
+# gf_2018_df <- all_rgns_data %>%
+#   dplyr::filter(rgn_id %in% c(gf_2018_rgns$rgn_id)) %>%
+#   dplyr::mutate(score_gf = score) %>%
+#   dplyr::group_by(rgn_id) %>%
+#   dplyr::do(tidyr::fill(., score_gf, .direction = "updown")) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(gapfilled = ifelse(is.na(score), 1, 0)) %>%
+#   dplyr::mutate(method = ifelse(is.na(score), "Used later year score", NA)) %>%
+#   dplyr::select(-score) %>%
+#   dplyr::mutate(score = score_gf) %>%
+#   dplyr::select(-score_gf)
 
 ```
 
@@ -409,97 +447,102 @@ gf_2018_df <- all_rgns_data %>%
 ```{r, eval = F}
 ## now fill gapfill places with no scores at all by larger regions... 
 
-# explore the larger regions 
+## explore the larger regions 
 region_wide_df <- region_df %>%
   dplyr::select(geo_area_code, geo_area_name, time_detail, region_type, score) %>% 
-  pivot_wider(names_from = time_detail, values_from = score) %>%
-  mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
-         no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
-         complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) 
+  tidyr::pivot_wider(names_from = time_detail, values_from = score) %>%
+  dplyr::mutate(no_2018 = ifelse(is.na(`2018`) & !is.na(`2020`), 1, 0),
+                no_2020 = ifelse(is.na(`2020`) & !is.na(`2018`), 1, 0),
+                complete_data = ifelse(!is.na(`2020`) & !is.na(`2018`), 1, 0)) 
 
 ## there are a couple larger regions with no 2020 data, so we will gapfill those backwards
 region_tidy_df <- region_df %>%
   dplyr::select(geo_area_code, geo_area_name, time_detail, region_type, score) %>%
-  group_by(geo_area_code) %>%
-  do(fill(., score, .direction = "down")) %>%
-  ungroup() %>%
-  mutate(geo_area_name = ifelse(geo_area_name == "South-Eastern Asia", "South-eastern Asia", geo_area_name)) ## correct a typo
-
+  dplyr::group_by(geo_area_code) %>%
+  tidyr::fill(score, .direction = "down") %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate( ## correct a typo
+    geo_area_name = stringr::str_replace_all(
+      string = geo_area_name, 
+      pattern = "South-Eastern Asia", 
+      replacement =  "South-eastern Asia"))
 
 ## filter for regions we haven't gapfilled yet
 
 gf_nodata_rgns <- gf_df %>%
-  filter(no_data == 1)
+  dplyr::filter(is.na(method))
 
 gf_nodata_df <- all_rgns_data %>%
-  filter(rgn_id %in% c(gf_nodata_rgns$rgn_id)) 
+  dplyr::filter(rgn_id %in% c(gf_nodata_rgns$rgn_id)) 
 
 unique(gf_nodata_df$rgn_id) # 103 regions - perfect
 
 ## now we will filter for "intermediate regions" and gapfill that way. If any remain after gapfilling by "intermediate region" we will filter for "sub_region" and gapfill using those values. If any remain after those steps, we will gapfill using larger "region_name" (these are the continents). And finally if there are still NAs, use the global "world" value. 
 
-
 ##### Intermediate region gapfilling, Step 3a. #####
 int_regions <- gf_nodata_df %>%
-  filter(!is.na(intermediate_region_name))
+  dplyr::filter(!is.na(intermediate_region_name))
 
 # now filter for intermediate regions in the region_tidy_df
 
 int_regions_data <- region_tidy_df %>%
-  filter(geo_area_name %in% c(int_regions$intermediate_region_name)) 
+  dplyr::filter(geo_area_name %in% c(int_regions$intermediate_region_name)) 
 
 int_regions_join_gf <- gf_nodata_df %>%
-  filter(!is.na(intermediate_region_name)) %>%
-  left_join(int_regions_data, by = c("intermediate_region_name" = "geo_area_name", "time_detail")) %>%
-  mutate(score = ifelse(small_island_developing_states_sids %in% "x", 0.8, score.y), region_type = region_type.x) %>% 
-  dplyr::select(rgn_id, rgn_name, time_detail, score, region_type, score, region_name, sub_region_name, intermediate_region_name, small_island_developing_states_sids) %>%
-  filter(!is.na(score)) %>% ## now filter out the ones that are still NA
-  mutate(gapfilled = 1) %>%
-  mutate(method = ifelse(small_island_developing_states_sids %in% "x", "Used developing small island score", "Used intermediate regions score"))
+  dplyr::filter(!is.na(intermediate_region_name)) %>%
+  dplyr::left_join(int_regions_data, by = c("intermediate_region_name" = "geo_area_name", "time_detail")) %>%
+  dplyr::mutate(score = ifelse(small_island_developing_states_sids %in% "x", 0.8, score.y), region_type = region_type.x) %>% 
+  dplyr::select(rgn_id, rgn_name, time_detail, score, region_type, score, region_name,
+                sub_region_name, intermediate_region_name, small_island_developing_states_sids) %>%
+  dplyr::filter(!is.na(score)) %>% ## now filter out the ones that are still NA
+  dplyr::mutate(gapfilled = 1) %>%
+  dplyr::mutate(method = ifelse(small_island_developing_states_sids %in% "x", "Used developing small island score", "Used intermediate regions score"))
 
 
 ##### Sub region gapfilling Step 3b. #####
 
 sub_regions <- gf_nodata_df %>%
-  filter(!is.na(sub_region_name)) %>% ## filter for regions with subregions
-  filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id))) ## filter out those that we have already gapfilled
+  dplyr::filter(!is.na(sub_region_name)) %>% ## filter for regions with subregions
+  dplyr::filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id))) ## filter out those that we have already gapfilled
 
 # now filter for intermediate regions in the region_tidy_df
 
 sub_regions_data <- region_tidy_df %>%
-  filter(geo_area_name %in% c(sub_regions$sub_region_name)) 
+  dplyr::filter(geo_area_name %in% c(sub_regions$sub_region_name)) 
 
 sub_regions_join_gf <- gf_nodata_df %>%
-  filter(!is.na(sub_region_name)) %>%
-  filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id))) %>%
-  left_join(sub_regions_data, by = c("sub_region_name" = "geo_area_name", "time_detail")) %>%
-  mutate(score = ifelse(small_island_developing_states_sids %in% "x", 0.8, score.y), region_type = region_type.x) %>% 
-  dplyr::select(rgn_id, rgn_name, time_detail, score, region_type, score, region_name, sub_region_name, intermediate_region_name, small_island_developing_states_sids) %>%
-  filter(!is.na(score))  %>% 
-  mutate(gapfilled = 1) %>%
-  mutate(method = ifelse(small_island_developing_states_sids %in% "x", "Used developing small island score", "Used sub-regions score"))
+  dplyr::filter(!is.na(sub_region_name)) %>%
+  dplyr::filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id))) %>%
+  dplyr::left_join(sub_regions_data, by = c("sub_region_name" = "geo_area_name", "time_detail")) %>%
+  dplyr::mutate(score = ifelse(small_island_developing_states_sids %in% "x", 0.8, score.y), region_type = region_type.x) %>% 
+  dplyr::select(rgn_id, rgn_name, time_detail, score, region_type, score, region_name,
+                sub_region_name, intermediate_region_name, small_island_developing_states_sids) %>%
+  dplyr::filter(!is.na(score))  %>% 
+  dplyr::mutate(gapfilled = 1) %>%
+  dplyr::mutate(method = ifelse(small_island_developing_states_sids %in% "x", "Used developing small island score", "Used sub-regions score"))
 
 
 #### Contentinal gapfilling (only 2 countries left, both in Oceania) Step 3c. ####
 
 cont_regions <- gf_nodata_df %>%
-  filter(!is.na(region_name)) %>% ## filter for regions with subregions
-  filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id)) & !(rgn_id %in% c(sub_regions_join_gf$rgn_id))) ## filter out those that we have already gapfilled
+  dplyr::filter(!is.na(region_name)) %>% ## filter for regions with subregions
+  dplyr::filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id)) & !(rgn_id %in% c(sub_regions_join_gf$rgn_id))) ## filter out those that we have already gapfilled
 
 # now filter for intermediate regions in teh region_tidy_df
 
 cont_regions_data <- region_tidy_df %>%
-  filter(geo_area_name %in% c(cont_regions$region_name)) 
+  dplyr::filter(geo_area_name %in% c(cont_regions$region_name)) 
 
 cont_regions_join_gf <- gf_nodata_df %>%
-  filter(!is.na(region_name)) %>%
-  filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id))& !(rgn_id %in% c(sub_regions_join_gf$rgn_id))) %>%
-  left_join(cont_regions_data, by = c("region_name" = "geo_area_name", "time_detail")) %>%
-  mutate(score = ifelse(small_island_developing_states_sids %in% "x", 0.8, score.y), region_type = region_type.x) %>% 
-  dplyr::select(rgn_id, rgn_name, time_detail, score, region_type, score, region_name, sub_region_name, intermediate_region_name, small_island_developing_states_sids) %>%
-  filter(!is.na(score)) %>%
-  mutate(gapfilled = 1) %>%
-  mutate(method = ifelse(small_island_developing_states_sids %in% "x", "Used developing small island score", "Used continental score"))
+  dplyr::filter(!is.na(region_name)) %>%
+  dplyr::filter(!(rgn_id %in% c(int_regions_join_gf$rgn_id))& !(rgn_id %in% c(sub_regions_join_gf$rgn_id))) %>%
+  dplyr::left_join(cont_regions_data, by = c("region_name" = "geo_area_name", "time_detail")) %>%
+  dplyr::mutate(score = ifelse(small_island_developing_states_sids %in% "x", 0.8, score.y), region_type = region_type.x) %>% 
+  dplyr::select(rgn_id, rgn_name, time_detail, score, region_type, score, region_name, 
+                sub_region_name, intermediate_region_name, small_island_developing_states_sids) %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::mutate(gapfilled = 1) %>%
+  dplyr::mutate(method = ifelse(small_island_developing_states_sids %in% "x", "Used developing small island score", "Used continental score"))
 
 
 nrow(cont_regions_join_gf) + nrow(int_regions_join_gf) + nrow(sub_regions_join_gf) # 206 - matches the number of rows that needed to be completely gapfilled. No need to do global gapfilling!
@@ -507,7 +550,7 @@ nrow(cont_regions_join_gf) + nrow(int_regions_join_gf) + nrow(sub_regions_join_g
 
 ## Compile all gapfilled and non-gapfilled data
 
-```{r, eval = F}
+```{r eval=F}
 #### Bind the gapfilled datasets together #### 
 
 nodata_gf_final <- rbind(cont_regions_join_gf, sub_regions_join_gf, int_regions_join_gf)
@@ -519,17 +562,16 @@ gapfilled_obs <- rbind(cont_regions_join_gf, sub_regions_join_gf, int_regions_jo
 #### Now bind together with non-gapfilled data to produce our final dataset ####
 
 complete_data_rgns <- gf_df %>%
-  filter(complete_data == 1) 
+  dplyr::filter(complete_data == 1) 
 
 final_gf_df <- all_rgns_data %>%
-  filter(rgn_id %in% c(complete_data_rgns$rgn_id)) %>%
-  mutate(gapfilled = 0,
+  dplyr::filter(rgn_id %in% c(complete_data_rgns$rgn_id)) %>%
+  dplyr::mutate(gapfilled = 0,
          method = NA) %>%
   rbind(gapfilled_obs) %>%
   dplyr::select(rgn_id, "year" = "time_detail", "value" = "score", gapfilled, method)
 
 hist(final_gf_df$value)
-
 ```
 
 ## Save the prepped data
@@ -537,59 +579,116 @@ hist(final_gf_df$value)
 ```{r, eval = F}
 ## save gapfilling flag dataset
 gf_flag_final <- final_gf_df %>%
-  dplyr::select(rgn_id, year, gapfilled, method)
-
-write.csv(gf_flag_final, file.path(here(), "globalprep/ao/v2021/output/sdg_14_b_1_ao_gf.csv"), row.names = FALSE)
+  dplyr::select(rgn_id, year, gapfilled, method) %>% 
+  readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao_gf.csv"))
 
 ## save value dataset
-
 final_data <- final_gf_df %>%
-  dplyr::select(rgn_id, year, value)
-
-write.csv(final_data, file.path(here(), "globalprep/ao/v2021/output/sdg_14_b_1_ao.csv"), row.names = FALSE)
-
+  dplyr::select(rgn_id, year, value) %>% 
+  readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao.csv"))
 ```
 
 ## Datacheck
 
-Lets compare to the old mora AO data. It is likely to be very dissimilar. Next year will be much more similar.
+Lets compare to last years AO data. It is likely to be very similar if not exact.
+
+```{r, eval = F}
+## This section is checking if we get the same values as last year 
+## This is primarily to see if the API change worked in v2022 
+## and if we got the same data as last year
+## The next section is for checking on the changes from last year to this
+version_year_new <- paste0("v", current_year - 0 )
+version_year_old <- paste0("v", current_year - 1 )
+
+region_data()
+
+new_data <- here::here("globalprep", "ao", version_year_new, "output", "sdg_14_b_1_ao.csv") %>% 
+  readr::read_csv() %>%
+  dplyr::left_join(rgns_eez)
+
+old_data <- here::here("globalprep", "ao", version_year_old, "output", "sdg_14_b_1_ao.csv") %>% 
+  readr::read_csv() %>%
+  dplyr::left_join(rgns_eez)
+
+print(setdiff(old_data$rgn_name, new_data$rgn_name))
+
+## regions in Mora data that are not in SDG data
+# "Macquarie Island"  "Clipperton Island" NA "Bouvet Island" - these are all uninhabited, so it does not matter 
+
+print(setdiff(old_data$rgn_id, new_data$rgn_id))
+
+#  4  107 NA 105 
+
+setdiff(new_data$rgn_id, old_data$rgn_id)
+
+compare <- new_data %>%
+  dplyr::filter(year < current_year) %>%
+  dplyr::left_join(old_data, by = c("rgn_id", "year", "rgn_name", "admin_country_name"), 
+            suffix = c(paste0("_", version_year_new), paste0("_", version_year_old))) %>%
+  dplyr::mutate(difference = !!rlang::sym(paste0("value_", version_year_old)) - !!rlang::sym(paste0("value_", version_year_new)))
+
+compare_diff <- compare %>% 
+  dplyr::filter(difference != 0) %>% 
+  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2021, value_v2022, difference)
+
+plot_diff <- 
+  ggplot2::ggplot(
+    compare, 
+    ggplot2::aes(x = !!rlang::sym(paste0("value_", version_year_old)), 
+        y = !!rlang::sym(paste0("value_", version_year_new)),
+        color = as.factor(year),
+        label = rgn_id), color = "black") +
+  ggplot2::geom_jitter(width = 0.025, height = .025) +
+  ggplot2::geom_abline() +
+  ggplot2::labs(title = paste0("SDG 14.b.1 values (", version_year_old, " vs. ", version_year_new, ")"), 
+       x = paste(version_year_old, "values"), 
+       y = paste(version_year_new, "values"), 
+       color = "Data year") +
+  ggplot2::theme_bw() 
+
+plotly::ggplotly(plot_diff, tooltip = c("as.factor(year)", "rgn_id", "x", "y"))
+## doesn't look great since the SDG data is essentially categorical, but it is more up-to-date
+
+## rgn_id = 9 is Micronesia
+## rgn_id = 159 is Johnston Atoll
+```
 
 ```{r, eval = F}
 
-region_data()
-mora_data <- read_csv(file.path(here(), "globalprep/res_mora_ao/v2013/data/r_mora_s4_2013a_updated.csv")) %>%
-  left_join(rgns_eez)
+old_data_2 <- old_data %>%
+  dplyr::filter(year == current_year - 2) %>% # Every two years
+  dplyr::mutate(version = version_year_old)
 
-new_data <- read_csv(file.path(here(), "globalprep/ao/v2021/output/sdg_14_b_1_ao.csv")) %>%
-  left_join(rgns_eez)
+new_data_2 <- new_data %>%
+  dplyr::filter(year == current_year) %>% 
+  dplyr::mutate(version = version_year_new)
 
-print(setdiff(mora_data$rgn_name, new_data$rgn_name))
+data_year_old = max(old_data_2$year)
+data_year_new = max(new_data_2$year)
 
-## regions in Mora data that are not in SDG data
-# [1] "Macquarie Island"  "Clipperton Island" NA                  "Bouvet Island"   - these are all uninhabited, so it does not matter 
+compare_2 <- rbind(new_data_2, old_data_2) %>% 
+  dplyr::distinct(.keep_all = T) %>% 
+  tidyr::pivot_wider(id_cols = rgn_name, names_from = version, values_from = value) %>%
+  dplyr::mutate(difference = !!rlang::sym(version_year_old) - !!rlang::sym(version_year_new))
 
-print(setdiff(mora_data$rgn_id, new_data$rgn_id))
+## look at countries that changed from last year to this year
+compare_diff_2 <- compare_2 %>% 
+  dplyr::filter(difference != 0)
 
-#  4  85  88  90 107  58  57  55 195  26  NA 105 237
+plot_diff <- 
+  ggplot2::ggplot(
+    compare_2, 
+    ggplot2::aes(
+      x = !!rlang::sym(version_year_old), 
+      y = !!rlang::sym(version_year_new),
+      text = rgn_name)) +
+  ggplot2::geom_jitter(width = 0.025, height = .025) +
+  ggplot2::geom_abline() +
+  ggplot2::labs(
+    title = paste0("SDG 14.b.1 values (", version_year_old, " vs. ", version_year_new, ")"), 
+    x = paste(data_year_old, "data from", version_year_old), 
+    y = paste(data_year_new, "data from", version_year_new)) +
+  ggplot2::theme_bw() 
 
-setdiff(new_data$rgn_id, mora_data$rgn_id)
-
-
-
-## 2013 (mora) vs 2018 (SDG)
-compare_2018 <- new_data %>%
-  filter(year == 2018) %>%
-  left_join(mora_data, by = "rgn_id") %>%
-  mutate(difference = value.x - value.y)
-
-ggplot(compare_2018, aes(x = value.y, y = value.x)) +
-  geom_point() +
-  geom_abline() +
-  labs(title = "AO Mora vs. SDG 14.b.1 values", x = "old value", y=  "new value") +
-  theme_bw()
-
-## doesn't look great since the SDG data is essentially categorical, but it is more up-to-date
-
+plotly::ggplotly(plot_diff, tooltip = c("rgn_name", "x", "y"))
 ```
-
-

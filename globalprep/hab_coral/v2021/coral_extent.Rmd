@@ -62,7 +62,7 @@ source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
 
 goal     <- 'globalprep/hab_coral/v2021'
 dir_git  <- file.path('~/github/ohiprep_v2021', goal)
-dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_coral'))
+dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/d2018/wcmc_coral'))
 ohi_rasters() # call the region zones raster
 ```
 
