@@ -80,7 +80,8 @@ codes_raw <- read_xlsx(file.path(here(), "globalprep/ao/v2021/raw/raw_sdg_14_dat
 
 ## Here is the link to the countries that fall under each code (saved in the "raw" folder as a csv): https://unstats.un.org/unsd/methodology/m49/
 
-region_info <- read_csv("raw/UNSD_Methodology.csv") %>% ## this shows the different over arching regions for each country
+region_info <- here::here("globalprep", "ao", "v2021", "raw", "UNSD_Methodology.csv") %>% 
+  read_csv() %>% ## this shows the different over arching regions for each country
   clean_names() %>%
   mutate(country_or_area = ifelse(country_or_area == "Bonaire", "Bonaire, Sint Eustatius and Saba", country_or_area)) %>%
   mutate(country_or_area = ifelse(country_or_area == "Côte d’Ivoire", "Ivory Coast", country_or_area)) 
