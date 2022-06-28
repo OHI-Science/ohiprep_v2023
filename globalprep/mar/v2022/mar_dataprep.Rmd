@@ -14,48 +14,47 @@ output:
 ---
 
 # Summary
+
 This analysis converts FAO mariculture and seafood watch sustainability data into data used to calculate the OHI global mariculture status score. This also calculates the genetic escapee from mariculture pressure data.
 
 # Updates from previous assessment
 
-* New year of FAO mariculture yield data for 2020.
-* Updated sustainability scores from seafood watch.
-* Updated code for new column names from seafood watch data.
-* Updated depreciated functions (`spread()` and `gather()`).
-* Added species name conversions when cross-checking Seafood Watch species with those in FAO data.
+-   New year of FAO mariculture yield data for 2020.
+-   Updated sustainability scores from seafood watch.
+-   Updated code for new column names from seafood watch data.
+-   Updated depreciated functions (`spread()` and `gather()`).
+-   Added species name conversions when cross-checking Seafood Watch species with those in FAO data.
 
-***
+------------------------------------------------------------------------
 
-# Data Source 
+# Data Source
 
 ## Production data
 
-**Reference**:      
-http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-Release date: March 2022
-FAO Global Aquaculture Production Quantity 1950_2020
-FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
+**Reference**:\
+<http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp> Release date: March 2022 FAO Global Aquaculture Production Quantity 1950_2020 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
 **Downloaded**: April 25, 2022
 
-**Description**:  Quantity (tonnes) of mariculture for each country, species, year.
+**Description**: Quantity (tonnes) of mariculture for each country, species, year.
 
 **Time range**: 1950-2020
 
 ## Seafood Watch sustainability data
 
-Obtained upon request of SFW. 
+Obtained upon request of SFW.
 
-**Reference**: 
-[Seafood Watch Complete Recommendation documentation](https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf)
-[Seafood Watch Scoring Theory](https://www.seafoodwatch.org/globalassets/sfw/pdf/standards/aquaculture/seafood-watch-aquaculture-standard-version-a4.pdf)
+**Reference**:\
+[Seafood Watch Complete Recommendation documentation](https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf)\
+[Seafood Watch Scoring Theory](https://www.seafoodwatch.org/globalassets/sfw/pdf/standards/aquaculture/seafood-watch-aquaculture-standard-version-a4.pdf)\
+[Seafood Watch Global Seaweed Assessment](https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568) (provides gapfilling constants)
 
 **Downloaded**: April 25, 2022
 
-**Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1 using the max score in the data. 
+**Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1 using the max score in the data.
 
-***
-  
+------------------------------------------------------------------------
+
 # Methods
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -81,7 +80,6 @@ source('../../../workflow/R/common.R') # directory locations
 setwd(here("globalprep/mar/v2021"))
 ```
 
-
 # Import Raw Data: FAO Mariculture data
 
 Mariculture production in tonnes.
@@ -91,7 +89,7 @@ Mariculture production in tonnes.
 mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2022/FAO_GlobalAquacultureProduction_Quantity_1950_2020.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
 ```
 
-# Wrangle: 
+# Wrangle:
 
 ## Tidy mariculture data
 
@@ -129,7 +127,7 @@ mar <- mar %>%
 
 ## Update species names
 
-Update species name in the `raw/species_list.csv` file with names in the `mar` dataset (exclude non-food species). I simplified the species_list.  I cut the "species" name columns because it wasn't clear what this was trying to accomplish and created potential error.  
+Update species name in the `raw/species_list.csv` file with names in the `mar` dataset (exclude non-food species). I simplified the species_list. I cut the "species" name columns because it wasn't clear what this was trying to accomplish and created potential error.
 
 ```{r update-species, eval = FALSE}
 
@@ -275,7 +273,7 @@ table(mar_rgn_gf$gap_0_fill)
 
 ```
 
-Remove species-region-environment time series with less than four years of mariculture production > 0 tonnes (assume these are not established mariculture programs).
+Remove species-region-environment time series with less than four years of mariculture production \> 0 tonnes (assume these are not established mariculture programs).
 
 ```{r remove-less-four-years, eval = FALSE}
 
@@ -303,22 +301,21 @@ maric <- mar_rgn_gf
 
 ```
 
-# Save file: 
+# Save file:
 
 Used to estimate total mariculture yield per country.
 
-Saves the Mariculture-FP file 
+Saves the Mariculture-FP file
 
 ```{r save-mariculture-yield, eval = FALSE}
 write.csv(maric, 'output/MAR_FP_data.csv', row.names=FALSE)
 ```
 
-
 # Sustainability Scores from Seafood Watch Data
 
 ## Import data: Seafood Watch sustainability scores
 
-These data describe the sustainability country/species combinations. In cases where these data were not available for a specific county/species, we averaged the data across taxonomic groups to gapfill the missing data. We also calculate the genetic escapes pressure layer from this, based on the column `AqCriteria6`. 
+These data describe the sustainability country/species combinations. In cases where these data were not available for a specific county/species, we averaged the data across taxonomic groups to gapfill the missing data. We also calculate the genetic escapes pressure layer from this, based on the column `AqCriteria6`.
 
 ```{r sw-scores, eval = FALSE}
 
@@ -423,6 +420,7 @@ maric <- read_csv("output/MAR_FP_data.csv")
 ```
 
 **Fix the non matches**
+
 ```{r sw-sus_fix-non-matches, eval = FALSE}
 
 ## Rename species in Seafood Watch data to match FAO species data
@@ -462,6 +460,7 @@ table(sw_sus_rgn$match_type)
 ```
 
 **Assign a Mediterranean bordering rgn id to each waterbody row**
+
 ```{r gf_sw_sp_w, eval = FALSE}
 ## Add a line for each country that borders each water body
   # The only water body without a rgn is the Mediterranean; add all countries that border it (source: https://www.medqsr.org/mediterranean-marine-and-coastal-environment#:~:text=Today%2021%20countries%2C%20with%20surface,Syria%2C%20Tunisia%2C%20and%20Turkey.)
@@ -512,11 +511,11 @@ mar_sw_sus <- mar_sw_sus %>%
 
 Merge the three Seafood Watch type categories into a single sustainability score and genetic escapes score column in the following order:
 
-1. Sust_sw_sp_c: specific to species/country
-2. Sust_sw_sp_w: specific to species/water body
-3. Sust_sw_sp_g: specific to species/global Seafood Watch data
+1.  Sust_sw_sp_c: specific to species/country
+2.  Sust_sw_sp_w: specific to species/water body
+3.  Sust_sw_sp_g: specific to species/global Seafood Watch data
 
-For example, if Sust_sw_sp_c is missing, use Sust_sw_sp_w and so on. 
+For example, if Sust_sw_sp_c is missing, use Sust_sw_sp_w and so on.
 
 ```{r sw-fao-sust-scores, eval = FALSE}
 mar_sw_sus = mar_sw_sus %>% 
@@ -544,7 +543,7 @@ Average sustainability scores within regions with more than one score (due to mo
 
 # check which countries have duplicates
 anyDuplicated(mar_sw_sus)
-# 2022 senario year: 532
+# 2022 scenario year: 532
 
 mar_sw_sus <- mar_sw_sus %>% 
   dplyr::group_by(rgn_id, species) %>% 
@@ -561,6 +560,16 @@ mar_sw_sus$esc_avg[is.nan(mar_sw_sus$esc_avg)] <- NA
 Get rid of duplicates for region/species/year:
 
 ```{r sw-sus-dup, eval = FALSE}
+
+# abalone <- mar_sw_sus %>% 
+#   filter(species == "Abalones nei",
+#          rgn_id == 14,
+#          environment == "Brackishwater",
+#          year == 1981) %>% 
+#   dplyr::select(-Sust, Sust = Sust_avg, -esc_score, esc_score = esc_avg)
+# 
+# distinct_abalone <- abalone %>% 
+#   dplyr::distinct(rgn_id, species, environment, year, .keep_all = TRUE)
 
 mar_sw_sus <- mar_sw_sus %>% 
   dplyr::distinct(rgn_id, species, environment, year, .keep_all = TRUE) %>%
@@ -581,14 +590,15 @@ summary(mar_sw_sus)
 
 Gapfilling based on families and taxon_code
 
-Steps: 
- - Group by country and family and summarise to get mean sustainability/escapes values (gapfilled by country/family)
- - Group by georegion and family and summarise to get mean sustainability/escapes values (gapfilled by georegion/family)
- - Group by family (global family gapfilled)
- - Gapfill by average of the taxon_code 
- - Assign any Algae with the seaweeds score from SFW data (7.92) (link to the SFW Global Assessment for Seaweed available for download  [here](https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568)
- - Apply the global average to any remaining sustainability/escapes score NAs 
- - Finally, we rescale the scores to the highest sustainability score, under the assumption that the highest score is the best sustainability currently out there, and should be given a score of 100. 
+Steps:\
+- Group by country and family and summarise to get mean sustainability/escapes values (gapfilled by country/family)\
+- Group by georegion and family and summarise to get mean sustainability/escapes values (gapfilled by georegion/family)\
+- Group by family (global family gapfilled)\
+- Gapfill by average of the taxon_code\
+- Assign any Algae with the overall SFW seaweeds score from SFW data (7.92) and the C6 Escapes score (4, a subcomponent of the overall seaweed score)\
+- link to the SFW Global Assessment for Seaweed available for download [here](https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568)\
+- Apply the global average to any remaining sustainability/escapes score NAs\
+- Finally, we rescale the scores to the highest sustainability score, under the assumption that the highest score is the best sustainability currently out there, and should be given a score of 100.
 
 ```{r sw-gapfill-categories, eval = FALSE}
 ## First we need to add a georegion column that we can group by later on. 
@@ -618,20 +628,20 @@ mar_sw_sus <- mar_sw_sus %>%
 
 mar_sw_sus <- mar_sw_sus %>%
   group_by(rgn_id, family) %>%
-  mutate(avg_rgn_fam_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 secario year)
+  mutate(avg_rgn_fam_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 scecario year)
          avg_rgn_fam_esc = mean(esc_score, na.rm = TRUE)) %>% # produced NaN values (2022 secario year)
   ungroup() %>%
   group_by(georgn_id, family) %>%
-  mutate(avg_gr_fam_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 secario year)
+  mutate(avg_gr_fam_sust = mean(Sust, na.rm = TRUE), # produced some NaN values (2022 scecario year)
          avg_gr_fam_esc = mean(esc_score, na.rm = TRUE)) %>% # produced NaN values (2022 secario year)
   ungroup() %>%
   group_by(family) %>%
-  mutate(avg_fam_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 secario year)
+  mutate(avg_fam_sust = mean(Sust, na.rm = TRUE), # produced some NaN values (2022 scecario year)
          avg_fam_esc = mean(esc_score, na.rm = TRUE)) %>% # produced NaN values (2022 secario year)
   ungroup() %>%
   group_by(Taxon_code) %>%
-  mutate(avg_taxon_code_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 secario year)
-         avg_taxon_code_esc = mean(esc_score, na.rm = TRUE)) %>% # produced NaN values (2022 secario year)
+  mutate(avg_taxon_code_sust = mean(Sust, na.rm = TRUE), # produced some NaN values (2022 scecario year)
+         avg_taxon_code_esc = mean(esc_score, na.rm = TRUE)) %>% # produced some NaN values (2022 scecario year)
   ungroup() %>%
   mutate(avg_global = mean(Sust, na.rm = TRUE),
          avg_global_esc = mean(esc_score, na.rm = TRUE)) %>%
@@ -675,20 +685,16 @@ mar_sw_sus$avg_taxon_code_esc[is.nan(mar_sw_sus$avg_taxon_code_esc)] <- NA
 
 ```
 
-
 Obtain a sustainability and escapes score for each record, and a book-keeping column of whether it's actual or gapfilled
 
 For missing sustainability and escapes scores:
 
-Steps: 
- 1. Group by country and family and summarise to get mean sustainability and escapes values (gapfilled by country/family)
- 2. Group by georegion and family and summarise to get mean sustainability and escapes values (gapfilled by georegion/family)
- 3. Group by family to get mean sustainability and escapes values (global family gapfilled)
- 4. Gapfill by average of the taxon_code to get mean sustainability and escapes values (taxon_group gapfilled)
- 5. Assign any Algae with the seaweeds score from SFW data (6.72 for sustainability, 4 for escapes)
- 6. Apply the global average to any remaining sustainability and escapes score NAs 
+Steps: 1. Group by country and family and summarise to get mean sustainability and escapes values (gapfilled by country/family) 2. Group by georegion and family and summarise to get mean sustainability and escapes values (gapfilled by georegion/family) 3. Group by family to get mean sustainability and escapes values (global family gapfilled) 4. Gapfill by average of the taxon_code to get mean sustainability and escapes values (taxon_group gapfilled) 5. Assign any Algae with the seaweeds score from SFW data (6.72 for sustainability, 4 for escapes) 6. Apply the global average to any remaining sustainability and escapes score NAs
 
 ```{r sw-sus-gapfill-missing, eval = FALSE}
+# define gapfilling scores for global seaweed and escapes (a subcomponent of the global seaweed score) found in pdf here (updated occasionally): https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568
+seaweed_gf_score <- 6.72
+escapes_gf_score <- 4 
 
 mar_sw_sus_final = mar_sw_sus %>%
   
@@ -701,8 +707,8 @@ mar_sw_sus_final = mar_sw_sus %>%
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_fam_sust, "family_avg", gapfill_sus)) %>% ## Add in family gapfill record
   mutate(Sust = ifelse(is.na(Sust), avg_taxon_code_sust, Sust)) %>%
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_taxon_code_sust, "taxon_group_avg", gapfill_sus)) %>%
-  mutate(Sust = ifelse(Taxon_code == "AL", 6.72, Sust)) %>% ## assign any algae with the SFW seaweed score (6.72)
-  mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == 6.72, "seaweed_score", gapfill_sus)) %>%
+  mutate(Sust = ifelse(Taxon_code == "AL", seaweed_gf_score, Sust)) %>% ## assign any algae with the overall SFW seaweed score, see Steps above for reference to document
+  mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == seaweed_gf_score, "seaweed_score", gapfill_sus)) %>%
   mutate(Sust = ifelse(is.na(Sust), avg_global, Sust)) %>% 
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_global, "global_avg", gapfill_sus)) %>%
   
@@ -715,8 +721,8 @@ mar_sw_sus_final = mar_sw_sus %>%
   mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == avg_fam_esc, "family_avg", gapfill_esc)) %>% ## Add in family gapfill record
   mutate(esc_score = ifelse(is.na(esc_score), avg_taxon_code_esc, esc_score)) %>%
   mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == avg_taxon_code_esc, "taxon_group_avg", gapfill_esc)) %>%
-  mutate(esc_score = ifelse(Taxon_code == "AL", 4, esc_score)) %>% ## assign any algae with the SFW seaweed score (4)
-  mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == 4, "seaweed_score", gapfill_esc)) %>%
+  mutate(esc_score = ifelse(Taxon_code == "AL", escapes_gf_score, esc_score)) %>% ## assign any algae with the SFW seaweed score for C6 Escapes, see Steps above for reference to document
+  mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == escapes_gf_score, "seaweed_score", gapfill_esc)) %>%
   mutate(esc_score = ifelse(is.na(esc_score), avg_global_esc, esc_score)) %>% 
   mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == avg_global_esc, "global_avg", gapfill_esc)) %>%
 
@@ -741,18 +747,21 @@ filter(mar_sw_sus_final, gapfill_sus == "taxon_group_avg")
 
 ```
 
-**Now we need to prep the escapes pressure layer a bit more**
-Final formatting of the escapee data. This is used as a pressure layer.
+**Now we need to prep the escapes pressure layer a bit more** Final formatting of the escapee data. This is used as a pressure layer.
 
-For each region/year: take a weighted average of the genetic escape probability for each taxa based on tonnes mariculture
+For each region/year: take a weighted average of the genetic escape probability for each taxa based on tonnes of mariculture.
+
 ```{r gen-esc-formatting, eval = FALSE}
+# subset the cleaned data to only include escapes data
 tonnes_esc <- mar_sw_sus_final %>%
   dplyr::select(rgn_id, year, species, gapfill_esc, esc_score, tonnes)
 
+# use "tonnes" values to weight the regional average of escapes
 genEscapes <- tonnes_esc %>%
   group_by(rgn_id, year) %>%
   summarize(genEscapes = weighted.mean(esc_score, tonnes, na.rm=TRUE))
 ```
+
 
 Obtain gapfill information from `genEscapes`
 
@@ -762,24 +771,45 @@ Gapfill values in output file are the proportion of data that is gapfilled.
 
 ## Obtain corresponding gapfilling information for each region (average of gapfilled data, weighted by tonnes of mariculture).
 genEscapes_gf <- tonnes_esc %>%
-  mutate(gapfill = ifelse(gapfill_esc =="none", 0, 1)) %>%
+  mutate(gapfill = ifelse(gapfill_esc == "none", 0, 1)) %>%
   group_by(rgn_id, year) %>%
   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm=TRUE)) %>%
   ungroup() %>%
-  filter(year==2019) %>%
+  filter(year == 2020) %>%
   select(rgn_id, pressures.score=genEscapes) %>%
-  mutate(pressures.score=ifelse(pressures.score=="NaN", NA, pressures.score)) %>%
+  mutate(pressures.score=ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
   data.frame()
 
+## Obtain corresponding gapfilling information for each region (average of gapfilled data, weighted by tonnes of mariculture).
+# genEscapes_gf_1 <- tonnes_esc %>%
+#   mutate(gapfill = ifelse(gapfill_esc == "none", 0, 1)) %>%
+#   group_by(rgn_id, year) %>%
+#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %>%
+#   ungroup() %>%
+#   filter(year == 2020) %>%
+#   select(rgn_id, pressures.score = genEscapes) %>%
+#   mutate(pressures.score = ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
+#   data.frame()
+# 
+# genEscapes_gf_2 <- tonnes_esc %>%
+#   mutate(gapfill = ifelse(gapfill_esc == "none", 0, 1)) %>%
+#   group_by(rgn_id, year) %>%
+#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %>%
+#   ungroup() %>%
+#   select(rgn_id, pressures.score = genEscapes) %>%
+#   mutate(pressures.score = ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
+#   data.frame()
+
 ```
+
 # Save data: Genetic Escapes
+
 ## Save gapfill data
 
 ```{r save-gen-esc-gapfilled, eval = FALSE}
 
 ## Saves the Genetic Escapes Gapfill file
-
- write.csv(genEscapes_gf, 'output/GenEsc_gf.csv', row.names=FALSE)
+write.csv(genEscapes_gf, 'output/GenEsc_gf.csv', row.names = FALSE)
 
 ```
 
@@ -793,13 +823,12 @@ data <- genEscapes %>%
 
 ```
 
-## Save escapee pressure layer 
+## Save escapee pressure layer
 
 ```{r save-gen-esc-pressure-layer, eval = FALSE}
 
 ## Saves the Genetic Escapes data file 
-
- write.csv(data, 'output/GenEsc.csv', row.names=FALSE)  
+write.csv(data, 'output/GenEsc.csv', row.names=FALSE)  
 
 ```
 
@@ -814,9 +843,7 @@ mar_harvest_tonnes = mar_sw_sus_final %>%
 anyDuplicated(mar_harvest_tonnes) # Check for duplication
 
 ## Saves the appropriate Mariculture Harvest Tonnes file
-
-
- write.csv(mar_harvest_tonnes, 'output/mar_harvest_tonnes.csv', row.names=F)
+write.csv(mar_harvest_tonnes, 'output/mar_harvest_tonnes.csv', row.names=F)
 
 
 ## Save gapfill data for mariculture harvest
@@ -825,14 +852,12 @@ mar_harvest_tonnes_gf = mar_sw_sus_final %>%
 
 
 ## Saves the appropriate Mariculture Harvest Gapfill file 
+write.csv(mar_harvest_tonnes_gf, 'output/mar_harvest_tonnes_gf.csv', row.names=F)
 
 
- write.csv(mar_harvest_tonnes_gf, 'output/mar_harvest_tonnes_gf.csv', row.names=F)
-
-
-## Save sustainability scores data for 2020 (SFW data year)
+## Save sustainability scores data for 2022 (SFW data year)
 mar_sustainability_score = mar_sw_sus_final %>%
-  mutate(year = 2021) %>% # 2021 sustainability scores exist (Seafood Watch)
+  mutate(year = 2022) %>% # 2022 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, taxa_code, sust_coeff = Sust) %>%
   unique() %>%
   mutate(sust_coeff = ifelse(sust_coeff > 0.7, 1, sust_coeff/0.77)) # rescale to the highest sust score
@@ -841,8 +866,7 @@ anyDuplicated(mar_sustainability_score)
 
 
 ## Saves the appropriate Sustainability Score file 
-
- write.csv(mar_sustainability_score, 'output/mar_sustainability.csv', row.names=F)
+write.csv(mar_sustainability_score, 'output/mar_sustainability.csv', row.names=F)
 
 
 ## Save gapfill data for sustainability scores
@@ -852,38 +876,58 @@ mar_sustainability_score_gf = mar_sw_sus_final %>%
 
 
 ## Saves the appropriate Sustainability Score Gapfill file 
-
-
- write.csv(mar_sustainability_score_gf, 'output/mar_sustainability_gf.csv', row.names=F)
+write.csv(mar_sustainability_score_gf, 'output/mar_sustainability_gf.csv', row.names=F)
 
 
 ## save mar sustainability for data checking; rgn_id, species, score
-
 mar_sustainability_score = mar_sw_sus_final %>%
-  mutate(year = 2021) %>% # Only 2021 sustainability scores exist (Seafood Watch)
+  mutate(year = 2022) %>% # Only 2022 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, species, sust_coeff = Sust) %>%
   unique() %>% 
     mutate(sust_coeff = ifelse(sust_coeff > 0.7, 1, sust_coeff/0.77)) # rescale to the highest sust score
 
 ## Saves the appropriate Sustainability Score file
-
-
- write.csv(mar_sustainability_score, 'int/mar_sustainability_check.csv', row.names=F)
+write.csv(mar_sustainability_score, 'int/mar_sustainability_check.csv', row.names=F)
 
 ```
 
-## Data check mariculture and sustainability scores 
+## Data check mariculture and sustainability scores
 
 Comparing this year's data to previous year's data. Expect small variation from year to year. Plot to view differences.
 
 ```{r data-check, eval = FALSE}
-
-## Compare yield data for Russia
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 73, year == 2018) %>% 
+## Compare yield data for all countries: 2020 versus 2019
+mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
+  filter(year == 2019) %>% 
   select(rgn_id, species, fao, old_value = value)
 mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
+  filter(year == 2020) %>% 
+  select(rgn_id, species, fao, value)
+
+yield <- mar_old %>% 
+  full_join(mar_new, by = c("rgn_id","species","fao")); #View(yield)
+
+plot(yield$old_value, yield$value)
+
+## Compare yield data for all countries: 2019 last year to 2019 this year
+mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
+  filter(year == 2019) %>% 
+  select(rgn_id, species, fao, old_value = value)
+mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
+  filter(year == 2019) %>% 
+  select(rgn_id, species, fao, value)
+
+yield <- mar_old %>% 
+  full_join(mar_new, by = c("rgn_id","species","fao")); #View(yield)
+
+plot(yield$old_value, yield$value)
+
+## Compare yield data for Russia
+mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
   filter(rgn_id == 73, year == 2019) %>% 
+  select(rgn_id, species, fao, old_value = value)
+mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
+  filter(rgn_id == 73, year == 2020) %>% 
   select(rgn_id, species, fao, value)
 
 yield <- mar_old %>% 
@@ -892,15 +936,17 @@ yield <- mar_old %>%
 plot(yield$old_value, yield$value)
 
 ## Compare yield data for Vietnam
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 207, year == 2018) %>% 
+mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
+  filter(rgn_id == 207, year == 2019) %>% 
   select(rgn_id, species, fao, environment, old_value = value)
 mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 207, year == 2019) %>% 
+  filter(rgn_id == 207, year == 2020) %>% 
   select(rgn_id, species, fao, environment, value)
 
 yield <- mar_old %>% 
-  full_join(mar_new, by = c("rgn_id","species","fao", "environment")); View(yield)
+  full_join(mar_new, by = c("rgn_id","species","fao", "environment")); #View(yield)
+
+plot(yield$old_value, yield$value)
 
 
 
@@ -970,7 +1016,7 @@ plot(yield$old_value, yield$value)
 
 
 ## Compare new/old Mariculture sustainability scores
-tmp_old <- read.csv("../v2020/output/mar_sustainability.csv") %>% 
+tmp_old <- read.csv("../v2021/output/mar_sustainability.csv") %>% 
   select(rgn_id, taxa_code, sust_old = sust_coeff)
   
 tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
@@ -981,7 +1027,7 @@ tmp_new <- read.csv("int/mar_sustainability_check.csv") %>%
 test <- tmp_new %>% 
   full_join(tmp_old, by=c("rgn_id", "species")) %>%
   mutate(difference = sust_new - sust_old)
-View(test)
+#View(test)
 
 plot(test$sust_old, test$sust_new);abline(0,1,col="red")
 
@@ -1029,20 +1075,20 @@ plot(test$sust_old, test$sust_new);abline(0,1,col="red")
 
 ```
 
-## Data check genetic escapes 
+## Data check genetic escapes
 
 Comparing this year's data to previous year's data. Expect small variation from year to year. Plot to view differences.
 
 ```{r data-check-gen-esc, eval = FALSE}
 
 ## Compare genetic escapes pressure score; saw large changes between 2018 and 2017 assessment years. No big changes between 2019 and 2018 assessment years. Big changes from 2019 to 2020 due to a data update. Small changes between 2020 and 2021 due to updating the FAO data, gapfilling caused this. Also fixed some name errors 
-old <- read.csv("../v2020/output/GenEsc.csv") %>%
+old <- read.csv("../v2021/output/GenEsc.csv") %>%
   select(rgn_id, year, prs_score_old=pressure_score)
 
-new <- read.csv("../v2021/output/GenEsc.csv") %>%
+new <- read.csv("../v2022/output/GenEsc.csv") %>%
   select(rgn_id, year, pressure_score)
 
-compare <- full_join(old, new, by=c("rgn_id","year")); View(compare)
+compare <- full_join(old, new, by=c("rgn_id","year")); #View(compare)
 
 plot(compare$prs_score_old, compare$pressure_score);abline(0,1,col="red")
 
@@ -1055,43 +1101,42 @@ new <- read.csv("../v2021/output/GenEsc.csv") %>%
   filter(rgn_id == 232) %>% 
   select(rgn_id, year, pressure_score)
 
-compare <- full_join(old, new, by=c("rgn_id","year")); View(compare)
+compare <- full_join(old, new, by=c("rgn_id","year")); #View(compare)
 
 plot(compare$prs_score_old, compare$pressure_score);abline(0,1,col="red")
 
 
 ```
 
-
-
-***
+------------------------------------------------------------------------
 
 NOTE: THIS DOES NOT NEED TO BE RUN ANYMORE. Below here is archival... unless we change the reference point.
 
 # Potential Aquaculture Calculations for New Reference Point
 
-[REFERENCE RMD FILE: https://raw.githubusercontent.com/OHI-Science/ohiprep_v2019/gh-pages/globalprep/mar/v2019/reference_point/CountryProductionEstimate.Rmd]
+\[REFERENCE RMD FILE: <https://raw.githubusercontent.com/OHI-Science/ohiprep_v2019/gh-pages/globalprep/mar/v2019/reference_point/CountryProductionEstimate.Rmd>\]
 
 # Summary
+
 This analysis produces potential tonnes of aquaculture from growth potential estimates of finfish and bivalves. These aquaculture numbers will be used for the reference point for the mariculture subgoal. This only needs to be run for the 2019 global assessment, as this data is static.
 
-***
+------------------------------------------------------------------------
 
-# Data Source 
+# Data Source
 
-## Growth Potential (Phi) data 
+## Growth Potential (Phi) data
 
-**Reference**:      
-https://knb.ecoinformatics.org/view/doi:10.5063/F1CF9N69
-Rebecca Gentry, Halley Froehlich, Dietmar Grimm, Peter Kareiva, Michael Parke, et al. SNAPP - Mapping the Global Potential for Marine Aquaculture. Knowledge Network for Biocomplexity. doi:10.5063/F1CF9N69. 
+**Reference**:\
+<https://knb.ecoinformatics.org/view/doi:10.5063/F1CF9N69> Rebecca Gentry, Halley Froehlich, Dietmar Grimm, Peter Kareiva, Michael Parke, et al. SNAPP - Mapping the Global Potential for Marine Aquaculture. Knowledge Network for Biocomplexity. <doi:10.5063/F1CF9N69>.
 
 **Downloaded**: 7/3/2019
 
-**Description**: Growth Potential estimate raster for global cells 
+**Description**: Growth Potential estimate raster for global cells
 
-***
-  
+------------------------------------------------------------------------
+
 # Methods
+
 ```{r setup ref, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(eval=FALSE)
 #######regression inputs from VBGF_Fish.r
@@ -1130,6 +1175,7 @@ dir_git <- file.path(here(), "globalprep/mar/v2019")
 ```
 
 ## Establish variables and coefficients
+
 ```{r}
 ## Variables needed to get from PHI to tonnes of production
 ## MRF: assumes 1 farm is 1km2  ##
@@ -1145,6 +1191,7 @@ weight35cm <- 554.8  ## in grams see VBGF_Fish_Final. Paper reports 548 grams
 ```
 
 ## Finfish Production
+
 ```{r}
 ## Global tiff file of PHI (Growth Potential) estimates
 FishPhiALLConstraints <- raster(file.path(dir_M, "git-annex/globalprep/mar/v2019/Spatial_Data/NewLayersWOHypoxia/FishPhiALLConstraints95LT2.tiff"))
@@ -1287,8 +1334,8 @@ sum(CountryProdSummaryFAO$MaxProdPerCountry, na.rm = TRUE)
 #15451023277 number matches paper. > 15 billion tonnes 
 ```
 
-
 ## Bivalve Production
+
 ```{r}
 ##Now for Bivalves 
 BivalvePhiALLConstraints=raster(file.path(dir_M, "git-annex/globalprep/mar/v2019/Spatial_Data/NewLayersWOHypoxia/BivalvePhiALLConstraints95LT1.tif"))
@@ -1410,18 +1457,18 @@ sum(CountryProdSummaryFAO$MaxDevPerCountry, na.rm = TRUE)
 #1491404 km2. Matches paper ~1,500,000 km2
 ```
 
-
 ## Unit Conversion and Gap Filling
-To compare potential vs harvest, we need to convert bivalve units to metric tonnes, they are currently in units of individual bivalves.  Some figures:
 
-* Scallops: [40-50 per kg (~22g ea)](http://www.thefoodcoach.com.au/food/?FoodID=241)
-* Mussels: [15-20 per 1 lb blue (~25g ea)](https://www.pacseafood.com/products/details/seafood,shellfish/mussels/)
-* Oysters: [12-15 per 1 lb (~33g ea) aquaculture halfshell](http://www.mobjackbayseafood.com/products.html)
-* Clams: [20-30 per 1 lb Manila (~18g ea), 8-14 per 1 lb littlenecks (~40g ea)](https://www.pacseafood.com/products/details/seafood,shellfish/clams/)
+To compare potential vs harvest, we need to convert bivalve units to metric tonnes, they are currently in units of individual bivalves. Some figures:
+
+-   Scallops: [40-50 per kg (\~22g ea)](http://www.thefoodcoach.com.au/food/?FoodID=241)
+-   Mussels: [15-20 per 1 lb blue (\~25g ea)](https://www.pacseafood.com/products/details/seafood,shellfish/mussels/)
+-   Oysters: [12-15 per 1 lb (\~33g ea) aquaculture halfshell](http://www.mobjackbayseafood.com/products.html)
+-   Clams: [20-30 per 1 lb Manila (\~18g ea), 8-14 per 1 lb littlenecks (\~40g ea)](https://www.pacseafood.com/products/details/seafood,shellfish/clams/)
 
 Averaging these gives about 27.5g per piece.
 
-``` {r}
+```{r}
 aq_mass_per_pc <- 0.0275 * 1e-3 ### mass of bivalve piece in tonnes
 
 pot_b <- read_csv(file.path(dir_git, 'int/BivalveProdByCountrySummaryFAO.csv')) %>%
@@ -1470,6 +1517,4 @@ pot_aq_final_gf <- pot_aq_final %>%
 write_csv(pot_aq_final_gf, file.path(dir_git, "output/aq_potential_gf.csv"))
 ```
 
-
-***
-
+------------------------------------------------------------------------
