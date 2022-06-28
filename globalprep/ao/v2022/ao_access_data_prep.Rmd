@@ -40,7 +40,7 @@ Link: https://www.fao.org/sustainable-development-goals/indicators/14b1/en/
 
 **Time range**: 2018, 2020, 2022
 
-**Download link**: We now use the API to access data (v2022) but alternatively you can access data here: https://unstats.un.org/sdgs/dataportal/database2021; Click "select indicators and country or area" and select indicator 14.b. Download all data for this indicator. 
+**Download link**: We now use the API to access data (v2022) but alternatively you can access data here: https://unstats.un.org/sdgs/dataportal/database; Click "select indicators and country or area" and select indicator 14.b. Download all data for this indicator. 
 
 ***
 
