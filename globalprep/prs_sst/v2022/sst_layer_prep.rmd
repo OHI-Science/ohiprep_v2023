@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Sea Surface Temperature Pressure Layer'
+title: 'OHI `r format(Sys.date(), "%Y")`: Sea Surface Temperature Pressure Layer'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -19,14 +19,14 @@ output:
 
 # Summary
 
-This script creates the Sea Surface Temperature (SST) layer for the 2021 global Ocean Health Index assessment.
+This script creates the Sea Surface Temperature (SST) layer for the 2022 global Ocean Health Index assessment.
 
 
 ***  
 
 # Updates from previous assessment
 
- For the 2021 assessment, data year will match 2020, so data year 2020 represents year 2019, and so on. 
+ For the 2022 assessment, data year will match 2021, so data year 2021 represents year 2020, and so on. 
 
 ***
 
@@ -40,9 +40,9 @@ See `prs_sst/v2015/dataprep.R` for preparation of the "annual_pos_anomalies" dat
 **Description**: 
 Cortadv6_SSTA.nc = SST anomalies (weekly SST minus weekly climatological SST), weekly data for all years, degrees Kelvin
 Cortadv6_weeklySST.nc =  SST, weekly data for all years, degrees Kelvin  
-**Time Range**: 1982 - 2020 (weekly averages across all years)  
+**Time Range**: 1982 - 2021 (weekly averages across all years)  
 **Format**: NetCDF
-**Downloaded**: August 10, 2021
+**Downloaded**: June 22, 2022
 
 ***  
 
@@ -79,15 +79,17 @@ library(here)
 # spatial files, directories, etc
 source(here("workflow/R/common.R"))
 
-dir_data <- file.path(dir_M, "git-annex/globalprep/_raw_data/CoRTAD_sst/d2022")
-dir_int  <- file.path(dir_M, "git-annex/globalprep/prs_sst/v2022/int")
-dir_output  <- file.path(dir_M, "git-annex/globalprep/prs_sst/v2022/output")
+scen_year <- "2022"
+
+dir_data <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year)
+dir_int  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/int")
+dir_output  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/output")
 
 
 ohi_rasters()
 regions_shape()
 
-# yrs <- 1982:2021
+yrs <- 1982:2021
 
 cols <- rev(colorRampPalette(brewer.pal(11, 'Spectral'))(255)) # rainbow color scheme
 land <- regions %>% subset(rgn_type %in% c("land", "land-disputed", "land-noeez"))
@@ -105,11 +107,11 @@ url <- "https://data.nodc.noaa.gov/cortad/Version6"
 ## retrieve the netcdf data, SSTA (~98GB) and WeeklySST (~28GB)
 ## these take like 2 hours, it's a lot of data!!!
 ssta <- sprintf("%s/cortadv6_SSTA.nc", url)
-ssta_filename <- file.path(dir_M, "git-annex/globalprep/_raw_data/CoRTAD_sst/d2021/cortadv6_SSTA.nc")
+ssta_filename <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year, "/cortadv6_SSTA.nc")
 ssta_res <- httr::GET(ssta, write_disk(ssta_filename))
 
 weekly_sst <- sprintf("%s/cortadv6_WeeklySST.nc", url)
-weekly_sst_filename <- file.path(dir_M, "git-annex/globalprep/_raw_data/CoRTAD_sst/d2021/cortadv6_WeeklySST.nc")
+weekly_sst_filename <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year, "/cortadv6_WeeklySST.nc")
 weekly_sst_res <- httr::GET(weekly_sst, write_disk(weekly_sst_filename))
 
 closeAllConnections()
@@ -237,7 +239,7 @@ land_mask <- land %>% st_geometry %>% st_transform(anom_proj) %>% as("Spatial") 
 ## calculate difference between recent 5-year cumulative sum and historical 1985-1989; writes in chunks of 5 files, every 5 files takes about 2 hrs and 15 mins. So with a total of 31 files should take ~14 hours to complete
 registerDoParallel(5)
 t0 = Sys.time()
-foreach(i = seq(1986, max(yrs)-4)) %dopar% {
+foreach(i = seq(2006, max(yrs)-4)) %dopar% {
   years = i:(i + 4)
   
   overlay(stack(anom_files[substr(anom_files, 81, 84) %in% years]) %>% sum(.), 
