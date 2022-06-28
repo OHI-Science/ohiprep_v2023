@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: Artisanal Opportunities, Preparing non-industrial catch data for BBmsy calculations"
+title: "OHI `r format(Sys.Date(), '%Y')` - Artisanal Opportunities, Preparing non-industrial catch data for BBmsy calculations"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
