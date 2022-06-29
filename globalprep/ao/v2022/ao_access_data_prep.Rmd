@@ -42,6 +42,8 @@ Link: https://www.fao.org/sustainable-development-goals/indicators/14b1/en/
 
 **Download link**: We now use the API to access data (v2022) but alternatively you can access data here: https://unstats.un.org/sdgs/dataportal/database; Click "select indicators and country or area" and select indicator 14.b. Download all data for this indicator. 
 
+**Note**: This data prep is also used for "Artisanal fisheries management effectiveness" (fp_artisinal). This means that when done with the data prep, you will need to update `ohi-global/metadata_documentation/layers_eez_base.csv`, `ao_access` and `fp_artisanal`. You will also need to update `ohi-global/eez/conf/scenario_data_years.csv` twice at `ao_access` and `fp_artisinal`. Each one should be run seperately to see the effect of each update on the scores. 
+
 ***
 
 # Methods
