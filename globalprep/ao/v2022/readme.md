@@ -4,13 +4,17 @@ Information about calculation of [need component](http://ohi-science.github.io/o
 
 Information about [opportunity component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_access_data_prep.html).
 
-Information about [stock status component](https://github.com/OHI-Science/ohiprep/tree/master/globalprep/ao/v2022/ao_stock_status_saup.html).
+Information about [stock status component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_stock_status_saup.html).
+
+Information about [stock status (catch) component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_catch_prep_saup.html).
+
+http://ohi-science.github.io/ohiprep_v2022/globalprep/prs_uv/v2022/uv_dataprep.html
 
 ### Layers Created
 
 * ao_need
 * ao_access
-* ao_stock_status
+* ao_stock_status/ao_stock_catch
 
 ### Additional information
 A description of files (1 and 2 need to be done in order, the rest it does not matter):
