@@ -27,7 +27,8 @@ This script takes the SAUP 2021 catch data and creates 1 data layer:
 **IMPORTANT NOTE: the fisheries subgoal data preps will need to be run first before this can be completed. That is where the RAM stock status dataprep and the fisheries catch download occurs.**
 
 ## Updates from previous assessment
-This is a new layer for the artisanal opportunities goal. And a new fisheries catch dataset.
+
+v2021 - This is a new layer for the artisanal opportunities goal stock status, and a new fisheries catch dataset.
 
 ***
 

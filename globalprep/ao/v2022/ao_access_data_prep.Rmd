@@ -459,7 +459,7 @@ Gapfill data type 3 with values from data type 4 (the regional average)
 
 First try "intermediate regions" (i.e. Caribbean countries filled with Caribbean islands mean).
 
-We first fill missing data in small island developing states (SIDS) with the averages scores from other SIDS. We then move on to intermediate regions. We can find the SIDS average and round to the nearest score value (0, 0.2, 0.4, 0.6, 0.8, 1) by dividing the mean score of the SIDS by 2, rounding to the nearest tenth, and multiplying by 2 (i.e. 2 * round(mean(score)/2, digits = 1)). 
+We first fill missing data in small island developing states (SIDS) with the averages scores from other SIDS. We then move on to intermediate regions. We can find the SIDS average and round to the nearest score value (0.2, 0.4, 0.6, 0.8, 1) by dividing the mean score of the SIDS by 2, rounding to the nearest tenth, and multiplying by 2 (i.e. 2 * round(mean(score)/2, digits = 1)). 
 
 ```{r, eval = F}
 sids_score = gf_step_3_df %>% 
