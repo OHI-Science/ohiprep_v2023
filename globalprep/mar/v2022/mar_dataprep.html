@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Jun 28 13:22:57 2022 by jcohen" />
+<meta name="author" content="Compiled on Wed Jun 29 14:15:56 2022 by jcohen" />
 
 
 <title>OHI 2022: Mariculture</title>
@@ -250,7 +250,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022: Mariculture</h1>
-<h4 class="author"><em>Compiled on Tue Jun 28 13:22:57 2022 by jcohen</em></h4>
+<h4 class="author"><em>Compiled on Wed Jun 29 14:15:56 2022 by jcohen</em></h4>
 
 </div>
 
@@ -341,7 +341,10 @@ pre code {
 <div id="seafood-watch-sustainability-data" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Seafood Watch sustainability data</h2>
 <p>Obtained upon request of SFW.</p>
-<p><strong>Reference</strong>: <a href="https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf">Seafood Watch Complete Recommendation documentation</a> <a href="https://www.seafoodwatch.org/globalassets/sfw/pdf/standards/aquaculture/seafood-watch-aquaculture-standard-version-a4.pdf">Seafood Watch Scoring Theory</a></p>
+<p><strong>Reference</strong>:<br />
+<a href="https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf">Seafood Watch Complete Recommendation documentation</a><br />
+<a href="https://www.seafoodwatch.org/globalassets/sfw/pdf/standards/aquaculture/seafood-watch-aquaculture-standard-version-a4.pdf">Seafood Watch Scoring Theory</a><br />
+<a href="https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568">Seafood Watch Global Seaweed Assessment</a> (provides gapfilling constants)</p>
 <p><strong>Downloaded</strong>: April 25, 2022</p>
 <p><strong>Description</strong>: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1 using the max score in the data.</p>
 <hr />
@@ -750,7 +753,7 @@ pre code {
 <p>Average sustainability scores within regions with more than one score (due to more than one aquaculture method):</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check which countries have duplicates</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anyDuplicated</span>(mar_sw_sus)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2022 senario year: 532</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2022 scenario year: 532</span></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>mar_sw_sus <span class="ot">&lt;-</span> mar_sw_sus <span class="sc">%&gt;%</span> </span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id, species) <span class="sc">%&gt;%</span> </span>
@@ -763,13 +766,23 @@ pre code {
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>esc_avg[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>esc_avg)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># nrows = 48,748</span></span></code></pre></div>
 <p>Get rid of duplicates for region/species/year:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mar_sw_sus <span class="ot">&lt;-</span> mar_sw_sus <span class="sc">%&gt;%</span> </span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>(rgn_id, species, environment, year, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old Sust column (which was used to produce Sust_avg column) &amp;</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename Sust_avg to Sust &amp;</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old esc_score column (which was used to produce esc_avg column) &amp;</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename esc_avg to esc_score :</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Sust, <span class="at">Sust =</span> Sust_avg, <span class="sc">-</span>esc_score, <span class="at">esc_score =</span> esc_avg)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># abalone &lt;- mar_sw_sus %&gt;% </span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(species == &quot;Abalones nei&quot;,</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#          rgn_id == 14,</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#          environment == &quot;Brackishwater&quot;,</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">#          year == 1981) %&gt;% </span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(-Sust, Sust = Sust_avg, -esc_score, esc_score = esc_avg)</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># distinct_abalone &lt;- abalone %&gt;% </span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::distinct(rgn_id, species, environment, year, .keep_all = TRUE)</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>mar_sw_sus <span class="ot">&lt;-</span> mar_sw_sus <span class="sc">%&gt;%</span> </span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>(rgn_id, species, environment, year, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old Sust column (which was used to produce Sust_avg column) &amp;</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename Sust_avg to Sust &amp;</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old esc_score column (which was used to produce esc_avg column) &amp;</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename esc_avg to esc_score :</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Sust, <span class="at">Sust =</span> Sust_avg, <span class="sc">-</span>esc_score, <span class="at">esc_score =</span> esc_avg)</span></code></pre></div>
 <p><strong>Now look at a summary after appending all the Seafood Watch data</strong></p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mar_sw_sus)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 21215 NA values out of 32051 total obs; ~68% without scores (2022)</span></span></code></pre></div>
@@ -779,7 +792,7 @@ pre code {
 - Group by georegion and family and summarise to get mean sustainability/escapes values (gapfilled by georegion/family)<br />
 - Group by family (global family gapfilled)<br />
 - Gapfill by average of the taxon_code<br />
-- Assign any Algae with the overall SFW seaweeds score from SFW data (7.92) and the C6 Escapes score (a subcomponent of the overall seaweed score)<br />
+- Assign any Algae with the overall SFW seaweeds score from SFW data (7.92) and the C6 Escapes score (4, a subcomponent of the overall seaweed score)<br />
 - link to the SFW Global Assessment for Seaweed available for download <a href="https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568">here</a><br />
 - Apply the global average to any remaining sustainability/escapes score NAs<br />
 - Finally, we rescale the scores to the highest sustainability score, under the assumption that the highest score is the best sustainability currently out there, and should be given a score of 100.</p>
@@ -810,137 +823,138 @@ pre code {
 <span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>mar_sw_sus <span class="ot">&lt;-</span> mar_sw_sus <span class="sc">%&gt;%</span></span>
 <span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, family) <span class="sc">%&gt;%</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_rgn_fam_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced NaN values (2022 secario year)</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_rgn_fam_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced NaN values (2022 scecario year)</span></span>
 <span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_rgn_fam_esc =</span> <span class="fu">mean</span>(esc_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="co"># produced NaN values (2022 secario year)</span></span>
 <span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(georgn_id, family) <span class="sc">%&gt;%</span></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_gr_fam_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced NaN values (2022 secario year)</span></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_gr_fam_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced some NaN values (2022 scecario year)</span></span>
 <span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_gr_fam_esc =</span> <span class="fu">mean</span>(esc_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="co"># produced NaN values (2022 secario year)</span></span>
 <span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family) <span class="sc">%&gt;%</span></span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_fam_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced NaN values (2022 secario year)</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_fam_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced some NaN values (2022 scecario year)</span></span>
 <span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_fam_esc =</span> <span class="fu">mean</span>(esc_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="co"># produced NaN values (2022 secario year)</span></span>
 <span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Taxon_code) <span class="sc">%&gt;%</span></span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_taxon_code_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced NaN values (2022 secario year)</span></span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_taxon_code_esc =</span> <span class="fu">mean</span>(esc_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="co"># produced NaN values (2022 secario year)</span></span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_taxon_code_sust =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># produced some NaN values (2022 scecario year)</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_taxon_code_esc =</span> <span class="fu">mean</span>(esc_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="co"># produced some NaN values (2022 scecario year)</span></span>
 <span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_global =</span> <span class="fu">mean</span>(Sust, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_global_esc =</span> <span class="fu">mean</span>(esc_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_rgn_fam_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_rgn_fam_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_rgn_fam_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_rgn_fam_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_gr_fam_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_gr_fam_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_gr_fam_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_gr_fam_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_fam_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_fam_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_fam_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_fam_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_taxon_code_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_taxon_code_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_taxon_code_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_taxon_code_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a><span class="co"># delete:</span></span>
-<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a><span class="co"># # code NA values as NaN for new columns</span></span>
-<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_rgn_fam_sust</span></span>
-<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_rgn_fam_esc</span></span>
-<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_gr_fam_sust</span></span>
-<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_gr_fam_esc</span></span>
-<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_fam_sust</span></span>
-<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_fam_esc</span></span>
-<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_taxon_code_sust</span></span>
-<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_taxon_code_esc</span></span>
-<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a><span class="co">#nan_cols &lt;- c(&quot;avg_rgn_fam_sust&quot;, &quot;avg_rgn_fam_esc&quot;, &quot;avg_gr_fam_sust&quot;, &quot;avg_gr_fam_esc&quot;, &quot;avg_fam_sust&quot;, &quot;avg_fam_esc&quot;, &quot;avg_taxon_code_sust&quot;, &quot;avg_taxon_code_esc&quot;)</span></span>
-<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a><span class="co">#nan_cols &lt;- c(mar_sw_sus$avg_rgn_fam_sust, mar_sw_sus$avg_rgn_fam_esc, mar_sw_sus$avg_gr_fam_sust, mar_sw_sus$avg_gr_fam_esc, mar_sw_sus$avg_fam_sust, mar_sw_sus$avg_fam_esc, mar_sw_sus$avg_taxon_code_sust, mar_sw_sus$vg_taxon_code_esc)</span></span>
-<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a><span class="co">#nan_cols</span></span>
-<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a><span class="co"># for (col in length(nan_cols)){</span></span>
-<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a><span class="co">#   column &lt;- mar_sw_sus$col</span></span>
-<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a><span class="co">#   column[is.nan(col)] &lt;- NA</span></span>
-<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span>
-<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a><span class="co"># for (i in seq_along(nan_cols)){</span></span>
-<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a><span class="co">#   col &lt;- paste0(mar_sw_sus, &quot;$&quot;, i)</span></span>
-<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a><span class="co">#   col[is.nan(col)] &lt;- NA</span></span>
-<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span></code></pre></div>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a><span class="co"># code NaN as NA for the columns that produced NaN, likely due to taking the mean of a set of all NA values </span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_rgn_fam_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_rgn_fam_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_rgn_fam_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_rgn_fam_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_gr_fam_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_gr_fam_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_gr_fam_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_gr_fam_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_fam_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_fam_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_fam_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_fam_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_taxon_code_sust[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_taxon_code_sust)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>avg_taxon_code_esc[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>avg_taxon_code_esc)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code></pre></div>
 <p>Obtain a sustainability and escapes score for each record, and a book-keeping column of whether it’s actual or gapfilled</p>
 <p>For missing sustainability and escapes scores:</p>
 <p>Steps: 1. Group by country and family and summarise to get mean sustainability and escapes values (gapfilled by country/family) 2. Group by georegion and family and summarise to get mean sustainability and escapes values (gapfilled by georegion/family) 3. Group by family to get mean sustainability and escapes values (global family gapfilled) 4. Gapfill by average of the taxon_code to get mean sustainability and escapes values (taxon_group gapfilled) 5. Assign any Algae with the seaweeds score from SFW data (6.72 for sustainability, 4 for escapes) 6. Apply the global average to any remaining sustainability and escapes score NAs</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>mar_sw_sus_final <span class="ot">=</span> mar_sw_sus <span class="sc">%&gt;%</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### sustainability scores ####</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_rgn_fam_sust, Sust)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with region/family level</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_rgn_fam_sust, <span class="st">&quot;region_family_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span> <span class="do">## add in rgn family gapfill record</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_gr_fam_sust, Sust)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with georegion/family level</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_gr_fam_sust, <span class="st">&quot;georegion_family_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span> <span class="co"># Add in georegion/family gapfill record</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust),  avg_fam_sust, Sust)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with family level</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_fam_sust, <span class="st">&quot;family_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span> <span class="do">## Add in family gapfill record</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_taxon_code_sust, Sust)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_taxon_code_sust, <span class="st">&quot;taxon_group_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(Taxon_code <span class="sc">==</span> <span class="st">&quot;AL&quot;</span>, <span class="fl">6.72</span>, Sust)) <span class="sc">%&gt;%</span> <span class="do">## assign any algae with the overall SFW seaweed score (6.72), see Steps above for reference to document</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> <span class="fl">6.72</span>, <span class="st">&quot;seaweed_score&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_global, Sust)) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_global, <span class="st">&quot;global_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### genetic escapes scores ####</span></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_rgn_fam_esc, esc_score)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with region/family level</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_rgn_fam_esc, <span class="st">&quot;region_family_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span> <span class="do">## add in rgn family gapfill record</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_gr_fam_esc, esc_score)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with georegion/family level</span></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_gr_fam_esc, <span class="st">&quot;georegion_family_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span> <span class="co"># Add in georegion/family gapfill record</span></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score),  avg_fam_esc, esc_score)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with family level</span></span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_fam_esc, <span class="st">&quot;family_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span> <span class="do">## Add in family gapfill record</span></span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_taxon_code_esc, esc_score)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_taxon_code_esc, <span class="st">&quot;taxon_group_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(Taxon_code <span class="sc">==</span> <span class="st">&quot;AL&quot;</span>, <span class="dv">4</span>, esc_score)) <span class="sc">%&gt;%</span> <span class="do">## assign any algae with the SFW seaweed score for C6 Escapes(4), see Steps above for reference to document</span></span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> <span class="dv">4</span>, <span class="st">&quot;seaweed_score&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_global_esc, esc_score)) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_global_esc, <span class="st">&quot;global_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### final tidying ####</span></span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">taxa_code =</span> <span class="fu">paste</span>(species, species_code, <span class="at">sep=</span><span class="st">&quot;_&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, species_code, taxa_code, <span class="at">taxa_group=</span>Taxon_code, family, year, gapfill_sus, gapfill_esc, <span class="at">gapfill_fao =</span> gap_0_fill, <span class="at">tonnes=</span>value, Sust, esc_score) <span class="sc">%&gt;%</span></span>
-<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">round</span>(Sust<span class="sc">/</span><span class="dv">10</span>, <span class="dv">2</span>),</span>
-<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">esc_score =</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">round</span>(esc_score<span class="sc">/</span><span class="dv">10</span>, <span class="dv">2</span>))</span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mar_sw_sus_final)</span>
-<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(mar_sw_sus_final, gapfill_sus <span class="sc">==</span> <span class="st">&quot;georegion_family_avg&quot;</span>)</span>
-<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(mar_sw_sus_final, gapfill_sus <span class="sc">==</span> <span class="st">&quot;family_avg&quot;</span>)</span>
-<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(mar_sw_sus_final, gapfill_sus <span class="sc">==</span> <span class="st">&quot;taxon_group_avg&quot;</span>)</span>
-<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a><span class="co"># test1 &lt;- mar_sw_sus_final %&gt;%</span></span>
-<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(Sust)) %&gt;%</span></span>
-<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(rgn_id, species, year, taxa_group, family, Sust, avg_rgn_fam_sust, avg_gr_fam_sust, avg_fam_sust, avg_taxon_code_sust)</span></span>
-<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a><span class="co"># filter(mar_sw_sus_final, family == &quot;Mollusca&quot;)</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define gapfilling scores for global seaweed and escapes (a subcomponent of the global seaweed score) found in pdf here (updated occasionally): https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>seaweed_gf_score <span class="ot">&lt;-</span> <span class="fl">6.72</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>escapes_gf_score <span class="ot">&lt;-</span> <span class="dv">4</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>mar_sw_sus_final <span class="ot">=</span> mar_sw_sus <span class="sc">%&gt;%</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### sustainability scores ####</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_rgn_fam_sust, Sust)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with region/family level</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_rgn_fam_sust, <span class="st">&quot;region_family_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span> <span class="do">## add in rgn family gapfill record</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_gr_fam_sust, Sust)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with georegion/family level</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_gr_fam_sust, <span class="st">&quot;georegion_family_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span> <span class="co"># Add in georegion/family gapfill record</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust),  avg_fam_sust, Sust)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with family level</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_fam_sust, <span class="st">&quot;family_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span> <span class="do">## Add in family gapfill record</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_taxon_code_sust, Sust)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_taxon_code_sust, <span class="st">&quot;taxon_group_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(Taxon_code <span class="sc">==</span> <span class="st">&quot;AL&quot;</span>, seaweed_gf_score, Sust)) <span class="sc">%&gt;%</span> <span class="do">## assign any algae with the overall SFW seaweed score, see Steps above for reference to document</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> seaweed_gf_score, <span class="st">&quot;seaweed_score&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Sust), avg_global, Sust)) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_sus =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_sus) <span class="sc">&amp;</span> Sust <span class="sc">==</span> avg_global, <span class="st">&quot;global_avg&quot;</span>, gapfill_sus)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### genetic escapes scores ####</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_rgn_fam_esc, esc_score)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with region/family level</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_rgn_fam_esc, <span class="st">&quot;region_family_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span> <span class="do">## add in rgn family gapfill record</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_gr_fam_esc, esc_score)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with georegion/family level</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_gr_fam_esc, <span class="st">&quot;georegion_family_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span> <span class="co"># Add in georegion/family gapfill record</span></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score),  avg_fam_esc, esc_score)) <span class="sc">%&gt;%</span> <span class="co"># Gapfill with family level</span></span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_fam_esc, <span class="st">&quot;family_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span> <span class="do">## Add in family gapfill record</span></span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_taxon_code_esc, esc_score)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_taxon_code_esc, <span class="st">&quot;taxon_group_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(Taxon_code <span class="sc">==</span> <span class="st">&quot;AL&quot;</span>, escapes_gf_score, esc_score)) <span class="sc">%&gt;%</span> <span class="do">## assign any algae with the SFW seaweed score for C6 Escapes, see Steps above for reference to document</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> escapes_gf_score, <span class="st">&quot;seaweed_score&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esc_score =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(esc_score), avg_global_esc, esc_score)) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill_esc =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gapfill_esc) <span class="sc">&amp;</span> esc_score <span class="sc">==</span> avg_global_esc, <span class="st">&quot;global_avg&quot;</span>, gapfill_esc)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### final tidying ####</span></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">taxa_code =</span> <span class="fu">paste</span>(species, species_code, <span class="at">sep=</span><span class="st">&quot;_&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, species_code, taxa_code, <span class="at">taxa_group=</span>Taxon_code, family, year, gapfill_sus, gapfill_esc, <span class="at">gapfill_fao =</span> gap_0_fill, <span class="at">tonnes=</span>value, Sust, esc_score) <span class="sc">%&gt;%</span></span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sust =</span> <span class="fu">round</span>(Sust<span class="sc">/</span><span class="dv">10</span>, <span class="dv">2</span>),</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">esc_score =</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">round</span>(esc_score<span class="sc">/</span><span class="dv">10</span>, <span class="dv">2</span>))</span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mar_sw_sus_final)</span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(mar_sw_sus_final, gapfill_sus <span class="sc">==</span> <span class="st">&quot;georegion_family_avg&quot;</span>)</span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(mar_sw_sus_final, gapfill_sus <span class="sc">==</span> <span class="st">&quot;family_avg&quot;</span>)</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(mar_sw_sus_final, gapfill_sus <span class="sc">==</span> <span class="st">&quot;taxon_group_avg&quot;</span>)</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a><span class="co"># test1 &lt;- mar_sw_sus_final %&gt;%</span></span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(Sust)) %&gt;%</span></span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(rgn_id, species, year, taxa_group, family, Sust, avg_rgn_fam_sust, avg_gr_fam_sust, avg_fam_sust, avg_taxon_code_sust)</span></span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a><span class="co"># filter(mar_sw_sus_final, family == &quot;Mollusca&quot;)</span></span></code></pre></div>
 <p><strong>Now we need to prep the escapes pressure layer a bit more</strong> Final formatting of the escapee data. This is used as a pressure layer.</p>
-<p>For each region/year: take a weighted average of the genetic escape probability for each taxa based on tonnes mariculture</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tonnes_esc <span class="ot">&lt;-</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, species, gapfill_esc, esc_score, tonnes)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>genEscapes <span class="ot">&lt;-</span> tonnes_esc <span class="sc">%&gt;%</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, year) <span class="sc">%&gt;%</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">genEscapes =</span> <span class="fu">weighted.mean</span>(esc_score, tonnes, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code></pre></div>
+<p>For each region/year: take a weighted average of the genetic escape probability for each taxa based on tonnes of mariculture.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># subset the cleaned data to only include escapes data</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>tonnes_esc <span class="ot">&lt;-</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, species, gapfill_esc, esc_score, tonnes)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co"># use &quot;tonnes&quot; values to weight the regional average of escapes</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>genEscapes <span class="ot">&lt;-</span> tonnes_esc <span class="sc">%&gt;%</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, year) <span class="sc">%&gt;%</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">genEscapes =</span> <span class="fu">weighted.mean</span>(esc_score, tonnes, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code></pre></div>
 <p>Obtain gapfill information from <code>genEscapes</code></p>
 <p>Gapfill values in output file are the proportion of data that is gapfilled.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Obtain corresponding gapfilling information for each region (average of gapfilled data, weighted by tonnes of mariculture).</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>genEscapes_gf <span class="ot">&lt;-</span> tonnes_esc <span class="sc">%&gt;%</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill =</span> <span class="fu">ifelse</span>(gapfill_esc <span class="sc">==</span><span class="st">&quot;none&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfill =</span> <span class="fu">ifelse</span>(gapfill_esc <span class="sc">==</span> <span class="st">&quot;none&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, year) <span class="sc">%&gt;%</span></span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">genEscapes =</span> <span class="fu">weighted.mean</span>(gapfill, tonnes, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year<span class="sc">==</span><span class="dv">2019</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, <span class="at">pressures.score=</span>genEscapes) <span class="sc">%&gt;%</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pressures.score=</span><span class="fu">ifelse</span>(pressures.score<span class="sc">==</span><span class="st">&quot;NaN&quot;</span>, <span class="cn">NA</span>, pressures.score)) <span class="sc">%&gt;%</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>()</span></code></pre></div>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pressures.score=</span><span class="fu">ifelse</span>(pressures.score <span class="sc">==</span> <span class="st">&quot;NaN&quot;</span>, <span class="cn">NA</span>, pressures.score)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>()</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Obtain corresponding gapfilling information for each region (average of gapfilled data, weighted by tonnes of mariculture).</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co"># genEscapes_gf_1 &lt;- tonnes_esc %&gt;%</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(gapfill = ifelse(gapfill_esc == &quot;none&quot;, 0, 1)) %&gt;%</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(rgn_id, year) %&gt;%</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %&gt;%</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   ungroup() %&gt;%</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(year == 2020) %&gt;%</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(rgn_id, pressures.score = genEscapes) %&gt;%</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(pressures.score = ifelse(pressures.score == &quot;NaN&quot;, NA, pressures.score)) %&gt;%</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="co">#   data.frame()</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co"># genEscapes_gf_2 &lt;- tonnes_esc %&gt;%</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(gapfill = ifelse(gapfill_esc == &quot;none&quot;, 0, 1)) %&gt;%</span></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(rgn_id, year) %&gt;%</span></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %&gt;%</span></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   ungroup() %&gt;%</span></span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(rgn_id, pressures.score = genEscapes) %&gt;%</span></span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(pressures.score = ifelse(pressures.score == &quot;NaN&quot;, NA, pressures.score)) %&gt;%</span></span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   data.frame()</span></span></code></pre></div>
 </div>
 <div id="save-data-genetic-escapes" class="section level1" number="11">
 <h1><span class="header-section-number">11</span> Save data: Genetic Escapes</h1>
 <div id="save-gapfill-data" class="section level2" number="11.1">
 <h2><span class="header-section-number">11.1</span> Save gapfill data</h2>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the Genetic Escapes Gapfill file</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(genEscapes_gf, <span class="st">&#39;output/GenEsc_gf.csv&#39;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(genEscapes_gf, <span class="st">&#39;output/GenEsc_gf.csv&#39;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>Obtain escapee data layers from <code>genEscapes</code></p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the escapee data layers:</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> genEscapes <span class="sc">%&gt;%</span></span>
@@ -949,8 +963,7 @@ pre code {
 <div id="save-escapee-pressure-layer" class="section level2" number="11.2">
 <h2><span class="header-section-number">11.2</span> Save escapee pressure layer</h2>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the Genetic Escapes data file </span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(data, <span class="st">&#39;output/GenEsc.csv&#39;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)  </span></code></pre></div>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(data, <span class="st">&#39;output/GenEsc.csv&#39;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)  </span></code></pre></div>
 </div>
 </div>
 <div id="save-data-mariculture-tonnes-and-sustainability-scores" class="section level1" number="12">
@@ -962,239 +975,301 @@ pre code {
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">anyDuplicated</span>(mar_harvest_tonnes) <span class="co"># Check for duplication</span></span>
 <span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Mariculture Harvest Tonnes file</span></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(mar_harvest_tonnes, <span class="st">&#39;output/mar_harvest_tonnes.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
 <span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(mar_harvest_tonnes, <span class="st">&#39;output/mar_harvest_tonnes.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Save gapfill data for mariculture harvest</span></span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>mar_harvest_tonnes_gf <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, taxa_group, family, year, <span class="at">tonnes=</span>gapfill_fao)</span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Mariculture Harvest Gapfill file </span></span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(mar_harvest_tonnes_gf, <span class="st">&#39;output/mar_harvest_tonnes_gf.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a><span class="do">## Save sustainability scores data for 2020 (SFW data year)</span></span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>mar_sustainability_score <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
-<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2021</span>) <span class="sc">%&gt;%</span> <span class="co"># 2021 sustainability scores exist (Seafood Watch)</span></span>
-<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, taxa_code, <span class="at">sust_coeff =</span> Sust) <span class="sc">%&gt;%</span></span>
-<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sust_coeff =</span> <span class="fu">ifelse</span>(sust_coeff <span class="sc">&gt;</span> <span class="fl">0.7</span>, <span class="dv">1</span>, sust_coeff<span class="sc">/</span><span class="fl">0.77</span>)) <span class="co"># rescale to the highest sust score</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Save gapfill data for mariculture harvest</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>mar_harvest_tonnes_gf <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, taxa_group, family, year, <span class="at">tonnes=</span>gapfill_fao)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Mariculture Harvest Gapfill file </span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(mar_harvest_tonnes_gf, <span class="st">&#39;output/mar_harvest_tonnes_gf.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="co"># define the maximum sustainability score, check with: summary(mar_sw_sus_final)</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>max_sus <span class="ot">&lt;-</span> <span class="fl">0.77</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="do">## Save sustainability scores data for 2022 (SFW data year)</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>mar_sustainability_score <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2022</span>) <span class="sc">%&gt;%</span> <span class="co"># 2022 sustainability scores exist (Seafood Watch)</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, taxa_code, <span class="at">sust_coeff =</span> Sust) <span class="sc">%&gt;%</span></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sust_coeff =</span> <span class="fu">ifelse</span>(sust_coeff <span class="sc">&gt;</span> max_sus, <span class="dv">1</span>, sust_coeff<span class="sc">/</span>max_sus)) <span class="co"># rescale to the highest sust score</span></span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a><span class="fu">anyDuplicated</span>(mar_sustainability_score)</span>
 <span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a><span class="fu">anyDuplicated</span>(mar_sustainability_score)</span>
-<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Sustainability Score file </span></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Sustainability Score file </span></span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(mar_sustainability_score, <span class="st">&#39;output/mar_sustainability.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(mar_sustainability_score, <span class="st">&#39;output/mar_sustainability.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
-<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a><span class="do">## Save gapfill data for sustainability scores</span></span>
-<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>mar_sustainability_score_gf <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
-<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_coeff =</span> gapfill_sus) <span class="sc">%&gt;%</span></span>
-<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>()</span>
-<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a><span class="do">## Save gapfill data for sustainability scores</span></span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>mar_sustainability_score_gf <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_coeff =</span> gapfill_sus) <span class="sc">%&gt;%</span></span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>()</span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Sustainability Score Gapfill file </span></span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(mar_sustainability_score_gf, <span class="st">&#39;output/mar_sustainability_gf.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
 <span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Sustainability Score Gapfill file </span></span>
-<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(mar_sustainability_score_gf, <span class="st">&#39;output/mar_sustainability_gf.csv&#39;</span>, <span class="at">row.names=</span>F)</span>
-<span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-50"><a href="#cb34-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-51"><a href="#cb34-51" aria-hidden="true" tabindex="-1"></a><span class="do">## save mar sustainability for data checking; rgn_id, species, score</span></span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a><span class="do">## save mar sustainability for data checking; rgn_id, species, score</span></span>
+<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a>mar_sustainability_score <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
+<span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2022</span>) <span class="sc">%&gt;%</span> <span class="co"># Only 2022 sustainability scores exist (Seafood Watch)</span></span>
+<span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, species, <span class="at">sust_coeff =</span> Sust) <span class="sc">%&gt;%</span></span>
+<span id="cb34-50"><a href="#cb34-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb34-51"><a href="#cb34-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sust_coeff =</span> <span class="fu">ifelse</span>(sust_coeff <span class="sc">&gt;</span> max_sus, <span class="dv">1</span>, sust_coeff<span class="sc">/</span>max_sus)) <span class="co"># rescale to the highest sust score</span></span>
 <span id="cb34-52"><a href="#cb34-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-53"><a href="#cb34-53" aria-hidden="true" tabindex="-1"></a>mar_sustainability_score <span class="ot">=</span> mar_sw_sus_final <span class="sc">%&gt;%</span></span>
-<span id="cb34-54"><a href="#cb34-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2021</span>) <span class="sc">%&gt;%</span> <span class="co"># Only 2021 sustainability scores exist (Seafood Watch)</span></span>
-<span id="cb34-55"><a href="#cb34-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, species, <span class="at">sust_coeff =</span> Sust) <span class="sc">%&gt;%</span></span>
-<span id="cb34-56"><a href="#cb34-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb34-57"><a href="#cb34-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sust_coeff =</span> <span class="fu">ifelse</span>(sust_coeff <span class="sc">&gt;</span> <span class="fl">0.7</span>, <span class="dv">1</span>, sust_coeff<span class="sc">/</span><span class="fl">0.77</span>)) <span class="co"># rescale to the highest sust score</span></span>
-<span id="cb34-58"><a href="#cb34-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-59"><a href="#cb34-59" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Sustainability Score file</span></span>
-<span id="cb34-60"><a href="#cb34-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-61"><a href="#cb34-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-62"><a href="#cb34-62" aria-hidden="true" tabindex="-1"></a> <span class="fu">write.csv</span>(mar_sustainability_score, <span class="st">&#39;int/mar_sustainability_check.csv&#39;</span>, <span class="at">row.names=</span>F)</span></code></pre></div>
+<span id="cb34-53"><a href="#cb34-53" aria-hidden="true" tabindex="-1"></a><span class="do">## Saves the appropriate Sustainability Score file</span></span>
+<span id="cb34-54"><a href="#cb34-54" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(mar_sustainability_score, <span class="st">&#39;int/mar_sustainability_check.csv&#39;</span>, <span class="at">row.names=</span>F)</span></code></pre></div>
 <div id="data-check-mariculture-and-sustainability-scores" class="section level2" number="12.1">
 <h2><span class="header-section-number">12.1</span> Data check mariculture and sustainability scores</h2>
 <p>Comparing this year’s data to previous year’s data. Expect small variation from year to year. Plot to view differences.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Russia</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">73</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare mariculture yield data for all countries: 2020 versus 2019</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">73</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
 <span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
 <span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
 <span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value)</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
 <span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Vietnam</span></span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">207</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, <span class="at">old_value =</span> value)</span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">207</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, value)</span>
-<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
-<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>, <span class="st">&quot;environment&quot;</span>)); <span class="fu">View</span>(yield)</span>
-<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare mariculture yield data for all countries: 2019 last year to 2019 this year</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
 <span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Iceland. Atlantic Salmon increased by a lot between 2018 and 2019 assessment years. Atlantic Salmon stayed relatively stable between 2020 and 2019 assessment years. However, Senegalese sole has an NA value in 2019 assessment; maybe a gapfilling error from last year?</span></span>
-<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, <span class="at">old_value =</span> value)</span>
-<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, value)</span>
-<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
-<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>, <span class="st">&quot;environment&quot;</span>)); <span class="fu">View</span>(yield)</span>
-<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Belize; yield of Whiteleg shrimp was halved between 2019 and 2020 assessment years.</span></span>
-<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">164</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
-<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">164</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
-<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
-<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
-<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare mariculture yield data for Russia: 2019 data from 2021 assessment to 2020 data from 2022 assessment</span></span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">73</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">73</span>, year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare mariculture yield data for Iceland: 2019 data from 2021 assessment to 2020 data from 2022 assessment</span></span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>, year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
 <span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for France</span></span>
-<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">179</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
-<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">179</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
-<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
-<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
-<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
-<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare mariculture yield data for Vietnam</span></span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">207</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, <span class="at">old_value =</span> value)</span>
+<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">207</span>, year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, value)</span>
 <span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Malta; tuna production dropped drastically - it looks like some new laws were instituted in 2019 for tuna in Malta </span></span>
-<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">68</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
-<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">68</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
-<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
-<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
-<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
-<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Ecuador, score increased by a lot</span></span>
-<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">137</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
-<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">137</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
-<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
-<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
-<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value)</span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>, <span class="st">&quot;environment&quot;</span>)); <span class="co">#View(yield)</span></span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value)</span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Iceland. Atlantic Salmon increased by a lot between 2018 and 2019 assessment years. Atlantic Salmon stayed relatively stable between 2020 and 2019 assessment years. However, Senegalese sole has an NA value in 2019 assessment; maybe a gapfilling error from last year?</span></span>
+<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, <span class="at">old_value =</span> value)</span>
+<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, environment, value)</span>
+<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>, <span class="st">&quot;environment&quot;</span>)); <span class="fu">View</span>(yield)</span>
+<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Belize; yield of Whiteleg shrimp was halved between 2019 and 2020 assessment years.</span></span>
+<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">164</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">164</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
 <span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores</span></span>
-<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/mar_sustainability.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff)</span>
-<span id="cb35-95"><a href="#cb35-95" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
-<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff)</span>
-<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
-<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> sust_new <span class="sc">-</span> sust_old)</span>
-<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(test)</span>
+<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
+<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-95"><a href="#cb35-95" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for France</span></span>
+<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">179</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">179</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
+<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
 <span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test<span class="sc">$</span>sust_old, test<span class="sc">$</span>sust_new);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
 <span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores for Bosnia</span></span>
-<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/mar_sustainability.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff) <span class="sc">%&gt;%</span></span>
-<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>) </span>
-<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>  tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
-<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>)</span>
-<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
-<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>))</span>
-<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(test)</span>
-<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test<span class="sc">$</span>sust_old, test<span class="sc">$</span>sust_new);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
-<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a><span class="do">## now look at bosnia production </span></span>
-<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
-<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores for Greece</span></span>
-<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/mar_sustainability.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff) <span class="sc">%&gt;%</span></span>
-<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">80</span>) </span>
-<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a>  tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
-<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">80</span>)</span>
+<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Malta; tuna production dropped drastically - it looks like some new laws were instituted in 2019 for tuna in Malta </span></span>
+<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">68</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">68</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
+<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
+<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare yield data for Ecuador, score increased by a lot</span></span>
+<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a>mar_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">137</span>, year <span class="sc">==</span> <span class="dv">2018</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, <span class="at">old_value =</span> value)</span>
+<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">137</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
+<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>yield <span class="ot">&lt;-</span> mar_old <span class="sc">%&gt;%</span> </span>
+<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mar_new, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;species&quot;</span>,<span class="st">&quot;fao&quot;</span>)); <span class="fu">View</span>(yield)</span>
+<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yield<span class="sc">$</span>old_value, yield<span class="sc">$</span>value)</span>
+<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a><span class="co"># ----Sustainability scores--------------------------------------------------------------------------</span></span>
+<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores for Bosnia</span></span>
+<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/mar_sustainability.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff) <span class="sc">%&gt;%</span></span>
+<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>) </span>
+<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a>  tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
+<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-143"><a href="#cb35-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
-<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>))</span>
-<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(test)</span>
-<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test<span class="sc">$</span>sust_old, test<span class="sc">$</span>sust_new);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>)</span>
+<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-149"><a href="#cb35-149" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
+<span id="cb35-150"><a href="#cb35-150" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>))</span>
+<span id="cb35-151"><a href="#cb35-151" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(test)</span>
+<span id="cb35-152"><a href="#cb35-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-153"><a href="#cb35-153" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test<span class="sc">$</span>sust_old, test<span class="sc">$</span>sust_new);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-154"><a href="#cb35-154" aria-hidden="true" tabindex="-1"></a><span class="do">## now look at bosnia production </span></span>
+<span id="cb35-155"><a href="#cb35-155" aria-hidden="true" tabindex="-1"></a>mar_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/MAR_FP_data.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-156"><a href="#cb35-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>, year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-157"><a href="#cb35-157" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, fao, value)</span>
+<span id="cb35-158"><a href="#cb35-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-159"><a href="#cb35-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-160"><a href="#cb35-160" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores for Greece</span></span>
+<span id="cb35-161"><a href="#cb35-161" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/mar_sustainability.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-162"><a href="#cb35-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff) <span class="sc">%&gt;%</span></span>
+<span id="cb35-163"><a href="#cb35-163" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">80</span>) </span>
+<span id="cb35-164"><a href="#cb35-164" aria-hidden="true" tabindex="-1"></a>  tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
+<span id="cb35-165"><a href="#cb35-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-166"><a href="#cb35-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-167"><a href="#cb35-167" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-168"><a href="#cb35-168" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-169"><a href="#cb35-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-170"><a href="#cb35-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">80</span>)</span>
+<span id="cb35-171"><a href="#cb35-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-172"><a href="#cb35-172" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
+<span id="cb35-173"><a href="#cb35-173" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>))</span>
+<span id="cb35-174"><a href="#cb35-174" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(test)</span>
+<span id="cb35-175"><a href="#cb35-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-176"><a href="#cb35-176" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test<span class="sc">$</span>sust_old, test<span class="sc">$</span>sust_new);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb35-177"><a href="#cb35-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-178"><a href="#cb35-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-179"><a href="#cb35-179" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores</span></span>
+<span id="cb35-180"><a href="#cb35-180" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/mar_sustainability.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-181"><a href="#cb35-181" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff)</span>
+<span id="cb35-182"><a href="#cb35-182" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-183"><a href="#cb35-183" aria-hidden="true" tabindex="-1"></a>tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
+<span id="cb35-184"><a href="#cb35-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-185"><a href="#cb35-185" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-186"><a href="#cb35-186" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff)</span>
+<span id="cb35-187"><a href="#cb35-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-188"><a href="#cb35-188" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
+<span id="cb35-189"><a href="#cb35-189" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-190"><a href="#cb35-190" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> sust_new <span class="sc">-</span> sust_old) <span class="sc">%&gt;%</span></span>
+<span id="cb35-191"><a href="#cb35-191" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb35-192"><a href="#cb35-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_rgn_sus_diff =</span> <span class="fu">mean</span>(difference, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb35-193"><a href="#cb35-193" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(test)</span>
+<span id="cb35-194"><a href="#cb35-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-195"><a href="#cb35-195" aria-hidden="true" tabindex="-1"></a><span class="co">#plot(test$sust_old, test$sust_new);abline(0,1,col=&quot;red&quot;)</span></span>
+<span id="cb35-196"><a href="#cb35-196" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test<span class="sc">$</span>rgn_id, test<span class="sc">$</span>difference)</span>
+<span id="cb35-197"><a href="#cb35-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-198"><a href="#cb35-198" aria-hidden="true" tabindex="-1"></a>mean_diff_sus <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(test, <span class="fu">aes</span>(<span class="at">x =</span> rgn_id, <span class="at">y =</span> mean_rgn_sus_diff)) <span class="sc">+</span> </span>
+<span id="cb35-199"><a href="#cb35-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb35-200"><a href="#cb35-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-201"><a href="#cb35-201" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(mean_diff_sus)</span></code></pre></div>
 </div>
 <div id="data-check-genetic-escapes" class="section level2" number="12.2">
 <h2><span class="header-section-number">12.2</span> Data check genetic escapes</h2>
 <p>Comparing this year’s data to previous year’s data. Expect small variation from year to year. Plot to view differences.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare genetic escapes pressure score; saw large changes between 2018 and 2017 assessment years. No big changes between 2019 and 2018 assessment years. Big changes from 2019 to 2020 due to a data update. Small changes between 2020 and 2021 due to updating the FAO data, gapfilling caused this. Also fixed some name errors </span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">prs_score_old=</span>pressure_score)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, pressure_score)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> <span class="fu">full_join</span>(old, new, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;year&quot;</span>)); <span class="fu">View</span>(compare)</span>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare genetic escapes pressure score; saw large changes between 2018 and 2017 assessment years. No big changes between 2019 and 2018 assessment years. Big changes from 2019 to 2020 due to a data update. Small changes between 2020 and 2021 due to updating the FAO data, gapfilling caused this. Also fixed some name errors. Small changes between 2021 and 2022, added a few name conversions. </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">prs_score_old=</span>pressure_score)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, pressure_score)</span>
 <span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span>prs_score_old, compare<span class="sc">$</span>pressure_score);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> <span class="fu">full_join</span>(old, new, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;year&quot;</span>)); <span class="fu">View</span>(compare)</span>
 <span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare genetic escapes pressure scores for Vietnam; no change in pressures between 2021 and 2020 assessment years.</span></span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2020/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">prs_score_old=</span>pressure_score)</span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, pressure_score)</span>
-<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> <span class="fu">full_join</span>(old, new, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;year&quot;</span>)); <span class="fu">View</span>(compare)</span>
-<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span>prs_score_old, compare<span class="sc">$</span>pressure_score);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span>prs_score_old, compare<span class="sc">$</span>pressure_score);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare genetic escapes pressure scores for Vietnam; no change in pressures between 2021 and 2020 assessment years.</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">prs_score_old=</span>pressure_score)</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2022/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">232</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, pressure_score)</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> <span class="fu">full_join</span>(old, new, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;year&quot;</span>)); <span class="co">#View(compare)</span></span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span>prs_score_old, compare<span class="sc">$</span>pressure_score);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare genetic escapes pressure scores for Iceland</span></span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">prs_score_old=</span>pressure_score)</span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2022/output/GenEsc.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">143</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, pressure_score)</span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> <span class="fu">full_join</span>(old, new, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>,<span class="st">&quot;year&quot;</span>)); <span class="fu">View</span>(compare)</span>
+<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span>prs_score_old, compare<span class="sc">$</span>pressure_score);<span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
 <hr />
 <p>NOTE: THIS DOES NOT NEED TO BE RUN ANYMORE. Below here is archival… unless we change the reference point.</p>
 </div>
