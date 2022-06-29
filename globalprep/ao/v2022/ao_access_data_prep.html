@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Jun 28 15:43:22 2022 by molitor" />
+<meta name="author" content="Compiled on Wed Jun 29 11:27:28 2022 by molitor" />
 
 
 <title>OHI 2022 - Artisanal Opportunities: Preparing access data</title>
@@ -347,7 +347,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">OHI 2022 - Artisanal Opportunities: Preparing access data</h1>
-<h4 class="author"><em>Compiled on Tue Jun 28 15:43:22 2022 by molitor</em></h4>
+<h4 class="author"><em>Compiled on Wed Jun 29 11:27:28 2022 by molitor</em></h4>
 
 </div>
 
@@ -369,6 +369,7 @@ div.tocify {
 <p><strong>Description</strong>: Progress by countries in the degree of application of a legal/regulatory/policy/institutional framework which recognizes and protects access rights for small-scale fisheries. It is a composite indicator based on FAO member country responses to the Code of Conduct for Responsible Fisheries (CCRF) survey questionnaire which is circulated by FAO every two years to members and IGOs and INGOs. This indicator is calculated on the basis of the efforts being made by countries to implement selected key provisions of the Voluntary Guidelines for Securing Sustainable Small-Scale Fisheries in the Context of Food Security and Poverty Eradication (SSF Guidelines), as reported in a given year of the survey.</p>
 <p><strong>Time range</strong>: 2018, 2020, 2022</p>
 <p><strong>Download link</strong>: We now use the API to access data (v2022) but alternatively you can access data here: <a href="https://unstats.un.org/sdgs/dataportal/database" class="uri">https://unstats.un.org/sdgs/dataportal/database</a>; Click “select indicators and country or area” and select indicator 14.b. Download all data for this indicator.</p>
+<p><strong>Note</strong>: This data prep is also used for “Artisanal fisheries management effectiveness” (fp_artisinal). This means that when done with the data prep, you will need to update <code>ohi-global/metadata_documentation/layers_eez_base.csv</code>, <code>ao_access</code> and <code>fp_artisanal</code>. You will also need to update <code>ohi-global/eez/conf/scenario_data_years.csv</code> twice at <code>ao_access</code> and <code>fp_artisinal</code>. Each one should be run seperately to see the effect of each update on the scores.</p>
 <hr />
 </div>
 </div>
@@ -773,7 +774,7 @@ div.tocify {
 <div id="step-4.a" class="section level4" number="2.4.2.1">
 <h4><span class="header-section-number">2.4.2.1</span> Step 4.a</h4>
 <p>First try “intermediate regions” (i.e. Caribbean countries filled with Caribbean islands mean).</p>
-<p>We first fill missing data in small island developing states (SIDS) with the averages scores from other SIDS. We then move on to intermediate regions. We can find the SIDS average and round to the nearest score value (0, 0.2, 0.4, 0.6, 0.8, 1) by dividing the mean score of the SIDS by 2, rounding to the nearest tenth, and multiplying by 2 (i.e. 2 * round(mean(score)/2, digits = 1)).</p>
+<p>We first fill missing data in small island developing states (SIDS) with the averages scores from other SIDS. We then move on to intermediate regions. We can find the SIDS average and round to the nearest score value (0.2, 0.4, 0.6, 0.8, 1) by dividing the mean score of the SIDS by 2, rounding to the nearest tenth, and multiplying by 2 (i.e. 2 * round(mean(score)/2, digits = 1)).</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sids_score <span class="ot">=</span> gf_step_3_df <span class="sc">%&gt;%</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(small_island_developing_states_sids <span class="sc">==</span> <span class="st">&quot;x&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">score =</span> <span class="fu">mean</span>(score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
