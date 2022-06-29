@@ -21924,15 +21924,15 @@
 182,"Sea belt","Atlantic, Northeast","Marine",2008,0.51,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2009,0.16,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2010,0,"AL","Algae","NA_to_zero",798
-182,"Sea belt","Atlantic, Northeast","Marine",2011,0.007,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2011,0.00700000000000001,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2012,0.03,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2013,0,"AL","Algae","NA_to_zero",798
-182,"Sea belt","Atlantic, Northeast","Marine",2014,0.08,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2014,0.0800000000000001,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2015,5e-04,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2016,0,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2017,0.0195,"AL","Algae","0",798
-182,"Sea belt","Atlantic, Northeast","Marine",2018,0.0825,"AL","Algae","0",798
-182,"Sea belt","Atlantic, Northeast","Marine",2019,0.007,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2018,0.0825000000000001,"AL","Algae","0",798
+182,"Sea belt","Atlantic, Northeast","Marine",2019,0.00700000000000001,"AL","Algae","0",798
 182,"Sea belt","Atlantic, Northeast","Marine",2020,0,"AL","Algae","NA_to_zero",798
 182,"Sea mussels nei","Atlantic, Northeast","Marine",1950,2100,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Atlantic, Northeast","Marine",1951,2800,"BI","Mytilidae","0",799
@@ -22004,19 +22004,19 @@
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2012,4479.1,"BI","Mytilidae","0",800
 182,"Sea mussels nei","Atlantic, Northeast","Marine",2013,157481,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2013,4531,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2014,215206.1,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2014,215206.06,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2014,5242.49,"BI","Mytilidae","0",800
 182,"Sea mussels nei","Atlantic, Northeast","Marine",2015,218000,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2015,7307.61,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2016,210105.4,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2016,210105.44,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2016,5750,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2017,235345.2,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2017,235345.18,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2017,6440,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2018,278707.8,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2018,278707.76,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2018,5092.8,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2019,223304.2,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2019,223304.16,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2019,4890.77,"BI","Mytilidae","0",800
-182,"Sea mussels nei","Atlantic, Northeast","Marine",2020,199408.4,"BI","Mytilidae","0",799
+182,"Sea mussels nei","Atlantic, Northeast","Marine",2020,199408.36,"BI","Mytilidae","0",799
 182,"Sea mussels nei","Mediterranean and Black Sea","Marine",2020,5057.76,"BI","Mytilidae","0",800
 182,"Seabasses nei","Mediterranean and Black Sea","Marine",2004,517,"F","Serranidae","0",801
 182,"Seabasses nei","Mediterranean and Black Sea","Marine",2005,0,"F","Serranidae","0",801
@@ -24597,25 +24597,25 @@
 196,"Snappers nei","Atlantic, Eastern Central","Marine",2019,0,"F","Lutjanidae","NA_to_zero",907
 196,"Snappers nei","Atlantic, Eastern Central","Marine",2020,0,"F","Lutjanidae","NA_to_zero",907
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2001,104.8,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2002,78.6,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2002,78.6000000000001,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2003,41.7,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2004,39.4,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2005,42.8,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2006,19,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2007,6.375,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2007,6.37500000000001,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2008,1.65,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2009,2.0575,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2010,1.28,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2011,6.21,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2012,9.04,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2011,6.21000000000001,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2012,9.04000000000001,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2013,20.08,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2014,53.3,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2015,58.4,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2016,0.115,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2017,2.6,"AL","Algae","0",908
 202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2018,12.9,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2019,9.66,"AL","Algae","0",908
-202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2020,8.97,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2019,9.66000000000001,"AL","Algae","0",908
+202,"Elkhorn sea moss","Indian Ocean, Western","Marine",2020,8.97000000000001,"AL","Algae","0",908
 202,"Giant tiger prawn","Indian Ocean, Western","Brackishwater",2006,59,"SH","Penaeidae","0",909
 202,"Giant tiger prawn","Indian Ocean, Western","Brackishwater",2007,32,"SH","Penaeidae","0",909
 202,"Giant tiger prawn","Indian Ocean, Western","Brackishwater",2008,202,"SH","Penaeidae","0",909
@@ -25557,7 +25557,7 @@
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2004,294,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2005,380,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2006,570,"AL","Algae","0",944
-206,"Elkhorn sea moss","Pacific, Western Central","Marine",2007,860,"AL","Algae","0",944
+206,"Elkhorn sea moss","Pacific, Western Central","Marine",2007,860.000000000001,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2008,1060,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2009,1330,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2010,2000,"AL","Algae","0",944
@@ -25567,7 +25567,7 @@
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2014,2453.32,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2015,2607.603,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2016,2059.89,"AL","Algae","0",944
-206,"Elkhorn sea moss","Pacific, Western Central","Marine",2017,2029.656,"AL","Algae","0",944
+206,"Elkhorn sea moss","Pacific, Western Central","Marine",2017,2029.6558,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2018,1740.832,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2019,1881.1,"AL","Algae","0",944
 206,"Elkhorn sea moss","Pacific, Western Central","Marine",2020,1820.61,"AL","Algae","0",944
@@ -26248,7 +26248,7 @@
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2009,50,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2010,47.79,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2011,43.99,"AL","Algae","0",972
-207,"Elkhorn sea moss","Pacific, Western Central","Marine",2012,60.29,"AL","Algae","0",972
+207,"Elkhorn sea moss","Pacific, Western Central","Marine",2012,60.2900000000001,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2013,50.66,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2014,46.1,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2015,33.59,"AL","Algae","0",972
@@ -26256,7 +26256,7 @@
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2017,10.365,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2018,53.726,"AL","Algae","0",972
 207,"Elkhorn sea moss","Pacific, Western Central","Marine",2019,15.45,"AL","Algae","0",972
-207,"Elkhorn sea moss","Pacific, Western Central","Marine",2020,9.33,"AL","Algae","0",972
+207,"Elkhorn sea moss","Pacific, Western Central","Marine",2020,9.33000000000001,"AL","Algae","0",972
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",1962,10,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",1963,10,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",1964,20,"SH","Penaeidae","0",973
@@ -26310,9 +26310,9 @@
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2012,164189,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2013,186467,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2014,240248,"SH","Penaeidae","0",973
-207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2015,250878.9,"SH","Penaeidae","0",973
+207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2015,250878.93,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2016,244087,"SH","Penaeidae","0",973
-207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2017,262936.4,"SH","Penaeidae","0",973
+207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2017,262936.39,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2018,290000,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2019,262981,"SH","Penaeidae","0",973
 207,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2020,263140,"SH","Penaeidae","0",973
@@ -26538,8 +26538,8 @@
 207,"Marine molluscs nei","Pacific, Western Central","Marine",2012,134031,"GAST","Mollusca","0",979
 207,"Marine molluscs nei","Pacific, Western Central","Marine",2013,181470,"GAST","Mollusca","0",979
 207,"Marine molluscs nei","Pacific, Western Central","Marine",2014,188881,"GAST","Mollusca","0",979
-207,"Marine molluscs nei","Pacific, Western Central","Marine",2015,232580,"GAST","Mollusca","0",979
-207,"Marine molluscs nei","Pacific, Western Central","Marine",2016,262952.9,"GAST","Mollusca","0",979
+207,"Marine molluscs nei","Pacific, Western Central","Marine",2015,232579.99,"GAST","Mollusca","0",979
+207,"Marine molluscs nei","Pacific, Western Central","Marine",2016,262952.92,"GAST","Mollusca","0",979
 207,"Marine molluscs nei","Pacific, Western Central","Marine",2017,282466,"GAST","Mollusca","0",979
 207,"Marine molluscs nei","Pacific, Western Central","Marine",2018,298000,"GAST","Mollusca","0",979
 207,"Marine molluscs nei","Pacific, Western Central","Marine",2019,212678,"GAST","Mollusca","0",979
@@ -26582,7 +26582,7 @@
 207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2012,148023,"SH","Penaeidae","0",982
 207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2013,236242,"SH","Penaeidae","0",982
 207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2014,352722,"SH","Penaeidae","0",982
-207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2015,339489.3,"SH","Penaeidae","0",982
+207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2015,339489.34,"SH","Penaeidae","0",982
 207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2016,380000,"SH","Penaeidae","0",982
 207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2017,439022.7,"SH","Penaeidae","0",982
 207,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2018,475000,"SH","Penaeidae","0",982
@@ -27400,8 +27400,8 @@
 209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2016,46882.47,"INV","Invertabrates","0",1020
 209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2017,45359,"INV","Invertabrates","0",1020
 209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2018,75183,"INV","Invertabrates","0",1020
-209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2019,106014.6,"INV","Invertabrates","0",1020
-209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2020,117442.4,"INV","Invertabrates","0",1020
+209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2019,106014.58,"INV","Invertabrates","0",1020
+209,"Aquatic invertebrates nei","Pacific, Northwest","Marine",2020,117442.35,"INV","Invertabrates","0",1020
 209,"Barramundi(=Giant seaperch)","Pacific, Northwest","Marine",1971,5,"F","Latidae","0",1021
 209,"Barramundi(=Giant seaperch)","Pacific, Northwest","Marine",1972,10,"F","Latidae","0",1021
 209,"Barramundi(=Giant seaperch)","Pacific, Northwest","Marine",1973,25,"F","Latidae","0",1021
@@ -27535,11 +27535,11 @@
 209,"Brown seaweeds","Pacific, Northwest","Marine",1996,235507.5,"AL","Algae","0",1023
 209,"Brown seaweeds","Pacific, Northwest","Marine",1997,216348.5,"AL","Algae","0",1023
 209,"Brown seaweeds","Pacific, Northwest","Marine",1998,881835.5,"AL","Algae","0",1023
-209,"Brown seaweeds","Pacific, Northwest","Marine",1999,1054316,"AL","Algae","0",1023
-209,"Brown seaweeds","Pacific, Northwest","Marine",2000,1424890,"AL","Algae","0",1023
-209,"Brown seaweeds","Pacific, Northwest","Marine",2001,1575308,"AL","Algae","0",1023
-209,"Brown seaweeds","Pacific, Northwest","Marine",2002,1722518,"AL","Algae","0",1023
-209,"Brown seaweeds","Pacific, Northwest","Marine",2003,1106376,"AL","Algae","0",1023
+209,"Brown seaweeds","Pacific, Northwest","Marine",1999,1054316.5,"AL","Algae","0",1023
+209,"Brown seaweeds","Pacific, Northwest","Marine",2000,1424889.5,"AL","Algae","0",1023
+209,"Brown seaweeds","Pacific, Northwest","Marine",2001,1575307.5,"AL","Algae","0",1023
+209,"Brown seaweeds","Pacific, Northwest","Marine",2002,1722517.5,"AL","Algae","0",1023
+209,"Brown seaweeds","Pacific, Northwest","Marine",2003,1106376.5,"AL","Algae","0",1023
 209,"Brown seaweeds","Pacific, Northwest","Marine",2004,1109064,"AL","Algae","0",1023
 209,"Brown seaweeds","Pacific, Northwest","Marine",2005,913469.5,"AL","Algae","0",1023
 209,"Brown seaweeds","Pacific, Northwest","Marine",2006,1154785,"AL","Algae","0",1023
@@ -27644,8 +27644,8 @@
 209,"Cupped oysters nei","Pacific, Northwest","Marine",2016,4661118,"BI","Ostreidae","0",1025
 209,"Cupped oysters nei","Pacific, Northwest","Marine",2017,4880047,"BI","Ostreidae","0",1025
 209,"Cupped oysters nei","Pacific, Northwest","Marine",2018,5140507,"BI","Ostreidae","0",1025
-209,"Cupped oysters nei","Pacific, Northwest","Marine",2019,5226215,"BI","Ostreidae","0",1025
-209,"Cupped oysters nei","Pacific, Northwest","Marine",2020,5425263,"BI","Ostreidae","0",1025
+209,"Cupped oysters nei","Pacific, Northwest","Marine",2019,5226215.1,"BI","Ostreidae","0",1025
+209,"Cupped oysters nei","Pacific, Northwest","Marine",2020,5425262.7,"BI","Ostreidae","0",1025
 209,"Dark green nori","Pacific, Northwest","Marine",2003,2409.66,"AL","Algae","0",1026
 209,"Dark green nori","Pacific, Northwest","Marine",2004,2841.3,"AL","Algae","0",1026
 209,"Dark green nori","Pacific, Northwest","Marine",2005,5490.54,"AL","Algae","0",1026
@@ -27787,17 +27787,17 @@
 209,"Goldlined seabream","Pacific, Northwest","Marine",2019,28,"F","Sparidae","0",1031
 209,"Goldlined seabream","Pacific, Northwest","Marine",2020,14,"F","Sparidae","0",1031
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2003,110604,"AL","Algae","0",1032
-209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2004,194430.8,"AL","Algae","0",1032
+209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2004,194430.75,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2005,215535.5,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2006,222210,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2007,248627.5,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2008,286115,"AL","Algae","0",1032
-209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2009,309762.2,"AL","Algae","0",1032
+209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2009,309762.25,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2010,278334,"AL","Algae","0",1032
-209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2011,360684.2,"AL","Algae","0",1032
-209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2012,471411.8,"AL","Algae","0",1032
+209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2011,360684.25,"AL","Algae","0",1032
+209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2012,471411.75,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2013,588891,"AL","Algae","0",1032
-209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2014,626556.8,"AL","Algae","0",1032
+209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2014,626556.75,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2015,646902,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2016,716457.5,"AL","Algae","0",1032
 209,"Gracilaria seaweeds","Pacific, Northwest","Marine",2017,771685,"AL","Algae","0",1032
@@ -27935,8 +27935,8 @@
 209,"Japanese isinglass","Pacific, Northwest","Marine",2005,43.75,"AL","Algae","0",1036
 209,"Japanese isinglass","Pacific, Northwest","Marine",2006,150,"AL","Algae","0",1036
 209,"Japanese isinglass","Pacific, Northwest","Marine",2007,50,"AL","Algae","0",1036
-209,"Japanese isinglass","Pacific, Northwest","Marine",2008,60,"AL","Algae","0",1036
-209,"Japanese isinglass","Pacific, Northwest","Marine",2009,59.3,"AL","Algae","0",1036
+209,"Japanese isinglass","Pacific, Northwest","Marine",2008,60.0000000000001,"AL","Algae","0",1036
+209,"Japanese isinglass","Pacific, Northwest","Marine",2009,59.3000000000001,"AL","Algae","0",1036
 209,"Japanese isinglass","Pacific, Northwest","Marine",2010,58.25,"AL","Algae","0",1036
 209,"Japanese isinglass","Pacific, Northwest","Marine",2011,0,"AL","Algae","0",1036
 209,"Japanese isinglass","Pacific, Northwest","Marine",2012,197.4,"AL","Algae","0",1036
@@ -27973,50 +27973,50 @@
 209,"Japanese kelp","Pacific, Northwest","Marine",1974,880397.1,"AL","Algae","0",1037
 209,"Japanese kelp","Pacific, Northwest","Marine",1975,973080.9,"AL","Algae","0",1037
 209,"Japanese kelp","Pacific, Northwest","Marine",1976,915192,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1977,1351931,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1978,1529590,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1979,1460993,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1980,1538686,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1981,1335548,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1982,1332140,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1983,1407205,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1984,1525021,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1985,1544357,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1986,1237711,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1987,1088428,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1988,1316668,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1989,1660403,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1990,1486358,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1991,2169920,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1992,3006281,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1993,3661516,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1994,3856654,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1995,3920810,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1996,4525559,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1997,4485046,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1998,4370532,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",1999,4846083,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2000,4457629,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2001,4263163,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1977,1351931.4,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1978,1529590.5,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1979,1460993.4,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1980,1538685.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1981,1335547.8,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1982,1332140.4,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1983,1407204.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1984,1525021.2,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1985,1544356.8,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1986,1237710.6,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1987,1088427.6,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1988,1316668.5,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1989,1660402.8,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1990,1486358.1,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1991,2169919.8,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1992,3006280.8,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1993,3661515.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1994,3856653.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1995,3920809.5,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1996,4525559.1,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1997,4485046.5,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1998,4370532.3,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",1999,4846083.3,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2000,4457628.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2001,4263163.2,"AL","Algae","0",1037
 209,"Japanese kelp","Pacific, Northwest","Marine",2002,4487247,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2003,4360937,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2004,4264593,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2005,4591754,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2006,4635959,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2007,4717966,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2008,4853517,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2009,4979188,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2010,5217055,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2011,5266958,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2012,5707666,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2013,5926344,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2014,7913948,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2015,8399150,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2016,8718901,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2017,9044748,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2003,4360937.4,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2004,4264593.3,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2005,4591754.1,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2006,4635959.4,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2007,4717965.6,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2008,4853517.3,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2009,4979187.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2010,5217055.2,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2011,5266957.5,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2012,5707665.9,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2013,5926344.3,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2014,7913947.5,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2015,8399150.1,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2016,8718901.308,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2017,9044748.18,"AL","Algae","0",1037
 209,"Japanese kelp","Pacific, Northwest","Marine",2018,9263115,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2019,9880526,"AL","Algae","0",1037
-209,"Japanese kelp","Pacific, Northwest","Marine",2020,10048170,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2019,9880525.8,"AL","Algae","0",1037
+209,"Japanese kelp","Pacific, Northwest","Marine",2020,10048170.132,"AL","Algae","0",1037
 209,"Japanese sea cucumber","Pacific, Northwest","Marine",2003,34100,"NS-INV","Stichopodidae","0",1038
 209,"Japanese sea cucumber","Pacific, Northwest","Marine",2004,46648,"NS-INV","Stichopodidae","0",1038
 209,"Japanese sea cucumber","Pacific, Northwest","Marine",2005,57104,"NS-INV","Stichopodidae","0",1038
@@ -28297,29 +28297,29 @@
 209,"Nori nei","Pacific, Northwest","Marine",1995,303088.5,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",1996,300643.2,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",1997,297128.7,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",1998,326835.6,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",1999,362522.2,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2000,420663.9,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",1998,326835.63,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",1999,362522.16,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2000,420663.87,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",2001,507840.3,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",2002,581872.5,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2003,630544.9,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2004,701774.4,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2005,696062.1,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2003,630544.86,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2004,701774.37,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2005,696062.07,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",2006,813879,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",2007,895128.3,"AL","Algae","0",1047
 209,"Nori nei","Pacific, Northwest","Marine",2008,806513.4,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2009,1051720,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2010,1030270,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2011,969560.5,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2012,1065641,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2013,1079248,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2014,1080253,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2015,1098804,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2016,1299722,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2017,1715720,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2018,1997612,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2019,2101810,"AL","Algae","0",1047
-209,"Nori nei","Pacific, Northwest","Marine",2020,2197978,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2009,1051719.57,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2010,1030270.23,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2011,969560.46,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2012,1065640.95,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2013,1079247.51,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2014,1080253.35,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2015,1098803.97,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2016,1299721.5,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2017,1715719.5,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2018,1997612.1,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2019,2101809.6,"AL","Algae","0",1047
+209,"Nori nei","Pacific, Northwest","Marine",2020,2197978.2,"AL","Algae","0",1047
 209,"Pearl oyster shells nei","Pacific, Northwest","Marine",2003,26,"BI","Pteriidae","0",1048
 209,"Pearl oyster shells nei","Pacific, Northwest","Marine",2004,26,"BI","Pteriidae","0",1048
 209,"Pearl oyster shells nei","Pacific, Northwest","Marine",2005,30,"BI","Pteriidae","0",1048
@@ -28753,24 +28753,24 @@
 209,"Turbot","Pacific, Northwest","Brackishwater",2018,60000,"F","Chernetidae","0",1064
 209,"Turbot","Pacific, Northwest","Brackishwater",2019,66300,"F","Chernetidae","0",1064
 209,"Turbot","Pacific, Northwest","Brackishwater",2020,65000,"F","Chernetidae","0",1064
-209,"Wakame","Pacific, Northwest","Marine",2003,1496024,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2004,1902251,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2005,2073811,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2003,1496023.65,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2004,1902251.34,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2005,2073811.41,"AL","Algae","0",1065
 209,"Wakame","Pacific, Northwest","Marine",2006,1629837,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2007,1388247,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2008,1307008,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2009,1295795,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2010,1048506,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2011,1266152,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2012,1661336,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2013,1611868,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2014,1921665,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2015,1825431,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2016,1504335,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2017,1651270,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2018,1737480,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2019,2003691,"AL","Algae","0",1065
-209,"Wakame","Pacific, Northwest","Marine",2020,2233480,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2007,1388247.3,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2008,1307007.9,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2009,1295795.16,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2010,1048506.03,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2011,1266151.59,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2012,1661335.83,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2013,1611868.5,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2014,1921665.24,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2015,1825431.3,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2016,1504334.7,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2017,1651270.5,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2018,1737479.7,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2019,2003690.7,"AL","Algae","0",1065
+209,"Wakame","Pacific, Northwest","Marine",2020,2233479.6,"AL","Algae","0",1065
 209,"Whiteleg shrimp","Pacific, Northwest","Brackishwater",2001,87839,"SH","Penaeidae","0",1066
 209,"Whiteleg shrimp","Pacific, Northwest","Brackishwater",2002,175286,"SH","Penaeidae","0",1066
 209,"Whiteleg shrimp","Pacific, Northwest","Brackishwater",2003,270467,"SH","Penaeidae","0",1066
@@ -29525,65 +29525,65 @@
 210,"Laver (Nori)","Pacific, Northwest","Marine",1958,61889.85,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1959,74456.91,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1960,99452.43,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1961,145905.2,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1962,153084.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1963,143085.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1964,110732.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1965,139345.5,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1961,145905.21,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1962,153084.69,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1963,143085.69,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1964,110732.49,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1965,139345.47,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1966,127155.6,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1967,155974.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1968,143519.3,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1968,143519.31,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1969,132976.8,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1970,229149.4,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1971,242496.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1972,215726.9,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1970,229149.36,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1971,242496.54,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1972,215726.94,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1973,308295.9,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1974,335920.9,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1975,275345.7,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1974,335920.86,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1975,275345.73,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1976,288139.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1977,276240.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1978,346966.3,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1979,322429.1,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1980,354095.3,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1977,276240.69,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1978,346966.29,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1979,322429.14,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1980,354095.28,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1981,337104.9,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1982,260678.9,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1983,357087.1,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1982,260678.88,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1983,357087.06,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1984,392564.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1985,348270.1,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1986,399080.9,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1987,318025.6,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1988,438377.9,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1985,348270.12,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1986,399080.88,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1987,318025.62,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1988,438377.94,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1989,399257.1,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1990,383372.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1991,399329.4,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1992,378977,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1993,359325.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1994,478364,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1995,402935,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1990,383372.55,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1991,399329.37,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1992,378976.95,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1993,359325.45,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1994,478364.04,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1995,402934.95,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1996,368973,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1997,388695.8,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",1998,392648.8,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1997,388695.78,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",1998,392648.85,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",1999,405751.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2000,387764.2,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2001,369389.8,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2002,431670.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2003,343880.5,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2004,355339.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2005,382708.3,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2006,364001.2,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2007,391819.2,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2008,335137.8,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2000,387764.19,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2001,369389.79,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2002,431670.69,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2003,343880.46,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2004,355339.71,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2005,382708.26,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2006,364001.22,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2007,391819.23,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2008,335137.77,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",2009,339193.8,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",2010,325413,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2011,289421.5,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2011,289421.55,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",2012,338164.2,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2013,313065.7,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2014,273367.7,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2013,313065.72,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2014,273367.71,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",2015,294396.3,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2016,297676.2,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2017,301264.9,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2018,280851.1,"AL","Algae","0",1080
-210,"Laver (Nori)","Pacific, Northwest","Marine",2019,248848.4,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2016,297676.17,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2017,301264.92,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2018,280851.12,"AL","Algae","0",1080
+210,"Laver (Nori)","Pacific, Northwest","Marine",2019,248848.38,"AL","Algae","0",1080
 210,"Laver (Nori)","Pacific, Northwest","Marine",2020,285813,"AL","Algae","0",1080
 210,"Marine crustaceans nei","Pacific, Northwest","Marine",1984,41,"CRUST","Crustaceans","0",1081
 210,"Marine crustaceans nei","Pacific, Northwest","Marine",1985,16,"CRUST","Crustaceans","0",1081
@@ -30128,27 +30128,27 @@
 210,"Wakame","Pacific, Northwest","Marine",1969,59222.79,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1970,75594.42,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1971,94203.45,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1972,104737.1,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1973,112078.9,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1974,152224.4,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1975,100917.6,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1976,125455.8,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1977,124574.7,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1978,101655.2,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1979,102753.1,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1980,112396.7,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1972,104737.05,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1973,112078.89,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1974,152224.38,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1975,100917.63,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1976,125455.77,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1977,124574.67,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1978,101655.18,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1979,102753.09,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1980,112396.68,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1981,90369.18,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1982,117156.6,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1983,111706.6,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1984,113440.1,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1985,111251.2,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1986,134264.8,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1987,114758.8,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1988,109433.6,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1989,107366.5,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1990,111844.3,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1983,111706.65,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1984,113440.14,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1985,111251.25,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1986,134264.79,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1987,114758.82,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1988,109433.61,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1989,107366.49,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1990,111844.26,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1991,98101.08,"AL","Algae","0",1091
-210,"Wakame","Pacific, Northwest","Marine",1992,111179,"AL","Algae","0",1091
+210,"Wakame","Pacific, Northwest","Marine",1992,111178.98,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1993,88685.19,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1994,87397.2,"AL","Algae","0",1091
 210,"Wakame","Pacific, Northwest","Marine",1995,98575.29,"AL","Algae","0",1091
@@ -30708,8 +30708,8 @@
 216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2012,573868.8,"AL","Algae","0",1107
 216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2013,832326.3,"AL","Algae","0",1107
 216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2014,897146.3,"AL","Algae","0",1107
-216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2015,1011211,"AL","Algae","0",1107
-216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2016,969190.1,"AL","Algae","0",1107
+216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2015,1011210.7,"AL","Algae","0",1107
+216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2016,969190.099,"AL","Algae","0",1107
 216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2017,948854.7,"AL","Algae","0",1107
 216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2018,1019200,"AL","Algae","0",1107
 216,"Eucheuma seaweeds nei","Pacific, Western Central","Marine",2019,847175.8,"AL","Algae","0",1107
@@ -30765,9 +30765,9 @@
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2011,126157,"SH","Penaeidae","0",1108
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2012,116311.4,"SH","Penaeidae","0",1108
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2013,175318.1,"SH","Penaeidae","0",1108
-216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2014,129231.2,"SH","Penaeidae","0",1108
+216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2014,129231.25,"SH","Penaeidae","0",1108
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2015,125073,"SH","Penaeidae","0",1108
-216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2016,128655.3,"SH","Penaeidae","0",1108
+216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2016,128655.31,"SH","Penaeidae","0",1108
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2017,126191,"SH","Penaeidae","0",1108
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2018,159980,"SH","Penaeidae","0",1108
 216,"Giant tiger prawn","Pacific, Western Central","Brackishwater",2019,133187,"SH","Penaeidae","0",1108
@@ -30782,14 +30782,14 @@
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2007,60705.25,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2008,51867.5,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2009,42967,"AL","Algae","0",1109
-216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2010,128895.2,"AL","Algae","0",1109
+216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2010,128895.25,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2011,157697,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2012,194041.5,"AL","Algae","0",1109
-216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2013,243802.8,"AL","Algae","0",1109
-216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2014,276382.2,"AL","Algae","0",1109
+216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2013,243802.75,"AL","Algae","0",1109
+216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2014,276382.15,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2015,289308.5,"AL","Algae","0",1109
-216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2016,339600.1,"AL","Algae","0",1109
-216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2017,264751.2,"AL","Algae","0",1109
+216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2016,339600.06,"AL","Algae","0",1109
+216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2017,264751.25,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2018,32000,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2019,305891,"AL","Algae","0",1109
 216,"Gracilaria seaweeds","Pacific, Western Central","Brackishwater",2020,364182.5,"AL","Algae","0",1109
@@ -31056,7 +31056,7 @@
 216,"Milkfish","Pacific, Western Central","Marine",2014,103.68,"F","Chanidae","0",1116
 216,"Milkfish","Pacific, Western Central","Brackishwater",2015,625288,"F","Chanidae","0",1115
 216,"Milkfish","Pacific, Western Central","Marine",2015,54,"F","Chanidae","0",1116
-216,"Milkfish","Pacific, Western Central","Brackishwater",2016,691289.3,"F","Chanidae","0",1115
+216,"Milkfish","Pacific, Western Central","Brackishwater",2016,691289.27,"F","Chanidae","0",1115
 216,"Milkfish","Pacific, Western Central","Marine",2016,218.71,"F","Chanidae","0",1116
 216,"Milkfish","Pacific, Western Central","Brackishwater",2017,632975,"F","Chanidae","0",1115
 216,"Milkfish","Pacific, Western Central","Marine",2017,0,"F","Chanidae","NA_to_zero",1116
@@ -31315,9 +31315,9 @@
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2011,246420,"SH","Penaeidae","0",1123
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2012,238662.9,"SH","Penaeidae","0",1123
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2013,376188.6,"SH","Penaeidae","0",1123
-216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2014,428905.4,"SH","Penaeidae","0",1123
+216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2014,428905.44,"SH","Penaeidae","0",1123
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2015,406795,"SH","Penaeidae","0",1123
-216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2016,476455.5,"SH","Penaeidae","0",1123
+216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2016,476455.47,"SH","Penaeidae","0",1123
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2017,737029,"SH","Penaeidae","0",1123
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2018,685730,"SH","Penaeidae","0",1123
 216,"Whiteleg shrimp","Pacific, Western Central","Brackishwater",2019,664750,"SH","Penaeidae","0",1123
@@ -32270,15 +32270,15 @@
 223,"Atlantic salmon","Atlantic, Northeast","Marine",2009,862907.7,"F","Salmonidae","0",1148
 223,"Atlantic salmon","Atlantic, Northeast","Marine",2010,939536,"F","Salmonidae","0",1148
 223,"Atlantic salmon","Atlantic, Northeast","Marine",2011,1064868,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2012,1232095,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2012,1232094.9,"F","Salmonidae","0",1148
 223,"Atlantic salmon","Atlantic, Northeast","Marine",2013,1168324,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2014,1258356,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2015,1303346,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2016,1233619,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2014,1258355.9,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2015,1303345.8,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2016,1233619.2,"F","Salmonidae","0",1148
 223,"Atlantic salmon","Atlantic, Northeast","Marine",2017,1236353,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2018,1282003,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2019,1364042,"F","Salmonidae","0",1148
-223,"Atlantic salmon","Atlantic, Northeast","Marine",2020,1388434,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2018,1282003.2,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2019,1364042.04,"F","Salmonidae","0",1148
+223,"Atlantic salmon","Atlantic, Northeast","Marine",2020,1388433.84,"F","Salmonidae","0",1148
 223,"Babberlocks","Atlantic, Northeast","Marine",2015,2,"AL","Algae","0",1149
 223,"Babberlocks","Atlantic, Northeast","Marine",2016,26,"AL","Algae","0",1149
 223,"Babberlocks","Atlantic, Northeast","Marine",2017,9.2,"AL","Algae","0",1149
@@ -32540,8 +32540,8 @@
 223,"Scallops nei","Atlantic, Northeast","Marine",2020,0,"BI","Pectinidae","NA_to_zero",1157
 223,"Sea belt","Atlantic, Northeast","Marine",2015,2.45,"AL","Algae","0",1158
 223,"Sea belt","Atlantic, Northeast","Marine",2016,1.669,"AL","Algae","0",1158
-223,"Sea belt","Atlantic, Northeast","Marine",2017,6.987,"AL","Algae","0",1158
-223,"Sea belt","Atlantic, Northeast","Marine",2018,8.6795,"AL","Algae","0",1158
+223,"Sea belt","Atlantic, Northeast","Marine",2017,6.98700000000001,"AL","Algae","0",1158
+223,"Sea belt","Atlantic, Northeast","Marine",2018,8.67950000000001,"AL","Algae","0",1158
 223,"Sea belt","Atlantic, Northeast","Marine",2019,3.6335,"AL","Algae","0",1158
 223,"Sea belt","Atlantic, Northeast","Marine",2020,12.377,"AL","Algae","0",1158
 224,"Atlantic salmon","Pacific, Southeast","Marine",1987,41,"F","Salmonidae","0",1159
@@ -32646,7 +32646,7 @@
 224,"Chilean mussel","Pacific, Southeast","Marine",2015,208707,"BI","Mytilidae","0",1160
 224,"Chilean mussel","Pacific, Southeast","Marine",2016,300648,"BI","Mytilidae","0",1160
 224,"Chilean mussel","Pacific, Southeast","Marine",2017,338846,"BI","Mytilidae","0",1160
-224,"Chilean mussel","Pacific, Southeast","Marine",2018,365595.2,"BI","Mytilidae","0",1160
+224,"Chilean mussel","Pacific, Southeast","Marine",2018,365595.16,"BI","Mytilidae","0",1160
 224,"Chilean mussel","Pacific, Southeast","Marine",2019,379097,"BI","Mytilidae","0",1160
 224,"Chilean mussel","Pacific, Southeast","Marine",2020,399097,"BI","Mytilidae","0",1160
 224,"Chinook(=Spring=King) salmon","Pacific, Southeast","Marine",1988,3,"F","Salmonidae","0",1161
@@ -32821,7 +32821,7 @@
 224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2015,126771,"F","Salmonidae","0",1164
 224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2016,110804,"F","Salmonidae","0",1164
 224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2017,164045,"F","Salmonidae","0",1164
-224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2018,148330.9,"F","Salmonidae","0",1164
+224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2018,148330.88,"F","Salmonidae","0",1164
 224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2019,205210,"F","Salmonidae","0",1164
 224,"Coho(=Silver) salmon","Pacific, Southeast","Marine",2020,204472,"F","Salmonidae","0",1164
 224,"Giant kelp","Pacific, Southeast","Marine",2008,0.1,"AL","Algae","0",1165
@@ -32885,7 +32885,7 @@
 224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2015,2988,"AL","Algae","0",1166
 224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2016,3711.5,"AL","Algae","0",1166
 224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2017,4181.305,"AL","Algae","0",1166
-224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2018,5176.172,"AL","Algae","0",1166
+224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2018,5176.1725,"AL","Algae","0",1166
 224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2019,5418,"AL","Algae","0",1166
 224,"Gracilaria seaweeds","Pacific, Southeast","Marine",2020,4567,"AL","Algae","0",1166
 224,"Japanese abalone","Pacific, Southeast","Marine",2003,8,"GAST","Haliotidae","0",1167
