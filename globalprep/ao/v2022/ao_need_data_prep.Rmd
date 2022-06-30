@@ -18,19 +18,19 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 # Summary
 
 This script generates the "need" layer for the artisanal opportunities goal. 
 
-
 ## Updates from previous assessment
+
 One more year of data. 
 
 ***
+
 ## Data Source 
 
-**Downloaded**: 08/04/2021
+**Downloaded**: 2022-06-30
 
 **Description**:  
 GDP adjusted per capita by PPP (ppppcgdp)
@@ -41,42 +41,48 @@ GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic
 
 Data is available directly to R through the WDI package.
 
-**Time range**: 1990-2020
-
+**Time range**: 1990-2021
 
 ***
+
 # Methods
 
 ## Setup
 
 ``` {r setup, message = FALSE, warning = FALSE, eval=F}
-
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message = FALSE, warning = FALSE)
-
-library(ohicore) # devtools::install_github('ohi-science/ohicore@dev')
-library(dplyr)
-library(tidyr)
-library(WDI) # install.packages('WDI') ## if the data has been updated you will need to re install the WDI package to get the updated data 
-library(stringr)
-library(readr)
-library(here)
-library(tidyverse)
-library(plotly)
-
-
-# directory paths and relevant files
-source(here('workflow/R/common.R'))
-
+if (!require(ohicore)){
+  devtools::install_github('ohi-science/ohicore@dev')
+  library(ohicore)
+}
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+librarian::shelf(
+  tidyverse,
+  here,
+  janitor,
+  jsonlite,
+  plotly,
+  WDI,
+  modelr
+) 
+## if the data has been updated you will need to re install the WDI package to get the updated data 
+update.packages("WDI")
+### directory paths and relevant files
+source(here::here('workflow', 'R', 'common.R'))
+current_year = 2022
+version_year = paste0("v", current_year)
+version_dir = here::here("globalprep", "ao", version_year)
 ```
 
 ## Download and save data
 *Skip if you have already downloaded data.*
 ```{r load_data, eval=F}
-
 # check website to see what years are available
 yr_start = 1990
-yr_end   = 2020
-
+yr_end   = 2021
 
 # get description of variables (NOTE: these descriptions appear out of date, they aren't in sync with the definitions of the World Bank):
 indicators <-  data.frame(WDI_data[[1]])
@@ -90,44 +96,49 @@ indicators[grep("NY.GDP.PCAP.PP.KD", indicators$indicator), ]  # constant dollar
 
 # download the data using the WDI package - This is the data we are going to work with. Create a variable for the data frame
 
-gdppcppp_raw <-  WDI(country = "all",
-               indicator = "NY.GDP.PCAP.PP.KD", 
-               start = yr_start, end=yr_end)
+gdppcppp_raw <- WDI(
+  country = "all",
+  indicator = "NY.GDP.PCAP.PP.KD", 
+  start = yr_start, end=yr_end)
 summary(gdppcppp_raw)
 
-# check if 'raw', 'intermediate', and 'final' folders exist in the current assessment folder, if not, then create the folder in the working directory
-if (!file.exists(here("globalprep/ao/v2021/raw"))){
-  dir.create(here("globalprep/ao/v2021/raw"))
+# check if 'raw', 'intermediate', and 'final' folders exist in the current assessment folder, if not, then create them
+if (!file.exists(file.path(version_dir, "raw"))){
+  dir.create(file.path(version_dir, "raw"))
 } 
 
-if (!file.exists(here("globalprep/ao/v2021/intermediate"))){
-  dir.create(here("globalprep/ao/v2021/intermediate"))
+if (!file.exists(file.path(version_dir, "intermediate"))){
+  dir.create(file.path(version_dir, "intermediate"))
 }
 
-if (!file.exists(here("globalprep/ao/v2021/output"))){
-  dir.create(here("globalprep/ao/v2021/output"))
+if (!file.exists(file.path(version_dir, "output"))){
+  dir.create(file.path(version_dir, "output"))
 }
 
 date <- Sys.Date()
 
 #Save the file into the raw folder
-write_csv(gdppcppp_raw, here(sprintf('globalprep/ao/v2021/raw/raw_gdppcppp_%s.csv', date))) # Save file with date, as WDI data changes over even short periods of time. For instance, the Mauritania GDP data changed by an order of magnitude over the course of a week. We want to preserve the date it was downloaded so that data is not being overwritten everytime we run the script. 
-
-
+write_csv(gdppcppp_raw, here(paste0(version_dir, '/raw/raw_gdppcppp_', date,'.csv'))) 
+# Save file with date, as WDI data changes over even short periods of time. 
+# For instance, the Mauritania GDP data changed by an order of magnitude over the course of a week. 
+# We want to preserve the date it was downloaded so that data is not being overwritten everytime we run the script. 
 ```
 
 
 ```{r raw check, eval=FALSE}
+new_saved_date <- "2022-06-30" # update when new data are downloaded.
+old_saved_date <- "2021-08-04"
 
-last_saved_date <- "2021-08-04" # update when new data are downloaded.
+new <- here(version_dir, "raw", paste0('raw_gdppcppp_', new_saved_date,'.csv')) %>% 
+  read_csv()
 
-new <- read_csv(here(sprintf('globalprep/ao/v2021/raw/raw_gdppcppp_%s.csv', last_saved_date)))
-
-old <- read_csv(here('globalprep/ao/v2020/raw/raw_gdppcppp_2020-07-02.csv')) %>%
+old <- read_csv(here(
+  "globalprep", "ao", paste0("v", current_year-1), 
+  "raw", paste0("raw_gdppcppp_", old_saved_date, ".csv"))) %>%
   select(country, old_value = NY.GDP.PCAP.PP.KD, year)
 
 compare <- left_join(new, old, by = c("country", "year"))  %>%
-  filter(year==2019)
+  filter(year==current_year-2)
  
 ggplot(compare, aes(x=NY.GDP.PCAP.PP.KD, y=old_value)) + 
   geom_point() + 
@@ -140,12 +151,10 @@ ggplot(compare, aes(x=NY.GDP.PCAP.PP.KD, y=old_value)) +
 When a country has some values (but not a complete series), a within-country regression model is used to predict the missing values.
 
 ```{r, eval=F}
-
 # Reorganize to create cells for countries that have missing values for some years
 
-last_saved_date <- "2021-08-04" # update when new data are downloaded.
-
-gdppcppp_clean <- read_csv(here(sprintf('globalprep/ao/v2021/raw/raw_gdppcppp_%s.csv', last_saved_date))) %>% # change date here also to match filename above 
+gdppcppp_clean <- here(version_dir, "raw", paste0('raw_gdppcppp_', new_saved_date,'.csv')) %>% 
+  readr::read_csv()%>% # change date here also to match filename above 
   dplyr::select(country, value=NY.GDP.PCAP.PP.KD, year) %>%
   dplyr::filter(year >= 2005) %>%
   tidyr::spread(year, value) %>%
@@ -160,7 +169,7 @@ summary(gdppcppp_clean) # 441 NAs
 
 # For the first case, if there is only one value use this value for all years
 # This is not ideal, but likely better than other forms of gapfilling
-gdppcppp_val <- gdppcppp_clean %>%
+gdppcppp_gf_1 <- gdppcppp_clean %>%
   dplyr::group_by(country) %>%
   dplyr::mutate(value_num = sum(!is.na(value))) %>% # counts the numbers of non-missing values for each country (logical TRUEs regarded as one)
   dplyr::filter(value_num > 0) %>%    # filter out the countries with no data between 2005 and 2019 
@@ -170,35 +179,35 @@ gdppcppp_val <- gdppcppp_clean %>%
   dplyr::select(country, year, value, value_num)  # select just these columns; to eliminate extraneous value_num_gf column
 
 
-head(gdppcppp_val)
-summary(gdppcppp_val) 
+head(gdppcppp_gf_1)
+summary(gdppcppp_gf_1)
+```
 
-
-# Predict values using a linear regression with 'year' as an independent variable 
-# Create new column with these predicted values
-gdppcppp_gf <- gdppcppp_val %>%
-  dplyr::group_by(country) %>%
-  dplyr::do({ 
-    mod <- lm(value ~ year, data =.)
-    value_pred <- predict(mod, newdata =.[c('year')]) # value_pred = country-grouped mod$fitted.values?
-    data.frame(., value_pred) # do loop applies the model fitting and prediction to each country group
-  }) %>% 
+```{r eval=F}
+## Predict values using a linear regression with 'year' as an independent variable 
+## Create new column with these predicted values
+## Fill in the remaining NA values using the predicted values
+country_model <- function(df) {
+  lm(value ~ year, data =df)
+}
+gdppcppp_gf_2 <- gdppcppp_gf_1 %>%
+  dplyr::group_by(country) %>% 
+  tidyr::nest() %>% 
+  dplyr::mutate(
+    model = purrr::map(data, country_model),
+    predictions = purrr::map2(data, model, add_predictions))%>% 
+  tidyr::unnest(cols = c(predictions)) %>% 
+  dplyr::select(-data, -model, prediction = pred) %>%
+  dplyr::mutate(
+    gapfilled = dplyr::case_when(is.na(value) | value_num == 1 ~ 1, T ~ 0),
+    value = dplyr::case_when(is.na(value) ~ prediction, T ~ value),
+    method = dplyr::case_when(
+      value_num == 1 ~ "gapfilled using one year of data",
+      gapfilled == 1 & value_num > 1 ~ paste("lm based on N years data:", value_num, sep=" "),
+      T ~ as.character(NA))) %>% 
   dplyr::ungroup()
-
-summary(gdppcppp_gf)
-head(gdppcppp_gf)
-
-
-# Fill in the remaining NA values using the predicted values
-gdppcppp_gf2 <- gdppcppp_gf %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(gapfilled = ifelse(is.na(value), 1, 0)) %>% # Create column 'gapfilled', if value is currently NA, it will be gapfilled, indicated by a 1 in the gapfill column
-  dplyr::mutate(gapfilled = ifelse(value_num == 1, 1, gapfilled)) %>% # if value_num is 1 it was gapfilled previously and gets a 1 in the gapfill column
-  dplyr::mutate(value = ifelse(is.na(value), value_pred, value)) %>% # if NA in value column, input the value in value_pred column
-  dplyr::mutate(method = ifelse(gapfilled==1, paste("lm based on N years data:", value_num, sep=" "), NA)) %>% # Create column 'method' that indicates method of gapfilling; this puts message "lm based..." even in some rows gapfilled with one year of data
-  dplyr::mutate(method = ifelse(value_num == 1, "gapfilled using one year of data", method)) # this overwrites/corrects method "lm based..." for rows actually gapfilled with "one-year of data"" method
   
-summary(gdppcppp_gf2) # no more NAs because everything has been gap-filled.
+summary(gdppcppp_gf_2) # no more NAs because everything has been gap-filled.
 ```
 
 ## Calculate rescaled values
@@ -207,7 +216,7 @@ This is performed by taking the natural log of each value and then dividing by t
 ```{r, eval=F}
 
 # Values at the 95th Quantile or greater are given a rescaled score of '1' (the highest value)
-gdppcppp_rescale <- gdppcppp_gf2 %>%
+gdppcppp_rescale <- gdppcppp_gf_2 %>%
   dplyr::mutate(quantile_95 = quantile(value, probs=0.95)) %>% # gives a single value - the 95th quant (v2020=57245.33)
   dplyr::mutate(value_stand = value/quantile_95) %>% # where does value scale relative to 95th quantile
   dplyr::mutate(value_stand = ifelse(value_stand > 1, 1, value_stand)) %>% 
