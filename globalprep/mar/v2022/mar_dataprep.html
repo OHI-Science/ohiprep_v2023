@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Wed Jun 29 14:15:56 2022 by jcohen" />
+<meta name="author" content="Compiled on Thu Jun 30 10:35:33 2022 by jcohen" />
 
 
 <title>OHI 2022: Mariculture</title>
@@ -250,7 +250,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022: Mariculture</h1>
-<h4 class="author"><em>Compiled on Wed Jun 29 14:15:56 2022 by jcohen</em></h4>
+<h4 class="author"><em>Compiled on Thu Jun 30 10:35:33 2022 by jcohen</em></h4>
 
 </div>
 
@@ -766,23 +766,13 @@ pre code {
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>mar_sw_sus<span class="sc">$</span>esc_avg[<span class="fu">is.nan</span>(mar_sw_sus<span class="sc">$</span>esc_avg)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># nrows = 48,748</span></span></code></pre></div>
 <p>Get rid of duplicates for region/species/year:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># abalone &lt;- mar_sw_sus %&gt;% </span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(species == &quot;Abalones nei&quot;,</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#          rgn_id == 14,</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#          environment == &quot;Brackishwater&quot;,</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">#          year == 1981) %&gt;% </span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(-Sust, Sust = Sust_avg, -esc_score, esc_score = esc_avg)</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># distinct_abalone &lt;- abalone %&gt;% </span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::distinct(rgn_id, species, environment, year, .keep_all = TRUE)</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>mar_sw_sus <span class="ot">&lt;-</span> mar_sw_sus <span class="sc">%&gt;%</span> </span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>(rgn_id, species, environment, year, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old Sust column (which was used to produce Sust_avg column) &amp;</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename Sust_avg to Sust &amp;</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old esc_score column (which was used to produce esc_avg column) &amp;</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename esc_avg to esc_score :</span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Sust, <span class="at">Sust =</span> Sust_avg, <span class="sc">-</span>esc_score, <span class="at">esc_score =</span> esc_avg)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mar_sw_sus <span class="ot">&lt;-</span> mar_sw_sus <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>(rgn_id, species, environment, year, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old Sust column (which was used to produce Sust_avg column) &amp;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename Sust_avg to Sust &amp;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove old esc_score column (which was used to produce esc_avg column) &amp;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename esc_avg to esc_score :</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Sust, <span class="at">Sust =</span> Sust_avg, <span class="sc">-</span>esc_score, <span class="at">esc_score =</span> esc_avg)</span></code></pre></div>
 <p><strong>Now look at a summary after appending all the Seafood Watch data</strong></p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mar_sw_sus)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 21215 NA values out of 32051 total obs; ~68% without scores (2022)</span></span></code></pre></div>
@@ -927,27 +917,7 @@ pre code {
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, <span class="at">pressures.score=</span>genEscapes) <span class="sc">%&gt;%</span></span>
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pressures.score=</span><span class="fu">ifelse</span>(pressures.score <span class="sc">==</span> <span class="st">&quot;NaN&quot;</span>, <span class="cn">NA</span>, pressures.score)) <span class="sc">%&gt;%</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>()</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Obtain corresponding gapfilling information for each region (average of gapfilled data, weighted by tonnes of mariculture).</span></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co"># genEscapes_gf_1 &lt;- tonnes_esc %&gt;%</span></span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(gapfill = ifelse(gapfill_esc == &quot;none&quot;, 0, 1)) %&gt;%</span></span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(rgn_id, year) %&gt;%</span></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %&gt;%</span></span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   ungroup() %&gt;%</span></span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(year == 2020) %&gt;%</span></span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(rgn_id, pressures.score = genEscapes) %&gt;%</span></span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(pressures.score = ifelse(pressures.score == &quot;NaN&quot;, NA, pressures.score)) %&gt;%</span></span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="co">#   data.frame()</span></span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co"># genEscapes_gf_2 &lt;- tonnes_esc %&gt;%</span></span>
-<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(gapfill = ifelse(gapfill_esc == &quot;none&quot;, 0, 1)) %&gt;%</span></span>
-<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(rgn_id, year) %&gt;%</span></span>
-<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %&gt;%</span></span>
-<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   ungroup() %&gt;%</span></span>
-<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(rgn_id, pressures.score = genEscapes) %&gt;%</span></span>
-<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(pressures.score = ifelse(pressures.score == &quot;NaN&quot;, NA, pressures.score)) %&gt;%</span></span>
-<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   data.frame()</span></span></code></pre></div>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>()</span></code></pre></div>
 </div>
 <div id="save-data-genetic-escapes" class="section level1" number="11">
 <h1><span class="header-section-number">11</span> Save data: Genetic Escapes</h1>
