@@ -1,0 +1,302 @@
+---
+title: "gov_gdp_model"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(ohicore)
+library(here)
+library(plotly)
+library(psych) # for correlation testing
+source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2019/gh-pages/workflow/R/common.R')
+
+#version_year = "2022"
+```
+
+```{r}
+# governance variables
+gov_data <- read_excel("data/minderoo/Global_Fishing_Index_2021_Data_for_Download_V1.1.xlsx", sheet = 3, col_names = FALSE) %>% 
+  row_to_names(row_number = 1) %>%
+  row_to_names(row_number = 1) %>% 
+  clean_names() %>% 
+  # add year 2019 to every row since this data was all from 2019 (and the start of 2020, but will deal with that if necessary later)
+  mutate(year = c("2019"))
+
+gov_data$year <- as.numeric(gov_data$year)
+
+# load variable descriptions
+gov_key <- read_excel("data/minderoo/Global_Fishing_Index_2021_Data_for_Download_V1.1.xlsx", sheet = 2)    
+```
+
+### Add OHI regions to gov data
+
+```{r}
+# first clean a few country names 
+# duplicate Bonaire, Sint Eustatius and Saba: split into 3 sep rows each with the same data?
+
+country_split <- gov_data %>% 
+  filter(country == "Bonaire, Sint Eustatius and Saba") %>% 
+  tidyr::separate_rows(country, sep = ", ") %>% 
+  tidyr::separate_rows(country, sep = " and ")
+
+gov_data <- rbind(gov_data, country_split) %>% 
+  filter(!country == "Bonaire, Sint Eustatius and Saba")
+
+# Côte d’Ivoire
+gov_data$country <- gsub(pattern = "Côte d’Ivoire", replacement = "Ivory Coast", x = gov_data$country)
+
+# Federated States of Micronesia: change to micronesia
+gov_data$country <- gsub("Federated States of Micronesia", "Micronesia", gov_data$country)
+
+# Islamic Republic of Iran: change to Iran
+gov_data$country <- gsub("Islamic Republic of Iran", "Iran", gov_data$country)
+
+# Taiwan (Province of China): change to Taiwan
+#gov_data$country <- gsub("Taiwan (Province of China)", "Taiwan", gov_data$country) # this one wont work for some reason
+#gov_data$country <- gsub("Taiwan (Province of China)", "Taiwan", gov_data$country)
+#gov_data$country <- str_replace_all(pattern = "Taiwan (Province of China)", replacement = "Taiwan", string = gov_data$country) # have no idea why this one won't change
+
+# Turks and Caicos Island: change to Turks and Caicos Islands
+gov_data$country <- gsub("Turks and Caicos Island", "Turks and Caicos Islands", gov_data$country)
+
+gov_data <- gov_data %>% 
+  name_2_rgn(fld_name = 'country',
+             flds_unique = c('rgn_id', 'rgn_name')) 
+```
+
+### normalize gov cap data to range 0-1 to match range of FMI data
+
+```{r}
+gov_data$governance_capacity <- as.numeric(gov_data$governance_capacity)
+
+# rescale the governance capacity values between 0-1
+# normalized = (x-min(x))/(max(x)-min(x)) (https://www.statology.org/normalize-data-between-0-and-1/)
+gov_data <- gov_data %>% 
+  mutate(normalized_gov_capacity = (governance_capacity - min(governance_capacity))/(max(governance_capacity) - min(governance_capacity)))
+
+# check the data is normalized correctly
+sort(unique(gov_data$normalized_gov_capacity)) # 0.0, 0.1, 0.2, etc. --> 1.0
+gov_data <- gov_data %>% select(rgn_id, rgn_name, normalized_gov_capacity, year)
+```
+
+## Create initial model for gapfilling using just GDP data
+
+```{r}
+# read in rescaled to have values between 0-1 and cap at 95th quantile
+gdp_rescaled <- read.csv("~/ohiprep_v2022/globalprep/ao/v2022/output/wb_gdppcppp_rescaled.csv")
+
+gov_gdp <- gov_data %>% 
+  left_join(gdp_rescaled, by = c("rgn_id", "year")) %>% 
+  rename(gdp = value)
+
+# regress gov & gdp without georegion labels
+gov_gdp_mod <- lm(normalized_gov_capacity ~ gdp, data = gov_gdp)
+summary(gov_gdp_mod)
+# adj r2: 0.08755
+
+# Look at correlation
+ggplotly(ggplot(gov_gdp, aes(x = gdp, y = normalized_gov_capacity, labels = rgn_name)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, color = "red"))
+```
+
+```{r}
+# calculate pearson's correlation
+gov_gdp_plot <- gov_gdp %>% 
+  select(gdp, normalized_gov_capacity)
+
+pairs.panels(gov_gdp_plot, density = TRUE, cor=TRUE, lm=TRUE)
+```
+
+## Create better model for gapfilling using GDP and UN regions (r2 lables)
+
+```{r}
+# Load UN georegion data 
+UNgeorgn()
+
+georegions <- UNgeorgn %>%
+  select(rgn_id, rgn_name = rgn_label, r0_label, r1_label, r2_label)
+
+gov_gdp_georegions <- gov_gdp %>%
+  left_join(georegions, by = c("rgn_id","rgn_name")) %>%
+  select(rgn_id, rgn_name, normalized_gov_capacity, r2_label, r1_label, year, gdp)
+
+# why does Kiribati not have UN region labels? insert these
+#
+#
+#
+#
+
+# regress gov & gdp with r2 georegion lables - that was the highest r2 of all models tried
+gov_gdp_r2_mod <- lm(normalized_gov_capacity ~ gdp + r2_label, data = gov_gdp_georegions)
+summary(gov_gdp_r2_mod)
+# adj r2: 0.4134
+
+# regress gov & gdp with r1 georegion lables
+gov_gdp_r1_mod <- lm(normalized_gov_capacity ~ gdp + r1_label, data = gov_gdp_georegions)
+summary(gov_gdp_r1_mod)
+# adj r2: 0.2039
+```
+
+## Make predictions with this gdp + r2_label model and compare to observed
+
+```{r}
+# Create array of predicted progress score values 
+gov_gdp_r2_pred <- gov_gdp_georegions %>%
+  dplyr::group_by(rgn_id) %>%
+  dplyr::do({ 
+    gov_r2_pred <- predict(gov_gdp_r2_mod, newdata =.[c('r2_label', 'gdp')]) 
+    data.frame(., gov_r2_pred) # do loop applies the model fitting and prediction to each country group
+  }) %>% 
+  dplyr::ungroup()
+
+# Plot predicted vs actual values 
+ggplotly(ggplot(gov_gdp_r2_pred, aes(x = normalized_gov_capacity, y = gov_r2_pred, labels = rgn_name)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, color = "red") +
+  labs(x = "Observed Government Capacity",
+      y = "Predicted Government Capacity",
+      title = "Observed vs Predicted Government Capacity: GDP + r2 georegions"))
+```
+
+## Make predictions with this gdp + r1_label model and compare to observed
+
+```{r}
+# Create array of predicted progress score values 
+gov_gdp_r1_pred <- gov_gdp_georegions %>%
+  dplyr::group_by(rgn_id) %>%
+  dplyr::do({ 
+    gov_r1_pred <- predict(gov_gdp_r1_mod, newdata =.[c('r1_label', 'gdp')]) 
+    data.frame(., gov_r1_pred) # do loop applies the model fitting and prediction to each country group
+  }) %>% 
+  dplyr::ungroup()
+
+# Plot predicted vs actual values 
+ggplotly(ggplot(gov_gdp_r1_pred, aes(x = normalized_gov_capacity, y = gov_r1_pred, labels = rgn_name)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, color = "red") +
+  labs(x = "Observed Government Capacity",
+      y = "Predicted Government Capacity",
+      title = "Observed vs Predicted Government Capacity: GDP + r2 georegions"))
+```
+
+## Gapfill
+
+```{r}
+gov_gf <- gov_gdp_georegions
+
+# create predictions with the model in a more complicated fashion because some r2 categories may have no data, this returns an NA for these
+gov_gf$gov_pred_r2 <- 
+  sapply(1:nrow(gov_gf), 
+           function(i) 
+               tryCatch(predict(gov_gdp_r2_mod, gov_gf[i,]), 
+                           error = function(e) NA))
+
+# fill in predictions for the regions not represented by r2 regions:
+gov_gf$fmi_pred_r1 <- 
+  sapply(1:nrow(gov_gf), 
+           function(i) 
+               tryCatch(predict(gov_gdp_r1_mod, gov_gf[i,]), 
+                           error = function(e) NA))
+
+
+# gov_gf <- UNgeorgn %>% 
+#   merge(gdp_rescaled) %>%
+#   filter(year == 2019) %>% 
+#   left_join(fmi_rgn, by=c("rgn_id", "year")) %>%
+#   mutate(rgn_label = as.character(rgn_label)) %>% 
+#   mutate(rgn_label = ifelse(str_detect(rgn_label, "R_union"), "Reunion", rgn_label)) %>% 
+#   select(-rgn_name, -r0_label, spi=resilience_score)
+
+
+# # Create array of predicted FMI values using fmi ~ spi + r2_label
+# 
+# mod_r2 <- lm(fmi ~ r2_label + spi, data=fmi_gf)
+# ## have to do the predict in a more complicated fashion because some r2 categories have no data, this returns an NA for these
+# fmi_gf$fmi_pred_r2 <- 
+#   sapply(1:nrow(fmi_gf), 
+#            function(i) 
+#                tryCatch(predict(mod_r2, fmi_gf[i,]), 
+#                            error=function(e) NA))
+# 
+# # get predictions for the regions not represented by r2 regions:
+# mod_r1 <- lm(fmi ~ r1_label + spi, data=fmi_gf)
+# ## have to do the predict in a more complicated fashion because some r2 categories have no data, this returns an NA for these
+# fmi_gf$fmi_pred_r1 <- 
+#   sapply(1:nrow(fmi_gf), 
+#            function(i) 
+#                tryCatch(predict(mod_r1, fmi_gf[i,]), 
+#                            error=function(e) NA))
+
+# final data and gapfilling recordkeeping
+
+fmi_gf_all <- fmi_gf %>%
+  dplyr::mutate(gapfilled = ifelse(is.na(fmi), "1", 0)) %>%
+  dplyr::mutate(method = ifelse(is.na(fmi) & !is.na(fmi_pred_r2), "SPI + UN_geopolitical region r2", NA)) %>%
+  dplyr::mutate(method = ifelse(is.na(fmi) & is.na(fmi_pred_r2), "SPI + UN_geopolitical region r1" , method)) %>%
+  dplyr::mutate(fmi2 = ifelse(is.na(fmi), fmi_pred_r2, fmi)) %>% 
+  dplyr::mutate(fmi2 = ifelse(is.na(fmi2), fmi_pred_r1, fmi2)) %>%
+  dplyr::mutate(fmi = fmi2) %>%
+  dplyr::select(-fmi2)
+
+
+# make sure all low/no population regions are NA 
+low_pop()
+low_pop <- low_pop %>%
+  filter(est_population < 3000 | is.na(est_population)) #filter out regions that have populations > 3000 and keep NA values 
+
+fmi_gf_low_pop <- fmi_gf_all %>%
+  dplyr::filter(rgn_id %in% low_pop$rgn_id)
+summary(fmi_gf_low_pop)
+  
+
+## Make sure all other regions have an fmi value
+fmi_gf_with_pop <- fmi_gf_all %>%
+  dplyr::filter(!(rgn_id %in% low_pop$rgn_id))
+summary(fmi_gf_with_pop)
+
+
+# Correct gapfilling info to low pop regions
+fmi_gf_all <- fmi_gf_all %>% 
+  mutate(gapfilled = ifelse(rgn_id %in% low_pop$rgn_id, 0, gapfilled)) %>% 
+  mutate(method = ifelse(rgn_id %in% low_pop$rgn_id, NA, method))
+
+## format final data
+fmi_final <- fmi_gf_all %>%
+  select(rgn_id, year, value=fmi)
+dim(fmi_final) # all regions represented
+summary(fmi_final) # 20 NA values
+
+
+# Save the data 
+write_csv(fmi_final, here("globalprep/res_fmi/v2019/output/fmi_res.csv"))
+
+
+# Save dataframe with gapfilled method and status information
+final_fmi_gf <- fmi_gf_all %>%
+  select(rgn_id, year, gapfilled, method)
+write_csv(final_fmi_gf, here("globalprep/res_fmi/v2019/output/fmi_res_gf.csv"))
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
