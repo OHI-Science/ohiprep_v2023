@@ -22,7 +22,7 @@ source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2019/gh-pages/wor
 
 ```{r}
 # governance variables
-gov_data <- read_excel("data/minderoo/Global_Fishing_Index_2021_Data_for_Download_V1.1.xlsx", sheet = 3, col_names = FALSE) %>% 
+gov_data <- read_excel(here("globalprep/res_fmi/v2022/raw/Global_Fishing_Index_2021_Data_for_Download_V1.1.xlsx"), sheet = 3, col_names = FALSE) %>% 
   row_to_names(row_number = 1) %>%
   row_to_names(row_number = 1) %>% 
   clean_names() %>% 
@@ -32,7 +32,7 @@ gov_data <- read_excel("data/minderoo/Global_Fishing_Index_2021_Data_for_Downloa
 gov_data$year <- as.numeric(gov_data$year)
 
 # load variable descriptions
-gov_key <- read_excel("data/minderoo/Global_Fishing_Index_2021_Data_for_Download_V1.1.xlsx", sheet = 2)    
+gov_key <- read_excel(here("globalprep/res_fmi/v2022/raw/Global_Fishing_Index_2021_Data_for_Download_V1.1.xlsx"), sheet = 2)    
 ```
 
 ### Add OHI regions to gov data
@@ -90,7 +90,7 @@ gov_data <- gov_data %>% select(rgn_id, rgn_name, normalized_gov_capacity, year)
 
 ```{r}
 # read in rescaled to have values between 0-1 and cap at 95th quantile
-gdp_rescaled <- read.csv("~/ohiprep_v2022/globalprep/ao/v2022/output/wb_gdppcppp_rescaled.csv")
+gdp_rescaled <- read.csv(here("globalprep/ao/v2022/output/wb_gdppcppp_rescaled.csv"))
 
 gov_gdp <- gov_data %>% 
   left_join(gdp_rescaled, by = c("rgn_id", "year")) %>% 
