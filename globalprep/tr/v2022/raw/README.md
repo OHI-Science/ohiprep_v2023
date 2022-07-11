@@ -1,15 +1,10 @@
 # CIA data
-Open link:
-https://www.cia.gov/library/publications/the-world-factbook/rankorder/2004rank.html
 
-Click on "Download data"
+The CIA portal for GDP PC PPP data has changed as of 2022
 
-Clear cia_gdp_ppp.txt and paste new data (save text file)
+Link: https://www.cia.gov/the-world-factbook/field/real-gdp-per-capita/country-comparison
 
-NOTE: the script wrangles the data that is pasted all in one column.
-
-
-
+The file is now available as a csv and requires less wrangling than the previous format.
 
 
 

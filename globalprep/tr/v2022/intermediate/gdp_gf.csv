@@ -14,6 +14,8 @@ rgn_id,year,gapfilled,method
 1,2017,gapfilled,UN georegion (r2)
 1,2018,gapfilled,UN georegion (r2)
 1,2019,gapfilled,UN georegion (r2)
+1,2020,gapfilled,UN georegion (r2)
+1,2021,gapfilled,UN georegion (r2)
 2,2005,gapfilled,UN georegion (r2)
 2,2006,gapfilled,UN georegion (r2)
 2,2007,gapfilled,UN georegion (r2)
@@ -29,6 +31,8 @@ rgn_id,year,gapfilled,method
 2,2017,gapfilled,UN georegion (r2)
 2,2018,gapfilled,UN georegion (r2)
 2,2019,gapfilled,UN georegion (r2)
+2,2020,gapfilled,UN georegion (r2)
+2,2021,gapfilled,UN georegion (r2)
 3,2005,gapfilled,UN georegion (r2)
 3,2006,gapfilled,UN georegion (r2)
 3,2007,gapfilled,UN georegion (r2)
@@ -44,6 +48,8 @@ rgn_id,year,gapfilled,method
 3,2017,gapfilled,UN georegion (r2)
 3,2018,gapfilled,UN georegion (r2)
 3,2019,gapfilled,UN georegion (r2)
+3,2020,gapfilled,UN georegion (r2)
+3,2021,gapfilled,UN georegion (r2)
 4,2005,gapfilled,UN georegion (r2)
 4,2006,gapfilled,UN georegion (r2)
 4,2007,gapfilled,UN georegion (r2)
@@ -59,6 +65,8 @@ rgn_id,year,gapfilled,method
 4,2017,gapfilled,UN georegion (r2)
 4,2018,gapfilled,UN georegion (r2)
 4,2019,gapfilled,UN georegion (r2)
+4,2020,gapfilled,UN georegion (r2)
+4,2021,gapfilled,UN georegion (r2)
 5,2005,NA,NA
 5,2006,NA,NA
 5,2007,NA,NA
@@ -74,6 +82,8 @@ rgn_id,year,gapfilled,method
 5,2017,NA,NA
 5,2018,NA,NA
 5,2019,NA,NA
+5,2020,NA,NA
+5,2021,NA,NA
 6,2005,NA,NA
 6,2006,NA,NA
 6,2007,NA,NA
@@ -89,6 +99,8 @@ rgn_id,year,gapfilled,method
 6,2017,NA,NA
 6,2018,NA,NA
 6,2019,NA,NA
+6,2020,NA,NA
+6,2021,NA,NA
 7,2005,NA,NA
 7,2006,NA,NA
 7,2007,NA,NA
@@ -104,6 +116,8 @@ rgn_id,year,gapfilled,method
 7,2017,NA,NA
 7,2018,NA,NA
 7,2019,NA,NA
+7,2020,NA,NA
+7,2021,NA,NA
 8,2005,NA,NA
 8,2006,NA,NA
 8,2007,NA,NA
@@ -119,6 +133,8 @@ rgn_id,year,gapfilled,method
 8,2017,NA,NA
 8,2018,NA,NA
 8,2019,NA,NA
+8,2020,NA,NA
+8,2021,NA,NA
 9,2005,NA,NA
 9,2006,NA,NA
 9,2007,NA,NA
@@ -134,6 +150,8 @@ rgn_id,year,gapfilled,method
 9,2017,NA,NA
 9,2018,NA,NA
 9,2019,NA,NA
+9,2020,NA,NA
+9,2021,NA,NA
 10,2005,NA,NA
 10,2006,NA,NA
 10,2007,NA,NA
@@ -149,6 +167,8 @@ rgn_id,year,gapfilled,method
 10,2017,NA,NA
 10,2018,NA,NA
 10,2019,NA,NA
+10,2020,NA,NA
+10,2021,NA,NA
 11,2005,NA,NA
 11,2006,NA,NA
 11,2007,NA,NA
@@ -164,6 +184,8 @@ rgn_id,year,gapfilled,method
 11,2017,NA,NA
 11,2018,NA,NA
 11,2019,NA,NA
+11,2020,NA,NA
+11,2021,NA,NA
 12,2005,gapfilled,UN georegion (r2)
 12,2006,gapfilled,UN georegion (r2)
 12,2007,gapfilled,UN georegion (r2)
@@ -179,6 +201,8 @@ rgn_id,year,gapfilled,method
 12,2017,gapfilled,UN georegion (r2)
 12,2018,gapfilled,UN georegion (r2)
 12,2019,gapfilled,UN georegion (r2)
+12,2020,gapfilled,UN georegion (r2)
+12,2021,gapfilled,UN georegion (r2)
 13,2005,NA,NA
 13,2006,NA,NA
 13,2007,NA,NA
@@ -194,6 +218,8 @@ rgn_id,year,gapfilled,method
 13,2017,NA,NA
 13,2018,NA,NA
 13,2019,NA,NA
+13,2020,NA,NA
+13,2021,NA,NA
 14,2005,NA,NA
 14,2006,NA,NA
 14,2007,NA,NA
@@ -209,6 +235,8 @@ rgn_id,year,gapfilled,method
 14,2017,NA,NA
 14,2018,NA,NA
 14,2019,NA,NA
+14,2020,NA,NA
+14,2021,NA,NA
 15,2005,NA,NA
 15,2006,NA,NA
 15,2007,NA,NA
@@ -224,6 +252,8 @@ rgn_id,year,gapfilled,method
 15,2017,NA,NA
 15,2018,NA,NA
 15,2019,NA,NA
+15,2020,NA,NA
+15,2021,NA,NA
 16,2005,NA,NA
 16,2006,NA,NA
 16,2007,NA,NA
@@ -239,6 +269,8 @@ rgn_id,year,gapfilled,method
 16,2017,NA,NA
 16,2018,NA,NA
 16,2019,NA,NA
+16,2020,NA,NA
+16,2021,NA,NA
 17,2005,NA,NA
 17,2006,NA,NA
 17,2007,NA,NA
@@ -254,6 +286,8 @@ rgn_id,year,gapfilled,method
 17,2017,NA,NA
 17,2018,NA,NA
 17,2019,NA,NA
+17,2020,NA,NA
+17,2021,NA,NA
 18,2005,NA,NA
 18,2006,NA,NA
 18,2007,NA,NA
@@ -269,6 +303,8 @@ rgn_id,year,gapfilled,method
 18,2017,NA,NA
 18,2018,NA,NA
 18,2019,NA,NA
+18,2020,NA,NA
+18,2021,NA,NA
 19,2005,NA,NA
 19,2006,NA,NA
 19,2007,NA,NA
@@ -284,6 +320,8 @@ rgn_id,year,gapfilled,method
 19,2017,NA,NA
 19,2018,NA,NA
 19,2019,NA,NA
+19,2020,NA,NA
+19,2021,NA,NA
 20,2005,NA,NA
 20,2006,NA,NA
 20,2007,NA,NA
@@ -299,6 +337,8 @@ rgn_id,year,gapfilled,method
 20,2017,NA,NA
 20,2018,NA,NA
 20,2019,NA,NA
+20,2020,NA,NA
+20,2021,NA,NA
 21,2005,NA,NA
 21,2006,NA,NA
 21,2007,NA,NA
@@ -314,6 +354,8 @@ rgn_id,year,gapfilled,method
 21,2017,NA,NA
 21,2018,NA,NA
 21,2019,NA,NA
+21,2020,NA,NA
+21,2021,NA,NA
 24,2005,NA,NA
 24,2006,NA,NA
 24,2007,NA,NA
@@ -329,6 +371,8 @@ rgn_id,year,gapfilled,method
 24,2017,NA,NA
 24,2018,NA,NA
 24,2019,NA,NA
+24,2020,NA,NA
+24,2021,NA,NA
 25,2005,NA,NA
 25,2006,NA,NA
 25,2007,NA,NA
@@ -344,6 +388,8 @@ rgn_id,year,gapfilled,method
 25,2017,NA,NA
 25,2018,NA,NA
 25,2019,NA,NA
+25,2020,NA,NA
+25,2021,NA,NA
 26,2005,gapfilled,UN georegion (r2)
 26,2006,gapfilled,UN georegion (r2)
 26,2007,gapfilled,UN georegion (r2)
@@ -359,6 +405,8 @@ rgn_id,year,gapfilled,method
 26,2017,gapfilled,UN georegion (r2)
 26,2018,gapfilled,UN georegion (r2)
 26,2019,gapfilled,UN georegion (r2)
+26,2020,gapfilled,UN georegion (r2)
+26,2021,gapfilled,UN georegion (r2)
 28,2005,NA,NA
 28,2006,NA,NA
 28,2007,NA,NA
@@ -374,6 +422,8 @@ rgn_id,year,gapfilled,method
 28,2017,NA,NA
 28,2018,NA,NA
 28,2019,NA,NA
+28,2020,NA,NA
+28,2021,NA,NA
 29,2005,gapfilled,UN georegion (r2)
 29,2006,gapfilled,UN georegion (r2)
 29,2007,gapfilled,UN georegion (r2)
@@ -389,6 +439,8 @@ rgn_id,year,gapfilled,method
 29,2017,gapfilled,UN georegion (r2)
 29,2018,gapfilled,UN georegion (r2)
 29,2019,gapfilled,UN georegion (r2)
+29,2020,gapfilled,UN georegion (r2)
+29,2021,gapfilled,UN georegion (r2)
 30,2005,gapfilled,UN georegion (r2)
 30,2006,gapfilled,UN georegion (r2)
 30,2007,gapfilled,UN georegion (r2)
@@ -404,6 +456,8 @@ rgn_id,year,gapfilled,method
 30,2017,gapfilled,UN georegion (r2)
 30,2018,gapfilled,UN georegion (r2)
 30,2019,gapfilled,UN georegion (r2)
+30,2020,gapfilled,UN georegion (r2)
+30,2021,gapfilled,UN georegion (r2)
 31,2005,NA,NA
 31,2006,NA,NA
 31,2007,NA,NA
@@ -419,6 +473,8 @@ rgn_id,year,gapfilled,method
 31,2017,NA,NA
 31,2018,NA,NA
 31,2019,NA,NA
+31,2020,NA,NA
+31,2021,NA,NA
 32,2005,gapfilled,UN georegion (r2)
 32,2006,gapfilled,UN georegion (r2)
 32,2007,gapfilled,UN georegion (r2)
@@ -434,6 +490,8 @@ rgn_id,year,gapfilled,method
 32,2017,gapfilled,UN georegion (r2)
 32,2018,gapfilled,UN georegion (r2)
 32,2019,gapfilled,UN georegion (r2)
+32,2020,gapfilled,UN georegion (r2)
+32,2021,gapfilled,UN georegion (r2)
 33,2005,gapfilled,UN georegion (r2)
 33,2006,gapfilled,UN georegion (r2)
 33,2007,gapfilled,UN georegion (r2)
@@ -449,6 +507,8 @@ rgn_id,year,gapfilled,method
 33,2017,gapfilled,UN georegion (r2)
 33,2018,gapfilled,UN georegion (r2)
 33,2019,gapfilled,UN georegion (r2)
+33,2020,gapfilled,UN georegion (r2)
+33,2021,gapfilled,UN georegion (r2)
 34,2005,gapfilled,UN georegion (r2)
 34,2006,gapfilled,UN georegion (r2)
 34,2007,gapfilled,UN georegion (r2)
@@ -464,6 +524,8 @@ rgn_id,year,gapfilled,method
 34,2017,gapfilled,UN georegion (r2)
 34,2018,gapfilled,UN georegion (r2)
 34,2019,gapfilled,UN georegion (r2)
+34,2020,gapfilled,UN georegion (r2)
+34,2021,gapfilled,UN georegion (r2)
 35,2005,gapfilled,UN georegion (r2)
 35,2006,gapfilled,UN georegion (r2)
 35,2007,gapfilled,UN georegion (r2)
@@ -479,6 +541,8 @@ rgn_id,year,gapfilled,method
 35,2017,gapfilled,UN georegion (r2)
 35,2018,gapfilled,UN georegion (r2)
 35,2019,gapfilled,UN georegion (r2)
+35,2020,gapfilled,UN georegion (r2)
+35,2021,gapfilled,UN georegion (r2)
 36,2005,gapfilled,UN georegion (r2)
 36,2006,gapfilled,UN georegion (r2)
 36,2007,gapfilled,UN georegion (r2)
@@ -494,6 +558,8 @@ rgn_id,year,gapfilled,method
 36,2017,gapfilled,UN georegion (r2)
 36,2018,gapfilled,UN georegion (r2)
 36,2019,gapfilled,UN georegion (r2)
+36,2020,gapfilled,UN georegion (r2)
+36,2021,gapfilled,UN georegion (r2)
 37,2005,NA,NA
 37,2006,NA,NA
 37,2007,NA,NA
@@ -509,6 +575,8 @@ rgn_id,year,gapfilled,method
 37,2017,NA,NA
 37,2018,NA,NA
 37,2019,NA,NA
+37,2020,NA,NA
+37,2021,NA,NA
 38,2005,gapfilled,UN georegion (r2)
 38,2006,gapfilled,UN georegion (r2)
 38,2007,gapfilled,UN georegion (r2)
@@ -524,6 +592,8 @@ rgn_id,year,gapfilled,method
 38,2017,gapfilled,UN georegion (r2)
 38,2018,gapfilled,UN georegion (r2)
 38,2019,gapfilled,UN georegion (r2)
+38,2020,gapfilled,UN georegion (r2)
+38,2021,gapfilled,UN georegion (r2)
 39,2005,NA,NA
 39,2006,NA,NA
 39,2007,NA,NA
@@ -539,6 +609,8 @@ rgn_id,year,gapfilled,method
 39,2017,NA,NA
 39,2018,NA,NA
 39,2019,NA,NA
+39,2020,NA,NA
+39,2021,NA,NA
 40,2005,NA,NA
 40,2006,NA,NA
 40,2007,NA,NA
@@ -554,6 +626,8 @@ rgn_id,year,gapfilled,method
 40,2017,NA,NA
 40,2018,NA,NA
 40,2019,NA,NA
+40,2020,NA,NA
+40,2021,NA,NA
 41,2005,NA,NA
 41,2006,NA,NA
 41,2007,NA,NA
@@ -569,6 +643,8 @@ rgn_id,year,gapfilled,method
 41,2017,NA,NA
 41,2018,NA,NA
 41,2019,NA,NA
+41,2020,NA,NA
+41,2021,NA,NA
 42,2005,NA,NA
 42,2006,NA,NA
 42,2007,NA,NA
@@ -584,6 +660,8 @@ rgn_id,year,gapfilled,method
 42,2017,NA,NA
 42,2018,NA,NA
 42,2019,NA,NA
+42,2020,NA,NA
+42,2021,NA,NA
 43,2005,NA,NA
 43,2006,NA,NA
 43,2007,NA,NA
@@ -599,21 +677,25 @@ rgn_id,year,gapfilled,method
 43,2017,NA,NA
 43,2018,NA,NA
 43,2019,NA,NA
-44,2005,gapfilled,UN georegion (r2)
-44,2006,gapfilled,UN georegion (r2)
-44,2007,gapfilled,UN georegion (r2)
-44,2008,gapfilled,UN georegion (r2)
-44,2009,gapfilled,UN georegion (r2)
-44,2010,gapfilled,UN georegion (r2)
-44,2011,gapfilled,UN georegion (r2)
-44,2012,gapfilled,UN georegion (r2)
-44,2013,gapfilled,UN georegion (r2)
-44,2014,gapfilled,UN georegion (r2)
-44,2015,gapfilled,UN georegion (r2)
-44,2016,gapfilled,UN georegion (r2)
-44,2017,gapfilled,UN georegion (r2)
-44,2018,gapfilled,UN georegion (r2)
-44,2019,gapfilled,UN georegion (r2)
+43,2020,NA,NA
+43,2021,NA,NA
+44,2005,NA,NA
+44,2006,NA,NA
+44,2007,NA,NA
+44,2008,NA,NA
+44,2009,NA,NA
+44,2010,NA,NA
+44,2011,NA,NA
+44,2012,NA,NA
+44,2013,NA,NA
+44,2014,NA,NA
+44,2015,NA,NA
+44,2016,NA,NA
+44,2017,NA,NA
+44,2018,NA,NA
+44,2019,NA,NA
+44,2020,NA,NA
+44,2021,NA,NA
 45,2005,NA,NA
 45,2006,NA,NA
 45,2007,NA,NA
@@ -629,6 +711,8 @@ rgn_id,year,gapfilled,method
 45,2017,NA,NA
 45,2018,NA,NA
 45,2019,NA,NA
+45,2020,NA,NA
+45,2021,NA,NA
 46,2005,NA,NA
 46,2006,NA,NA
 46,2007,NA,NA
@@ -644,6 +728,8 @@ rgn_id,year,gapfilled,method
 46,2017,NA,NA
 46,2018,NA,NA
 46,2019,NA,NA
+46,2020,NA,NA
+46,2021,NA,NA
 47,2005,NA,NA
 47,2006,NA,NA
 47,2007,NA,NA
@@ -659,6 +745,8 @@ rgn_id,year,gapfilled,method
 47,2017,NA,NA
 47,2018,NA,NA
 47,2019,NA,NA
+47,2020,NA,NA
+47,2021,NA,NA
 48,2005,NA,NA
 48,2006,NA,NA
 48,2007,NA,NA
@@ -674,6 +762,8 @@ rgn_id,year,gapfilled,method
 48,2017,NA,NA
 48,2018,NA,NA
 48,2019,NA,NA
+48,2020,NA,NA
+48,2021,NA,NA
 49,2005,NA,NA
 49,2006,NA,NA
 49,2007,NA,NA
@@ -689,6 +779,8 @@ rgn_id,year,gapfilled,method
 49,2017,NA,NA
 49,2018,NA,NA
 49,2019,NA,NA
+49,2020,NA,NA
+49,2021,NA,NA
 50,2005,NA,NA
 50,2006,NA,NA
 50,2007,NA,NA
@@ -704,6 +796,8 @@ rgn_id,year,gapfilled,method
 50,2017,NA,NA
 50,2018,NA,NA
 50,2019,NA,NA
+50,2020,NA,NA
+50,2021,NA,NA
 51,2005,NA,NA
 51,2006,NA,NA
 51,2007,NA,NA
@@ -719,6 +813,8 @@ rgn_id,year,gapfilled,method
 51,2017,NA,NA
 51,2018,NA,NA
 51,2019,NA,NA
+51,2020,NA,NA
+51,2021,NA,NA
 52,2005,NA,NA
 52,2006,NA,NA
 52,2007,NA,NA
@@ -734,6 +830,8 @@ rgn_id,year,gapfilled,method
 52,2017,NA,NA
 52,2018,NA,NA
 52,2019,NA,NA
+52,2020,NA,NA
+52,2021,NA,NA
 53,2005,NA,NA
 53,2006,NA,NA
 53,2007,NA,NA
@@ -749,6 +847,8 @@ rgn_id,year,gapfilled,method
 53,2017,NA,NA
 53,2018,NA,NA
 53,2019,NA,NA
+53,2020,NA,NA
+53,2021,NA,NA
 54,2005,NA,NA
 54,2006,NA,NA
 54,2007,NA,NA
@@ -764,6 +864,8 @@ rgn_id,year,gapfilled,method
 54,2017,NA,NA
 54,2018,NA,NA
 54,2019,NA,NA
+54,2020,NA,NA
+54,2021,NA,NA
 55,2005,gapfilled,UN georegion (r2)
 55,2006,gapfilled,UN georegion (r2)
 55,2007,gapfilled,UN georegion (r2)
@@ -779,6 +881,8 @@ rgn_id,year,gapfilled,method
 55,2017,gapfilled,UN georegion (r2)
 55,2018,gapfilled,UN georegion (r2)
 55,2019,gapfilled,UN georegion (r2)
+55,2020,gapfilled,UN georegion (r2)
+55,2021,gapfilled,UN georegion (r2)
 56,2005,NA,NA
 56,2006,NA,NA
 56,2007,NA,NA
@@ -794,6 +898,8 @@ rgn_id,year,gapfilled,method
 56,2017,NA,NA
 56,2018,NA,NA
 56,2019,NA,NA
+56,2020,NA,NA
+56,2021,NA,NA
 57,2005,gapfilled,UN georegion (r2)
 57,2006,gapfilled,UN georegion (r2)
 57,2007,gapfilled,UN georegion (r2)
@@ -809,6 +915,8 @@ rgn_id,year,gapfilled,method
 57,2017,gapfilled,UN georegion (r2)
 57,2018,gapfilled,UN georegion (r2)
 57,2019,gapfilled,UN georegion (r2)
+57,2020,gapfilled,UN georegion (r2)
+57,2021,gapfilled,UN georegion (r2)
 58,2005,gapfilled,UN georegion (r2)
 58,2006,gapfilled,UN georegion (r2)
 58,2007,gapfilled,UN georegion (r2)
@@ -824,6 +932,8 @@ rgn_id,year,gapfilled,method
 58,2017,gapfilled,UN georegion (r2)
 58,2018,gapfilled,UN georegion (r2)
 58,2019,gapfilled,UN georegion (r2)
+58,2020,gapfilled,UN georegion (r2)
+58,2021,gapfilled,UN georegion (r2)
 59,2005,NA,NA
 59,2006,NA,NA
 59,2007,NA,NA
@@ -839,6 +949,8 @@ rgn_id,year,gapfilled,method
 59,2017,NA,NA
 59,2018,NA,NA
 59,2019,NA,NA
+59,2020,NA,NA
+59,2021,NA,NA
 60,2005,NA,NA
 60,2006,NA,NA
 60,2007,NA,NA
@@ -854,6 +966,8 @@ rgn_id,year,gapfilled,method
 60,2017,NA,NA
 60,2018,NA,NA
 60,2019,NA,NA
+60,2020,NA,NA
+60,2021,NA,NA
 61,2005,NA,NA
 61,2006,NA,NA
 61,2007,NA,NA
@@ -869,6 +983,8 @@ rgn_id,year,gapfilled,method
 61,2017,NA,NA
 61,2018,NA,NA
 61,2019,NA,NA
+61,2020,NA,NA
+61,2021,NA,NA
 62,2005,NA,NA
 62,2006,NA,NA
 62,2007,NA,NA
@@ -884,21 +1000,25 @@ rgn_id,year,gapfilled,method
 62,2017,NA,NA
 62,2018,NA,NA
 62,2019,NA,NA
-63,2005,NA,NA
-63,2006,NA,NA
-63,2007,NA,NA
-63,2008,NA,NA
-63,2009,NA,NA
-63,2010,NA,NA
-63,2011,NA,NA
-63,2012,NA,NA
-63,2013,NA,NA
-63,2014,NA,NA
-63,2015,NA,NA
-63,2016,NA,NA
-63,2017,NA,NA
-63,2018,NA,NA
-63,2019,NA,NA
+62,2020,NA,NA
+62,2021,NA,NA
+63,2005,gapfilled,UN georegion (r2)
+63,2006,gapfilled,UN georegion (r2)
+63,2007,gapfilled,UN georegion (r2)
+63,2008,gapfilled,UN georegion (r2)
+63,2009,gapfilled,UN georegion (r2)
+63,2010,gapfilled,UN georegion (r2)
+63,2011,gapfilled,UN georegion (r2)
+63,2012,gapfilled,UN georegion (r2)
+63,2013,gapfilled,UN georegion (r2)
+63,2014,gapfilled,UN georegion (r2)
+63,2015,gapfilled,UN georegion (r2)
+63,2016,gapfilled,UN georegion (r2)
+63,2017,gapfilled,UN georegion (r2)
+63,2018,gapfilled,UN georegion (r2)
+63,2019,gapfilled,UN georegion (r2)
+63,2020,gapfilled,UN georegion (r2)
+63,2021,gapfilled,UN georegion (r2)
 64,2005,NA,NA
 64,2006,NA,NA
 64,2007,NA,NA
@@ -914,6 +1034,8 @@ rgn_id,year,gapfilled,method
 64,2017,NA,NA
 64,2018,NA,NA
 64,2019,NA,NA
+64,2020,NA,NA
+64,2021,NA,NA
 65,2005,NA,NA
 65,2006,NA,NA
 65,2007,NA,NA
@@ -929,6 +1051,8 @@ rgn_id,year,gapfilled,method
 65,2017,NA,NA
 65,2018,NA,NA
 65,2019,NA,NA
+65,2020,NA,NA
+65,2021,NA,NA
 66,2005,NA,NA
 66,2006,NA,NA
 66,2007,NA,NA
@@ -944,6 +1068,8 @@ rgn_id,year,gapfilled,method
 66,2017,NA,NA
 66,2018,NA,NA
 66,2019,NA,NA
+66,2020,NA,NA
+66,2021,NA,NA
 67,2005,NA,NA
 67,2006,NA,NA
 67,2007,NA,NA
@@ -959,6 +1085,8 @@ rgn_id,year,gapfilled,method
 67,2017,NA,NA
 67,2018,NA,NA
 67,2019,NA,NA
+67,2020,NA,NA
+67,2021,NA,NA
 68,2005,NA,NA
 68,2006,NA,NA
 68,2007,NA,NA
@@ -974,6 +1102,8 @@ rgn_id,year,gapfilled,method
 68,2017,NA,NA
 68,2018,NA,NA
 68,2019,NA,NA
+68,2020,NA,NA
+68,2021,NA,NA
 69,2005,NA,NA
 69,2006,NA,NA
 69,2007,NA,NA
@@ -989,6 +1119,8 @@ rgn_id,year,gapfilled,method
 69,2017,NA,NA
 69,2018,NA,NA
 69,2019,NA,NA
+69,2020,NA,NA
+69,2021,NA,NA
 70,2005,NA,NA
 70,2006,NA,NA
 70,2007,NA,NA
@@ -1004,6 +1136,8 @@ rgn_id,year,gapfilled,method
 70,2017,NA,NA
 70,2018,NA,NA
 70,2019,NA,NA
+70,2020,NA,NA
+70,2021,NA,NA
 71,2005,NA,NA
 71,2006,NA,NA
 71,2007,NA,NA
@@ -1019,6 +1153,8 @@ rgn_id,year,gapfilled,method
 71,2017,NA,NA
 71,2018,NA,NA
 71,2019,NA,NA
+71,2020,NA,NA
+71,2021,NA,NA
 72,2005,NA,NA
 72,2006,NA,NA
 72,2007,NA,NA
@@ -1034,6 +1170,8 @@ rgn_id,year,gapfilled,method
 72,2017,NA,NA
 72,2018,NA,NA
 72,2019,NA,NA
+72,2020,NA,NA
+72,2021,NA,NA
 73,2005,NA,NA
 73,2006,NA,NA
 73,2007,NA,NA
@@ -1049,6 +1187,8 @@ rgn_id,year,gapfilled,method
 73,2017,NA,NA
 73,2018,NA,NA
 73,2019,NA,NA
+73,2020,NA,NA
+73,2021,NA,NA
 74,2005,NA,NA
 74,2006,NA,NA
 74,2007,NA,NA
@@ -1064,6 +1204,8 @@ rgn_id,year,gapfilled,method
 74,2017,NA,NA
 74,2018,NA,NA
 74,2019,NA,NA
+74,2020,NA,NA
+74,2021,NA,NA
 75,2005,NA,NA
 75,2006,NA,NA
 75,2007,NA,NA
@@ -1079,21 +1221,25 @@ rgn_id,year,gapfilled,method
 75,2017,NA,NA
 75,2018,NA,NA
 75,2019,NA,NA
-76,2005,NA,NA
-76,2006,NA,NA
-76,2007,NA,NA
-76,2008,NA,NA
-76,2009,NA,NA
-76,2010,NA,NA
-76,2011,NA,NA
-76,2012,NA,NA
-76,2013,NA,NA
-76,2014,NA,NA
-76,2015,NA,NA
-76,2016,NA,NA
-76,2017,NA,NA
-76,2018,NA,NA
-76,2019,NA,NA
+75,2020,NA,NA
+75,2021,NA,NA
+76,2005,gapfilled,UN georegion (r2)
+76,2006,gapfilled,UN georegion (r2)
+76,2007,gapfilled,UN georegion (r2)
+76,2008,gapfilled,UN georegion (r2)
+76,2009,gapfilled,UN georegion (r2)
+76,2010,gapfilled,UN georegion (r2)
+76,2011,gapfilled,UN georegion (r2)
+76,2012,gapfilled,UN georegion (r2)
+76,2013,gapfilled,UN georegion (r2)
+76,2014,gapfilled,UN georegion (r2)
+76,2015,gapfilled,UN georegion (r2)
+76,2016,gapfilled,UN georegion (r2)
+76,2017,gapfilled,UN georegion (r2)
+76,2018,gapfilled,UN georegion (r2)
+76,2019,gapfilled,UN georegion (r2)
+76,2020,gapfilled,UN georegion (r2)
+76,2021,gapfilled,UN georegion (r2)
 77,2005,NA,NA
 77,2006,NA,NA
 77,2007,NA,NA
@@ -1109,6 +1255,8 @@ rgn_id,year,gapfilled,method
 77,2017,NA,NA
 77,2018,NA,NA
 77,2019,NA,NA
+77,2020,NA,NA
+77,2021,NA,NA
 78,2005,NA,NA
 78,2006,NA,NA
 78,2007,NA,NA
@@ -1124,6 +1272,8 @@ rgn_id,year,gapfilled,method
 78,2017,NA,NA
 78,2018,NA,NA
 78,2019,NA,NA
+78,2020,NA,NA
+78,2021,NA,NA
 79,2005,NA,NA
 79,2006,NA,NA
 79,2007,NA,NA
@@ -1139,6 +1289,8 @@ rgn_id,year,gapfilled,method
 79,2017,NA,NA
 79,2018,NA,NA
 79,2019,NA,NA
+79,2020,NA,NA
+79,2021,NA,NA
 80,2005,NA,NA
 80,2006,NA,NA
 80,2007,NA,NA
@@ -1154,6 +1306,8 @@ rgn_id,year,gapfilled,method
 80,2017,NA,NA
 80,2018,NA,NA
 80,2019,NA,NA
+80,2020,NA,NA
+80,2021,NA,NA
 81,2005,NA,NA
 81,2006,NA,NA
 81,2007,NA,NA
@@ -1169,6 +1323,8 @@ rgn_id,year,gapfilled,method
 81,2017,NA,NA
 81,2018,NA,NA
 81,2019,NA,NA
+81,2020,NA,NA
+81,2021,NA,NA
 82,2005,NA,NA
 82,2006,NA,NA
 82,2007,NA,NA
@@ -1184,6 +1340,8 @@ rgn_id,year,gapfilled,method
 82,2017,NA,NA
 82,2018,NA,NA
 82,2019,NA,NA
+82,2020,NA,NA
+82,2021,NA,NA
 84,2005,NA,NA
 84,2006,NA,NA
 84,2007,NA,NA
@@ -1199,6 +1357,8 @@ rgn_id,year,gapfilled,method
 84,2017,NA,NA
 84,2018,NA,NA
 84,2019,NA,NA
+84,2020,NA,NA
+84,2021,NA,NA
 85,2005,NA,NA
 85,2006,NA,NA
 85,2007,NA,NA
@@ -1214,6 +1374,8 @@ rgn_id,year,gapfilled,method
 85,2017,NA,NA
 85,2018,NA,NA
 85,2019,NA,NA
+85,2020,NA,NA
+85,2021,NA,NA
 86,2005,NA,NA
 86,2006,NA,NA
 86,2007,NA,NA
@@ -1229,6 +1391,8 @@ rgn_id,year,gapfilled,method
 86,2017,NA,NA
 86,2018,NA,NA
 86,2019,NA,NA
+86,2020,NA,NA
+86,2021,NA,NA
 88,2005,NA,NA
 88,2006,NA,NA
 88,2007,NA,NA
@@ -1244,6 +1408,8 @@ rgn_id,year,gapfilled,method
 88,2017,NA,NA
 88,2018,NA,NA
 88,2019,NA,NA
+88,2020,NA,NA
+88,2021,NA,NA
 89,2005,NA,NA
 89,2006,NA,NA
 89,2007,NA,NA
@@ -1259,6 +1425,8 @@ rgn_id,year,gapfilled,method
 89,2017,NA,NA
 89,2018,NA,NA
 89,2019,NA,NA
+89,2020,NA,NA
+89,2021,NA,NA
 90,2005,NA,NA
 90,2006,NA,NA
 90,2007,NA,NA
@@ -1274,6 +1442,8 @@ rgn_id,year,gapfilled,method
 90,2017,NA,NA
 90,2018,NA,NA
 90,2019,NA,NA
+90,2020,NA,NA
+90,2021,NA,NA
 91,2005,NA,NA
 91,2006,NA,NA
 91,2007,NA,NA
@@ -1289,6 +1459,8 @@ rgn_id,year,gapfilled,method
 91,2017,NA,NA
 91,2018,NA,NA
 91,2019,NA,NA
+91,2020,NA,NA
+91,2021,NA,NA
 92,2005,NA,NA
 92,2006,NA,NA
 92,2007,NA,NA
@@ -1304,6 +1476,8 @@ rgn_id,year,gapfilled,method
 92,2017,NA,NA
 92,2018,NA,NA
 92,2019,NA,NA
+92,2020,NA,NA
+92,2021,NA,NA
 93,2005,NA,NA
 93,2006,NA,NA
 93,2007,NA,NA
@@ -1319,6 +1493,8 @@ rgn_id,year,gapfilled,method
 93,2017,NA,NA
 93,2018,NA,NA
 93,2019,NA,NA
+93,2020,NA,NA
+93,2021,NA,NA
 94,2005,NA,NA
 94,2006,NA,NA
 94,2007,NA,NA
@@ -1334,6 +1510,8 @@ rgn_id,year,gapfilled,method
 94,2017,NA,NA
 94,2018,NA,NA
 94,2019,NA,NA
+94,2020,NA,NA
+94,2021,NA,NA
 95,2005,NA,NA
 95,2006,NA,NA
 95,2007,NA,NA
@@ -1349,6 +1527,8 @@ rgn_id,year,gapfilled,method
 95,2017,NA,NA
 95,2018,NA,NA
 95,2019,NA,NA
+95,2020,NA,NA
+95,2021,NA,NA
 96,2005,NA,NA
 96,2006,NA,NA
 96,2007,NA,NA
@@ -1364,6 +1544,8 @@ rgn_id,year,gapfilled,method
 96,2017,NA,NA
 96,2018,NA,NA
 96,2019,NA,NA
+96,2020,NA,NA
+96,2021,NA,NA
 97,2005,NA,NA
 97,2006,NA,NA
 97,2007,NA,NA
@@ -1379,6 +1561,8 @@ rgn_id,year,gapfilled,method
 97,2017,NA,NA
 97,2018,NA,NA
 97,2019,NA,NA
+97,2020,NA,NA
+97,2021,NA,NA
 98,2005,NA,NA
 98,2006,NA,NA
 98,2007,NA,NA
@@ -1394,6 +1578,8 @@ rgn_id,year,gapfilled,method
 98,2017,NA,NA
 98,2018,NA,NA
 98,2019,NA,NA
+98,2020,NA,NA
+98,2021,NA,NA
 99,2005,NA,NA
 99,2006,NA,NA
 99,2007,NA,NA
@@ -1409,6 +1595,8 @@ rgn_id,year,gapfilled,method
 99,2017,NA,NA
 99,2018,NA,NA
 99,2019,NA,NA
+99,2020,NA,NA
+99,2021,NA,NA
 100,2005,NA,NA
 100,2006,NA,NA
 100,2007,NA,NA
@@ -1424,6 +1612,8 @@ rgn_id,year,gapfilled,method
 100,2017,NA,NA
 100,2018,NA,NA
 100,2019,NA,NA
+100,2020,NA,NA
+100,2021,NA,NA
 101,2005,NA,NA
 101,2006,NA,NA
 101,2007,NA,NA
@@ -1439,6 +1629,8 @@ rgn_id,year,gapfilled,method
 101,2017,NA,NA
 101,2018,NA,NA
 101,2019,NA,NA
+101,2020,NA,NA
+101,2021,NA,NA
 102,2005,NA,NA
 102,2006,NA,NA
 102,2007,NA,NA
@@ -1454,6 +1646,8 @@ rgn_id,year,gapfilled,method
 102,2017,NA,NA
 102,2018,NA,NA
 102,2019,NA,NA
+102,2020,NA,NA
+102,2021,NA,NA
 103,2005,NA,NA
 103,2006,NA,NA
 103,2007,NA,NA
@@ -1469,6 +1663,8 @@ rgn_id,year,gapfilled,method
 103,2017,NA,NA
 103,2018,NA,NA
 103,2019,NA,NA
+103,2020,NA,NA
+103,2021,NA,NA
 104,2005,NA,NA
 104,2006,NA,NA
 104,2007,NA,NA
@@ -1484,6 +1680,8 @@ rgn_id,year,gapfilled,method
 104,2017,NA,NA
 104,2018,NA,NA
 104,2019,NA,NA
+104,2020,NA,NA
+104,2021,NA,NA
 105,2005,NA,NA
 105,2006,NA,NA
 105,2007,NA,NA
@@ -1499,6 +1697,8 @@ rgn_id,year,gapfilled,method
 105,2017,NA,NA
 105,2018,NA,NA
 105,2019,NA,NA
+105,2020,NA,NA
+105,2021,NA,NA
 106,2005,NA,NA
 106,2006,NA,NA
 106,2007,NA,NA
@@ -1514,6 +1714,8 @@ rgn_id,year,gapfilled,method
 106,2017,NA,NA
 106,2018,NA,NA
 106,2019,NA,NA
+106,2020,NA,NA
+106,2021,NA,NA
 107,2005,gapfilled,UN georegion (r2)
 107,2006,gapfilled,UN georegion (r2)
 107,2007,gapfilled,UN georegion (r2)
@@ -1529,6 +1731,8 @@ rgn_id,year,gapfilled,method
 107,2017,gapfilled,UN georegion (r2)
 107,2018,gapfilled,UN georegion (r2)
 107,2019,gapfilled,UN georegion (r2)
+107,2020,gapfilled,UN georegion (r2)
+107,2021,gapfilled,UN georegion (r2)
 108,2005,NA,NA
 108,2006,NA,NA
 108,2007,NA,NA
@@ -1544,6 +1748,8 @@ rgn_id,year,gapfilled,method
 108,2017,NA,NA
 108,2018,NA,NA
 108,2019,NA,NA
+108,2020,NA,NA
+108,2021,NA,NA
 110,2005,NA,NA
 110,2006,NA,NA
 110,2007,NA,NA
@@ -1559,6 +1765,8 @@ rgn_id,year,gapfilled,method
 110,2017,NA,NA
 110,2018,NA,NA
 110,2019,NA,NA
+110,2020,NA,NA
+110,2021,NA,NA
 111,2005,NA,NA
 111,2006,NA,NA
 111,2007,NA,NA
@@ -1574,6 +1782,8 @@ rgn_id,year,gapfilled,method
 111,2017,NA,NA
 111,2018,NA,NA
 111,2019,NA,NA
+111,2020,NA,NA
+111,2021,NA,NA
 112,2005,NA,NA
 112,2006,NA,NA
 112,2007,NA,NA
@@ -1589,6 +1799,8 @@ rgn_id,year,gapfilled,method
 112,2017,NA,NA
 112,2018,NA,NA
 112,2019,NA,NA
+112,2020,NA,NA
+112,2021,NA,NA
 113,2005,NA,NA
 113,2006,NA,NA
 113,2007,NA,NA
@@ -1604,6 +1816,8 @@ rgn_id,year,gapfilled,method
 113,2017,NA,NA
 113,2018,NA,NA
 113,2019,NA,NA
+113,2020,NA,NA
+113,2021,NA,NA
 114,2005,NA,NA
 114,2006,NA,NA
 114,2007,NA,NA
@@ -1619,6 +1833,8 @@ rgn_id,year,gapfilled,method
 114,2017,NA,NA
 114,2018,NA,NA
 114,2019,NA,NA
+114,2020,NA,NA
+114,2021,NA,NA
 115,2005,NA,NA
 115,2006,NA,NA
 115,2007,NA,NA
@@ -1634,6 +1850,8 @@ rgn_id,year,gapfilled,method
 115,2017,NA,NA
 115,2018,NA,NA
 115,2019,NA,NA
+115,2020,NA,NA
+115,2021,NA,NA
 116,2005,NA,NA
 116,2006,NA,NA
 116,2007,NA,NA
@@ -1649,6 +1867,8 @@ rgn_id,year,gapfilled,method
 116,2017,NA,NA
 116,2018,NA,NA
 116,2019,NA,NA
+116,2020,NA,NA
+116,2021,NA,NA
 117,2005,NA,NA
 117,2006,NA,NA
 117,2007,NA,NA
@@ -1664,6 +1884,8 @@ rgn_id,year,gapfilled,method
 117,2017,NA,NA
 117,2018,NA,NA
 117,2019,NA,NA
+117,2020,NA,NA
+117,2021,NA,NA
 118,2005,NA,NA
 118,2006,NA,NA
 118,2007,NA,NA
@@ -1679,6 +1901,8 @@ rgn_id,year,gapfilled,method
 118,2017,NA,NA
 118,2018,NA,NA
 118,2019,NA,NA
+118,2020,NA,NA
+118,2021,NA,NA
 119,2005,NA,NA
 119,2006,NA,NA
 119,2007,NA,NA
@@ -1694,6 +1918,8 @@ rgn_id,year,gapfilled,method
 119,2017,NA,NA
 119,2018,NA,NA
 119,2019,NA,NA
+119,2020,NA,NA
+119,2021,NA,NA
 120,2005,NA,NA
 120,2006,NA,NA
 120,2007,NA,NA
@@ -1709,6 +1935,8 @@ rgn_id,year,gapfilled,method
 120,2017,NA,NA
 120,2018,NA,NA
 120,2019,NA,NA
+120,2020,NA,NA
+120,2021,NA,NA
 121,2005,NA,NA
 121,2006,NA,NA
 121,2007,NA,NA
@@ -1724,6 +1952,8 @@ rgn_id,year,gapfilled,method
 121,2017,NA,NA
 121,2018,NA,NA
 121,2019,NA,NA
+121,2020,NA,NA
+121,2021,NA,NA
 122,2005,NA,NA
 122,2006,NA,NA
 122,2007,NA,NA
@@ -1739,6 +1969,8 @@ rgn_id,year,gapfilled,method
 122,2017,NA,NA
 122,2018,NA,NA
 122,2019,NA,NA
+122,2020,NA,NA
+122,2021,NA,NA
 123,2005,NA,NA
 123,2006,NA,NA
 123,2007,NA,NA
@@ -1754,6 +1986,8 @@ rgn_id,year,gapfilled,method
 123,2017,NA,NA
 123,2018,NA,NA
 123,2019,NA,NA
+123,2020,NA,NA
+123,2021,NA,NA
 124,2005,NA,NA
 124,2006,NA,NA
 124,2007,NA,NA
@@ -1769,6 +2003,8 @@ rgn_id,year,gapfilled,method
 124,2017,NA,NA
 124,2018,NA,NA
 124,2019,NA,NA
+124,2020,NA,NA
+124,2021,NA,NA
 125,2005,NA,NA
 125,2006,NA,NA
 125,2007,NA,NA
@@ -1784,6 +2020,8 @@ rgn_id,year,gapfilled,method
 125,2017,NA,NA
 125,2018,NA,NA
 125,2019,NA,NA
+125,2020,NA,NA
+125,2021,NA,NA
 126,2005,NA,NA
 126,2006,NA,NA
 126,2007,NA,NA
@@ -1799,6 +2037,8 @@ rgn_id,year,gapfilled,method
 126,2017,NA,NA
 126,2018,NA,NA
 126,2019,NA,NA
+126,2020,NA,NA
+126,2021,NA,NA
 127,2005,NA,NA
 127,2006,NA,NA
 127,2007,NA,NA
@@ -1814,6 +2054,8 @@ rgn_id,year,gapfilled,method
 127,2017,NA,NA
 127,2018,NA,NA
 127,2019,NA,NA
+127,2020,NA,NA
+127,2021,NA,NA
 129,2005,NA,NA
 129,2006,NA,NA
 129,2007,NA,NA
@@ -1829,6 +2071,8 @@ rgn_id,year,gapfilled,method
 129,2017,NA,NA
 129,2018,NA,NA
 129,2019,NA,NA
+129,2020,NA,NA
+129,2021,NA,NA
 130,2005,NA,NA
 130,2006,NA,NA
 130,2007,NA,NA
@@ -1844,6 +2088,8 @@ rgn_id,year,gapfilled,method
 130,2017,NA,NA
 130,2018,NA,NA
 130,2019,NA,NA
+130,2020,NA,NA
+130,2021,NA,NA
 131,2005,NA,NA
 131,2006,NA,NA
 131,2007,NA,NA
@@ -1859,6 +2105,8 @@ rgn_id,year,gapfilled,method
 131,2017,NA,NA
 131,2018,NA,NA
 131,2019,NA,NA
+131,2020,NA,NA
+131,2021,NA,NA
 132,2005,NA,NA
 132,2006,NA,NA
 132,2007,NA,NA
@@ -1874,6 +2122,8 @@ rgn_id,year,gapfilled,method
 132,2017,NA,NA
 132,2018,NA,NA
 132,2019,NA,NA
+132,2020,NA,NA
+132,2021,NA,NA
 133,2005,NA,NA
 133,2006,NA,NA
 133,2007,NA,NA
@@ -1889,6 +2139,8 @@ rgn_id,year,gapfilled,method
 133,2017,NA,NA
 133,2018,NA,NA
 133,2019,NA,NA
+133,2020,NA,NA
+133,2021,NA,NA
 134,2005,NA,NA
 134,2006,NA,NA
 134,2007,NA,NA
@@ -1904,6 +2156,8 @@ rgn_id,year,gapfilled,method
 134,2017,NA,NA
 134,2018,NA,NA
 134,2019,NA,NA
+134,2020,NA,NA
+134,2021,NA,NA
 135,2005,NA,NA
 135,2006,NA,NA
 135,2007,NA,NA
@@ -1919,6 +2173,8 @@ rgn_id,year,gapfilled,method
 135,2017,NA,NA
 135,2018,NA,NA
 135,2019,NA,NA
+135,2020,NA,NA
+135,2021,NA,NA
 136,2005,NA,NA
 136,2006,NA,NA
 136,2007,NA,NA
@@ -1934,6 +2190,8 @@ rgn_id,year,gapfilled,method
 136,2017,NA,NA
 136,2018,NA,NA
 136,2019,NA,NA
+136,2020,NA,NA
+136,2021,NA,NA
 137,2005,NA,NA
 137,2006,NA,NA
 137,2007,NA,NA
@@ -1949,6 +2207,8 @@ rgn_id,year,gapfilled,method
 137,2017,NA,NA
 137,2018,NA,NA
 137,2019,NA,NA
+137,2020,NA,NA
+137,2021,NA,NA
 138,2005,NA,NA
 138,2006,NA,NA
 138,2007,NA,NA
@@ -1964,6 +2224,8 @@ rgn_id,year,gapfilled,method
 138,2017,NA,NA
 138,2018,NA,NA
 138,2019,NA,NA
+138,2020,NA,NA
+138,2021,NA,NA
 139,2005,NA,NA
 139,2006,NA,NA
 139,2007,NA,NA
@@ -1979,6 +2241,8 @@ rgn_id,year,gapfilled,method
 139,2017,NA,NA
 139,2018,NA,NA
 139,2019,NA,NA
+139,2020,NA,NA
+139,2021,NA,NA
 140,2005,gapfilled,UN georegion (r2)
 140,2006,gapfilled,UN georegion (r2)
 140,2007,gapfilled,UN georegion (r2)
@@ -1994,6 +2258,8 @@ rgn_id,year,gapfilled,method
 140,2017,gapfilled,UN georegion (r2)
 140,2018,gapfilled,UN georegion (r2)
 140,2019,gapfilled,UN georegion (r2)
+140,2020,gapfilled,UN georegion (r2)
+140,2021,gapfilled,UN georegion (r2)
 141,2005,NA,NA
 141,2006,NA,NA
 141,2007,NA,NA
@@ -2009,6 +2275,8 @@ rgn_id,year,gapfilled,method
 141,2017,NA,NA
 141,2018,NA,NA
 141,2019,NA,NA
+141,2020,NA,NA
+141,2021,NA,NA
 143,2005,NA,NA
 143,2006,NA,NA
 143,2007,NA,NA
@@ -2024,6 +2292,8 @@ rgn_id,year,gapfilled,method
 143,2017,NA,NA
 143,2018,NA,NA
 143,2019,NA,NA
+143,2020,NA,NA
+143,2021,NA,NA
 144,2005,gapfilled,UN georegion (r2)
 144,2006,gapfilled,UN georegion (r2)
 144,2007,gapfilled,UN georegion (r2)
@@ -2039,6 +2309,8 @@ rgn_id,year,gapfilled,method
 144,2017,gapfilled,UN georegion (r2)
 144,2018,gapfilled,UN georegion (r2)
 144,2019,gapfilled,UN georegion (r2)
+144,2020,gapfilled,UN georegion (r2)
+144,2021,gapfilled,UN georegion (r2)
 145,2005,NA,NA
 145,2006,NA,NA
 145,2007,NA,NA
@@ -2054,6 +2326,8 @@ rgn_id,year,gapfilled,method
 145,2017,NA,NA
 145,2018,NA,NA
 145,2019,NA,NA
+145,2020,NA,NA
+145,2021,NA,NA
 146,2005,gapfilled,UN georegion (r2)
 146,2006,gapfilled,UN georegion (r2)
 146,2007,gapfilled,UN georegion (r2)
@@ -2069,6 +2343,8 @@ rgn_id,year,gapfilled,method
 146,2017,gapfilled,UN georegion (r2)
 146,2018,gapfilled,UN georegion (r2)
 146,2019,gapfilled,UN georegion (r2)
+146,2020,gapfilled,UN georegion (r2)
+146,2021,gapfilled,UN georegion (r2)
 147,2005,NA,NA
 147,2006,NA,NA
 147,2007,NA,NA
@@ -2084,6 +2360,8 @@ rgn_id,year,gapfilled,method
 147,2017,NA,NA
 147,2018,NA,NA
 147,2019,NA,NA
+147,2020,NA,NA
+147,2021,NA,NA
 148,2005,gapfilled,UN georegion (r2)
 148,2006,gapfilled,UN georegion (r2)
 148,2007,gapfilled,UN georegion (r2)
@@ -2099,6 +2377,8 @@ rgn_id,year,gapfilled,method
 148,2017,gapfilled,UN georegion (r2)
 148,2018,gapfilled,UN georegion (r2)
 148,2019,gapfilled,UN georegion (r2)
+148,2020,gapfilled,UN georegion (r2)
+148,2021,gapfilled,UN georegion (r2)
 149,2005,gapfilled,UN georegion (r2)
 149,2006,gapfilled,UN georegion (r2)
 149,2007,gapfilled,UN georegion (r2)
@@ -2114,6 +2394,8 @@ rgn_id,year,gapfilled,method
 149,2017,gapfilled,UN georegion (r2)
 149,2018,gapfilled,UN georegion (r2)
 149,2019,gapfilled,UN georegion (r2)
+149,2020,gapfilled,UN georegion (r2)
+149,2021,gapfilled,UN georegion (r2)
 150,2005,gapfilled,UN georegion (r2)
 150,2006,gapfilled,UN georegion (r2)
 150,2007,gapfilled,UN georegion (r2)
@@ -2129,6 +2411,8 @@ rgn_id,year,gapfilled,method
 150,2017,gapfilled,UN georegion (r2)
 150,2018,gapfilled,UN georegion (r2)
 150,2019,gapfilled,UN georegion (r2)
+150,2020,gapfilled,UN georegion (r2)
+150,2021,gapfilled,UN georegion (r2)
 151,2005,NA,NA
 151,2006,NA,NA
 151,2007,NA,NA
@@ -2144,6 +2428,8 @@ rgn_id,year,gapfilled,method
 151,2017,NA,NA
 151,2018,NA,NA
 151,2019,NA,NA
+151,2020,NA,NA
+151,2021,NA,NA
 152,2005,NA,NA
 152,2006,NA,NA
 152,2007,NA,NA
@@ -2159,6 +2445,8 @@ rgn_id,year,gapfilled,method
 152,2017,NA,NA
 152,2018,NA,NA
 152,2019,NA,NA
+152,2020,NA,NA
+152,2021,NA,NA
 153,2005,NA,NA
 153,2006,NA,NA
 153,2007,NA,NA
@@ -2174,6 +2462,8 @@ rgn_id,year,gapfilled,method
 153,2017,NA,NA
 153,2018,NA,NA
 153,2019,NA,NA
+153,2020,NA,NA
+153,2021,NA,NA
 154,2005,NA,NA
 154,2006,NA,NA
 154,2007,NA,NA
@@ -2189,6 +2479,8 @@ rgn_id,year,gapfilled,method
 154,2017,NA,NA
 154,2018,NA,NA
 154,2019,NA,NA
+154,2020,NA,NA
+154,2021,NA,NA
 155,2005,NA,NA
 155,2006,NA,NA
 155,2007,NA,NA
@@ -2204,6 +2496,8 @@ rgn_id,year,gapfilled,method
 155,2017,NA,NA
 155,2018,NA,NA
 155,2019,NA,NA
+155,2020,NA,NA
+155,2021,NA,NA
 156,2005,NA,NA
 156,2006,NA,NA
 156,2007,NA,NA
@@ -2219,6 +2513,8 @@ rgn_id,year,gapfilled,method
 156,2017,NA,NA
 156,2018,NA,NA
 156,2019,NA,NA
+156,2020,NA,NA
+156,2021,NA,NA
 157,2005,gapfilled,UN georegion (r2)
 157,2006,gapfilled,UN georegion (r2)
 157,2007,gapfilled,UN georegion (r2)
@@ -2234,6 +2530,8 @@ rgn_id,year,gapfilled,method
 157,2017,gapfilled,UN georegion (r2)
 157,2018,gapfilled,UN georegion (r2)
 157,2019,gapfilled,UN georegion (r2)
+157,2020,gapfilled,UN georegion (r2)
+157,2021,gapfilled,UN georegion (r2)
 158,2005,gapfilled,UN georegion (r2)
 158,2006,gapfilled,UN georegion (r2)
 158,2007,gapfilled,UN georegion (r2)
@@ -2249,6 +2547,8 @@ rgn_id,year,gapfilled,method
 158,2017,gapfilled,UN georegion (r2)
 158,2018,gapfilled,UN georegion (r2)
 158,2019,gapfilled,UN georegion (r2)
+158,2020,gapfilled,UN georegion (r2)
+158,2021,gapfilled,UN georegion (r2)
 159,2005,gapfilled,UN georegion (r2)
 159,2006,gapfilled,UN georegion (r2)
 159,2007,gapfilled,UN georegion (r2)
@@ -2264,6 +2564,8 @@ rgn_id,year,gapfilled,method
 159,2017,gapfilled,UN georegion (r2)
 159,2018,gapfilled,UN georegion (r2)
 159,2019,gapfilled,UN georegion (r2)
+159,2020,gapfilled,UN georegion (r2)
+159,2021,gapfilled,UN georegion (r2)
 161,2005,NA,NA
 161,2006,NA,NA
 161,2007,NA,NA
@@ -2279,6 +2581,8 @@ rgn_id,year,gapfilled,method
 161,2017,NA,NA
 161,2018,NA,NA
 161,2019,NA,NA
+161,2020,NA,NA
+161,2021,NA,NA
 162,2005,NA,NA
 162,2006,NA,NA
 162,2007,NA,NA
@@ -2294,6 +2598,8 @@ rgn_id,year,gapfilled,method
 162,2017,NA,NA
 162,2018,NA,NA
 162,2019,NA,NA
+162,2020,NA,NA
+162,2021,NA,NA
 163,2005,NA,NA
 163,2006,NA,NA
 163,2007,NA,NA
@@ -2309,6 +2615,8 @@ rgn_id,year,gapfilled,method
 163,2017,NA,NA
 163,2018,NA,NA
 163,2019,NA,NA
+163,2020,NA,NA
+163,2021,NA,NA
 164,2005,NA,NA
 164,2006,NA,NA
 164,2007,NA,NA
@@ -2324,6 +2632,8 @@ rgn_id,year,gapfilled,method
 164,2017,NA,NA
 164,2018,NA,NA
 164,2019,NA,NA
+164,2020,NA,NA
+164,2021,NA,NA
 166,2005,NA,NA
 166,2006,NA,NA
 166,2007,NA,NA
@@ -2339,6 +2649,8 @@ rgn_id,year,gapfilled,method
 166,2017,NA,NA
 166,2018,NA,NA
 166,2019,NA,NA
+166,2020,NA,NA
+166,2021,NA,NA
 167,2005,NA,NA
 167,2006,NA,NA
 167,2007,NA,NA
@@ -2354,6 +2666,8 @@ rgn_id,year,gapfilled,method
 167,2017,NA,NA
 167,2018,NA,NA
 167,2019,NA,NA
+167,2020,NA,NA
+167,2021,NA,NA
 168,2005,NA,NA
 168,2006,NA,NA
 168,2007,NA,NA
@@ -2369,6 +2683,8 @@ rgn_id,year,gapfilled,method
 168,2017,NA,NA
 168,2018,NA,NA
 168,2019,NA,NA
+168,2020,NA,NA
+168,2021,NA,NA
 169,2005,gapfilled,UN georegion (r2)
 169,2006,gapfilled,UN georegion (r2)
 169,2007,gapfilled,UN georegion (r2)
@@ -2384,6 +2700,8 @@ rgn_id,year,gapfilled,method
 169,2017,gapfilled,UN georegion (r2)
 169,2018,gapfilled,UN georegion (r2)
 169,2019,gapfilled,UN georegion (r2)
+169,2020,gapfilled,UN georegion (r2)
+169,2021,gapfilled,UN georegion (r2)
 171,2005,NA,NA
 171,2006,NA,NA
 171,2007,NA,NA
@@ -2399,6 +2717,8 @@ rgn_id,year,gapfilled,method
 171,2017,NA,NA
 171,2018,NA,NA
 171,2019,NA,NA
+171,2020,NA,NA
+171,2021,NA,NA
 172,2005,NA,NA
 172,2006,NA,NA
 172,2007,NA,NA
@@ -2414,6 +2734,8 @@ rgn_id,year,gapfilled,method
 172,2017,NA,NA
 172,2018,NA,NA
 172,2019,NA,NA
+172,2020,NA,NA
+172,2021,NA,NA
 173,2005,NA,NA
 173,2006,NA,NA
 173,2007,NA,NA
@@ -2429,6 +2751,8 @@ rgn_id,year,gapfilled,method
 173,2017,NA,NA
 173,2018,NA,NA
 173,2019,NA,NA
+173,2020,NA,NA
+173,2021,NA,NA
 174,2005,NA,NA
 174,2006,NA,NA
 174,2007,NA,NA
@@ -2444,6 +2768,8 @@ rgn_id,year,gapfilled,method
 174,2017,NA,NA
 174,2018,NA,NA
 174,2019,NA,NA
+174,2020,NA,NA
+174,2021,NA,NA
 175,2005,NA,NA
 175,2006,NA,NA
 175,2007,NA,NA
@@ -2459,6 +2785,8 @@ rgn_id,year,gapfilled,method
 175,2017,NA,NA
 175,2018,NA,NA
 175,2019,NA,NA
+175,2020,NA,NA
+175,2021,NA,NA
 176,2005,NA,NA
 176,2006,NA,NA
 176,2007,NA,NA
@@ -2474,6 +2802,8 @@ rgn_id,year,gapfilled,method
 176,2017,NA,NA
 176,2018,NA,NA
 176,2019,NA,NA
+176,2020,NA,NA
+176,2021,NA,NA
 177,2005,NA,NA
 177,2006,NA,NA
 177,2007,NA,NA
@@ -2489,6 +2819,8 @@ rgn_id,year,gapfilled,method
 177,2017,NA,NA
 177,2018,NA,NA
 177,2019,NA,NA
+177,2020,NA,NA
+177,2021,NA,NA
 178,2005,NA,NA
 178,2006,NA,NA
 178,2007,NA,NA
@@ -2504,6 +2836,8 @@ rgn_id,year,gapfilled,method
 178,2017,NA,NA
 178,2018,NA,NA
 178,2019,NA,NA
+178,2020,NA,NA
+178,2021,NA,NA
 179,2005,NA,NA
 179,2006,NA,NA
 179,2007,NA,NA
@@ -2519,6 +2853,8 @@ rgn_id,year,gapfilled,method
 179,2017,NA,NA
 179,2018,NA,NA
 179,2019,NA,NA
+179,2020,NA,NA
+179,2021,NA,NA
 180,2005,NA,NA
 180,2006,NA,NA
 180,2007,NA,NA
@@ -2534,6 +2870,8 @@ rgn_id,year,gapfilled,method
 180,2017,NA,NA
 180,2018,NA,NA
 180,2019,NA,NA
+180,2020,NA,NA
+180,2021,NA,NA
 181,2005,NA,NA
 181,2006,NA,NA
 181,2007,NA,NA
@@ -2549,6 +2887,8 @@ rgn_id,year,gapfilled,method
 181,2017,NA,NA
 181,2018,NA,NA
 181,2019,NA,NA
+181,2020,NA,NA
+181,2021,NA,NA
 182,2005,NA,NA
 182,2006,NA,NA
 182,2007,NA,NA
@@ -2564,6 +2904,8 @@ rgn_id,year,gapfilled,method
 182,2017,NA,NA
 182,2018,NA,NA
 182,2019,NA,NA
+182,2020,NA,NA
+182,2021,NA,NA
 183,2005,NA,NA
 183,2006,NA,NA
 183,2007,NA,NA
@@ -2579,6 +2921,8 @@ rgn_id,year,gapfilled,method
 183,2017,NA,NA
 183,2018,NA,NA
 183,2019,NA,NA
+183,2020,NA,NA
+183,2021,NA,NA
 184,2005,NA,NA
 184,2006,NA,NA
 184,2007,NA,NA
@@ -2594,6 +2938,8 @@ rgn_id,year,gapfilled,method
 184,2017,NA,NA
 184,2018,NA,NA
 184,2019,NA,NA
+184,2020,NA,NA
+184,2021,NA,NA
 185,2005,NA,NA
 185,2006,NA,NA
 185,2007,NA,NA
@@ -2609,6 +2955,8 @@ rgn_id,year,gapfilled,method
 185,2017,NA,NA
 185,2018,NA,NA
 185,2019,NA,NA
+185,2020,NA,NA
+185,2021,NA,NA
 186,2005,NA,NA
 186,2006,NA,NA
 186,2007,NA,NA
@@ -2624,6 +2972,8 @@ rgn_id,year,gapfilled,method
 186,2017,NA,NA
 186,2018,NA,NA
 186,2019,NA,NA
+186,2020,NA,NA
+186,2021,NA,NA
 187,2005,NA,NA
 187,2006,NA,NA
 187,2007,NA,NA
@@ -2639,6 +2989,8 @@ rgn_id,year,gapfilled,method
 187,2017,NA,NA
 187,2018,NA,NA
 187,2019,NA,NA
+187,2020,NA,NA
+187,2021,NA,NA
 188,2005,NA,NA
 188,2006,NA,NA
 188,2007,NA,NA
@@ -2654,6 +3006,8 @@ rgn_id,year,gapfilled,method
 188,2017,NA,NA
 188,2018,NA,NA
 188,2019,NA,NA
+188,2020,NA,NA
+188,2021,NA,NA
 189,2005,NA,NA
 189,2006,NA,NA
 189,2007,NA,NA
@@ -2669,6 +3023,8 @@ rgn_id,year,gapfilled,method
 189,2017,NA,NA
 189,2018,NA,NA
 189,2019,NA,NA
+189,2020,NA,NA
+189,2021,NA,NA
 190,2005,NA,NA
 190,2006,NA,NA
 190,2007,NA,NA
@@ -2684,6 +3040,8 @@ rgn_id,year,gapfilled,method
 190,2017,NA,NA
 190,2018,NA,NA
 190,2019,NA,NA
+190,2020,NA,NA
+190,2021,NA,NA
 191,2005,NA,NA
 191,2006,NA,NA
 191,2007,NA,NA
@@ -2699,6 +3057,8 @@ rgn_id,year,gapfilled,method
 191,2017,NA,NA
 191,2018,NA,NA
 191,2019,NA,NA
+191,2020,NA,NA
+191,2021,NA,NA
 192,2005,NA,NA
 192,2006,NA,NA
 192,2007,NA,NA
@@ -2714,6 +3074,8 @@ rgn_id,year,gapfilled,method
 192,2017,NA,NA
 192,2018,NA,NA
 192,2019,NA,NA
+192,2020,NA,NA
+192,2021,NA,NA
 193,2005,NA,NA
 193,2006,NA,NA
 193,2007,NA,NA
@@ -2729,6 +3091,8 @@ rgn_id,year,gapfilled,method
 193,2017,NA,NA
 193,2018,NA,NA
 193,2019,NA,NA
+193,2020,NA,NA
+193,2021,NA,NA
 194,2005,NA,NA
 194,2006,NA,NA
 194,2007,NA,NA
@@ -2744,6 +3108,8 @@ rgn_id,year,gapfilled,method
 194,2017,NA,NA
 194,2018,NA,NA
 194,2019,NA,NA
+194,2020,NA,NA
+194,2021,NA,NA
 195,2005,NA,NA
 195,2006,NA,NA
 195,2007,NA,NA
@@ -2759,6 +3125,8 @@ rgn_id,year,gapfilled,method
 195,2017,NA,NA
 195,2018,NA,NA
 195,2019,NA,NA
+195,2020,NA,NA
+195,2021,NA,NA
 196,2005,NA,NA
 196,2006,NA,NA
 196,2007,NA,NA
@@ -2774,6 +3142,8 @@ rgn_id,year,gapfilled,method
 196,2017,NA,NA
 196,2018,NA,NA
 196,2019,NA,NA
+196,2020,NA,NA
+196,2021,NA,NA
 197,2005,NA,NA
 197,2006,NA,NA
 197,2007,NA,NA
@@ -2789,6 +3159,8 @@ rgn_id,year,gapfilled,method
 197,2017,NA,NA
 197,2018,NA,NA
 197,2019,NA,NA
+197,2020,NA,NA
+197,2021,NA,NA
 198,2005,NA,NA
 198,2006,NA,NA
 198,2007,NA,NA
@@ -2804,6 +3176,8 @@ rgn_id,year,gapfilled,method
 198,2017,NA,NA
 198,2018,NA,NA
 198,2019,NA,NA
+198,2020,NA,NA
+198,2021,NA,NA
 199,2005,NA,NA
 199,2006,NA,NA
 199,2007,NA,NA
@@ -2819,6 +3193,8 @@ rgn_id,year,gapfilled,method
 199,2017,NA,NA
 199,2018,NA,NA
 199,2019,NA,NA
+199,2020,NA,NA
+199,2021,NA,NA
 200,2005,NA,NA
 200,2006,NA,NA
 200,2007,NA,NA
@@ -2834,6 +3210,8 @@ rgn_id,year,gapfilled,method
 200,2017,NA,NA
 200,2018,NA,NA
 200,2019,NA,NA
+200,2020,NA,NA
+200,2021,NA,NA
 202,2005,NA,NA
 202,2006,NA,NA
 202,2007,NA,NA
@@ -2849,6 +3227,8 @@ rgn_id,year,gapfilled,method
 202,2017,NA,NA
 202,2018,NA,NA
 202,2019,NA,NA
+202,2020,NA,NA
+202,2021,NA,NA
 203,2005,NA,NA
 203,2006,NA,NA
 203,2007,NA,NA
@@ -2864,6 +3244,8 @@ rgn_id,year,gapfilled,method
 203,2017,NA,NA
 203,2018,NA,NA
 203,2019,NA,NA
+203,2020,NA,NA
+203,2021,NA,NA
 204,2005,NA,NA
 204,2006,NA,NA
 204,2007,NA,NA
@@ -2879,6 +3261,8 @@ rgn_id,year,gapfilled,method
 204,2017,NA,NA
 204,2018,NA,NA
 204,2019,NA,NA
+204,2020,NA,NA
+204,2021,NA,NA
 205,2005,NA,NA
 205,2006,NA,NA
 205,2007,NA,NA
@@ -2894,6 +3278,8 @@ rgn_id,year,gapfilled,method
 205,2017,NA,NA
 205,2018,NA,NA
 205,2019,NA,NA
+205,2020,NA,NA
+205,2021,NA,NA
 206,2005,NA,NA
 206,2006,NA,NA
 206,2007,NA,NA
@@ -2909,6 +3295,8 @@ rgn_id,year,gapfilled,method
 206,2017,NA,NA
 206,2018,NA,NA
 206,2019,NA,NA
+206,2020,NA,NA
+206,2021,NA,NA
 207,2005,NA,NA
 207,2006,NA,NA
 207,2007,NA,NA
@@ -2924,6 +3312,8 @@ rgn_id,year,gapfilled,method
 207,2017,NA,NA
 207,2018,NA,NA
 207,2019,NA,NA
+207,2020,NA,NA
+207,2021,NA,NA
 208,2005,NA,NA
 208,2006,NA,NA
 208,2007,NA,NA
@@ -2939,6 +3329,8 @@ rgn_id,year,gapfilled,method
 208,2017,NA,NA
 208,2018,NA,NA
 208,2019,NA,NA
+208,2020,NA,NA
+208,2021,NA,NA
 209,2005,NA,NA
 209,2006,NA,NA
 209,2007,NA,NA
@@ -2954,6 +3346,8 @@ rgn_id,year,gapfilled,method
 209,2017,NA,NA
 209,2018,NA,NA
 209,2019,NA,NA
+209,2020,NA,NA
+209,2021,NA,NA
 210,2005,NA,NA
 210,2006,NA,NA
 210,2007,NA,NA
@@ -2969,6 +3363,8 @@ rgn_id,year,gapfilled,method
 210,2017,NA,NA
 210,2018,NA,NA
 210,2019,NA,NA
+210,2020,NA,NA
+210,2021,NA,NA
 212,2005,NA,NA
 212,2006,NA,NA
 212,2007,NA,NA
@@ -2984,6 +3380,8 @@ rgn_id,year,gapfilled,method
 212,2017,NA,NA
 212,2018,NA,NA
 212,2019,NA,NA
+212,2020,NA,NA
+212,2021,NA,NA
 214,2005,NA,NA
 214,2006,NA,NA
 214,2007,NA,NA
@@ -2999,6 +3397,8 @@ rgn_id,year,gapfilled,method
 214,2017,NA,NA
 214,2018,NA,NA
 214,2019,NA,NA
+214,2020,NA,NA
+214,2021,NA,NA
 215,2005,NA,NA
 215,2006,NA,NA
 215,2007,NA,NA
@@ -3014,6 +3414,8 @@ rgn_id,year,gapfilled,method
 215,2017,NA,NA
 215,2018,NA,NA
 215,2019,NA,NA
+215,2020,NA,NA
+215,2021,NA,NA
 216,2005,NA,NA
 216,2006,NA,NA
 216,2007,NA,NA
@@ -3029,6 +3431,8 @@ rgn_id,year,gapfilled,method
 216,2017,NA,NA
 216,2018,NA,NA
 216,2019,NA,NA
+216,2020,NA,NA
+216,2021,NA,NA
 218,2005,NA,NA
 218,2006,NA,NA
 218,2007,NA,NA
@@ -3044,6 +3448,8 @@ rgn_id,year,gapfilled,method
 218,2017,NA,NA
 218,2018,NA,NA
 218,2019,NA,NA
+218,2020,NA,NA
+218,2021,NA,NA
 219,2005,NA,NA
 219,2006,NA,NA
 219,2007,NA,NA
@@ -3059,6 +3465,8 @@ rgn_id,year,gapfilled,method
 219,2017,NA,NA
 219,2018,NA,NA
 219,2019,NA,NA
+219,2020,NA,NA
+219,2021,NA,NA
 220,2005,NA,NA
 220,2006,NA,NA
 220,2007,NA,NA
@@ -3074,6 +3482,8 @@ rgn_id,year,gapfilled,method
 220,2017,NA,NA
 220,2018,NA,NA
 220,2019,NA,NA
+220,2020,NA,NA
+220,2021,NA,NA
 221,2005,NA,NA
 221,2006,NA,NA
 221,2007,NA,NA
@@ -3089,6 +3499,8 @@ rgn_id,year,gapfilled,method
 221,2017,NA,NA
 221,2018,NA,NA
 221,2019,NA,NA
+221,2020,NA,NA
+221,2021,NA,NA
 222,2005,NA,NA
 222,2006,NA,NA
 222,2007,NA,NA
@@ -3104,6 +3516,8 @@ rgn_id,year,gapfilled,method
 222,2017,NA,NA
 222,2018,NA,NA
 222,2019,NA,NA
+222,2020,NA,NA
+222,2021,NA,NA
 223,2005,NA,NA
 223,2006,NA,NA
 223,2007,NA,NA
@@ -3119,6 +3533,8 @@ rgn_id,year,gapfilled,method
 223,2017,NA,NA
 223,2018,NA,NA
 223,2019,NA,NA
+223,2020,NA,NA
+223,2021,NA,NA
 224,2005,NA,NA
 224,2006,NA,NA
 224,2007,NA,NA
@@ -3134,6 +3550,8 @@ rgn_id,year,gapfilled,method
 224,2017,NA,NA
 224,2018,NA,NA
 224,2019,NA,NA
+224,2020,NA,NA
+224,2021,NA,NA
 227,2005,NA,NA
 227,2006,NA,NA
 227,2007,NA,NA
@@ -3149,6 +3567,8 @@ rgn_id,year,gapfilled,method
 227,2017,NA,NA
 227,2018,NA,NA
 227,2019,NA,NA
+227,2020,NA,NA
+227,2021,NA,NA
 228,2005,NA,NA
 228,2006,NA,NA
 228,2007,NA,NA
@@ -3164,6 +3584,8 @@ rgn_id,year,gapfilled,method
 228,2017,NA,NA
 228,2018,NA,NA
 228,2019,NA,NA
+228,2020,NA,NA
+228,2021,NA,NA
 231,2005,NA,NA
 231,2006,NA,NA
 231,2007,NA,NA
@@ -3179,6 +3601,8 @@ rgn_id,year,gapfilled,method
 231,2017,NA,NA
 231,2018,NA,NA
 231,2019,NA,NA
+231,2020,NA,NA
+231,2021,NA,NA
 232,2005,NA,NA
 232,2006,NA,NA
 232,2007,NA,NA
@@ -3194,6 +3618,8 @@ rgn_id,year,gapfilled,method
 232,2017,NA,NA
 232,2018,NA,NA
 232,2019,NA,NA
+232,2020,NA,NA
+232,2021,NA,NA
 237,2005,gapfilled,UN georegion (r2)
 237,2006,gapfilled,UN georegion (r2)
 237,2007,gapfilled,UN georegion (r2)
@@ -3209,6 +3635,8 @@ rgn_id,year,gapfilled,method
 237,2017,gapfilled,UN georegion (r2)
 237,2018,gapfilled,UN georegion (r2)
 237,2019,gapfilled,UN georegion (r2)
+237,2020,gapfilled,UN georegion (r2)
+237,2021,gapfilled,UN georegion (r2)
 244,2005,NA,NA
 244,2006,NA,NA
 244,2007,NA,NA
@@ -3224,6 +3652,8 @@ rgn_id,year,gapfilled,method
 244,2017,NA,NA
 244,2018,NA,NA
 244,2019,NA,NA
+244,2020,NA,NA
+244,2021,NA,NA
 245,2005,gapfilled,UN georegion (r2)
 245,2006,gapfilled,UN georegion (r2)
 245,2007,gapfilled,UN georegion (r2)
@@ -3239,6 +3669,8 @@ rgn_id,year,gapfilled,method
 245,2017,gapfilled,UN georegion (r2)
 245,2018,gapfilled,UN georegion (r2)
 245,2019,gapfilled,UN georegion (r2)
+245,2020,gapfilled,UN georegion (r2)
+245,2021,gapfilled,UN georegion (r2)
 247,2005,NA,NA
 247,2006,NA,NA
 247,2007,NA,NA
@@ -3254,6 +3686,8 @@ rgn_id,year,gapfilled,method
 247,2017,NA,NA
 247,2018,NA,NA
 247,2019,NA,NA
+247,2020,NA,NA
+247,2021,NA,NA
 248,2005,gapfilled,UN georegion (r2)
 248,2006,gapfilled,UN georegion (r2)
 248,2007,gapfilled,UN georegion (r2)
@@ -3269,6 +3703,8 @@ rgn_id,year,gapfilled,method
 248,2017,gapfilled,UN georegion (r2)
 248,2018,gapfilled,UN georegion (r2)
 248,2019,gapfilled,UN georegion (r2)
+248,2020,gapfilled,UN georegion (r2)
+248,2021,gapfilled,UN georegion (r2)
 249,2005,gapfilled,UN georegion (r2)
 249,2006,gapfilled,UN georegion (r2)
 249,2007,gapfilled,UN georegion (r2)
@@ -3284,6 +3720,8 @@ rgn_id,year,gapfilled,method
 249,2017,gapfilled,UN georegion (r2)
 249,2018,gapfilled,UN georegion (r2)
 249,2019,gapfilled,UN georegion (r2)
+249,2020,gapfilled,UN georegion (r2)
+249,2021,gapfilled,UN georegion (r2)
 250,2005,NA,NA
 250,2006,NA,NA
 250,2007,NA,NA
@@ -3299,3 +3737,5 @@ rgn_id,year,gapfilled,method
 250,2017,NA,NA
 250,2018,NA,NA
 250,2019,NA,NA
+250,2020,NA,NA
+250,2021,NA,NA
