@@ -19,7 +19,7 @@ editor_options:
 ---
 
 
-[REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2022/globalprep/tr/v2021/tr_data_prep.html)
+[REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2022/globalprep/tr/v2022/tr_data_prep.html)
 
 
 # Summary
@@ -52,15 +52,15 @@ WTTC data includes projections 10 years in the future, and in 2018 it was unclea
 
 **We were able to update the following data:**
 
-* Tourism sustainability data from the WEC Travel and Tourism Competitiveness Report were updated to include the September 2019 report update. (downloaded on 03/11/2020)
+* Tourism sustainability data from the WEF Travel and Tourism Development Index replaced data from its predecessor the TTCI and were updated to include 2021 and back-calculated 2019. (downloaded on 07/01/2022)
 * Proportion of jobs in tourism - WTTC data reported until 2030, but 2020 is most recent year of real data (year_max) (downloaded from WTTC on 03/12/2020)
 
 ## Initial set-up code
 
 ```{r setup, message=FALSE, warning=FALSE, results="hide"}
 
-#library(devtools)
-#devtools::install_github("ohi-science/ohicore@dev") # dont worry about devtools
+# library(devtools)
+# devtools::install_github("ohi-science/ohicore@dev") # dont worry about devtools
 library(ohicore)
 library(tidyverse)
 library(stringr)
@@ -68,6 +68,7 @@ library(WDI)
 library(here)
 library(janitor)
 library(plotly)
+library(readxl)
 
 version_year <- "2022"
 
@@ -76,9 +77,7 @@ source(paste0("http://ohi-science.org/ohiprep_v", version_year, "/workflow/R/com
 ## maximum year of wttc data:
 year_max <- 2020
 
-source(here("globalprep/tr/v", version_year, "/R/tr_fxns.R"))
-
-setwd(here("globalprep/tr/v", version_year))
+source(here(paste0("globalprep/tr/v", version_year, "/R/tr_fxns.R")))
 
 ```
 
@@ -242,9 +241,9 @@ ggplotly(ggplot(new, aes(x = Ep, y = ep_old, labels = rgn_id)) +
 
 # Ts: Tourism sustainability
 
-These data are from the World Economic Forum's "Travel and Tourism Competitiveness Report" (https://www.weforum.org/reports/travel-and-tourism-development-index-2021/downloads-510eb47e12) See mazu: _raw_data/WEF-Economics/ for more details and the raw data.
+These data are from the World Economic Forum's "Travel and Tourism Development Index" (https://www.weforum.org/reports/travel-and-tourism-development-index-2021/downloads-510eb47e12) See mazu: _raw_data/WEF-Economics/ for more details and the raw data.
 
-These data are not compatible across years, so only the most recent year of data is across scenarios.
+The TTDI was formerly the TTCI which was a similar index, but unfortunately not comparable. The TTDI only extends back to 2019. 
 
 These data are gapfilled using gdppcppp and UN georegion information (see next section for obtaining and preparing these data).
 
@@ -252,7 +251,7 @@ These data are gapfilled using gdppcppp and UN georegion information (see next s
 # update to latest file name
 ttdi_file <- "WEF_TTDI_2021_data_for_download.xlsx"
 
-ttdi_raw <- read_excel(here(paste0("globalprep/tr/v", version_year, "/raw/", ttdi_file)),
+ttdi_raw <- read_excel(paste0(dir_M, "/git-annex/globalprep/_raw_data/WEF-Economics/d", version_year, "/", ttdi_file),
                  skip = 2) 
 
 # move up column names from first row while keeping the full country names as columns too
@@ -261,15 +260,15 @@ names(ttdi_raw)[1:9] <- as.character(ttdi_raw[1, 1:9])
 # filtering for sustainability scores, selecting needed columns, and pivoting to tidy format
 ttdi <- ttdi_raw %>%
   filter(Title == "T&T Sustainability subindex, 1-7 (best)",
-         Attribute == "Score",
-         Edition == "2021") %>% 
-  select(Albania:Zambia) %>% 
-  # currently Zambia is the last country column - this may need to change in the future if countries are added (e.g. Zimbabwe)
+         Attribute == "Score") %>% 
+  select(year = Edition, Albania:Zambia) %>% 
+  # currently Zambia is the last country column
   pivot_longer(cols = Albania:Zambia, names_to = "country",
-               values_to = "score")
+               values_to = "score") %>% 
+  mutate(score = as.numeric(score))
 
 
-#Changing names that are not recognized by ohicore
+# Changing names that are not recognized by ohicore
 ttdi <- ttdi %>%
     mutate(country = ifelse(str_detect(country, "Ivoire"), "Ivory Coast", country))
   
@@ -279,23 +278,24 @@ ttdi_rgn <- name_2_rgn(df_in = ttdi,
 
 ## Duplicated regions weighted mean
 weight_data <- data.frame(country = c("China", "Hong Kong SAR"),
-                          # pop values from World Bank 2021 estimates
+                          # pop values from World Bank 2021 estimates - updated v2022
                           population = c(1412360000, 7413100))
 
-# *** MAKING SURE THIS WORKED RIGHT ***
 
 ttdi_rgn <- ttdi_rgn %>%
   arrange(country) %>%
   left_join(weight_data, by = "country") %>%
   mutate(population = ifelse(is.na(population), 1, population)) %>%
-  group_by(rgn_id, rgn_name) %>%
+  group_by(rgn_id, rgn_name, year) %>%
   summarize(score = weighted.mean(score, population)) %>%
-  select(rgn_id, rgn_name, score)
+  select(year, rgn_id, rgn_name, score)
+
+# compare with old dataframe to make sure only the duplicated region scores changed 
 
 head(ttdi_rgn, 10)
 
-### Save TTCI data file
-write.csv(ttci_rgn, file.path(here(), 'globalprep/tr/v2020/intermediate/wef_ttci.csv'), row.names = FALSE)
+### Save TTDI data file
+write.csv(ttdi_rgn, here(paste0("globalprep/tr/v", version_year, "/intermediate/wef_ttdi.csv")), row.names = FALSE)
 
 ```
 
@@ -306,14 +306,14 @@ The Artisanal Opportunities goal uses gdppcppp data, so we will get the data tha
 
 
 ```{r worldbank, eval=FALSE}
-wb <- read.csv("../../ao/v2020/intermediate/gdppcppp_ohi.csv") %>%
+wb <- read.csv(here(paste0("globalprep/ao/v", version_year, "/intermediate/gdppcppp_ohi.csv"))) %>%
   dplyr::select(rgn_id, year, value)
 
 ```
 
-CIA data are used to fill in missing gaps in the gdppcppp data (https://www.cia.gov/library/publications/the-world-factbook/rankorder/2004rank.html)
+CIA data are used to fill in missing gaps in the gdppcppp data (https://www.cia.gov/the-world-factbook/field/real-gdp-per-capita/country-comparison)
 
-Downloaded: 04/01/2020
+Downloaded: 07/05/2022
 
 See README on the raw folder for instructions on how to download this data. 
 
@@ -321,26 +321,20 @@ The following code is used to prepare these data for OHI:
 
 ```{r cia gdp, eval=FALSE}
 
-cia_gdp <- read.delim('raw/cia_gdp_pc_ppp.txt', stringsAsFactors = FALSE, header = FALSE) %>% 
-  separate(V1, c("number", "other"), sep = " ", extra = "merge") %>% 
-  separate(other, c("country", "gdppcppp"), sep = "\\$") %>%
-  mutate(country = str_trim(country, side = "both")) %>% 
-  mutate(country = noquote(country)) %>% 
-  mutate(country = as.character(country)) %>% 
-  mutate(gdppcppp = as.numeric(gsub(",", "", gdppcppp))) %>% 
-  select(-number) %>% 
-  data.frame()
+cia_gdp <- read.csv(here(paste0("globalprep/tr/v", version_year, "/raw/cia_gdp_pc_ppp.csv"))) %>% 
+  # remove dollar signs and commas and convert to numeric
+  mutate(value = as.numeric(gsub("[$,]", "", value))) %>% 
+  select(name, value) %>% 
+  rename(country = name, pcgdp_cia = value)
 
-##Data reported in a lower resolution than OHI regions
-splits <- data.frame(country = "Saint Helena, Ascension, and Tristan da Cunha", country2 = c("Saint Helena",                                                                "Ascension","Tristan da Cunha")) %>%
-  mutate(country = as.character(country),
-         country2 = as.character(country2))
+ ## Data reported in a lower resolution than OHI regions
+splits <- data.frame(country = "Saint Helena, Ascension, and Tristan da Cunha", 
+                     country2 = c("Saint Helena", "Ascension","Tristan da Cunha"))
 
 cia_gdp <- cia_gdp %>%
   left_join(splits, by='country') %>%
   mutate(country2 = ifelse(is.na(country2), country, country2)) %>%
-  select(country=country2, pcgdp_cia = gdppcppp)
-
+  select(country = country2, pcgdp_cia)
 
 cia_gdp_rgn <- name_2_rgn(df_in = cia_gdp, 
                        fld_name='country')
@@ -350,9 +344,9 @@ cia_gdp_rgn <- name_2_rgn(df_in = cia_gdp,
 population_weights <- data.frame(country = c("Virgin Islands", "Puerto Rico",
                                              "China", "Hong Kong", "Macau",
                                              "Guam", "Northern Mariana Islands"),
-                                 population = c(104423, 2860840,
-                                         1439323774, 7496988, 649342,
-                                         168775, 55144))
+                                 # from world bank - updated v2022
+                                 population = c(105870, 3263584, 1412360000,
+                                                7413100, 658391, 170184, 57910))
 
 cia_gdp_rgn <- cia_gdp_rgn %>%
   left_join(population_weights, by="country") %>%
@@ -363,7 +357,7 @@ cia_gdp_rgn <- cia_gdp_rgn %>%
   filter(rgn_id <= 250) %>%
   select(rgn_id, pcgdp_cia)
 
-write.csv(cia_gdp_rgn, "intermediate/wb_rgn_cia_GDPPCPPP.csv", row.names=FALSE)
+write.csv(cia_gdp_rgn, here(paste0("globalprep/tr/v", version_year, "/intermediate/wb_rgn_cia_GDPPCPPP.csv")), row.names=FALSE)
 
 ```
 
@@ -378,7 +372,7 @@ gdppcppp <- wb %>%
   select(rgn_id, year, pcgdp = value)
 
 ### cia gdp data
-gdppcppp2 <- read.csv('intermediate/wb_rgn_cia_GDPPCPPP.csv')
+gdppcppp2 <- read.csv(here(paste0("globalprep/tr/v", version_year, "/intermediate/wb_rgn_cia_GDPPCPPP.csv")))
 
 
 ### Use WB data, but if missing, use pcgdp_cia.
@@ -395,14 +389,14 @@ gdp_raw <- merge(years, regions, by=NULL) %>%
   left_join(gdppcppp2, by = c("rgn_id")) 
 
 ## quick compare to make sure the CIA and World Bank data are compatible
-plot(gdp_raw$pcgdp[gdp_raw$year==2018], gdp_raw$pcgdp_cia[gdp_raw$year==2018])
+plot(gdp_raw$pcgdp[gdp_raw$year==2021], gdp_raw$pcgdp_cia[gdp_raw$year==2021])
 abline(0,1, col="red")
-# a bit of scatter for a few regions, but overall looks good
+# a few minor outliers but overall looks good
 
 gdp_raw <- gdp_raw %>%
   mutate(pcgdp2 = ifelse(is.na(pcgdp), pcgdp_cia, pcgdp))
 
-##Calculating the means across different geopolitical levels (e.g. r2, r1)
+## Calculating the means across different geopolitical levels (e.g. r2, r1)
 gdp_raw <- gdp_raw %>%
   group_by(r2, year) %>%
   mutate(gdp_pred_r2 = mean(pcgdp2, na.rm=TRUE)) %>%
@@ -418,17 +412,17 @@ gdp_raw_gf <- gdp_raw %>%
   mutate(method = ifelse(is.na(pcgdp2) & !is.na(gdp_pred_r2), "UN georegion (r2)", NA)) %>%
   mutate(method = ifelse(is.na(pcgdp2) & is.na(gdp_pred_r2) & !is.na(gdp_pred_r1), "UN georegion (r1)", method)) 
 
-write_csv(gdp_raw_gf, "intermediate/gdp_raw_gf.csv")
+write_csv(gdp_raw_gf, here(paste0("globalprep/tr/v", version_year, "/intermediate/gdp_raw_gf.csv")))
 
 gdp_data_gf <- gdp_raw_gf %>%
   select(rgn_id, year, gapfilled, method) 
 
-write_csv(gdp_data_gf, "intermediate/gdp_gf.csv")
+write_csv(gdp_data_gf, here(paste0("globalprep/tr/v", version_year, "/intermediate/gdp_gf.csv")))
 
 gdp_data <- gdp_raw_gf %>%
   select(rgn_id, year, pcgdp = gdp_all)
 
-write_csv(gdp_data, "intermediate/gdp.csv")
+write_csv(gdp_data, here(paste0("globalprep/tr/v", version_year, "/intermediate/gdp.csv")))
 
 ```
 
@@ -437,40 +431,41 @@ The final step is gapfilling the Sustainability data using a linear model with g
 
 ```{r, eval=FALSE}
 
-sust  <- read.csv('intermediate/wef_ttci.csv', stringsAsFactors = FALSE)
+sust <- read.csv(here(paste0("globalprep/tr/v", version_year, "/intermediate/wef_ttdi.csv")), stringsAsFactors = FALSE)
 
 ### don't need to gapfill data without tourism data:
 ## Most recent tourism data is 2019.  
 
-ep_gf <- read.csv("output/tr_jobs_pct_tourism.csv") %>%
-  filter(year == 2019) %>%
-  select(rgn_id, Ep) %>%
+ep_gf <- read.csv(here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv"))) %>%
+  # filter(year == 2021) %>%
+  select(rgn_id, Ep, year) %>%
   filter(!is.na(Ep))
 
 # gdp dataframe prepared above (World Bank, CIA, and gapfilled gdp data)
-gdp_raw_gf <- read.csv("intermediate/gdp_raw_gf.csv", stringsAsFactors = FALSE) %>% 
-  filter(year == 2018) %>%
-  select(rgn_id, r0_label, r1_label, r2_label, rgn_label, pcgdp, pcgdp_cia, pcgdp2, gdp_all) 
+gdp_raw_gf <- read.csv(here(paste0("globalprep/tr/v", version_year, "/intermediate/gdp_raw_gf.csv")), stringsAsFactors = FALSE) %>% 
+  # filter(year == 2021) %>%
+  select(rgn_id, r0_label, r1_label, r2_label, rgn_label,
+         pcgdp, pcgdp_cia, pcgdp2, gdp_all, year) 
 
 tr_sust <- gdp_raw_gf %>%
-           left_join(sust, by = c("rgn_id")) %>%
-          left_join(ep_gf, by = c("rgn_id")) %>%  
+           left_join(sust, by = c("rgn_id", "year")) %>%
+          left_join(ep_gf, by = c("rgn_id", "year")) %>%
           rename(S_score = score) %>%
           filter(rgn_id != 213)
 
 ### Add gapfill flag variable 
-##Reminder:
+## Reminder:
 ## pcgdp2: includes both the World Bank and CIA data (with CIA data only used if there is not World Bank data)
 ## Ep: Proportion of workforce directly employed in tourism
-##S_score: tourism sustainability score
+## S_score: tourism sustainability score
 
 tr_sust_gf <- tr_sust %>%
   mutate(gapfilled = ifelse(is.na(S_score) & !is.na(Ep), "gapfilled", NA)) %>%
   mutate(method = ifelse(is.na(S_score) & !is.na(Ep) & is.na(pcgdp2), "lm georegion + gdppcppp, with est. gdppcppp", NA)) %>%
   mutate(method = ifelse(is.na(S_score) & !is.na(Ep) & !is.na(pcgdp2), "lm georegion + gdppcppp", method)) %>%
-  select(rgn_id, gapfilled, method)
+  select(rgn_id, gapfilled, method, year)
 
-write.csv(tr_sust_gf, "output/tr_sustainability_gf.csv", row.names=FALSE)
+write.csv(tr_sust_gf, here(paste0("globalprep/tr/v", version_year, "/output/tr_sustainability_gf.csv")), row.names=FALSE)
 
 ```
   
@@ -498,7 +493,7 @@ abline(0,1)
 
 
 ## Estimate missing data and gapfill
-# Some of the r1 levels do not have data and consequently causes a fail. This chink of code  drop these levels so an NA is returned
+# Some of the r1 levels do not have data and consequently causes a fail. This chunk of code drops these levels so an NA is returned
 
 # Select only r2 column
 new_data <- tr_sust %>% 
@@ -534,34 +529,35 @@ tr_sust <- tr_sust %>%
 
 
 ## some are missing the r1 predictions, but none of these have Ep scores, so not relevant
-filter(tr_sust, is.na(S_score_pred_r1))
+View(filter(tr_sust, is.na(S_score_pred_r1)))
 
 tr_sust <- tr_sust %>%
   mutate(S_score_2 = ifelse(is.na(S_score), S_score_pred_r2, S_score)) %>%
   mutate(S_score_2 = ifelse(is.na(S_score_2), S_score_pred_r1, S_score_2)) %>%
-  mutate(year = '2019') %>%
-#  filter(!is.na(Ep)) %>%
+  filter(year %in% c(2019, 2021)) %>%
   select(rgn_id, year, S_score=S_score_2)
 
 summary(tr_sust)
 
-write_csv(tr_sust, "output/tr_sustainability.csv")
+write_csv(tr_sust, here(paste0("globalprep/tr/v", version_year, "/output/tr_sustainability.csv")))
 ```
 
 
 ## Compare with previous year of data 
 
 ```{r, eval=FALSE}
-tr_sust <- read_csv("output/tr_sustainability.csv")
+tr_sust <- read_csv(here(paste0("globalprep/tr/v", version_year, "/output/tr_sustainability.csv")))
 
-compare <- read.csv("../v2018/output/tr_sustainability.csv") %>% # change year
-  select(rgn_id, old_S_score = S_score) %>%
-  left_join(tr_sust, by = "rgn_id") %>%
-  mutate(dif = old_S_score - S_score)
+prev_year <- (as.numeric(version_year) - 1) %>% 
+  as.character()
 
-plot(compare$S_score, compare$old_S_score)
+compare <- tr_sust %>% 
+  pivot_wider(names_from = year, values_from = S_score)
+
+# current vs previous year of data
+plot(compare$"2021", compare$"2019")
 abline(0, 1, col="red")
-#looks reasonable 
+# looks good
 
 ```
 
