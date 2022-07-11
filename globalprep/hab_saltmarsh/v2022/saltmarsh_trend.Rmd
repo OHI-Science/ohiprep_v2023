@@ -167,9 +167,8 @@ dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tid
 ```{r eval = FALSE}
 tictoc::tic()
 
-registerDoParallel(10)
+registerDoParallel(4)
 
-path <- paste0(dir_data, "/raw/")
 files <- list.files(paste0(dir_data, "/raw"), pattern = "Type")
 
 foreach (i = files) %dopar% { 
@@ -182,11 +181,7 @@ foreach (i = files) %dopar% {
   
   if(!file.exists(file_name)){
     
-    cat(paste0("Opening: ", files[i], "\n"))
-    
-    img <- terra::rast(paste0(path, i))
-    
-    cat("Filtering for Tidal Marsh...\n")
+    img <- terra::rast(paste0(dir_data, "/raw/", i))
     
     terra::subst(
       x = img,
@@ -196,7 +191,6 @@ foreach (i = files) %dopar% {
       overwrite = FALSE
     )
     
-    cat(paste0("Saving file as: /int/type/", fn, "\n"))
   } else {
     cat(paste0(fn, " already exists!\n"))
   }
@@ -204,135 +198,185 @@ foreach (i = files) %dopar% {
 tictoc::toc()
 ```
 
-```{r eval = FALSE}
-# tictoc::tic()
-# 
-# paths <- list.files(paste0(dir_data, "/raw"), pattern = "Type", full.names = TRUE)
-# files <- list.files(paste0(dir_data, "/raw"), pattern = "Type")
-# 
-# for (i in 1:length(paths)) {
-#   
-#   fn <- files[i] %>% 
-#     stringr::str_replace(pattern = "gainType", replacement = "TM_gain") %>% 
-#     stringr::str_replace(pattern = "lossType", replacement = "TM_loss")
-#   
-#   file_name <- paste0(dir_data, "/int/type/", fn)
-#   
-#   if(!file.exists(file_name)){
-#     
-#     cat(paste0("Opening: ", files[i], "\n"))
-#     
-#     img <- terra::rast(paths[i])
-#     
-#     cat("Filtering for Tidal Marsh...\n")
-#     
-#     terra::subst(
-#       x = img,
-#       from = c(2, 3, 5),
-#       to   = c(0, 0, 1),
-#       filename = file_name,
-#       overwrite = FALSE
-#     )
-#     
-#     cat(paste0("Saving file as: /int/type/", fn, "\n"))
-#   } else {
-#     cat(paste0(fn, " already exists!\n"))
-#   }
-# }
-# tictoc::toc()
-```
-
 ## Separate years into individual layers 
 
-```{r eval = FALSE}
-### Example gainType-0000065536-0001114112 has all the different habitat types
-
-file <- list.files(paste0(dir_data, "/raw"), pattern = "gainYear-0000065536-0001114112", full.names = TRUE)
-
-img <- rast(file)
-
-terr::unique(img)
-# 
-# x = terra::subst(
-#   x = img, 
-#   from = c(2, 3, 5),
-#   to   = c(0, 0, 1)
-# )
-# 
-# terr::unique(x)
-```
-
-```{r eval = FALSE}
+```{r eval=FALSE}
 tictoc::tic()
-paths <- list.files(paste0(dir_data, "/raw"), pattern = "Year", full.names = TRUE)
-files <- list.files(paste0(dir_data, "/raw"), pattern = "Year")
-years <- c(1, 4, 7, 10, 13, 16, 19)
 
-for (i in 1:length(paths)) {
+registerDoParallel(10)
+
+files <- list.files(paste0(dir_data, "/raw"), pattern = "Year")
+years <- c(4, 7, 10, 13, 16, 19)
+
+foreach (i = files) %dopar% { 
   for (yr in years){
     
-    print(paste0("Opening: ", files[i]))
-    
-    fn <- files[i] %>% 
+    fn <- i %>% 
       stringr::str_replace(pattern = "gainYear", replacement = paste0("gain_", yr)) %>% 
       stringr::str_replace(pattern = "lossYear", replacement = paste0("loss_", yr))
     
-    img <- terra::rast(paths[i])
+    file_name <- paste0(dir_data, "/int/year/", fn)
     
-    print("Filtering for Tidal Marsh...")
-    
-    ### Delete current year from list of years
-    yrs <- years %>% magrittr::extract(. != yr)
-    
-    ### Subsititue years not equal to this year with 0
-    int <- terra::subst(
-      x    = img,
-      from = yrs,
-      to   = 0
-    )
-    ### Subsititue this year with 1 and save file with year appended to filename
-    terra::subst(
-      x    = int,
-      from = yr,
-      to   = 1,
-      filename = paste0(dir_data, "/int/year/", fn)
-    )
-    
-    cat(paste0("Saving file as: /int/year/", fn, "\n"))
+    if(!file.exists(file_name)){
+      
+      img <- terra::rast(paste0(dir_data, "/raw/", i))
+      
+      ### Delete current year from list of years
+      yrs <- years %>% magrittr::extract(. != yr)
+      
+      ### Subsititue years not equal to this year with 0
+      int <- terra::subst(
+        x    = img,
+        from = yrs,
+        to   = 0
+      )
+      ### Subsititue this year with 1 and save file with year appended to filename
+      terra::subst(
+        x    = int,
+        from = yr,
+        to   = 1,
+        filename = file_name
+      )
+      
+    } else {
+      cat(paste0(fn, " already exists!\n"))
+    }
   }
 }
-  
 tictoc::toc()
 ```
 
 ## Find yearly gain and loss
 
 ```{r eval = FALSE}
+tictoc::tic()
 
+registerDoParallel(10)
+
+loss_files <- list.files(paste0(dir_data, "/raw"), pattern = "loss-")
+gain_files <- list.files(paste0(dir_data, "/raw"), pattern = "gain-")
+
+years <- c(4, 7, 10, 13, 16, 19)
+
+foreach (i = loss_files) %dopar% { 
+  for (yr in years){
+    
+    fn <- i %>% 
+      stringr::str_replace(pattern = "gain-", replacement = paste0("gain_in_", yr)) %>% 
+      stringr::str_replace(pattern = "loss-", replacement = paste0("loss_in_", yr))
+    
+    file_name <- paste0(dir_data, "/int/gain_loss/", fn)
+    
+    if(!file.exists(file_name)){
+      
+      if (stringr::str_detect(string = i, pattern = "gain-")) {
+        hash <- stringr::str_split(string = i, pattern = "gain-")[[1]][2] %>% stringr::str_remove(".tif")
+        type_file <- list.files(paste0(dir_data, "/int/type"), pattern = paste0("gain-", hash), full.names = TRUE)
+        year_file <- list.files(paste0(dir_data, "/int/year"), pattern = paste0("gain_", yr, "-", hash), full.names = TRUE)
+      } else {
+        hash <- stringr::str_split(string = i, pattern = "loss-")[[1]][2] %>% stringr::str_remove(".tif")
+        type_file <- list.files(paste0(dir_data, "/int/type"), pattern = paste0("loss-", hash), full.names = TRUE)
+        year_file <- list.files(paste0(dir_data, "/int/year"), pattern = paste0("loss_", yr, "-", hash), full.names = TRUE)
+      }
+      
+      gain_loss_img <- terra::rast(paste0(dir_data, "/raw/", i))
+      
+      type_img <- terra::rast(type_file)
+      
+      year_img <- terra::rast(year_file)
+      
+      gain_loss <- gain_loss_img * type_img * year_img
+      
+      terra::writeRaster(gain_loss, filename = file_name)
+      
+    } else {
+      cat(paste0(fn, " already exists!\n"))
+    }
+  }
+}
+tictoc::toc()
 ```
 
 ## Down sample rasters
 
 ```{r eval = FALSE}
+tictoc::tic()
+
+registerDoParallel(10)
+
 scale_factor = 30
-img <- list.files(paste0(dir_data, "/raw"), pattern = "gain-", full.names = TRUE)
 
-img_rast_agg <- lapply(sprc(lapply(img, rast)), terra::aggregate, fact = scale_factor, fun = sum)
+files <- list.files(paste0(dir_data, "/int/gain_loss"))
+years <- c(4, 7, 10, 13, 16, 19)
 
-for (i in 1:length(img_rast_agg)) {
-  fn = paste0("gain-upscaled_", scale_factor, "_", i, ".tif")
-  terra::writeRaster(img_rast_agg[[i]], paste0(dir_data, "/int/", fn))
-  print(i)
+foreach (i = files) %dopar% { 
+  for (yr in years){
+    
+    fn <- i %>% 
+      stringr::str_replace(pattern = paste0("gain_in_", yr), replacement = paste0("gain_in_", yr, "down_sampled")) %>% 
+      stringr::str_replace(pattern =paste0("loss_in_", yr), replacement = paste0("loss_in_", yr, "down_sampled"))
+    
+    file_name <- paste0(dir_data, "/int/down_sample/", i)
+    
+    if(!file.exists(file_name)){
+      
+      img <- terra::rast(paste0(dir_data, "/int/gain_loss/", i))
+      terra::aggregate(
+        x = img, 
+        fact = scale_factor, 
+        fun = sum,
+        na.rm = T,
+        filename = file_name)
+      
+    } else {
+      cat(paste0(fn, " already exists!\n"))
+    }
+  }
 }
-# for (ras in 1:length(img_rast_agg)) {
-#   terra::plot(img_rast_agg[[ras]])
-# }
+tictoc::toc()
 ```
 
 ## Subtract gain from loss
 
 ```{r eval = FALSE}
+tictoc::tic()
 
+registerDoParallel(10)
+
+scale_factor = 30
+
+files <- list.files(paste0(dir_data, "/int/down_sample"))
+
+hash_list <- stringr::str_split(string = files, pattern = "gain-")[[1]][2] %>% stringr::str_remove(".tif")
+ 
+# years <- c(4, 7, 10, 13, 16, 19)
+# 
+# foreach (i = files) %dopar% { 
+#   for (yr in years){
+#     
+#     fn <- i %>% 
+#       stringr::str_replace(pattern = paste0("gain_in_", yr), replacement = paste0("gain_in_", yr, "down_sampled")) %>% 
+#       stringr::str_replace(pattern =paste0("loss_in_", yr), replacement = paste0("loss_in_", yr, "down_sampled"))
+#     
+#     file_name <- paste0(dir_data, "/int/down_sample/", i)
+#     
+#     if(!file.exists(file_name)){
+#       
+#       gain_img <- terra::rast(paste0(dir_data, "/int/down_sample/", i))
+#       loss_img <- terra::rast(paste0(dir_data, "/int/down_sample/", i))
+#       terra::aggregate(
+#         x = img, 
+#         fact = scale_factor, 
+#         fun = sum,
+#         na.rm = T,
+#         filename = file_name)
+#       
+#     } else {
+#       cat(paste0(fn, " already exists!\n"))
+#     }
+#   }
+# }
+tictoc::toc()
 ```
 
 ## Mosaic the rasters
