@@ -561,16 +561,6 @@ Get rid of duplicates for region/species/year:
 
 ```{r sw-sus-dup, eval = FALSE}
 
-# abalone <- mar_sw_sus %>% 
-#   filter(species == "Abalones nei",
-#          rgn_id == 14,
-#          environment == "Brackishwater",
-#          year == 1981) %>% 
-#   dplyr::select(-Sust, Sust = Sust_avg, -esc_score, esc_score = esc_avg)
-# 
-# distinct_abalone <- abalone %>% 
-#   dplyr::distinct(rgn_id, species, environment, year, .keep_all = TRUE)
-
 mar_sw_sus <- mar_sw_sus %>% 
   dplyr::distinct(rgn_id, species, environment, year, .keep_all = TRUE) %>%
   # remove old Sust column (which was used to produce Sust_avg column) &
@@ -752,26 +742,6 @@ genEscapes_gf <- tonnes_esc %>%
   select(rgn_id, pressures.score=genEscapes) %>%
   mutate(pressures.score=ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
   data.frame()
-
-## Obtain corresponding gapfilling information for each region (average of gapfilled data, weighted by tonnes of mariculture).
-# genEscapes_gf_1 <- tonnes_esc %>%
-#   mutate(gapfill = ifelse(gapfill_esc == "none", 0, 1)) %>%
-#   group_by(rgn_id, year) %>%
-#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %>%
-#   ungroup() %>%
-#   filter(year == 2020) %>%
-#   select(rgn_id, pressures.score = genEscapes) %>%
-#   mutate(pressures.score = ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
-#   data.frame()
-# 
-# genEscapes_gf_2 <- tonnes_esc %>%
-#   mutate(gapfill = ifelse(gapfill_esc == "none", 0, 1)) %>%
-#   group_by(rgn_id, year) %>%
-#   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm = TRUE)) %>%
-#   ungroup() %>%
-#   select(rgn_id, pressures.score = genEscapes) %>%
-#   mutate(pressures.score = ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
-#   data.frame()
 
 ```
 
