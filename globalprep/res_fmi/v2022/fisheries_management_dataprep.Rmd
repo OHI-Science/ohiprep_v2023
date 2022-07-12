@@ -47,15 +47,6 @@ caribbean_split <- gov_data %>%
   tidyr::separate_rows(country, sep = ", ") %>% 
   tidyr::separate_rows(country, sep = " and ")
 
-# ## Split "Kiribati" into "Line Islands (Kiribati)", "Phoenix Islands (Kiribati)", & "Gilbert Islands (Kiribati)"
-# kiribati_split <- gov_data %>%
-#   dplyr::filter(country == "Kiribati") %>%
-#   dplyr::mutate(country = stringr::str_replace_all(
-#       string = country, 
-#       pattern = "Kiribati", 
-#       replacement = "Line Islands (Kiribati), Phoenix Islands (Kiribati), Gilbert Islands (Kiribati)")) %>%
-#   tidyr::separate_rows(country, sep = ", ") 
-
 # must separate Taiwan from "(province of China) in this way because gsub() and str_repalce_all() do not to the trick for this one:
 taiwan_split <- gov_data %>% 
   filter(country == "Taiwan (Province of China)") %>% 
@@ -89,7 +80,7 @@ gov_data <- gov_data %>%
 gov_data <- gov_data %>% select(rgn_id, rgn_name, gov_capacity, year)
 ```
 
-## Create initial model for gapfilling using just GDP data
+## Join fisheries governance data with GDP data and UN georegion data to create gapfill model
 
 ```{r}
 # read in rescaled GDP data (values range between 0-1 and capped at 95th quantile)
@@ -101,22 +92,20 @@ gov_gdp <- gov_data %>%
   rename(gdp = value)
 
 # regress gov & gdp without georegion labels (yet)
-gov_gdp_mod <- lm(gov_capacity ~ gdp, data = gov_gdp)
-summary(gov_gdp_mod)
-# adj r2: 0.08755
+# gov_gdp_mod <- lm(gov_capacity ~ gdp, data = gov_gdp)
+# summary(gov_gdp_mod)
+# # adj r2: 0.08755
+# 
+# # Look at correlation
+# ggplotly(ggplot(gov_gdp, aes(x = gdp, y = gov_capacity, labels = rgn_name)) +
+#   geom_point() +
+#   geom_abline(slope = 1, intercept = 0, color = "red"))
 
-# Look at correlation
-ggplotly(ggplot(gov_gdp, aes(x = gdp, y = gov_capacity, labels = rgn_name)) +
-  geom_point() +
-  geom_abline(slope = 1, intercept = 0, color = "red"))
-```
-
-```{r}
 # calculate pearson's correlation
-gov_gdp_plot <- gov_gdp %>% 
-  select(gdp, gov_capacity)
-
-pairs.panels(gov_gdp_plot, density = TRUE, cor=TRUE, lm=TRUE)
+# gov_gdp_plot <- gov_gdp %>% 
+#   select(gdp, gov_capacity)
+# 
+# pairs.panels(gov_gdp_plot, density = TRUE, cor=TRUE, lm=TRUE)
 
 # try logging gdp (it has already been rescaled..not sure if thats good science?)
 # gov_gdp_plot_test <- gov_gdp_plot %>% 
@@ -124,35 +113,31 @@ pairs.panels(gov_gdp_plot, density = TRUE, cor=TRUE, lm=TRUE)
 #   select(log_gdp, normalized_gov_capacity)
 # 
 # pairs.panels(gov_gdp_plot_test, density = TRUE, cor=TRUE, lm=TRUE)
-```
 
-## Create better models for gapfilling using GDP and UN regions (r2 lables)
-
-```{r}
 # Load UN georegion data 
 georegions <- UNgeorgn() %>%
-  select(rgn_id, rgn_name = rgn_label, r1_label, r2_label)
+  select(rgn_id, rgn_name = rgn_label, r2_label) # r1_label
 
 gov_gdp_georegions <- gov_gdp %>%
   left_join(georegions, by = c("rgn_id","rgn_name")) %>%
-  select(rgn_id, rgn_name, gov_capacity, gdp, r2_label, r1_label, year)
+  select(rgn_id, rgn_name, gov_capacity, gdp, r2_label, year) # r1_label
 
 # return rows that contain NA in any column
-gov_gdp_georegions[rowSums(is.na(gov_gdp_georegions)) > 0, ] # Kiribati has NA for r2_label & r1_label because in UNgeoregion(), Kiriati is split into Line Islands (Kiribati), Phoenix Islands (Kiribati), and Gilbert Islands (Kiribati), but Kiribati is the correct OHI region name
+gov_gdp_georegions[rowSums(is.na(gov_gdp_georegions)) > 0, ] # Kiribati has NA for r2_label because in UNgeoregion(), Kiriati is split into Line Islands (Kiribati), Phoenix Islands (Kiribati), and Gilbert Islands (Kiribati), but Kiribati is the correct OHI region name
 
 # fill Kiribati row with correct r1_label and r2_label (extracted from island subsets labels)
 gov_gdp_georegions <- gov_gdp_georegions %>%
-  mutate(r2_label = ifelse(is.na(r2_label), "Micronesia", r2_label)) %>%
-  mutate(r1_label = ifelse(is.na(r1_label), "Oceania", r1_label))
+  mutate(r2_label = ifelse(is.na(r2_label), "Micronesia", r2_label)) #%>%
+#  mutate(r1_label = ifelse(is.na(r1_label), "Oceania", r1_label))
 
-# regress gov & gdp with r2 georegion lables - that was the highest r2 of all models tried
+# regress gov & gdp with r2 georegion lables - that was the highest r2 of all models we tried
 gov_gdp_r2_mod <- lm(gov_capacity ~ gdp + r2_label, data = gov_gdp_georegions)
 summary(gov_gdp_r2_mod)
 # adj r2: 0.4128
 
 # regress gov & gdp with r1 georegion lables
-gov_gdp_r1_mod <- lm(gov_capacity ~ gdp + r1_label, data = gov_gdp_georegions)
-summary(gov_gdp_r1_mod)
+#gov_gdp_r1_mod <- lm(gov_capacity ~ gdp + r1_label, data = gov_gdp_georegions)
+#summary(gov_gdp_r1_mod)
 # adj r2: 0.2043
 ```
 
@@ -168,7 +153,7 @@ gov_gdp_r2_pred <- gov_gdp_georegions %>%
   }) %>% 
   dplyr::ungroup()
 
-# Plot predicted vs actual values 
+# Plot predicted vs actual values for governance capacity
 ggplotly(ggplot(gov_gdp_r2_pred, aes(x = gov_capacity, y = gov_r2_pred, labels = rgn_name)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0, color = "red") +
@@ -180,138 +165,215 @@ ggplotly(ggplot(gov_gdp_r2_pred, aes(x = gov_capacity, y = gov_r2_pred, labels =
 ## Make predictions with this gdp + r1_label model and compare to observed
 
 ```{r}
-# Create array of predicted progress score values 
-gov_gdp_r1_pred <- gov_gdp_georegions %>%
-  dplyr::group_by(rgn_id) %>%
-  dplyr::do({ 
-    gov_r1_pred <- predict(gov_gdp_r1_mod, newdata =.[c('r1_label', 'gdp')]) 
-    data.frame(., gov_r1_pred) # do() loop applies the model fitting and prediction to each country group
-  }) %>% 
-  dplyr::ungroup()
-
-# Plot predicted vs actual values 
-ggplotly(ggplot(gov_gdp_r1_pred, aes(x = gov_capacity, y = gov_r1_pred, labels = rgn_name)) +
-  geom_point() +
-  geom_abline(slope = 1, intercept = 0, color = "red") +
-  labs(x = "Observed Government Capacity",
-      y = "Predicted Government Capacity",
-      title = "Observed vs Predicted Government Capacity: GDP + r1 georegions model"))
+# # Create array of predicted progress score values 
+# gov_gdp_r1_pred <- gov_gdp_georegions %>%
+#   dplyr::group_by(rgn_id) %>%
+#   dplyr::do({ 
+#     gov_r1_pred <- predict(gov_gdp_r1_mod, newdata =.[c('r1_label', 'gdp')]) 
+#     data.frame(., gov_r1_pred) # do() loop applies the model fitting and prediction to each country group
+#   }) %>% 
+#   dplyr::ungroup()
+# 
+# # Plot predicted vs actual values 
+# ggplotly(ggplot(gov_gdp_r1_pred, aes(x = gov_capacity, y = gov_r1_pred, labels = rgn_name)) +
+#   geom_point() +
+#   geom_abline(slope = 1, intercept = 0, color = "red") +
+#   labs(x = "Observed Government Capacity",
+#       y = "Predicted Government Capacity",
+#       title = "Observed vs Predicted Government Capacity: GDP + r1 georegions model"))
 ```
 
-## Gapfill GDP data for all 220 OHI regions before using GDP data to gapfill for government capacity
+## Check how comprehensive the GDP data is for all 220 OHI regions before using GDP data to gapfill for government capacity
 
 ```{r}
+# GDP data for all 220 OHI regions for 2019:
 gdp_geo_2019 <- UNgeorgn %>%
   # Reunion is a part of the French Republic
   mutate(rgn_label = ifelse(str_detect(rgn_label, "R_union"), "Reunion", rgn_label)) %>%
   rename(rgn_name = rgn_label) %>%
   left_join(gdp, by = "rgn_id") %>% 
   rename(gdp = value) %>% 
-  filter(year == 2019) 
+  filter(year == recent_data_yr) 
 
-gdp_geo_2019$gdp[is.nan(gdp_geo_2019$gdp)]
+# check which countries have NA gdp
+na_gdp <- gdp_geo_2019[rowSums(is.na(gdp_geo_2019)) > 0, ]
+na_gdp # 20 regions
 
-na_georegions <- gdp_gapfill_2019[rowSums(is.na(gdp_geo_2019)) > 0, ] %>% 
-  group_by(r2_label) %>% 
-  summarize(count = n())
+# check that the 20 regions are those within low_pop()
+low_pop()
+setdiff(low_pop$rgn_id, na_gdp$rgn_id) # only rgn_id 38 is present in low_pop but not na_gdp which is fine because this region has pop = 3000, so we remove it later
 
-# gapfill these 20 countries that are missing 2019 data with other countries within r2_label from 2019
-gdp_2019_mean <- gdp_geo_2019 %>% 
-  group_by(r2_label) %>%
-  summarize(mean_gdp = mean(gdp, na.rm = TRUE))
+# r2_label exploration:
+# obtain mean GDP of each r2_label group
+# gdp_r2_2019_mean <- gdp_geo_2019 %>% 
+#   group_by(r2_label) %>%
+#   summarize(gdp_mean_r2 = mean(gdp, na.rm = TRUE))
 # it's ok that the southern islands mean value is NaN because ALL the GDP values for those regions are deliberately set to NA because their population is less than 3000
 
+# check how many NA values are present in each r2_label group
+# na_georegions_r2 <- gdp_geo_2019[rowSums(is.na(gdp_geo_2019)) > 0, ] %>% 
+#   group_by(r2_label) %>% 
+#   summarize(count = n())
+# 20 countries are missing 2019 data with other countries within r2_label from 2019, this aligns with the 20 countries that were assigned NA for GDP in the GDP data processing
 
+# r1_label exploration:
+# obtain mean GDP of each r1_label group
+# gdp_r1_2019_mean <- gdp_geo_2019 %>% 
+#   group_by(r1_label) %>%
+#   summarize(gdp_mean_r1 = mean(gdp, na.rm = TRUE))
+# it's ok that the southern islands mean value is NaN because of the reason above; "southern islands" is the same for r2_label and r1_label
+
+# check how many NA values are present in each r2_label group
+# na_georegions_r1 <- gdp_geo_2019[rowSums(is.na(gdp_geo_2019)) > 0, ] %>% 
+#   group_by(r1_label) %>% 
+#   summarize(count = n())
 ```
 
-## Gapfill
+## Create gapfill dataframe
 
 ```{r}
 # rejoin georegions, gov_data, & gdp from scratch so we can get GDP numbers for countries regardless if they were present in gov_data
 gov_gf <- UNgeorgn %>%
-  # Reunion is a part of the French Republic
-  mutate(rgn_label = ifelse(str_detect(rgn_label, "R_union"), "Reunion", rgn_label)) %>%
+  mutate(rgn_label = ifelse(str_detect(rgn_label, "R_union"), "Reunion", rgn_label)) %>% # Reunion is a part of the French Republic
   rename(rgn_name = rgn_label) %>%
-  left_join(gdp, by = "rgn_id") %>% # need to join GDP before gov_data because GDP contains more OHI regions that gov_data
+  left_join(gdp, by = "rgn_id") %>% # need to join GDP before gov_data because GDP contains more OHI regions that gov_data & we are using left joins
   rename(gdp = value) %>%
   left_join(gov_data, by = c("rgn_id", "rgn_name", "year")) %>%
-  filter(year == recent_data_yr) %>% 
-  select(-c(rgn_name, r0_label, year)) 
+  filter(year == recent_data_yr) %>% # filter by 2019 for GDP data because the gov_capacity data is 2019 only
+  select(-c(rgn_name, r0_label))
+```
 
-# check if there are any r2 labels that only occur once
-table(UNgeorgn$r2_label)
-sum(is.na(gov_gf$gdp))
+## Generate gapfilled government capacity values using GDP and r2_labels
 
-
-
-
-
-
-
-# create predictions with the model in a more complicated fashion because some r2 categories may have no data, this returns an NA for these
+```{r}
+# create predictions with the model in a more complicated fashion because some r2 categories may have no data (because GDP data was set to NA for small population regions)
+# so this returns an NA for these regions
 # sapply() creates an array object, we need an array rather than a list object (which would be the output of lapply())
-gov_gf$gov_pred_r2 <- sapply(1:nrow(gov_gf),
+gov_gf$gov_pred_gdp_r2 <- sapply(1:nrow(gov_gf),
                              function(i) # use all columns in that row to feed into the model to generate a gov_capacity prediction
                                tryCatch(predict(gov_gdp_r2_mod, gov_gf[i,]), error = function(e) NA)) 
 
-# fill in predictions for the regions not represented by r2 regions:
-gov_gf$gov_pred_r1 <-
-  sapply(1:nrow(gov_gf), 
-         function(i) 
-           tryCatch(predict(gov_gdp_r1_mod, gov_gf[i,]), error = function(e) NA))
+# count how many GDP values were filled in by the first gapfill model:
+gdp_r2_gapfilled <- gov_gf %>% 
+  filter(is.na(gov_capacity) & !is.na(gov_pred_gdp_r2))
+paste0(nrow(gdp_r2_gapfilled), " regions' government capacity were gapfilled by the model GDP + r2_label.")
 
-# final data and gapfilling recordkeeping
-gov_gf_all <- gov_gf %>%
-  # if there is no existing value for gov_capacity, put a 1 to identify that it is gapfilled:
-  dplyr::mutate(gapfilled = ifelse(is.na(gov_capacity), "1", 0)) %>%
-  # if there is no existing value for gov_capacity & there is a prediction from the model using GDP & r2_label, use that model for the gapfill method: 
-  dplyr::mutate(method = ifelse(is.na(gov_capacity) & !is.na(gov_pred_r2), "SPI + UN_geopolitical region r2", NA)) %>%
-  # if there is no existing value for gov_capacity & no prediction from the model using GDP and r1_label, use the GDP & r1_label for the gapfill method:
-  dplyr::mutate(method = ifelse(is.na(gov_capacity) & is.na(gov_pred_r2), "SPI + UN_geopolitical region r1" , method)) %>%
-  dplyr::mutate(gov_capacity = ifelse(is.na(gov_capacity), gov_pred_r2, gov_capacity)) %>% 
-  dplyr::mutate(gov_capacity = ifelse(is.na(gov_capacity), gov_pred_r1, gov_capacity))
+# ensure that the only remaining NA values are those of the low_pop regions:
+remaining_na <- gov_gf %>% filter(is.na(gov_pred_gdp_r2))
+setdiff(remaining_na$rgn_id, low_pop$rgn_id) # 0 regions that still have NA values are not low_pop regions
+```
 
-# make sure all low/no population regions are NA 
-low_pop()
-low_pop <- low_pop %>%
-  filter(est_population < 3000 | is.na(est_population)) #filter out regions that have populations > 3000 and keep NA values 
+## Generate gapfilled government capacity values using GDP and r1_labels
 
-fmi_gf_low_pop <- fmi_gf_all %>%
-  dplyr::filter(rgn_id %in% low_pop$rgn_id)
-summary(fmi_gf_low_pop)
-  
+```{r}
+# fill in predictions for the regions not represented by r2 regions, bur rather those represented by r1_regions:
+# gov_gf$gov_pred_gdp_r1 <-
+#   sapply(1:nrow(gov_gf), 
+#          function(i) 
+#            tryCatch(predict(gov_gdp_r1_mod, gov_gf[i,]), error = function(e) NA))
+# 
+# # count how many GDP values were filled in by the second gapfill model:
+# gdp_r1_gapfilled <- gov_gf %>% 
+#   filter(is.na(gov_pred_r2) & !is.na(gov_pred_gdp_r1))
+# 
+# paste0(nrow(gdp_r1_gapfilled), " regions' government capacity were gapfilled by the model GDP + r2_label.")
+```
 
-## Make sure all other regions have an fmi value
-fmi_gf_with_pop <- fmi_gf_all %>%
-  dplyr::filter(!(rgn_id %in% low_pop$rgn_id))
-summary(fmi_gf_with_pop)
+## Generate gapfilled government capacity values using mean GDP of respective r2_labels
 
-
-# Correct gapfilling info to low pop regions
-fmi_gf_all <- fmi_gf_all %>% 
-  mutate(gapfilled = ifelse(rgn_id %in% low_pop$rgn_id, 0, gapfilled)) %>% 
-  mutate(method = ifelse(rgn_id %in% low_pop$rgn_id, NA, method))
-
-## format final data
-fmi_final <- fmi_gf_all %>%
-  select(rgn_id, year, value=fmi)
-dim(fmi_final) # all regions represented
-summary(fmi_final) # 20 NA values
-
-
-# Save the data 
-write_csv(fmi_final, here("globalprep/res_fmi/v2019/output/fmi_res.csv"))
-
-
-# Save dataframe with gapfilled method and status information
-final_fmi_gf <- fmi_gf_all %>%
-  select(rgn_id, year, gapfilled, method)
-write_csv(final_fmi_gf, here("globalprep/res_fmi/v2019/output/fmi_res_gf.csv"))
-
-
+```{r}
+# gov_gf <- gov_gf %>% 
+#   left_join(gdp_r2_2019_mean, by = "r2_label") %>% # adds column gdp_mean_r2
+#   
+#   
+#   mutate(gov_mean_gdp_r2 = ifelse(is.na(gov_pred_gdp_r2), gdp_mean_r2, gov_pred_gdp_r2)) %>% 
+#   select(-gdp_mean_r2)
+# 
+# # count how many GDP values were filled in by the average GDP for r2_labels
+# gdp_mean_r2_gapfilled <- gov_gf %>% 
+#   filter(is.na(gov_pred_gdp_r2) & !is.na(gov_mean_gdp_r2))
+# 
+# paste0(nrow(gdp_mean_r2_gapfilled), " regions' government capacity were gapfilled by the mean of the respective r2_label.")
 ```
 
 
+```{r}
+# final data and gapfilling recordkeeping
+gov_gf <- gov_gf %>%
+  # if there is no existing value for gov_capacity, put a 1 to identify that it is gapfilled:
+  dplyr::mutate(gapfilled = ifelse(is.na(gov_capacity), "1", 0)) %>%
+  # if there is no existing value for gov_capacity & there is a prediction from the model using GDP & r2_label, record that model as the gapfill method: 
+  dplyr::mutate(method = ifelse(is.na(gov_capacity) & !is.na(gov_pred_gdp_r2), "GDP + UN_geopolitical region r2", NA)) %>%
+  # actually use the model to fill in those missing gov_capacity values
+  dplyr::mutate(gov_capacity = ifelse(is.na(gov_capacity), gov_pred_gdp_r2, gov_capacity)) %>% 
+  # drop gov_pred_r2 column because we just used those values to populate 57 values in the gov_capacity data
+  dplyr::select(-gov_pred_gdp_r2)
+
+# make sure all low/no population regions are NA
+low_pop <- low_pop %>%
+  filter(est_population < 3000 | is.na(est_population)) # filter out regions that have populations > 3000 and keep NA values 
+
+gov_gf_low_pop <- gov_gf %>% dplyr::filter(rgn_id %in% low_pop$rgn_id)
+summary(gov_gf_low_pop) # there should be 20 NA's in the gdp and gov_capacity in the summary because 20 regions have <3000 pop
+
+## Make sure all other regions have a government capacity value
+gov_gf_with_pop <- gov_gf %>% dplyr::filter(!rgn_id %in% low_pop$rgn_id)
+summary(gov_gf_with_pop) # there should be no NA's recorded in the summary for the gdp and gov_capacity columns
+
+# Correct gapfilling info to low pop regions - they have a 1 currently, but they were not actually gapfilled!
+gov_gf <- gov_gf %>%
+  mutate(gapfilled = ifelse(rgn_id %in% low_pop$rgn_id, 0, gapfilled)) %>%
+  mutate(method = ifelse(rgn_id %in% low_pop$rgn_id, NA, method))
+
+# format final data
+gov_final <- gov_gf %>% select(rgn_id, year, gov_capacity)
+dim(gov_final) # all 220 regions represented
+summary(gov_final) # 20 NA values
+write_csv(gov_final, here("globalprep/res_fmi/v2022/output/fisheries_management_res.csv"))
+
+# Save dataframe with gapfilled method and status information
+gov_gf_final <- gov_gf %>% select(rgn_id, year, gapfilled, method)
+write_csv(gov_gf_final, here("globalprep/res_fmi/v2022/output/fisheries_management_res_gf.csv"))
+```
+
+## Compare FMI scores (with gapfilling) from 2018 to government capacity scores (with gapfilling) from 2019
+
+```{r}
+# join FMI data with gov_data
+fmi <- read_csv(here("globalprep/res_fmi/v2019/output/fmi_res.csv")) %>% select(-year, fmi = value)
+gov <- read_csv(here("globalprep/res_fmi/v2022/output/fisheries_management_res.csv")) %>% select(-year)
+fmi_gov <- full_join(fmi, gov, by = "rgn_id") 
+
+fmi_gov_tidy <- fmi_gov %>% 
+  pivot_longer(cols = c(gov_capacity, fmi))
+
+rgns <- fmi_gov_tidy$rgn_id
+
+compare <- ggplot(fmi_gov_tidy, aes(rgn_id, value, color = name)) +
+  geom_point(size = 4) +
+  labs(title = "Gapfilled FMI values & Gapfilled Minderoo Governance Capacity values",
+         x = "Region ID",
+         y = "Fisheries Governance Score",
+         color = "Data Source") +
+  geom_vline(xintercept = rgns, alpha = 0.5)
+
+compare
+
+#ggsave(filename = "fmi_gov_gapfilled.png", path = here("globalprep/res_fmi/v2022/output/"), height = 7, width = 25)
+
+fmi_gov <- fmi_gov %>%
+  mutate(diff = abs(fmi - gov_capacity))
+
+paste0("The average difference in fisheries governance scores between the two data sources is ", round(mean(fmi_gov$diff, na.rm = TRUE), 2))
+```
+
+```{r}
+plot(fmi_gov$gov_capacity, fmi_gov$fmi,
+     xlab = "Government Capacity",
+     ylab = "FMI Score",
+     main = "Government Capacity vs FMI")
+abline(0,1, col="red")
+```
 
 
 
