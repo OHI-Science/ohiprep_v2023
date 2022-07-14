@@ -34,7 +34,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 6,2027,Vanuatu,14593,14.8922
 6,2028,Vanuatu,15134,15.1088
 6,2029,Vanuatu,15559,15.203
-6,2030,Vanuatu,0,NaN
+6,2030,Vanuatu,0,NA
 7,1995,Solomon Islands,3442,2.46264
 7,1996,Solomon Islands,3206,2.21186
 7,1997,Solomon Islands,1852,1.22906
@@ -70,7 +70,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 7,2027,Solomon Islands,13531,3.98205
 7,2028,Solomon Islands,13806,3.97463
 7,2029,Solomon Islands,13976,3.93801
-7,2030,Solomon Islands,0,NaN
+7,2030,Solomon Islands,0,NA
 14,1995,Taiwan,170993,1.8905599999999998
 14,1996,Taiwan,175019,1.93009
 14,1997,Taiwan,169013,1.84198
@@ -106,7 +106,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 14,2027,Taiwan,368202,3.33639
 14,2028,Taiwan,378020,3.45747
 14,2029,Taiwan,391026,3.61195
-14,2030,Taiwan,0,NaN
+14,2030,Taiwan,0,NA
 15,1995,Philippines,1535230,5.9791300000000005
 15,1996,Philippines,1737670,6.39165
 15,1997,Philippines,2364870,8.53289
@@ -142,7 +142,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 15,2027,Philippines,6855720,13.1485
 15,2028,Philippines,7026680,13.2567
 15,2029,Philippines,7181290,13.3402
-15,2030,Philippines,0,NaN
+15,2030,Philippines,0,NA
 16,1995,Australia,378397,4.61225
 16,1996,Australia,389525,4.69434
 16,1997,Australia,393656,4.70007
@@ -178,7 +178,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 16,2027,Australia,645376,4.4967
 16,2028,Australia,656986,4.51493
 16,2029,Australia,669918,4.53865
-16,2030,Australia,0,NaN
+16,2030,Australia,0,NA
 17,1995,Papua New Guinea,16359,0.882048
 17,1996,Papua New Guinea,17533,0.921777
 17,1997,Papua New Guinea,17583,0.892356
@@ -214,7 +214,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 17,2027,Papua New Guinea,22281,0.534481
 17,2028,Papua New Guinea,22891,0.538009
 17,2029,Papua New Guinea,23408,0.53923
-17,2030,Papua New Guinea,0,NaN
+17,2030,Papua New Guinea,0,NA
 18,1995,Fiji,27319,9.84779
 18,1996,Fiji,26288,9.41725
 18,1997,Fiji,27422,9.69644
@@ -250,7 +250,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 18,2027,Fiji,64555,17.1683
 18,2028,Fiji,67558,17.887
 18,2029,Fiji,69536,18.3287
-18,2030,Fiji,0,NaN
+18,2030,Fiji,0,NA
 20,1995,South Korea,185765,0.90997
 20,1996,South Korea,175095,0.8396610000000001
 20,1997,South Korea,185778,0.875739
@@ -286,7 +286,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 20,2027,South Korea,327138,1.22386
 20,2028,South Korea,325065,1.22601
 20,2029,South Korea,320921,1.22116
-20,2030,South Korea,0,NaN
+20,2030,South Korea,0,NA
 24,1995,Cambodia,51914,1.16126
 24,1996,Cambodia,93104,2.01987
 24,1997,Cambodia,95372,1.98544
@@ -322,7 +322,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 24,2027,Cambodia,1959710,18.4481
 24,2028,Cambodia,2025740,18.8097
 24,2029,Cambodia,2096020,19.2004
-24,2030,Cambodia,0,NaN
+24,2030,Cambodia,0,NA
 25,1995,Thailand,1595160,5.15845
 25,1996,Thailand,1513850,4.91742
 25,1997,Thailand,1651180,5.255439999999999
@@ -358,7 +358,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 25,2027,Thailand,3280120,8.61603
 25,2028,Thailand,3393480,8.95284
 25,2029,Thailand,3512290,9.31394
-25,2030,Thailand,0,NaN
+25,2030,Thailand,0,NA
 28,1995,Comoro Islands,3865,5.76765
 28,1996,Comoro Islands,3290,4.74385
 28,1997,Comoro Islands,3252,4.54373
@@ -394,7 +394,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 28,2027,Comoro Islands,5917,3.407
 28,2028,Comoro Islands,6028,3.3856100000000002
 28,2029,Comoro Islands,6161,3.3766999999999996
-28,2030,Comoro Islands,0,NaN
+28,2030,Comoro Islands,0,NA
 31,1995,Seychelles,5728,22.0318
 31,1996,Seychelles,5250,20.1936
 31,1997,Seychelles,5175,18.4831
@@ -430,7 +430,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 31,2027,Seychelles,13609,27.076899999999995
 31,2028,Seychelles,13712,27.0793
 31,2029,Seychelles,13854,27.164200000000005
-31,2030,Seychelles,0,NaN
+31,2030,Seychelles,0,NA
 32,1995,Reunion,4226,2.49595
 32,1996,Reunion,4956,2.88832
 32,1997,Reunion,5829,3.35216
@@ -466,7 +466,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 32,2027,Reunion,14655,4.95315
 32,2028,Reunion,14830,5.00247
 32,2029,Reunion,14997,5.05162
-32,2030,Reunion,0,NaN
+32,2030,Reunion,0,NA
 37,1995,Mauritius,30153,6.83912
 37,1996,Mauritius,30669,6.8388
 37,1997,Mauritius,31741,6.9203
@@ -502,7 +502,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 37,2027,Mauritius,46377,8.15987
 37,2028,Mauritius,47532,8.35483
 37,2029,Mauritius,48470,8.51801
-37,2030,Mauritius,0,NaN
+37,2030,Mauritius,0,NA
 39,1995,Maldives,11338,16.5243
 39,1996,Maldives,14095,19.6022
 39,1997,Maldives,14282,18.9377
@@ -538,7 +538,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 39,2027,Maldives,34998,14.7926
 39,2028,Maldives,35604,14.8302
 39,2029,Maldives,36200,14.8628
-39,2030,Maldives,0,NaN
+39,2030,Maldives,0,NA
 40,1995,Sri Lanka,143275,2.39192
 40,1996,Sri Lanka,126203,2.04969
 40,1997,Sri Lanka,142022,2.2493
@@ -574,7 +574,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 40,2027,Sri Lanka,556535,6.53137
 40,2028,Sri Lanka,565308,6.63802
 40,2029,Sri Lanka,576466,6.77301
-40,2030,Sri Lanka,0,NaN
+40,2030,Sri Lanka,0,NA
 41,1995,Mozambique,74365,1.30973
 41,1996,Mozambique,62130,1.06681
 41,1997,Mozambique,97943,1.6381
@@ -610,7 +610,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 41,2027,Mozambique,339398,2.72945
 41,2028,Mozambique,342551,2.6896
 41,2029,Mozambique,346621,2.6582
-41,2030,Mozambique,0,NaN
+41,2030,Mozambique,0,NA
 42,1995,Madagascar,54523,1.8972
 42,1996,Madagascar,38568,1.30011
 42,1997,Madagascar,55392,1.80729
@@ -646,7 +646,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 42,2027,Madagascar,269764,3.57734
 42,2028,Madagascar,273229,3.52323
 42,2029,Madagascar,277411,3.48103
-42,2030,Madagascar,0,NaN
+42,2030,Madagascar,0,NA
 43,1995,Kenya,299343,4.93219
 43,1996,Kenya,259223,4.09578
 43,1997,Kenya,325337,4.95023
@@ -682,7 +682,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 43,2027,Kenya,534057,3.09735
 43,2028,Kenya,546005,3.07571
 43,2029,Kenya,557966,3.05509
-43,2030,Kenya,0,NaN
+43,2030,Kenya,0,NA
 47,1995,Yemen,37049,1.20166
 47,1996,Yemen,35854,1.11175
 47,1997,Yemen,45710,1.35681
@@ -718,7 +718,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 47,2027,Yemen,68446,1.03847
 47,2028,Yemen,69455,1.03312
 47,2029,Yemen,70676,1.03067
-47,2030,Yemen,0,NaN
+47,2030,Yemen,0,NA
 48,1995,Oman,6170,1.07963
 48,1996,Oman,10579,1.85669
 48,1997,Oman,10268,1.82336
@@ -754,7 +754,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 48,2027,Oman,119919,4.70316
 48,2028,Oman,125257,4.84755
 48,2029,Oman,130180,4.97238
-48,2030,Oman,0,NaN
+48,2030,Oman,0,NA
 49,1995,Sudan,45237,0.7662849999999999
 49,1996,Sudan,30993,0.503879
 49,1997,Sudan,44335,0.702435
@@ -790,7 +790,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 49,2027,Sudan,175071,1.45314
 49,2028,Sudan,179517,1.4504
 49,2029,Sudan,184126,1.44909
-49,2030,Sudan,0,NaN
+49,2030,Sudan,0,NA
 50,1995,Saudi Arabia,300443,5.83988
 50,1996,Saudi Arabia,293876,5.69838
 50,1997,Saudi Arabia,303672,5.93008
@@ -826,7 +826,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 50,2027,Saudi Arabia,695268,4.3964
 50,2028,Saudi Arabia,702001,4.38635
 50,2029,Saudi Arabia,713847,4.40776
-50,2030,Saudi Arabia,0,NaN
+50,2030,Saudi Arabia,0,NA
 51,1995,Kuwait,31737,4.13703
 51,1996,Kuwait,29992,3.87431
 51,1997,Kuwait,30660,3.83254
@@ -862,7 +862,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 51,2027,Kuwait,63303,2.22993
 51,2028,Kuwait,63638,2.19033
 51,2029,Kuwait,63806,2.14812
-51,2030,Kuwait,0,NaN
+51,2030,Kuwait,0,NA
 52,1995,Bahrain,24496,23.783
 52,1996,Bahrain,24572,22.8579
 52,1997,Bahrain,25927,23.1909
@@ -898,7 +898,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 52,2027,Bahrain,41622,5.38827
 52,2028,Bahrain,42585,5.43691
 52,2029,Bahrain,43519,5.48048
-52,2030,Bahrain,0,NaN
+52,2030,Bahrain,0,NA
 53,1995,Pakistan,736046,2.32338
 53,1996,Pakistan,724789,2.27706
 53,1997,Pakistan,760067,2.2942
@@ -934,7 +934,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 53,2027,Pakistan,1890300,2.51859
 53,2028,Pakistan,1943580,2.53439
 53,2029,Pakistan,1996360,2.54874
-53,2030,Pakistan,0,NaN
+53,2030,Pakistan,0,NA
 54,1995,United Arab Emirates,41215,3.13538
 54,1996,United Arab Emirates,45357,3.29373
 54,1997,United Arab Emirates,47486,3.27523
@@ -970,7 +970,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 54,2027,United Arab Emirates,419739,5.859
 54,2028,United Arab Emirates,432522,5.97996
 54,2029,United Arab Emirates,439919,6.02426
-54,2030,United Arab Emirates,0,NaN
+54,2030,United Arab Emirates,0,NA
 56,1995,Cape Verde,2708,2.76856
 56,1996,Cape Verde,3712,3.63867
 56,1997,Cape Verde,5169,4.93013
@@ -1006,7 +1006,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 56,2027,Cape Verde,51738,21.194599999999998
 56,2028,Cape Verde,52413,21.2265
 56,2029,Cape Verde,53126,21.2728
-56,2030,Cape Verde,0,NaN
+56,2030,Cape Verde,0,NA
 59,1995,Belgium,104351,2.69788
 59,1996,Belgium,110110,2.8392799999999996
 59,1997,Belgium,117037,2.99749
@@ -1042,7 +1042,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 59,2027,Belgium,139541,2.78244
 59,2028,Belgium,142058,2.81836
 59,2029,Belgium,144040,2.84444
-59,2030,Belgium,0,NaN
+59,2030,Belgium,0,NA
 61,1995,Tunisia,189393,7.72199
 61,1996,Tunisia,192680,7.624219999999999
 61,1997,Tunisia,182258,7.027069999999999
@@ -1078,7 +1078,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 61,2027,Tunisia,279176,7.38839
 61,2028,Tunisia,279693,7.34903
 61,2029,Tunisia,279868,7.30091
-61,2030,Tunisia,0,NaN
+61,2030,Tunisia,0,NA
 62,1995,Morocco,269773,3.66821
 62,1996,Morocco,319126,4.26197
 62,1997,Morocco,324818,4.20474
@@ -1114,7 +1114,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 62,2027,Morocco,1020860,7.71524
 62,2028,Morocco,1039850,7.76632
 62,2029,Morocco,1067710,7.88376
-62,2030,Morocco,0,NaN
+62,2030,Morocco,0,NA
 65,1995,Gambia,10011,3.3585000000000003
 65,1996,Gambia,18800,6.13991
 65,1997,Gambia,21738,6.90412
@@ -1150,7 +1150,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 65,2027,Gambia,59061,6.8837
 65,2028,Gambia,61058,6.8915500000000005
 65,2029,Gambia,63633,6.96226
-65,2030,Gambia,0,NaN
+65,2030,Gambia,0,NA
 66,1995,Senegal,62950,2.66845
 66,1996,Senegal,61374,2.53758
 66,1997,Senegal,70046,2.8271
@@ -1186,7 +1186,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 66,2027,Senegal,206986,3.02621
 66,2028,Senegal,209466,2.96548
 66,2029,Senegal,215619,2.95623
-66,2030,Senegal,0,NaN
+66,2030,Senegal,0,NA
 67,1995,Libya,24188,1.95715
 67,1996,Libya,25073,1.99024
 67,1997,Libya,29380,2.25147
@@ -1222,7 +1222,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 67,2027,Libya,26714,1.16255
 67,2028,Libya,27548,1.18661
 67,2029,Libya,27990,1.1939500000000003
-67,2030,Libya,0,NaN
+67,2030,Libya,0,NA
 68,1995,Malta,9565,7.24543
 68,1996,Malta,4125,3.04292
 68,1997,Malta,3372,2.45526
@@ -1258,7 +1258,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 68,2027,Malta,37604,14.2324
 68,2028,Malta,38204,14.4136
 68,2029,Malta,39074,14.6912
-68,2030,Malta,0,NaN
+68,2030,Malta,0,NA
 69,1995,Latvia,8154,0.779534
 69,1996,Latvia,20987,2.06161
 69,1997,Latvia,23086,2.22619
@@ -1294,7 +1294,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 69,2027,Latvia,38266,4.63598
 69,2028,Latvia,38973,4.78157
 69,2029,Latvia,39988,4.96094
-69,2030,Latvia,0,NaN
+69,2030,Latvia,0,NA
 70,1995,Estonia,26663,4.05739
 70,1996,Estonia,25068,3.92081
 70,1997,Estonia,23523,3.74851
@@ -1330,7 +1330,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 70,2027,Estonia,32354,4.97034
 70,2028,Estonia,32917,5.0761
 70,2029,Estonia,33445,5.17773
-70,2030,Estonia,0,NaN
+70,2030,Estonia,0,NA
 71,1995,Bulgaria,34155,1.1906
 71,1996,Bulgaria,50533,1.4608100000000002
 71,1997,Bulgaria,43954,1.33556
@@ -1366,7 +1366,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 71,2027,Bulgaria,119777,4.03826
 71,2028,Bulgaria,121953,4.14824
 71,2029,Bulgaria,122831,4.21415
-71,2030,Bulgaria,0,NaN
+71,2030,Bulgaria,0,NA
 72,1995,Romania,346095,3.46556
 72,1996,Romania,304595,3.17404
 72,1997,Romania,296508,3.21379
@@ -1402,7 +1402,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 72,2027,Romania,232540,2.82312
 72,2028,Romania,234905,2.86101
 72,2029,Romania,237203,2.89479
-72,2030,Romania,0,NaN
+72,2030,Romania,0,NA
 73,1995,Russia,848717,1.28123
 73,1996,Russia,998798,1.5137100000000001
 73,1997,Russia,971217,1.48485
@@ -1438,9 +1438,9 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 73,2027,Russia,964938,1.40368
 73,2028,Russia,980920,1.43204
 73,2029,Russia,996595,1.46039
-73,2030,Russia,0,NaN
-74,1995,Georgia,0,NaN
-74,1996,Georgia,0,NaN
+73,2030,Russia,0,NA
+74,1995,Georgia,0,NA
+74,1996,Georgia,0,NA
 74,1997,Georgia,94457,5.1113
 74,1998,Georgia,61764,3.57226
 74,1999,Georgia,59683,3.52318
@@ -1474,7 +1474,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 74,2027,Georgia,154646,8.93989
 74,2028,Georgia,155071,9.0028
 74,2029,Georgia,155211,9.04964
-74,2030,Georgia,0,NaN
+74,2030,Georgia,0,NA
 75,1995,Ukraine,421476,1.7470499999999998
 75,1996,Ukraine,342003,1.41827
 75,1997,Ukraine,329936,1.38885
@@ -1510,7 +1510,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 75,2027,Ukraine,224195,1.30713
 75,2028,Ukraine,224793,1.32276
 75,2029,Ukraine,225415,1.33882
-75,2030,Ukraine,0,NaN
+75,2030,Ukraine,0,NA
 76,1995,Turkey,448664,2.23116
 76,1996,Turkey,494762,2.38981
 76,1997,Turkey,560640,2.70677
@@ -1546,7 +1546,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 76,2027,Turkey,659235,2.04236
 76,2028,Turkey,676350,2.07516
 76,2029,Turkey,702574,2.13569
-76,2030,Turkey,0,NaN
+76,2030,Turkey,0,NA
 77,1995,Syria,217337,5.51631
 77,1996,Syria,199157,5.06975
 77,1997,Syria,206756,5.15515
@@ -1582,7 +1582,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 77,2027,Syria,60629,1.19373
 77,2028,Syria,60838,1.17436
 77,2029,Syria,61315,1.13339
-77,2030,Syria,0,NaN
+77,2030,Syria,0,NA
 78,1995,Lebanon,13601,1.6412799999999999
 78,1996,Lebanon,12008,1.4256800000000003
 78,1997,Lebanon,12734,1.47686
@@ -1618,7 +1618,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 78,2027,Lebanon,186824,8.58398
 78,2028,Lebanon,187180,8.71508
 78,2029,Lebanon,190090,8.96957
-78,2030,Lebanon,0,NaN
+78,2030,Lebanon,0,NA
 79,1995,Israel,51910,2.45656
 79,1996,Israel,51623,2.38471
 79,1997,Israel,54006,2.46183
@@ -1654,7 +1654,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 79,2027,Israel,93432,2.08961
 79,2028,Israel,95796,2.10811
 79,2029,Israel,97925,2.12093
-79,2030,Israel,0,NaN
+79,2030,Israel,0,NA
 80,1995,Greece,275600,7.29222
 80,1996,Greece,258232,6.70646
 80,1997,Greece,241315,6.21136
@@ -1690,7 +1690,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 80,2027,Greece,585143,14.0414
 80,2028,Greece,592478,14.2448
 80,2029,Greece,599302,14.4725
-80,2030,Greece,0,NaN
+80,2030,Greece,0,NA
 81,1995,Cyprus,26831,10.2788
 81,1996,Cyprus,25472,9.69367
 81,1997,Cyprus,26375,9.95871
@@ -1726,7 +1726,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 81,2027,Cyprus,29795,7.27113
 81,2028,Cyprus,30264,7.38336
 81,2029,Cyprus,31264,7.61441
-81,2030,Cyprus,0,NaN
+81,2030,Cyprus,0,NA
 82,1995,Albania,34606,3.03554
 82,1996,Albania,26905,2.40828
 82,1997,Albania,30220,2.72977
@@ -1762,7 +1762,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 82,2027,Albania,99726,8.64095
 82,2028,Albania,100693,8.79398
 82,2029,Albania,101441,8.92651
-82,2030,Albania,0,NaN
+82,2030,Albania,0,NA
 84,1995,Algeria,110111,2.05859
 84,1996,Algeria,120484,2.08485
 84,1997,Algeria,138304,2.23499
@@ -1834,7 +1834,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 96,2027,Sierra Leone,25748,1.64355
 96,2028,Sierra Leone,26024,1.62024
 96,2029,Sierra Leone,26038,1.5822199999999997
-96,2030,Sierra Leone,0,NaN
+96,2030,Sierra Leone,0,NA
 98,1995,Togo,5312,0.714377
 98,1996,Togo,2639,0.379372
 98,1997,Togo,3510,0.513041
@@ -1870,7 +1870,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 98,2027,Togo,41784,2.82479
 98,2028,Togo,42244,2.77983
 98,2029,Togo,42539,2.72555
-98,2030,Togo,0,NaN
+98,2030,Togo,0,NA
 99,1995,Benin,50638,2.18747
 99,1996,Benin,51929,2.17467
 99,1997,Benin,41807,1.69802
@@ -1906,7 +1906,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 99,2027,Benin,98178,1.63318
 99,2028,Benin,100871,1.6290499999999999
 99,2029,Benin,103331,1.6202
-99,2030,Benin,0,NaN
+99,2030,Benin,0,NA
 100,1995,Republique du Congo,4656,0.888238
 100,1996,Republique du Congo,4549,0.84099
 100,1997,Republique du Congo,8534,1.52803
@@ -1942,7 +1942,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 100,2027,Republique du Congo,26093,2.02165
 100,2028,Republique du Congo,26874,2.02747
 100,2029,Republique du Congo,27741,2.03753
-100,2030,Republique du Congo,0,NaN
+100,2030,Republique du Congo,0,NA
 101,1995,Namibia,11877,2.73473
 101,1996,Namibia,11834,2.65429
 101,1997,Namibia,10532,2.32187
@@ -1978,7 +1978,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 101,2027,Namibia,52260,5.23263
 101,2028,Namibia,53904,5.26945
 101,2029,Namibia,55832,5.32964
-101,2030,Namibia,0,NaN
+101,2030,Namibia,0,NA
 102,1995,South Africa,226116,1.7330500000000002
 102,1996,South Africa,268422,2.09011
 102,1997,South Africa,299310,2.35627
@@ -2014,7 +2014,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 102,2027,South Africa,872368,4.69249
 102,2028,South Africa,892770,4.75424
 102,2029,South Africa,917933,4.83975
-102,2030,South Africa,0,NaN
+102,2030,South Africa,0,NA
 103,1995,Sao Tome and Principe,1086,3.42087
 103,1996,Sao Tome and Principe,1247,3.81678
 103,1997,Sao Tome and Principe,1103,3.30372
@@ -2050,7 +2050,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 103,2027,Sao Tome and Principe,8491,10.8579
 103,2028,Sao Tome and Principe,8615,10.7379
 103,2029,Sao Tome and Principe,8697,10.573
-103,2030,Sao Tome and Principe,0,NaN
+103,2030,Sao Tome and Principe,0,NA
 106,1995,Ghana,101962,1.5136299999999998
 106,1996,Ghana,112073,1.6299500000000002
 106,1997,Ghana,114914,1.63841
@@ -2086,7 +2086,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 106,2027,Ghana,299352,1.79241
 106,2028,Ghana,303677,1.7801999999999998
 106,2029,Ghana,308068,1.7686099999999998
-106,2030,Ghana,0,NaN
+106,2030,Ghana,0,NA
 108,1995,Bermuda,6857,20.0895
 108,1996,Bermuda,6095,17.5986
 108,1997,Bermuda,5847,16.5649
@@ -2122,7 +2122,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 108,2027,Bermuda,3773,11.4229
 108,2028,Bermuda,3865,11.7285
 108,2029,Bermuda,3944,11.9992
-108,2030,Bermuda,0,NaN
+108,2030,Bermuda,0,NA
 110,1995,Bahamas,46191,35.8388
 110,1996,Bahamas,45382,34.9082
 110,1997,Bahamas,47329,35.1222
@@ -2158,7 +2158,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 110,2027,Bahamas,63123,28.4343
 110,2028,Bahamas,63293,28.4072
 110,2029,Bahamas,63481,28.388
-110,2030,Bahamas,0,NaN
+110,2030,Bahamas,0,NA
 112,1995,Cuba,95813,2.41175
 112,1996,Cuba,104387,2.57159
 112,1997,Cuba,116006,2.81969
@@ -2194,7 +2194,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 112,2027,Cuba,131952,2.74649
 112,2028,Cuba,131661,2.77351
 112,2029,Cuba,131626,2.80662
-112,2030,Cuba,0,NaN
+112,2030,Cuba,0,NA
 113,1995,Cayman Islands,3186,17.6295
 113,1996,Cayman Islands,2876,15.0591
 113,1997,Cayman Islands,3946,19.2639
@@ -2230,7 +2230,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 113,2027,Cayman Islands,4685,12.3475
 113,2028,Cayman Islands,4804,12.578
 113,2029,Cayman Islands,4917,12.7916
-113,2030,Cayman Islands,0,NaN
+113,2030,Cayman Islands,0,NA
 114,1995,Haiti,48149,1.8537
 114,1996,Haiti,51981,1.96694
 114,1997,Haiti,53683,1.99511
@@ -2266,7 +2266,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 114,2027,Haiti,129333,2.47286
 114,2028,Haiti,130951,2.47221
 114,2029,Haiti,132047,2.46184
-114,2030,Haiti,0,NaN
+114,2030,Haiti,0,NA
 115,1995,Dominican Republic,123970,4.68868
 115,1996,Dominican Republic,128306,4.7333
 115,1997,Dominican Republic,140064,5.02595
@@ -2302,7 +2302,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 115,2027,Dominican Republic,240610,4.4773
 115,2028,Dominican Republic,241268,4.44948
 115,2029,Dominican Republic,241464,4.41369
-115,2030,Dominican Republic,0,NaN
+115,2030,Dominican Republic,0,NA
 116,1995,Puerto Rico and Virgin Islands of the United States,33917,7.513972311820031
 116,1996,Puerto Rico and Virgin Islands of the United States,28086,3.3419844947660753
 116,1997,Puerto Rico and Virgin Islands of the United States,32408,5.707044680325846
@@ -2338,7 +2338,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 116,2027,Puerto Rico and Virgin Islands of the United States,33744,9.058579819819819
 116,2028,Puerto Rico and Virgin Islands of the United States,34379,8.858988153814828
 116,2029,Puerto Rico and Virgin Islands of the United States,34971,8.73132973234966
-116,2030,Puerto Rico and Virgin Islands of the United States,0,NaN
+116,2030,Puerto Rico and Virgin Islands of the United States,0,NA
 117,1995,British Virgin Islands,2631,33.732
 117,1996,British Virgin Islands,2961,37.4825
 117,1997,British Virgin Islands,2216,27.6995
@@ -2374,7 +2374,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 117,2027,British Virgin Islands,2004,17.7673
 117,2028,British Virgin Islands,2013,17.7606
 117,2029,British Virgin Islands,2015,17.7056
-117,2030,British Virgin Islands,0,NaN
+117,2030,British Virgin Islands,0,NA
 118,1995,Anguilla,1610,31.3867
 118,1996,Anguilla,1646,29.163
 118,1997,Anguilla,1768,31.3351
@@ -2446,7 +2446,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 119,2027,Saint Kitts and Nevis,6341,23.0911
 119,2028,Saint Kitts and Nevis,6613,23.945499999999996
 119,2029,Saint Kitts and Nevis,6902,24.8502
-119,2030,Saint Kitts and Nevis,0,NaN
+119,2030,Saint Kitts and Nevis,0,NA
 120,1995,Antigua and Barbuda,5063,19.1335
 120,1996,Antigua and Barbuda,5054,18.5235
 120,1997,Antigua and Barbuda,5127,18.2523
@@ -2482,7 +2482,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 120,2027,Antigua and Barbuda,5330,13.2264
 120,2028,Antigua and Barbuda,5395,13.2841
 120,2029,Antigua and Barbuda,5449,13.3159
-120,2030,Antigua and Barbuda,0,NaN
+120,2030,Antigua and Barbuda,0,NA
 122,1995,Saint Lucia,9242,17.1635
 122,1996,Saint Lucia,8994,15.9978
 122,1997,Saint Lucia,9350,16.8006
@@ -2518,7 +2518,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 122,2027,Saint Lucia,14959,17.3587
 122,2028,Saint Lucia,15149,17.5476
 122,2029,Saint Lucia,15297,17.7128
-122,2030,Saint Lucia,0,NaN
+122,2030,Saint Lucia,0,NA
 123,1995,Dominica,3435,9.72797
 123,1996,Dominica,3566,9.96957
 123,1997,Dominica,4186,11.6676
@@ -2554,7 +2554,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 123,2027,Dominica,5136,13.8993
 123,2028,Dominica,5205,14.0736
 123,2029,Dominica,5256,14.201500000000001
-123,2030,Dominica,0,NaN
+123,2030,Dominica,0,NA
 124,1995,Barbados,15024,13.6397
 124,1996,Barbados,15268,13.3328
 124,1997,Barbados,14686,12.6295
@@ -2590,7 +2590,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 124,2027,Barbados,19969,15.5713
 124,2028,Barbados,20434,16.0399
 124,2029,Barbados,20918,16.531
-124,2030,Barbados,0,NaN
+124,2030,Barbados,0,NA
 125,1995,Grenada,6339,18.7403
 125,1996,Grenada,6453,17.5561
 125,1997,Grenada,6203,16.3621
@@ -2626,7 +2626,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 125,2027,Grenada,11729,21.7459
 125,2028,Grenada,12084,22.4222
 125,2029,Grenada,12471,23.160400000000003
-125,2030,Grenada,0,NaN
+125,2030,Grenada,0,NA
 126,1995,Trinidad and Tobago,16969,3.9279299999999995
 126,1996,Trinidad and Tobago,18820,4.23869
 126,1997,Trinidad and Tobago,19790,4.3021
@@ -2698,7 +2698,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 127,2027,Saint Vincent and the Grenadines,6675,14.9726
 127,2028,Saint Vincent and the Grenadines,6779,15.245
 127,2029,Saint Vincent and the Grenadines,6845,15.4342
-127,2030,Saint Vincent and the Grenadines,0,NaN
+127,2030,Saint Vincent and the Grenadines,0,NA
 129,1995,Panama,24005,2.46363
 129,1996,Panama,26018,2.6082299999999994
 129,1997,Panama,27611,2.66877
@@ -2734,7 +2734,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 129,2027,Panama,152046,6.995840000000001
 129,2028,Panama,153338,6.973499999999999
 129,2029,Panama,155729,7.004889999999999
-129,2030,Panama,0,NaN
+129,2030,Panama,0,NA
 130,1995,Costa Rica,43435,3.69978
 130,1996,Costa Rica,42490,3.7109199999999998
 130,1997,Costa Rica,47339,3.85808
@@ -2770,7 +2770,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 130,2027,Costa Rica,146122,6.26912
 130,2028,Costa Rica,148628,6.35039
 130,2029,Costa Rica,151072,6.42834
-130,2030,Costa Rica,0,NaN
+130,2030,Costa Rica,0,NA
 131,1995,Nicaragua,24362,1.9009199999999997
 131,1996,Nicaragua,30732,2.27748
 131,1997,Nicaragua,31390,2.1928900000000002
@@ -2806,7 +2806,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 131,2027,Nicaragua,149157,4.65321
 131,2028,Nicaragua,152278,4.69471
 131,2029,Nicaragua,155493,4.73814
-131,2030,Nicaragua,0,NaN
+131,2030,Nicaragua,0,NA
 132,1995,Colombia,269841,2.14159
 132,1996,Colombia,291985,2.28901
 132,1997,Colombia,302359,2.31035
@@ -2842,7 +2842,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 132,2027,Colombia,557977,2.27633
 132,2028,Colombia,562554,2.28605
 132,2029,Colombia,566169,2.29179
-132,2030,Colombia,0,NaN
+132,2030,Colombia,0,NA
 133,1995,Honduras,55806,2.73945
 133,1996,Honduras,57833,2.77226
 133,1997,Honduras,64914,2.96225
@@ -2878,7 +2878,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 133,2027,Honduras,258773,5.27812
 133,2028,Honduras,266857,5.37333
 133,2029,Honduras,274384,5.45509
-133,2030,Honduras,0,NaN
+133,2030,Honduras,0,NA
 134,1995,El Salvador,21097,1.0469
 134,1996,El Salvador,21373,1.07537
 134,1997,El Salvador,21579,1.07493
@@ -2914,7 +2914,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 134,2027,El Salvador,135679,4.18483
 134,2028,El Salvador,137605,4.21793
 134,2029,El Salvador,139100,4.23749
-134,2030,El Salvador,0,NaN
+134,2030,El Salvador,0,NA
 135,1995,Mexico,3157340,8.97594
 135,1996,Mexico,3057630,8.4205
 135,1997,Mexico,3308910,8.59479
@@ -2950,7 +2950,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 135,2027,Mexico,5585710,9.49435
 135,2028,Mexico,5684250,9.56467
 135,2029,Mexico,5785220,9.64005
-135,2030,Mexico,0,NaN
+135,2030,Mexico,0,NA
 136,1995,Guatemala,59580,1.74419
 136,1996,Guatemala,61744,1.78615
 136,1997,Guatemala,68513,1.9254399999999998
@@ -2986,7 +2986,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 136,2027,Guatemala,219183,2.57578
 136,2028,Guatemala,224371,2.5781700000000005
 136,2029,Guatemala,229506,2.58024
-136,2030,Guatemala,0,NaN
+136,2030,Guatemala,0,NA
 137,1995,Ecuador,66680,1.5253
 137,1996,Ecuador,74643,1.70709
 137,1997,Ecuador,71491,1.56932
@@ -3022,7 +3022,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 137,2027,Ecuador,239438,2.68716
 137,2028,Ecuador,242813,2.6919400000000002
 137,2029,Ecuador,248795,2.72517
-137,2030,Ecuador,0,NaN
+137,2030,Ecuador,0,NA
 138,1995,Peru,149053,1.65834
 138,1996,Peru,170361,1.7993900000000003
 138,1997,Peru,187657,1.91403
@@ -3058,7 +3058,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 138,2027,Peru,489987,2.4544
 138,2028,Peru,499872,2.47374
 138,2029,Peru,511707,2.50327
-138,2030,Peru,0,NaN
+138,2030,Peru,0,NA
 139,1995,Venezuela,210968,2.6767
 139,1996,Venezuela,212878,2.63185
 139,1997,Venezuela,224765,2.707
@@ -3094,7 +3094,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 139,2027,Venezuela,474745,3.17917
 139,2028,Venezuela,485471,3.2225799999999998
 139,2029,Venezuela,495828,3.26374
-139,2030,Venezuela,0,NaN
+139,2030,Venezuela,0,NA
 140,1995,Guadeloupe and Martinique,9640,4.389481468879668
 140,1996,Guadeloupe and Martinique,9618,4.337468598461218
 140,1997,Guadeloupe and Martinique,9635,4.273065773741567
@@ -3130,7 +3130,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 140,2027,Guadeloupe and Martinique,10416,4.402344446044547
 140,2028,Guadeloupe and Martinique,10612,4.5528830719939695
 140,2029,Guadeloupe and Martinique,10783,4.7051477872577205
-140,2030,Guadeloupe and Martinique,0,NaN
+140,2030,Guadeloupe and Martinique,0,NA
 143,1995,Iceland,4473,3.15448
 143,1996,Iceland,4921,3.46571
 143,1997,Iceland,4777,3.36407
@@ -3166,7 +3166,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 143,2027,Iceland,20970,10.2056
 143,2028,Iceland,21894,10.6382
 143,2029,Iceland,22856,11.0879
-143,2030,Iceland,0,NaN
+143,2030,Iceland,0,NA
 155,1995,Tonga,961,3.23213
 155,1996,Tonga,1112,3.73986
 155,1997,Tonga,1379,4.63687
@@ -3202,7 +3202,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 155,2027,Tonga,3188,8.68389
 155,2028,Tonga,3259,8.75344
 155,2029,Tonga,3360,8.8992
-155,2030,Tonga,0,NaN
+155,2030,Tonga,0,NA
 162,1995,New Zealand,166632,9.88197
 162,1996,New Zealand,175130,10.0648
 162,1997,New Zealand,164233,9.3841
@@ -3238,7 +3238,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 162,2027,New Zealand,293854,11.7196
 162,2028,New Zealand,300784,11.975
 162,2029,New Zealand,308051,12.2428
-162,2030,New Zealand,0,NaN
+162,2030,New Zealand,0,NA
 163,1995,United States,4851970,3.88443
 163,1996,United States,5183210,4.09028
 163,1997,United States,5421700,4.1843
@@ -3274,7 +3274,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 163,2027,United States,6564370,4.03157
 163,2028,United States,6644870,4.06039
 163,2029,United States,6725840,4.0882
-163,2030,United States,0,NaN
+163,2030,United States,0,NA
 164,1995,Belize,4137,6.78048
 164,1996,Belize,4842,7.7089300000000005
 164,1997,Belize,4997,7.45346
@@ -3310,7 +3310,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 164,2027,Belize,26903,13.9531
 164,2028,Belize,27783,14.131900000000002
 164,2029,Belize,29044,14.4936
-164,2030,Belize,0,NaN
+164,2030,Belize,0,NA
 166,1995,Jamaica,76481,7.941910000000001
 166,1996,Jamaica,70519,7.34569
 166,1997,Jamaica,66956,7.00373
@@ -3346,7 +3346,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 166,2027,Jamaica,145447,11.0709
 166,2028,Jamaica,148215,11.2379
 166,2029,Jamaica,152057,11.4991
-166,2030,Jamaica,0,NaN
+166,2030,Jamaica,0,NA
 167,1995,Guyana,3996,1.56419
 167,1996,Guyana,13444,5.30038
 167,1997,Guyana,13005,5.176620000000001
@@ -3382,7 +3382,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 167,2027,Guyana,9805,3.29388
 167,2028,Guyana,9880,3.30677
 167,2029,Guyana,9917,3.30697
-167,2030,Guyana,0,NaN
+167,2030,Guyana,0,NA
 168,1995,Suriname,5390,4.02052
 168,1996,Suriname,3064,2.28776
 168,1997,Suriname,2939,2.13565
@@ -3418,7 +3418,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 168,2027,Suriname,3699,1.65285
 168,2028,Suriname,3717,1.65062
 168,2029,Suriname,3748,1.6518
-168,2030,Suriname,0,NaN
+168,2030,Suriname,0,NA
 171,1995,Brazil,2102520,3.4224
 171,1996,Brazil,1912070,3.1495
 171,1997,Brazil,1829650,2.95058
@@ -3454,7 +3454,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 171,2027,Brazil,2892700,2.77898
 171,2028,Brazil,2916730,2.79
 171,2029,Brazil,2937240,2.80037
-171,2030,Brazil,0,NaN
+171,2030,Brazil,0,NA
 172,1995,Argentina,383108,3.1553
 172,1996,Argentina,372050,3.038
 172,1997,Argentina,417221,3.1902899999999996
@@ -3490,7 +3490,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 172,2027,Argentina,721820,3.4214600000000006
 172,2028,Argentina,730841,3.42951
 172,2029,Argentina,739448,3.4354800000000005
-172,2030,Argentina,0,NaN
+172,2030,Argentina,0,NA
 173,1995,Uruguay,64601,4.77469
 173,1996,Uruguay,69243,5.1616
 173,1997,Uruguay,69911,5.13873
@@ -3526,7 +3526,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 173,2027,Uruguay,173403,10.2339
 173,2028,Uruguay,175830,10.3617
 173,2029,Uruguay,178186,10.4849
-173,2030,Uruguay,0,NaN
+173,2030,Uruguay,0,NA
 174,1995,Finland,52952,2.5785
 174,1996,Finland,62769,3.01341
 174,1997,Finland,65410,3.03599
@@ -3562,7 +3562,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 174,2027,Finland,69264,2.61897
 174,2028,Finland,70959,2.68529
 174,2029,Finland,73412,2.78085
-174,2030,Finland,0,NaN
+174,2030,Finland,0,NA
 175,1995,Denmark,53022,2.04288
 175,1996,Denmark,56952,2.17039
 175,1997,Denmark,58566,2.18865
@@ -3598,7 +3598,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 175,2027,Denmark,71032,2.37927
 175,2028,Denmark,71107,2.3818
 175,2029,Denmark,71156,2.38452
-175,2030,Denmark,0,NaN
+175,2030,Denmark,0,NA
 176,1995,Germany,2563450,6.753960000000001
 176,1996,Germany,2584150,6.806399999999999
 176,1997,Germany,2704300,7.1268400000000005
@@ -3634,7 +3634,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 176,2027,Germany,3345090,7.39709
 176,2028,Germany,3340570,7.41518
 176,2029,Germany,3306960,7.38284
-176,2030,Germany,0,NaN
+176,2030,Germany,0,NA
 177,1995,Netherlands,399148,6.56174
 177,1996,Netherlands,450611,7.24045
 177,1997,Netherlands,539031,8.38967
@@ -3670,7 +3670,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 177,2027,Netherlands,450292,5.62053
 177,2028,Netherlands,457290,5.70723
 177,2029,Netherlands,458321,5.721059999999999
-177,2030,Netherlands,0,NaN
+177,2030,Netherlands,0,NA
 178,1995,Poland,425199,2.8779299999999997
 178,1996,Poland,469615,3.1452199999999997
 178,1997,Poland,500212,3.29502
@@ -3706,7 +3706,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 178,2027,Poland,414995,2.52901
 178,2028,Poland,426364,2.60531
 178,2029,Poland,439561,2.69225
-178,2030,Poland,0,NaN
+178,2030,Poland,0,NA
 179,1995,France,983243,4.15837
 179,1996,France,1006890,4.23435
 179,1997,France,1069920,4.46481
@@ -3742,7 +3742,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 179,2027,France,1451440,4.84061
 179,2028,France,1472780,4.89557
 179,2029,France,1492950,4.94989
-179,2030,France,0,NaN
+179,2030,France,0,NA
 180,1995,United Kingdom,1532810,5.46383
 180,1996,United Kingdom,1701310,6.00952
 180,1997,United Kingdom,1721870,5.97949
@@ -3778,7 +3778,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 180,2027,United Kingdom,1914930,5.15231
 180,2028,United Kingdom,1929630,5.179000000000001
 180,2029,United Kingdom,1930060,5.16735
-180,2030,United Kingdom,0,NaN
+180,2030,United Kingdom,0,NA
 181,1995,Ireland,27602,2.02535
 181,1996,Ireland,28547,2.0157
 181,1997,Ireland,29748,2.01655
@@ -3814,7 +3814,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 181,2027,Ireland,61560,2.54223
 181,2028,Ireland,63368,2.58642
 181,2029,Ireland,65830,2.6692
-181,2030,Ireland,0,NaN
+181,2030,Ireland,0,NA
 182,1995,Spain,556489,4.42289
 182,1996,Spain,579643,4.47825
 182,1997,Spain,628919,4.68636
@@ -3850,7 +3850,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 182,2027,Spain,1161940,5.58808
 182,2028,Spain,1183460,5.68874
 182,2029,Spain,1200420,5.77604
-182,2030,Spain,0,NaN
+182,2030,Spain,0,NA
 183,1995,Portugal,120477,2.73325
 183,1996,Portugal,113638,2.53562
 183,1997,Portugal,123307,2.6811
@@ -3886,7 +3886,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 183,2027,Portugal,467275,9.98317
 183,2028,Portugal,466670,10.0419
 183,2029,Portugal,463999,10.0657
-183,2030,Portugal,0,NaN
+183,2030,Portugal,0,NA
 184,1995,Italy,910734,4.38596
 184,1996,Italy,958939,4.60375
 184,1997,Italy,979432,4.69583
@@ -3922,7 +3922,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 184,2027,Italy,1658970,6.97619
 184,2028,Italy,1678020,7.0679
 184,2029,Italy,1689700,7.13229
-184,2030,Italy,0,NaN
+184,2030,Italy,0,NA
 186,1995,Montenegro,11192,7.60341
 186,1996,Montenegro,11738,7.98519
 186,1997,Montenegro,11103,7.699779999999999
@@ -3958,7 +3958,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 186,2027,Montenegro,12172,5.93544
 186,2028,Montenegro,11955,5.836
 186,2029,Montenegro,11628,5.68236
-186,2030,Montenegro,0,NaN
+186,2030,Montenegro,0,NA
 187,1995,Croatia,93548,6.18534
 187,1996,Croatia,102813,7.106050000000001
 187,1997,Croatia,99864,6.7985
@@ -3994,7 +3994,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 187,2027,Croatia,137392,10.2461
 187,2028,Croatia,138059,10.3493
 187,2029,Croatia,139035,10.4755
-187,2030,Croatia,0,NaN
+187,2030,Croatia,0,NA
 188,1995,Slovenia,23545,3.15935
 188,1996,Slovenia,26396,3.55643
 188,1997,Slovenia,27328,3.67596
@@ -4030,7 +4030,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 188,2027,Slovenia,37997,4.22793
 188,2028,Slovenia,38341,4.27008
 188,2029,Slovenia,38727,4.3169
-188,2030,Slovenia,0,NaN
+188,2030,Slovenia,0,NA
 189,1995,Lithuania,25712,1.5640099999999997
 189,1996,Lithuania,28923,1.74338
 189,1997,Lithuania,32071,1.92157
@@ -4066,7 +4066,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 189,2027,Lithuania,29220,2.55524
 189,2028,Lithuania,29670,2.65348
 189,2029,Lithuania,30282,2.76527
-189,2030,Lithuania,0,NaN
+189,2030,Lithuania,0,NA
 190,1995,Qatar,24430,8.56672
 190,1996,Qatar,23994,8.29133
 190,1997,Qatar,21728,7.35692
@@ -4102,7 +4102,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 190,2027,Qatar,191156,8.84679
 190,2028,Qatar,195708,8.967
 190,2029,Qatar,197025,8.93809
-190,2030,Qatar,0,NaN
+190,2030,Qatar,0,NA
 191,1995,Iran,386410,2.81158
 191,1996,Iran,441029,3.0963
 191,1997,Iran,474072,3.2822399999999994
@@ -4138,7 +4138,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 191,2027,Iran,505942,1.92434
 191,2028,Iran,503478,1.89919
 191,2029,Iran,502088,1.87848
-191,2030,Iran,0,NaN
+191,2030,Iran,0,NA
 192,1995,Iraq,574077,15.0482
 192,1996,Iraq,220968,5.6378
 192,1997,Iraq,149858,3.66556
@@ -4174,7 +4174,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 192,2027,Iraq,160477,1.62952
 192,2028,Iraq,161459,1.60734
 192,2029,Iraq,163716,1.59785
-192,2030,Iraq,0,NaN
+192,2030,Iraq,0,NA
 194,1995,Guinea,6294,0.4347579999999999
 194,1996,Guinea,8732,0.585592
 194,1997,Guinea,9242,0.612341
@@ -4210,7 +4210,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 194,2027,Guinea,61110,1.8342
 194,2028,Guinea,62951,1.83443
 194,2029,Guinea,64782,1.83435
-194,2030,Guinea,0,NaN
+194,2030,Guinea,0,NA
 195,1995,Ivory Coast,76030,1.45966
 195,1996,Ivory Coast,81095,1.5119
 195,1997,Ivory Coast,99360,1.79936
@@ -4246,7 +4246,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 195,2027,Ivory Coast,373374,3.77027
 195,2028,Ivory Coast,379974,3.74784
 195,2029,Ivory Coast,386699,3.72465
-195,2030,Ivory Coast,0,NaN
+195,2030,Ivory Coast,0,NA
 196,1995,Nigeria,597186,1.38476
 196,1996,Nigeria,727161,1.64539
 196,1997,Nigeria,658975,1.45389
@@ -4282,7 +4282,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 196,2027,Nigeria,1842280,1.86688
 196,2028,Nigeria,1899870,1.87462
 196,2029,Nigeria,1960280,1.88338
-196,2030,Nigeria,0,NaN
+196,2030,Nigeria,0,NA
 197,1995,Cameroon,54848,1.06142
 197,1996,Cameroon,79192,1.49333
 197,1997,Cameroon,80943,1.48455
@@ -4318,7 +4318,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 197,2027,Cameroon,379712,2.83066
 197,2028,Cameroon,392132,2.84195
 197,2029,Cameroon,406798,2.86711
-197,2030,Cameroon,0,NaN
+197,2030,Cameroon,0,NA
 198,1995,Gabon,5526,2.25756
 198,1996,Gabon,4904,1.9498
 198,1997,Gabon,5603,2.16641
@@ -4354,7 +4354,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 198,2027,Gabon,7735,1.06088
 198,2028,Gabon,7918,1.05558
 198,2029,Gabon,8227,1.06703
-198,2030,Gabon,0,NaN
+198,2030,Gabon,0,NA
 199,1995,Democratic Republic of the Congo,114305,0.72502200000000006
 199,1996,Democratic Republic of the Congo,287930,1.7767
 199,1997,Democratic Republic of the Congo,145327,0.875394
@@ -4390,7 +4390,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 199,2027,Democratic Republic of the Congo,175991,0.411181
 199,2028,Democratic Republic of the Congo,180174,0.407204
 199,2029,Democratic Republic of the Congo,183294,0.400942
-199,2030,Democratic Republic of the Congo,0,NaN
+199,2030,Democratic Republic of the Congo,0,NA
 200,1995,Angola,59012,1.33936
 200,1996,Angola,70308,1.55318
 200,1997,Angola,60456,1.29681
@@ -4462,7 +4462,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 202,2027,Tanzania,697296,3.64139
 202,2028,Tanzania,729335,3.67726
 202,2029,Tanzania,768310,3.7450799999999997
-202,2030,Tanzania,0,NaN
+202,2030,Tanzania,0,NA
 203,1995,India,18472900,4.93442
 203,1996,India,18157800,4.79428
 203,1997,India,18880700,4.92828
@@ -4498,7 +4498,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 203,2027,India,32395800,5.27881
 203,2028,India,33051800,5.3144
 203,2029,India,33688100,5.35
-203,2030,India,0,NaN
+203,2030,India,0,NA
 204,1995,Bangladesh,461575,1.2623
 204,1996,Bangladesh,446183,1.28214
 204,1997,Bangladesh,489696,1.36616
@@ -4534,7 +4534,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 204,2027,Bangladesh,1581050,2.17356
 204,2028,Bangladesh,1607950,2.19021
 204,2029,Bangladesh,1625110,2.19342
-204,2030,Bangladesh,0,NaN
+204,2030,Bangladesh,0,NA
 205,1995,Myanmar,312276,1.81563
 205,1996,Myanmar,393887,2.24033
 205,1997,Myanmar,366299,2.03907
@@ -4570,7 +4570,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 205,2027,Myanmar,900143,3.53341
 205,2028,Myanmar,937595,3.65786
 205,2029,Myanmar,977438,3.79007
-205,2030,Myanmar,0,NaN
+205,2030,Myanmar,0,NA
 206,1995,Malaysia,417118,5.327769999999999
 206,1996,Malaysia,470559,5.470140000000001
 206,1997,Malaysia,453177,5.16417
@@ -4606,7 +4606,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 206,2027,Malaysia,1059690,5.99432
 206,2028,Malaysia,1098630,6.12793
 206,2029,Malaysia,1130670,6.22583
-206,2030,Malaysia,0,NaN
+206,2030,Malaysia,0,NA
 207,1995,Vietnam,581273,1.72423
 207,1996,Vietnam,1295190,3.74806
 207,1997,Vietnam,1429620,4.04663
@@ -4642,7 +4642,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 207,2027,Vietnam,2765420,4.75991
 207,2028,Vietnam,2796620,4.79197
 207,2029,Vietnam,2815010,4.8019
-207,2030,Vietnam,0,NaN
+207,2030,Vietnam,0,NA
 208,1995,Singapore,85437,4.82436
 208,1996,Singapore,79943,4.25394
 208,1997,Singapore,80506,4.03621
@@ -4678,7 +4678,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 208,2027,Singapore,186800,4.81951
 208,2028,Singapore,191545,4.94971
 208,2029,Singapore,196429,5.09029
-208,2030,Singapore,0,NaN
+208,2030,Singapore,0,NA
 209,1995,China,17484809,2.5854409322778413
 209,1996,China,16569944,2.424322432296693
 209,1997,China,17283781,2.4924053174383545
@@ -4714,7 +4714,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 209,2027,China,34036368,4.384171833803183
 209,2028,China,34760714,4.472073957610882
 209,2029,China,35460442,4.559890705073557
-209,2030,China,0,NaN
+209,2030,China,0,NA
 210,1995,Japan,1301880,2.01613
 210,1996,Japan,1419870,2.18905
 210,1997,Japan,1568660,2.39238
@@ -4750,7 +4750,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 210,2027,Japan,1332940,2.05793
 210,2028,Japan,1337310,2.07398
 210,2029,Japan,1345530,2.09745
-210,2030,Japan,0,NaN
+210,2030,Japan,0,NA
 212,1995,Kiribati,756,5.26409
 212,1996,Kiribati,892,5.96949
 212,1997,Kiribati,906,5.83724
@@ -4786,7 +4786,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 212,2027,Kiribati,2811,5.6823
 212,2028,Kiribati,2824,5.53005
 212,2029,Kiribati,2846,5.40616
-212,2030,Kiribati,0,NaN
+212,2030,Kiribati,0,NA
 214,1995,Egypt,693147,4.69099
 214,1996,Egypt,782775,5.10536
 214,1997,Egypt,795576,5.03017
@@ -4822,7 +4822,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 214,2027,Egypt,1390970,4.34873
 214,2028,Egypt,1436560,4.39417
 214,2029,Egypt,1473620,4.41092
-214,2030,Egypt,0,NaN
+214,2030,Egypt,0,NA
 215,1995,Jordan,54467,8.92411
 215,1996,Jordan,58227,9.0345
 215,1997,Jordan,58649,8.85321
@@ -4858,7 +4858,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 215,2027,Jordan,102090,7.12767
 215,2028,Jordan,107687,7.41292
 215,2029,Jordan,114859,7.79723
-215,2030,Jordan,0,NaN
+215,2030,Jordan,0,NA
 216,1995,Indonesia,4263240,5.1618
 216,1996,Indonesia,4777760,5.40733
 216,1997,Indonesia,5002390,5.57389
@@ -4894,7 +4894,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 216,2027,Indonesia,6340580,4.3221
 216,2028,Indonesia,6715270,4.52236
 216,2029,Indonesia,7156210,4.76604
-216,2030,Indonesia,0,NaN
+216,2030,Indonesia,0,NA
 218,1995,Canada,574302,4.31904
 218,1996,Canada,587098,4.3752
 218,1997,Canada,599067,4.37126
@@ -4930,7 +4930,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 218,2027,Canada,805756,4.11627
 218,2028,Canada,800016,4.06593
 218,2029,Canada,793099,4.01018
-218,2030,Canada,0,NaN
+218,2030,Canada,0,NA
 220,1995,Sint Maarten,7549,13.9805
 220,1996,Sint Maarten,5327,9.34621
 220,1997,Sint Maarten,6668,12.1241
@@ -4966,7 +4966,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 220,2027,Sint Maarten,10064,15.4502
 220,2028,Sint Maarten,10163,15.6511
 220,2029,Sint Maarten,10266,15.8586
-220,2030,Sint Maarten,0,NaN
+220,2030,Sint Maarten,0,NA
 222,1995,Sweden,116462,2.85259
 222,1996,Sweden,127284,3.13604
 222,1997,Sweden,143899,3.58435
@@ -5002,7 +5002,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 222,2027,Sweden,229934,4.12803
 222,2028,Sweden,236484,4.22229
 222,2029,Sweden,243226,4.32433
-222,2030,Sweden,0,NaN
+222,2030,Sweden,0,NA
 223,1995,Norway,134411,6.46316
 223,1996,Norway,151639,7.11187
 223,1997,Norway,159794,7.279029999999999
@@ -5038,7 +5038,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 223,2027,Norway,185202,6.37131
 223,2028,Norway,186211,6.374490000000001
 223,2029,Norway,186948,6.3740499999999995
-223,2030,Norway,0,NaN
+223,2030,Norway,0,NA
 224,1995,Chile,139531,2.73078
 224,1996,Chile,144200,2.78294
 224,1997,Chile,158506,2.99492
@@ -5074,7 +5074,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 224,2027,Chile,318617,3.6676599999999997
 224,2028,Chile,322350,3.69878
 224,2029,Chile,325138,3.71885
-224,2030,Chile,0,NaN
+224,2030,Chile,0,NA
 232,1995,Bosnia and Herzegovina,6711,1.01321
 232,1996,Bosnia and Herzegovina,5874,0.869499
 232,1997,Bosnia and Herzegovina,4036,0.590399
@@ -5110,7 +5110,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 232,2027,Bosnia and Herzegovina,30544,4.06913
 232,2028,Bosnia and Herzegovina,31160,4.20102
 232,2029,Bosnia and Herzegovina,31901,4.35325
-232,2030,Bosnia and Herzegovina,0,NaN
+232,2030,Bosnia and Herzegovina,0,NA
 244,1995,Curacao,7549,13.9805
 244,1996,Curacao,5327,9.34621
 244,1997,Curacao,6668,12.1241
@@ -5146,7 +5146,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 244,2027,Curacao,10064,15.4502
 244,2028,Curacao,10163,15.6511
 244,2029,Curacao,10266,15.8586
-244,2030,Curacao,0,NaN
+244,2030,Curacao,0,NA
 245,1995,Bonaire,7549,13.9805
 245,1996,Bonaire,5327,9.34621
 245,1997,Bonaire,6668,12.1241
@@ -5182,7 +5182,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 245,2027,Bonaire,10064,15.4502
 245,2028,Bonaire,10163,15.6511
 245,2029,Bonaire,10266,15.8586
-245,2030,Bonaire,0,NaN
+245,2030,Bonaire,0,NA
 247,1995,Brunei,5570,4.45541
 247,1996,Brunei,6415,4.97455
 247,1997,Brunei,6614,4.95973
@@ -5218,7 +5218,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 247,2027,Brunei,6209,2.58531
 247,2028,Brunei,6400,2.64784
 247,2029,Brunei,6595,2.71107
-247,2030,Brunei,0,NaN
+247,2030,Brunei,0,NA
 248,1995,Saba,7549,13.9805
 248,1996,Saba,5327,9.34621
 248,1997,Saba,6668,12.1241
@@ -5254,7 +5254,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 248,2027,Saba,10064,15.4502
 248,2028,Saba,10163,15.6511
 248,2029,Saba,10266,15.8586
-248,2030,Saba,0,NaN
+248,2030,Saba,0,NA
 249,1995,Sint Eustatius,7549,13.9805
 249,1996,Sint Eustatius,5327,9.34621
 249,1997,Sint Eustatius,6668,12.1241
@@ -5290,7 +5290,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 249,2027,Sint Eustatius,10064,15.4502
 249,2028,Sint Eustatius,10163,15.6511
 249,2029,Sint Eustatius,10266,15.8586
-249,2030,Sint Eustatius,0,NaN
+249,2030,Sint Eustatius,0,NA
 250,1995,Aruba,6810,17.4956
 250,1996,Aruba,8407,21.0487
 250,1997,Aruba,8497,20.9578
@@ -5326,7 +5326,7 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 250,2027,Aruba,16810,36.3436
 250,2028,Aruba,16797,36.6303
 250,2029,Aruba,16904,37.1846
-250,2030,Aruba,0,NaN
+250,2030,Aruba,0,NA
 255,1995,Azerbaijan,68522,1.89653
 255,1996,Azerbaijan,70944,1.9243200000000003
 255,1997,Azerbaijan,70806,1.9167499999999997
@@ -5362,4 +5362,4 @@ rgn_id,year,rgn_name,jobs_ct,jobs_pct
 255,2027,Azerbaijan,216238,4.3702
 255,2028,Azerbaijan,223568,4.50233
 255,2029,Azerbaijan,231989,4.65545
-255,2030,Azerbaijan,0,NaN
+255,2030,Azerbaijan,0,NA

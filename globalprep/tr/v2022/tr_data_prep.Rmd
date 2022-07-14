@@ -84,24 +84,66 @@ source(here(paste0("globalprep/tr/v", version_year, "/R/tr_fxns.R")))
 
 # Ep: Proportion of workforce directly employed in tourism
 
-These data are from the [World Travel & Tourism Council](http://www.wttc.org/datagateway).  We use "direct" employment data (see mazu: git-annex/globalprep/_raw_data/WTTC/d2019/README.md for instructions on obtaining data). The data extend to 2030, which includes 10 years of projections. The actual data goes to 2020 (projected/real data are differentiated on the data gateway chart).
+These data are accessed via the TTDI dataset, but are originally from the [World Travel & Tourism Council](http://www.wttc.org/). We use "direct" employment data (see mazu: git-annex/globalprep/_raw_data/WTTC/d2019/README.md for instructions on obtaining data).
 
-These data are cleaned and formatted using the R/process_WTTC.R script. Missing values are gapfilled using the UN georegion information.
+These data are cleaned and formatted using the R/process_TTDI_emp.R script. Missing values are gapfilled using the UN georegion information.
 
 ```{r wttc prop tourism, message=FALSE, warning=FALSE, echo=FALSE, results="hide"}
 
-## describe where the raw data are located:
-scenario_yr <- "v2020"
-dir_wttc <- file.path(dir_M, 'git-annex/globalprep/_raw_data/WTTC/d2020/raw')
-dir_github <- here("globalprep/tr", scenario_yr)
+ttdi_file <- "WEF_TTDI_2021_data_for_download.xlsx"
 
-## processing script that formats the WTTC for OHI, saves the following: intermediate/wttc_empd_rgn.csv
-source(here("globalprep/tr/v2020/R/process_WTTC.R"))
-##### v2020: Duplicates = Guadeloupe/Martinique, PR/VI, China (accounted for in the script)
+ttdi_raw <- read_excel(paste0(dir_M, "/git-annex/globalprep/_raw_data/WEF-Economics/d",
+                              version_year, "/", ttdi_file), skip = 2) 
+
+# moving up first row column names to headers while keeping full country names that are already acting as headers
+names(ttdi_raw)[1:9] <- as.character(ttdi_raw[1, 1:9])
+
+ttdi_emp <- ttdi_raw %>%
+  filter(Title %in% c("T&T industry Share of Employment, % of total employment",
+                      "T&T industry Employment, 1,000 jobs"),
+         Attribute == "Value") %>% 
+  select(Title, Edition, Albania:Zambia) %>% 
+  # currently Zambia is the last country column - this may need to change in the future if countries are added (e.g. Zimbabwe)
+  pivot_longer(cols = Albania:Zambia, names_to = "country",
+               values_to = "value") %>% 
+  mutate(value = as.numeric(value)) %>% 
+  pivot_wider(names_from = Title, values_from = value) %>% 
+  rename("jobs_pct" = "T&T industry Share of Employment, % of total employment",
+         "jobs_ct" = "T&T industry Employment, 1,000 jobs",
+         "year" = "Edition") %>% 
+  mutate(jobs_ct = round(jobs_ct * 1000), # original values represent 1000s of jobs
+         year = as.numeric(year),
+         country = case_when(country == "Côte d'Ivoire" ~ "Ivory Coast",
+                             TRUE ~ country))
+
+
+ttdi_emp_rgn <- ttdi_emp %>% 
+  name_2_rgn(fld_name = "country") %>% 
+  select(-country)
+
 
 ## read in the dataset created by above function:
-tr_jobs_pct_tour <- read_csv(here('globalprep/tr/v2020/intermediate/wttc_empd_rgn.csv')) %>% 
+tr_jobs_pct_tour <- ttdi_emp_rgn %>% 
  dplyr::select(rgn_id, year, jobs_pct)
+
+
+
+# quick comparison with job percents from the previous data which were directly from WTTC
+tr_jobs_pct_prev <- read_csv(here('globalprep/tr/v2020/intermediate/wttc_empd_rgn.csv')) %>% 
+  dplyr::select(rgn_id, year, jobs_pct) %>% 
+  filter(year == 2019)
+  
+
+compare <- tr_jobs_pct_tour %>% 
+  filter(year == 2019) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  left_join(tr_jobs_pct_prev, by = c("rgn_id"))
+
+plot(compare$jobs_pct.x, compare$jobs_pct.y)
+abline(0,1)
+# major outlier is Philippines - the discrepancy could be related to reporting before and after the tourism crash associated with the pandemic which hit the Philippines particularly hard: (https://wttc.org/News-Article/WTTCs-latest-Economic-Impact-Report-reveals-significant-recovery-in-the-Philippines-Travel-and-Tourism-sector-in-2021)
+
+
 
 ## format data to have complete years/regions and convert percentage of jobs to proportion of jobs
 rgn_names <- read_csv('https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv') %>%
@@ -109,33 +151,35 @@ rgn_names <- read_csv('https://raw.githubusercontent.com/OHI-Science/ohi-global/
 
 # create data frame with a row for each combination of region id and year
 rgn_names <- expand.grid(rgn_id = rgn_names$rgn_id, 
-                             year= min(tr_jobs_pct_tour$year):max(tr_jobs_pct_tour$year)) 
+                             year = min(tr_jobs_pct_tour$year):max(tr_jobs_pct_tour$year)) 
       
-tr_data_raw <- rgn_names %>%
-  full_join(tr_jobs_pct_tour %>%
+tr_jobs_pct_tour <- tr_jobs_pct_tour %>%
+  full_join(rgn_names, by = c("rgn_id", "year")) %>%
                 rename(Ep = jobs_pct) %>%
                 mutate(Ep = Ep/100) %>%
-                mutate(Ep = ifelse(Ep > 1, NA, Ep)),
-              by = c('rgn_id', 'year')) %>%
+                mutate(Ep = ifelse(Ep > 1, NA, Ep)) %>% 
   filter(!rgn_id == 213) %>% 
   filter(!rgn_id == 255) # ditch disputed regions and Antarctica
 
 ## v2019: >2500 NAs in Ep column
 ## v2020: 2738 NAs in Ep column
-# summary(tr_data_raw)
+## v2021: 480 NAs in Ep column (only 2019 and 2021)
+# summary(tr_jobs_pct_all)
 
+```
 
+```{r}
 ## gapfill missing data using UN georegion data:
-georegions       <- georegions
+georegions <- georegions
 georegion_labels <- georegion_labels
 
-tr_data_raw <- tr_data_raw %>%
+tr_jobs_pct_tour <- tr_jobs_pct_tour %>%
   left_join(georegions, by = 'rgn_id') %>%
   left_join(georegion_labels, by = 'rgn_id') %>%
   select(-r0)
 
 # Calculate two different gapfill columns using r2 and r1
-tr_data_raw_gf <- tr_data_raw %>%
+tr_jobs_pct_tour_gf <- tr_jobs_pct_tour %>%
   group_by(year, r2) %>%
   mutate(Ep_pred_r2 = mean(Ep, na.rm=TRUE)) %>%
   ungroup() %>%
@@ -144,7 +188,7 @@ tr_data_raw_gf <- tr_data_raw %>%
   ungroup()
 
 # first gapfill with r2, if no value available use r1; create column indicating whether value was gapfilled and if so, by what method.
-tr_data_raw_gf <- tr_data_raw_gf %>%
+tr_jobs_pct_tour_gf <- tr_jobs_pct_tour_gf %>%
   mutate(Ep_all = ifelse(is.na(Ep), Ep_pred_r2, Ep)) %>%
   mutate(Ep_all = ifelse(is.na(Ep_all), Ep_pred_r1, Ep_all)) %>% 
   mutate(gapfilled = ifelse(is.na(Ep) & !is.na(Ep_all), "gapfilled", NA)) %>%
@@ -160,44 +204,50 @@ low_pop <- low_pop %>%
   filter(est_population < 3000 | is.na(est_population)) %>%  #filter out regions that have populations > 3000 and keep NA values 
   rename(rgn_label = rgn_nam)
 
-#summary(tr_data_raw_gf)
+summary(tr_jobs_pct_tour_gf)
 # v2020 371 NAs
+# v2022 234 NAs
 
 # make sure all the NAs are uninhabited regions
-tr_data_nas <- tr_data_raw_gf %>% 
+tr_jobs_pct_nas <- tr_jobs_pct_tour_gf %>% 
   filter(is.na(Ep_all)) %>% 
   select(rgn_id, year, r1_label, r2_label, rgn_label) %>% 
   left_join(low_pop, by = c("rgn_id", "rgn_label"))
-#  filter(!duplicated(rgn_id))
 
-max(tr_data_nas$est_population, na.rm=TRUE)<3000 # should be true
+tr_jobs_pct_nas %>% 
+  filter(Inhabited == 0 & !is.na(est_population)) %>% 
+  nrow() # 0 ✓
+
+max(tr_jobs_pct_nas$est_population, na.rm=TRUE) < 3000 # should be true
 
 # make sure all the uninhabited regions are NA (along with gapfill and method if they were gapfilled above)
-tr_data_raw_gf <- tr_data_raw_gf %>% 
+tr_jobs_pct_tour_gf <- tr_jobs_pct_tour_gf %>% 
   mutate(Ep_all = ifelse(rgn_id %in% low_pop$rgn_id, NA, Ep_all)) %>% 
   mutate(gapfilled = ifelse(is.na(Ep_all), NA, gapfilled)) %>% 
   mutate(method = ifelse(is.na(Ep_all), NA, method))
 
 
+
+
 # check NAs once more 
- #summary(tr_data_raw_gf)
+summary(tr_data_raw_gf)
 # v2019: Adding the low pop df identifies 13 additional regions that should be NA instead of gapfilled, taking the total number of NAs in the data set from 245 to 700
 # v2020: Adding the low pop df takes the total number of NAs in the data set from 371 to 832
+# v2022: Adding the low pop df takes the total number of NAs in the data set from 234 to 260
 
 
 # save the gapfill report data
-tr_data_gf <- tr_data_raw_gf %>%
+tr_jobs_pct_tourism_gf <- tr_jobs_pct_tour_gf %>%
   select(rgn_id, year, gapfilled, method) 
 
-write_csv(tr_data_gf, here("globalprep/tr/v2020/output/tr_jobs_pct_tourism_gf.csv"))
+write_csv(tr_jobs_pct_tourism_gf, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism_gf.csv")))
 
-tr_data <- tr_data_raw_gf %>%
+tr_jobs_pct_tourism <- tr_jobs_pct_tour_gf %>%
   select(rgn_id, year, Ep=Ep_all) 
 
 
-
 # Save gap-filled data
-write_csv(tr_data, here("globalprep/tr/v2020/output/tr_jobs_pct_tourism.csv"))
+write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv")))
 
 ```
 
