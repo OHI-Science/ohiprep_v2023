@@ -69,13 +69,14 @@ library(doParallel)
 library(tictoc)
 library(readr)
 library(dplyr)
+library(doSNOW)
 
 source('http://ohi-science.org/ohiprep_v2022/workflow/R/common.R')
 
 options(scipen = 999)
 
 # raster template
-r_template <- raster::raster(ncol=720, nrow=360, vals=c(1:259200))
+#r_template <- raster::raster(ncol=720, nrow=360, vals=c(1:259200))
 ```
 
 Step 1: Summarize effort data
@@ -92,30 +93,85 @@ mmsi_present: 1
 read in each of file and sum `fishing_hours` by: latitude, longitude, & geartype, then save the resulting files.
 
 ```{r}
-tic() # takes ~14 minutes
+tic() # takes 14-27 minutes
 
-fish_effort <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/global_fishing_watch/d2022", pattern = ".csv", full = TRUE)
+fish_effort <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/raw_daily"), pattern = ".csv", full = TRUE)
 
+
+
+
+# consider adding a year column (parsing the Date column) in the loop at the end of the pipe in order to keep track of which data is from what year later when we combine everything into 1 df
+
+# test this workflow
+raw_daily <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/raw_daily/2012-01-01.csv"), colClasses = c("Date", "double", "double", "character", "character", "double", "double", "numeric"))
+
+summarized_daily <- raw_daily %>% 
+  dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+  dplyr::summarize(fishing_hours = sum(fishing_hours)) %>% 
+  as.data.frame() # diff btw data.frame and as.data.frame() ?
+    
+summarized_daily$year <- substr(raw_daily$date, 1, 4)
+
+
+
+
+#mutate(year = c(format(date, format = "%Y"))) %>%
+
+
+# set up parallelization cluster
 cl <- makeCluster(10)
 registerDoParallel(cl)
 
 # load tidyverse & here in every session of parallel loop
-foreach::foreach(f = fish_effort, .packages = c("tidyverse", "here")) %dopar% {
+foreach::foreach(f = fish_effort, .packages = "tidyverse") %dopar% {
+  # extract just the file name from the file path 
   saveName <- basename(f)
-  # assign column types: "date", "double", "character", and "number" based on column order
-  day_file <- readr::read_csv(f, col_types = "Dddccddn") %>% 
+  # assign column types while reading in the data 
+  day_file <- read.csv(f, colClasses = c("Date", "double", "double", "character", "character", "double", "double", "numeric")) %>% 
     dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
     dplyr::summarize(fishing_hours = sum(fishing_hours)) %>%
+    mutate(year = format(date, format = "%Y")) %>% 
     data.frame()
   
-  write_csv(day_file, here(sprintf("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/summary_%s", saveName)))
-  
-  print(paste0("Summarized fishing hours for ", str_sub(saveName, 1, 10), " by latitude, longitude, and gear type."))
+  write_csv(day_file, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/summary_daily/summary_", saveName))
 }
 
 stopCluster(cl)
 
+# print(paste0("Summarized fishing hours for ", str_sub(saveName, 1, 10), " by latitude, longitude, and gear type."))
+
 toc()
+```
+
+# try loop on subset with pb
+
+```{r}
+# stopCluster(cl)
+# 
+# cl <- makeCluster(10, outfile="")
+# registerDoParallel(cl)
+# 
+# fish_effort_subset <- fish_effort[1]:fish_effort[5]
+#   
+# # set up progress bar
+# iterations <- length(fish_effort_subset)
+# progress_bar <- txtProgressBar(min = 1, max = iterations, style = 3)
+# 
+# foreach::foreach(f = fish_effort_subset, .packages = "tidyverse") %dopar% {
+#   # extract just the file name from the file path 
+#   saveName <- basename(f)
+#   # assign column types while reading in the data 
+#   day_file <- read.csv(f, colClasses = c("Date", "double", "double", "character", "character", "double", "double", "numeric")) %>% 
+#     dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+#     dplyr::summarize(fishing_hours = sum(fishing_hours)) %>%
+#     as.data.frame()
+#   
+#   setTxtProgressBar(progress_bar, f)
+#   
+#   write_csv(day_file, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/test_output/summary_", saveName))
+# }
+# 
+# stopCluster(cl)
 ```
 
 
@@ -155,24 +211,44 @@ toc()
 Summarize daily csv files by latitude, longitude, & geartype to produce 1 file per year:
 
 ```{r}
-# bind all files into one dataframe before summarizing by year
+tic()
 
-fish_effort_daily_summaries <- list.files(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int"), pattern = "summary", full=TRUE) 
+# create list of daily summaries that are grouped by latitude, longitude, and geartype
+fish_effort_daily_summaries <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/summary_daily"), pattern = "summary", full = TRUE)
 
-foreach(f = fish_effort_daily_summaries, .combine = rbind)
+# set up parallel processing again
+#registerDoParallel(cl)
 
-# for reference:
-# foreach::foreach(f = fish_effort, .packages = c("tidyverse", "here")) %dopar% {
-#   saveName <- basename(f)
-#   # assign column types: "date", "double", "character", and "number" based on column order
-#   day_file <- readr::read_csv(f, col_types = "Dddccddn") %>% 
-#     dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
-#     dplyr::summarize(fishing_hours = sum(fishing_hours)) %>%
-#     data.frame()
-#   
-#   write_csv(day_file, here(sprintf("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/summary_%s", saveName)))
+# test class
+#test <- data.table::fread(fish_effort_daily_summaries[1])
+#class(test)
+``` 
 
-fish_effort_annual <- fish_effort_df %>%
+```{r}
+tic() # took 13 minutes
+
+# set up parallelization cluster
+cl <- makeCluster(10)
+registerDoParallel(cl)
+
+# read all files and bind into one dataframe using .combine argument
+foreach(f = fish_effort_daily_summaries, .combine = rbind, .packages = "tidyverse") %dopar% {
+  daily_summary_df <- data.table::fread(f)
+  write_csv(daily_summary_df, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/summary_daily_combined/daily_summary_df.csv"))
+}
+
+stopCluster(cl)
+
+toc()
+```
+
+
+```{r}
+# read in the df containing all daily summaries data
+daily_summary_all <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/summary_daily_combined/daily_summary_df.csv"))
+
+# summarize the df by year
+fish_effort_annual_summaries <- daily_summary_df %>%
   group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
    summarize(fishing_hours = sum(fishing_hours)) %>%
     data.frame()
@@ -189,6 +265,10 @@ write_csv(fish_effort_annual, "~/foodprint_exploration/foodprint_disturbance/dat
 #     data.frame()
 # 
 # write_csv(fish_effort_annual, "~/foodprint_exploration/foodprint_disturbance/data/j_int/effort_summarized_by_cell_gear/annual/FishingWatch_annual_effort_2017.csv")
+
+#stopCluster(cl)
+
+toc()
 ```
 
 # Determine proportion of fisheries with unidentified geartypes
