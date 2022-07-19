@@ -1,0 +1,276 @@
+---
+title: "OHI 2022 - Soft bottom pressure data prep"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: false
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+Exploring and preparing Global Fishing Watch data.
+1. Combine daily effort data into annual effort data
+2. Explore how big an issue unidentified geartypes are in the data (total proportion of effort and spatial distriubtion of unidentified geartypes)
+3. Create maps of effort for destructive geartypes: trawl and dredge, which will be used in subsequent scripts.
+
+
+## Data description
+
+Data download: https://globalfishingwatch.org/data-download/datasets/public-fishing-effort
+July 18 2022, JC
+
+Description: Fleet daily v2
+Resolution: daily, 100th degree
+Year: 2017
+
+**Geartypes:**
+- fishing: a combination of vessels of unknown fishing gear
+ - drifting_longlines: drifting longlines
+ - seiners: vessels using seine nets, including potential purse seine vessels
+   targeting tuna and other species, as well as danish and other seines
+     - purse_seines: purse seines, both pelagic and demersal
+        - tuna_purse_seines: large purse seines primarily fishing for tuna.
+        - other_purse_seines: purse seiners fishing for mackerel, anchovies, etc, often smaller and operating nearer the coast than tuna purse seines.
+    - other_seines: danish seines and other seiners not using purse seines.
+ - trawlers: trawlers, all types
+ - pole_and_line: vessel from which people fish with pole and line.
+ - trollers: vessel that tows multiple fishing lines.
+ - fixed_gear: a category that includes potential set longlines, set gillnets,  and pots and traps
+     - pots_and_traps: vessel that deploys pots (small, portable traps) or traps to
+       catch fish
+     - set_longlines: vessel that fishes by setting longlines anchored to the
+       seafloor. These lines have shorter hooked, typically baited, lines hanging
+       from them
+     - set_gillnets: vessel that fishes by setting gillnets anchored to the seafloor.
+ - dredge_fishing: vessel that tows a dredge the scrapes up edible bottom
+   dwellers such as scallops or oysters.
+ - squid_jigger: squid jiggers, mostly large industrial pelagic operating vessels
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(here)
+library(raster)
+library(tidyverse)
+library(foreach)
+library(doParallel)
+library(tictoc)
+library(readr)
+library(dplyr)
+
+source('http://ohi-science.org/ohiprep_v2022/workflow/R/common.R')
+
+options(scipen = 999)
+
+# raster template
+r_template <- raster::raster(ncol=720, nrow=360, vals=c(1:259200))
+```
+
+Step 1: Summarize effort data
+The effort data are provided as separate csvs for each day. Each row provides the following data:
+date: 1/1/17
+cell_ll_lat: 2.25
+cell_ll_lon: -138.81
+flag: USA
+geartype: series of gear types
+hours: 0.2575
+fishing_hours: 0
+mmsi_present: 1
+
+read in each of file and sum `fishing_hours` by: latitude, longitude, & geartype, then save the resulting files.
+
+```{r}
+tic() # takes ~14 minutes
+
+fish_effort <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/global_fishing_watch/d2022", pattern = ".csv", full = TRUE)
+
+cl <- makeCluster(10)
+registerDoParallel(cl)
+
+# load tidyverse & here in every session of parallel loop
+foreach::foreach(f = fish_effort, .packages = c("tidyverse", "here")) %dopar% {
+  saveName <- basename(f)
+  # assign column types: "date", "double", "character", and "number" based on column order
+  day_file <- readr::read_csv(f, col_types = "Dddccddn") %>% 
+    dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+    dplyr::summarize(fishing_hours = sum(fishing_hours)) %>%
+    data.frame()
+  
+  write_csv(day_file, here(sprintf("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/summary_%s", saveName)))
+  
+  print(paste0("Summarized fishing hours for ", str_sub(saveName, 1, 10), " by latitude, longitude, and gear type."))
+}
+
+stopCluster(cl)
+
+toc()
+```
+
+
+```{r}
+# delete
+# fish_lat_long_gear <- function(filepath){
+#    #filepath <- fish_effort[1]
+#   saveName <- basename(filepath)
+#   # assign column types: "date", "double", "character", and "number" based on column order
+#   day_file <- readr::read_csv(filepath, col_types = "Dddccddn")
+#   day_file <- day_file %>%
+#     group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+#     summarize(fishing_hours = sum(fishing_hours)) %>%
+#     data.frame()
+# 
+#   write_csv(day_file, here(sprintf("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/summary_%s", saveName)))
+#   
+#   print(paste0("Summarized fishing hours for ", str_sub(saveName, 1, 10), " by latitude, longitude, and gear type."))
+#   }
+
+# for(filepath in fish_effort){
+#   fish_lat_long_gear(filepath)
+# }
+
+
+# scratch
+# fish_effort 
+# basename(fish_effort)
+# test <- readr::read_csv(fish_effort[1], col_types = "Dddccddn")
+# class(test$cell_ll_lat)
+# test2 <- test %>%
+#     dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+#     dplyr::summarize(fishing_hours = sum(fishing_hours)) %>%
+#     data.frame()
+```
+
+Summarize daily csv files by latitude, longitude, & geartype to produce 1 file per year:
+
+```{r}
+# bind all files into one dataframe before summarizing by year
+
+fish_effort_daily_summaries <- list.files(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int"), pattern = "summary", full=TRUE) 
+
+foreach(f = fish_effort_daily_summaries, .combine = rbind)
+
+# for reference:
+# foreach::foreach(f = fish_effort, .packages = c("tidyverse", "here")) %dopar% {
+#   saveName <- basename(f)
+#   # assign column types: "date", "double", "character", and "number" based on column order
+#   day_file <- readr::read_csv(f, col_types = "Dddccddn") %>% 
+#     dplyr::group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+#     dplyr::summarize(fishing_hours = sum(fishing_hours)) %>%
+#     data.frame()
+#   
+#   write_csv(day_file, here(sprintf("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/summary_%s", saveName)))
+
+fish_effort_annual <- fish_effort_df %>%
+  group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+   summarize(fishing_hours = sum(fishing_hours)) %>%
+    data.frame()
+
+write_csv(fish_effort_annual, "~/foodprint_exploration/foodprint_disturbance/data/j_int/effort_summarized_by_cell_gear/annual/FishingWatch_annual_effort_2017.csv")
+
+# delete:
+# fish_effort_df <- list.files(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int"), pattern = "summary", full=TRUE) %>%
+#   lapply(data.table::fread) %>%
+#   bind_rows
+# fish_effort_annual <- fish_effort_df %>%
+#   group_by(cell_ll_lat, cell_ll_lon, geartype) %>%
+#    summarize(fishing_hours = sum(fishing_hours)) %>%
+#     data.frame()
+# 
+# write_csv(fish_effort_annual, "~/foodprint_exploration/foodprint_disturbance/data/j_int/effort_summarized_by_cell_gear/annual/FishingWatch_annual_effort_2017.csv")
+```
+
+# Determine proportion of fisheries with unidentified geartypes
+
+```{r}
+fishing_effort <- read_csv("~/foodprint_exploration/foodprint_disturbance/data/j_int/effort_summarized_by_cell_gear/annual/FishingWatch_annual_effort_2017.csv")
+
+## quick peak
+totals <- fishing_effort %>%
+  group_by(geartype) %>%
+  summarize(fishing_hours = sum(fishing_hours))
+
+totals$fishing_hours[totals$geartype == "fishing"]/sum(totals$fishing_hours)
+
+#Map all fishing effort
+total_map <- fishing_effort %>%
+  group_by(cell_ll_lat, cell_ll_lon) %>%
+  summarize(fishing_hours = sum(fishing_hours))
+
+
+total_map$lat <- total_map$cell_ll_lat
+total_map$lon <- total_map$cell_ll_lon
+total_map <- total_map[,c("lon", "lat","fishing_hours")]
+coordinates(total_map) <- ~lon+lat
+proj4string(total_map) = CRS("+init=epsg:4326")
+total_map_raster <- rasterFromXYZ(total_map, crs = "+init=epsg:4326")
+proj4string(total_map_raster) = CRS("+init=epsg:4326")
+plot(log(total_map_raster + 1))
+
+#Map only unknowns
+unk_map <- fishing_effort %>%
+  filter(geartype %in% c("fishing")) %>%
+  group_by(cell_ll_lat, cell_ll_lon) %>%
+  summarize(fishing_hours = sum(fishing_hours, na.rm=TRUE))
+
+
+unk_map$lat <- unk_map$cell_ll_lat
+unk_map$lon <- unk_map$cell_ll_lon
+unk_map <- unk_map[,c("lon", "lat","fishing_hours")]
+coordinates(unk_map) <- ~lon+lat
+proj4string(unk_map)=CRS("+init=epsg:4326")
+unk_map_raster<-rasterFromXYZ(unk_map, crs = "+init=epsg:4326")
+proj4string(unk_map_raster)=CRS("+init=epsg:4326")
+plot(unk_map_raster)
+unk_map_raster[is.na(unk_map_raster)] <- 0
+
+prop_unk <- unk_map_raster/total_map_raster
+colr <- rev(RColorBrewer::brewer.pal(4, 'RdYlBu'))
+plot(prop_unk, col=colr, breaks=c(-0.01, 0.10, 0.30, 0.66, 1.01))
+
+library(sf)
+pts = rasterToPoints(prop_unk, spatial = TRUE)
+pts_sf <- st_as_sf(pts)
+plot(pts_sf,  pal = colr, pch=16, cex=0.005, breaks=c(-0.01, 0.10, 0.30, 0.66, 1.01))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
