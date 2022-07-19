@@ -101,10 +101,11 @@ names(ttdi_raw)[1:9] <- as.character(ttdi_raw[1, 1:9])
 ttdi_emp <- ttdi_raw %>%
   filter(Title %in% c("T&T industry Share of Employment, % of total employment",
                       "T&T industry Employment, 1,000 jobs"),
-         Attribute == "Value") %>% 
+         Attribute == "Value",
+         Edition == "2021") %>% 
   select(Title, Edition, Albania:Zambia) %>% 
   # currently Zambia is the last country column - this may need to change in the future if countries are added (e.g. Zimbabwe)
-  pivot_longer(cols = Albania:Zambia, names_to = "country",
+  pivot_longer(cols = Albania:Zambia, names_to = "rgn_name",
                values_to = "value") %>% 
   mutate(value = as.numeric(value)) %>% 
   pivot_wider(names_from = Title, values_from = value) %>% 
@@ -113,12 +114,13 @@ ttdi_emp <- ttdi_raw %>%
          "year" = "Edition") %>% 
   mutate(jobs_ct = round(jobs_ct * 1000), # original values represent 1000s of jobs
          year = as.numeric(year),
-         country = case_when(country == "Côte d'Ivoire" ~ "Ivory Coast",
-                             TRUE ~ country))
-
+         country = case_when(rgn_name == "Côte d'Ivoire" ~ "Ivory Coast",
+                             TRUE ~ rgn_name))
+  
 
 ttdi_emp_rgn <- ttdi_emp %>% 
-  name_2_rgn(fld_name = "country") %>% 
+  name_2_rgn(fld_name = "rgn_name",
+             flds_unique=c("rgn_name","year")) %>% 
   select(-country)
 
 
@@ -126,8 +128,15 @@ ttdi_emp_rgn <- ttdi_emp %>%
 tr_jobs_pct_tour <- ttdi_emp_rgn %>% 
  dplyr::select(rgn_id, year, jobs_pct)
 
+# read in last year's data and join with new data - this is being done because the previous data were retrieved directly from the WTTC (before they required membership) and include territories separately
 
 
+
+```
+
+### 2019 Comparsion
+
+```{r}
 # quick comparison with job percents from the previous data which were directly from WTTC
 tr_jobs_pct_prev <- read_csv(here('globalprep/tr/v2020/intermediate/wttc_empd_rgn.csv')) %>% 
   dplyr::select(rgn_id, year, jobs_pct) %>% 
@@ -230,12 +239,16 @@ tr_jobs_pct_tour_gf <- tr_jobs_pct_tour_gf %>%
 
 
 # check NAs once more 
-summary(tr_data_raw_gf)
+summary(tr_jobs_pct_tour_gf)
 # v2019: Adding the low pop df identifies 13 additional regions that should be NA instead of gapfilled, taking the total number of NAs in the data set from 245 to 700
 # v2020: Adding the low pop df takes the total number of NAs in the data set from 371 to 832
 # v2022: Adding the low pop df takes the total number of NAs in the data set from 234 to 260
 
+```
 
+### Write output files
+
+```{r}
 # save the gapfill report data
 tr_jobs_pct_tourism_gf <- tr_jobs_pct_tour_gf %>%
   select(rgn_id, year, gapfilled, method) 
@@ -245,11 +258,10 @@ write_csv(tr_jobs_pct_tourism_gf, here(paste0("globalprep/tr/v", version_year, "
 tr_jobs_pct_tourism <- tr_jobs_pct_tour_gf %>%
   select(rgn_id, year, Ep=Ep_all) 
 
-
 # Save gap-filled data
 write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv")))
-
 ```
+
 
 ## Data check and outlier investigation
 ```{r data check, message=FALSE, echo=FALSE}
@@ -258,16 +270,22 @@ write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/ou
 ## A quick check to make sure last year's values aren't too crazy different
 ## (NOTE: the source data has been updated, so there are some changes, but they shouldn't be super different)
 
-old <- read_csv(here('globalprep/tr/v2019/output/tr_jobs_pct_tourism.csv')) %>%
-  select(rgn_id, year, ep_old=Ep)
+new <- read_csv(here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv"))) %>% 
+  rename("Ep_new" = "Ep")
 
-new <- read_csv(here('globalprep/tr/v2020/output/tr_jobs_pct_tourism.csv')) %>%
-  left_join(old) %>%
-  filter(year==2019) %>%
-  arrange(ep_old)
+prev_version_year <- as.character(as.numeric(version_year) - 1)
+
+old <- read_csv(here(paste0("globalprep/tr/v", prev_version_year, "/output/tr_jobs_pct_tourism.csv"))) %>% 
+  rename("Ep_old" = "Ep")
+
+
+compare <- new %>%
+  left_join(old) %>% 
+  filter(year == 2019) %>%
+  arrange(Ep_old)
 
 # Visualize data comparison 
-ggplotly(ggplot(new, aes(x = Ep, y = ep_old, labels = rgn_id)) +
+ggplotly(ggplot(compare, aes(x = Ep_new, y = Ep_old, labels = rgn_id)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 20, color = "red"))
 
