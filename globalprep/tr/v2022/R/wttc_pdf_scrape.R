@@ -2,14 +2,11 @@
 ### This script scrapes all the PDF download links from the WTTC Economic Impact page (URL below), downloads those files to a temporary directory, and reads the tables in (as best as tabulizer can). The purpose of this is to extract change in "Total contribution of Travel & Tourism to Employment" for each country in order to gapfill values from the WTTC that the TTDI doesn't offer (territories). Running the full script will result in writing a csv with the desired values and will delete the PDFs from Mazu after. Some years are hardcoded into strings below and will need to be changed for future uses.
 
 
-
 library(tidyverse)
 library(rvest)
 library(stringr)
 library(purrr)
 library(here)
-
-version_year <- "2022"
 
 page <- read_html("https://wttc.org/Research/Economic-Impact")
 
