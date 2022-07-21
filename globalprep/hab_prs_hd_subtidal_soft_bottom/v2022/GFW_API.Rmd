@@ -87,7 +87,7 @@ region_data()
 
 #rgn = # convert OHI region to GFW 3-letter region code
   
-foreach(r = rgns_all$rgn_id)
+#foreach(r = rgns_all$rgn_id)
 
 trawlers <- get_vessel_info(query = paste0("flag = ", rgn, " AND geartype = 'trawlers'"),
                             search_type = "advanced",
@@ -106,6 +106,8 @@ fishing_events_trawler <- get_event(event_type = "fishing",
                                     end_date = paste(year, "-12-31"),
                                     key = key)
 ```
+
+### scratch code:
 
 ```{r}
 usa_fishing <- get_vessel_info(query = "flag = 'USA'",
@@ -130,44 +132,87 @@ fishing_events_trawler$time_diff <- fishing_events_trawler$end - fishing_events_
 ## Switch to using the Map Visualization API
 
 ```{r}
-# try one country's eez first
-# retrieve the eez code for usa
-code_eez <- get_region_id(region_name = 'CIV', region_source = 'eez', key = key)
+# load all OHI regions df:
+region_data()
 
-fishing_hours_2017 <- gfwr::get_raster(spatial_resolution = 'low',
+# try one country's eez first using the ISO3 code, with only 1 eez:
+code_eez <- get_region_id(region_name = 'FJI', region_source = 'eez', key = key)
+
+fishing_hours_16_17 <- gfwr::get_raster(spatial_resolution = 'low',
                  temporal_resolution = 'yearly',
                  group_by = 'flag',
-                 date_range = '2017-01-01,2017-12-31',
-                 region = code_eez$id, # this runs bc CIV has only 1 EEZ, if you are applying this function to a country with many, need to index which EEZ from the df code_eez or type in manually
+                 date_range = '2016-01-01,2017-12-31',
+                 region = code_eez$id, 
                  region_source = 'eez',
                  key = key)
 
 # this df represents all countries' fishing hours in that EEZ, but rows separate the lat and lon, so group by country to get the total per country by year
 # in order to expand out to all eez's, i wonder if i can make a list with c() for the region argument 
 
-# try with all USA:
-code_eez <- get_region_id(region_name = 'USA', region_source = 'eez', key = key)
+# try with cocos islands:
+code_eez <- get_region_id(region_name = 'CCK', region_source = 'eez', key = key)
 
-# convert the vector of eez ID's to a comma separated character string?
-usa_eez_ids <- paste0(code_eez$id, collapse = ',')
-usa_eez_ids
+# aus_eez_ids <- paste0(code_eez$id, collapse = ",")
 
-usa_eez_fishing_hours_2017 <- gfwr::get_raster(spatial_resolution = 'low',
+fishing_hours_16_17 <- gfwr::get_raster(spatial_resolution = 'low',
                  temporal_resolution = 'yearly',
                  group_by = 'flag',
-                 date_range = '2017-01-01,2017-12-31',
-                 region = usa_eez_ids,
+                 date_range = '2016-01-01,2017-12-31',
+                 region = code_eez$id[1],
                  region_source = 'eez',
                  key = key)
 
-# did not work, maybe need to iterate through all eez id values in column for each country, and can expand range to 2012-2020 in one query
-
-foreach(r = code_eez$id, )
-
+# did not work, maybe need to iterate through all eez id values in column for each country, and can expand range to 2012-2020 in one query:
+# nested for loop to iterate over countries and eez's:
+foreach(r = rgns_eez$eez_iso3) %do% {
+  foreach(e = code_eez$id) %do% {
+    fishing_hours_16_17 <- gfwr::get_raster(spatial_resolution = 'low',
+                                            temporal_resolution = 'yearly',
+                                            group_by = 'flag',
+                                            date_range = '2016-01-01,2017-12-31',
+                                            region = e, 
+                                            region_source = 'eez',
+                                            key = key)
+    
+    write_csv(fishing_hours_16_17, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/", r, "_effort_16_17.csv"))
+  }
+}
 
 ```
 
 ```{r}
+# test on subset of countries: choose large countries for which we know there is plenty of fishing data 
+rgns_eez_subset <- rgns_eez %>%
+  filter(eez_iso3 %in% c("USA", "CHN", "THA", "RUS"))
+  
+foreach(r = rgns_eez_subset$eez_iso3) %do% {
+  # extract all eez code for that country
+  code_eez <- get_region_id(region_name = r, region_source = 'eez', key = key)
+  # iterate through all eez codes for that country to extract fishing hours
+  print(paste0("Processing apparent fishing hours for ", r, " EEZ ", code_eez$id))
+  
+  foreach(e = code_eez$id, .combine = rbind) %do% {
+    fishing_hours_16_17 <- gfwr::get_raster(spatial_resolution = 'low',
+                                            temporal_resolution = 'yearly',
+                                            group_by = 'flag',
+                                            date_range = '2015-01-01,2018-12-31',
+                                            region = e, 
+                                            region_source = 'eez',
+                                            key = key)
+    
+    print(paste0("Extracted all apparent fishing hours for ", r, " EEZ ID ", e))
+    
+    write_csv(fishing_hours_16_17, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/", r, "_effort_16_17.csv"))
+  }
+}
+
+
+
+# check out the output
+usa <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/USA_effort_16_17.csv"))
+chn <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/CHN_effort_16_17.csv"))
+tha <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/THA_effort_16_17.csv"))
+rus <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/RUS_effort_16_17.csv"))
 
 ```
 
