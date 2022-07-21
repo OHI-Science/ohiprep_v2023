@@ -29,10 +29,12 @@ files <- list.files(here(paste0("globalprep/tr/v", version_year, "/wttc_pdfs")))
 
 n_countries <- length(files)
 
+# dataframe to be populated with extracted values
 tr_jobs_pct_change <- data.frame("country" = vector(mode = "character", length = n_countries),
                                  "pct_change_2020" = vector(mode = "character", length = n_countries),
                                  "pct_change_2021" = vector(mode = "character", length = n_countries))
 
+# this loops reads in the pdf tables using `tabulizer::extract_tables()`, pulls out the country name and the two percent change values we're interested in and then inserts them into the output dataframe
 for (i in seq_along(files)) {
   
   df <- extract_tables(
@@ -59,9 +61,10 @@ for (i in seq_along(files)) {
   
 }
 
+# save the csv which is then read in in the full workflow
 write_csv(tr_jobs_pct_change, here(paste0("globalprep/tr/v", version_year, "/intermediate/tr_jobs_pct_change.csv")))
 
-# This will *DELETE* all the downloaded pdfs from Mazu
+# This will delete all the downloaded pdfs from Mazu - they aren't needed beyond this point
 unlink(pdf_dir, recursive = TRUE)
 
 

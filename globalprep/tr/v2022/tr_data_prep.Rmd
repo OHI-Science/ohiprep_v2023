@@ -36,9 +36,10 @@ Xtr = tr/90th quantile across regions
 
 ## The following data are used:
 
-* Tourism sustainability: World Economic Forum. The Travel & Tourism Development Index 2021 dataset (version 24 May 2022). 2022.
-* Proportion of workforce directly employed in tourism: World Travel & Tourism Council ([WTTC](https://www.wttc.org/datagateway))
-* Per capita GDP: (World Bank with gaps filled using CIA data), used to gapfill missing values in Tourism sustainability (in previous years)
+* Tourism sustainability: World Economic Forum. The Travel & Tourism Development Index 2021 dataset (version 24 May 2022). 2022. [TTDI](https://www.weforum.org/reports/travel-and-tourism-development-index-2021/downloads-510eb47e12#report-nav)
+* Proportion of workforce directly employed in tourism: obtained through the 2021 TTDI, however the WEF sources the employment data contained in the TTDI from the World Travel & Tourism Council ([WTTC](https://www.wttc.org/))
+* Percent change in "Total contribution of Travel & Tourism to Employment", used to gapfill proportion of workforce directly employed in tourism: scraped from PDFs on the [WTTC Economic Impact page](https://wttc.org/Research/Economic-Impact)
+* Per capita GDP: (World Bank with gaps filled using CIA data), used to gapfill missing values in Tourism sustainability
 
 
 # Updates from previous assessment
@@ -86,7 +87,7 @@ source(here(paste0("globalprep/tr/v", version_year, "/R/tr_fxns.R")))
 
 These data are accessed via the TTDI dataset, but are originally from the [World Travel & Tourism Council](http://www.wttc.org/). We use "direct" employment data (see mazu: git-annex/globalprep/_raw_data/WTTC/d2019/README.md for instructions on obtaining data).
 
-These data are cleaned and formatted using the R/process_TTDI_emp.R script. Missing values are gapfilled using the UN georegion information.
+These data are cleaned and formatted below. The TTDI employment data are not as comprehensive as the data that were retrieved directly from the WTTC, so missing 2019 values are supplemented with output from the previous update. Gapfilling is done first using percent change in "Total contribution of Travel & Tourism to Employment" values from the [WTTC individual country reports](https://wttc.org/Research/Economic-Impact) available as PDFs, and then done using UN georegion means.
 
 ```{r wttc prop tourism, message=FALSE, warning=FALSE, echo=FALSE, results="hide"}
 
@@ -98,6 +99,7 @@ ttdi_raw <- read_excel(paste0(dir_M, "/git-annex/globalprep/_raw_data/WEF-Econom
 # moving up first row column names to headers while keeping full country names that are already acting as headers
 names(ttdi_raw)[1:9] <- as.character(ttdi_raw[1, 1:9])
 
+# making the dataframe Tidy
 ttdi_emp <- ttdi_raw %>%
   filter(Title %in% c("T&T industry Share of Employment, % of total employment",
                       "T&T industry Employment, 1,000 jobs"),
@@ -116,7 +118,7 @@ ttdi_emp <- ttdi_raw %>%
          country = case_when(rgn_name == "Côte d'Ivoire" ~ "Ivory Coast",
                              TRUE ~ rgn_name))
 
-
+# add region names and change percent to proportion
 ttdi_emp_rgn <- ttdi_emp %>% 
   name_2_rgn(fld_name = "rgn_name") %>% 
   rename(Ep = jobs_pct) %>%
@@ -136,18 +138,14 @@ tr_jobs_pct_tour <- ttdi_emp_rgn %>%
   summarize(Ep = weighted.mean(Ep, population))
 
 
-# creating vector of regions containing data in 2019 in TTDI dataset
-ttdi_included_rgns <- tr_jobs_pct_tour$rgn_id[tr_jobs_pct_tour$year == 2019]
-  
-
 # read in last year's data and join with new data - this is being done because the previous data were retrieved directly from the WTTC (before they required membership) and include territories separately
-tr_jobs_pct_2019 <- read_csv(here("globalprep/tr/v2021/output/tr_jobs_pct_tourism.csv")) %>% 
-  filter(year == 2019,
-         !rgn_id %in% ttdi_included_rgns)
+tr_jobs_pct_v2021 <- read_csv(here("globalprep/tr/v2021/output/tr_jobs_pct_tourism.csv")) %>% 
+  filter(year == 2019) %>% 
+  rename("Ep_prev" = "Ep")
 
 
 tr_jobs_pct_tour <- tr_jobs_pct_tour %>% 
-  rbind.data.frame(tr_jobs_pct_2019)
+  full_join(tr_jobs_pct_v2021, by = c("rgn_id", "year"))
 
 ## format data to have complete years/regions and convert percentage of jobs to proportion of jobs
 rgn_names <- read_csv('https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv') %>%
@@ -161,94 +159,116 @@ tr_jobs_pct_tour <- tr_jobs_pct_tour %>%
   full_join(rgn_names, by = c("rgn_id", "year")) %>%
   filter(!rgn_id == 213) %>% 
   filter(!rgn_id == 255) # ditch disputed regions and Antarctica
+
+tr_jobs_pct_tour <- tr_jobs_pct_tour %>% 
+  mutate(Ep = case_when(is.na(Ep) & !is.na(Ep_prev) ~ Ep_prev,
+                        TRUE ~ Ep)) %>% 
+  select(-Ep_prev)
 ```
 
-### Gapfilling with WTTC percent change in tourism jobs values
+### Gapfilling (pt. 1) using WTTC percent change in tourism jobs values
 
-In previous years gapfilling was done by using the mean of existing values in each respective r2 or r1 georegion. Because the TTDI data do not include territories from the WTTC, attempting to use this method resulted in a large discrepancy between gapfilled 2019 values from this year and reported 2019 values from the previous update because certain georegions lacked a substantial number of reported values. To solve this issue we are using percent change in "Total contribution of Travel & Tourism to Employment" from the WTTC which they provide in pdf format for each country. While we are interested in "direct employment" as opposed to "total employment," we are assuming that percent change will be similar enough between these two measures for gapfilling purposes. We use the percent change to calculate missing values using reported ones for those regions in previous years
+In previous years gapfilling was done by solely using the mean of existing values in each respective r2 or r1 georegion. Because the TTDI data do not include territories from the WTTC, attempting to use this method resulted in a large discrepancy between gapfilled 2019 values from this year and reported 2019 values from the previous update because certain georegions lacked a substantial number of reported values. To solve this issue we are using percent change in "Total contribution of Travel & Tourism to Employment" from the WTTC which they provide in pdf format for each country. While we are interested in "direct employment" as opposed to "total employment," we are assuming that percent change will be similar enough between these two measures for gapfilling purposes. We use the percent change to calculate missing values using reported ones for those regions in previous years
 
-To make this pdf scraping process less time-consuming, the script below will download all of them from the WTTC website, read them in as dataframes (which end up formatted non-traditionally, but consistently), and pull the desired percent change values into an output dataframe. That dataframe is then saved to the `intermediate` folder, and all the pdfs are deleted.
+To make this pdf scraping process less time-consuming, the script sourced below will download all of them from the WTTC website, read them in as dataframes (which end up formatted non-traditionally, but consistently), and pull the desired percent change values into an output dataframe. That dataframe is then saved to the `intermediate` folder, and all the pdfs are deleted.
 
 ```{r}
 # source script that gets percent change from WTTC pdfs - may take a couple minutes or so to do its thing
-#source(here("globalprep/tr/v2022/R/wttc_pdf_scrape.R"))
+# source(here(paste0("globalprep/tr/v", version_year, "/R/wttc_pdf_scrape.R")))
 
+# read in csv created by above script and add rgn_ids to it
 tr_jobs_pct_change <- read_csv(here(paste0("globalprep/tr/v", version_year,
                                            "/intermediate/tr_jobs_pct_change.csv"))) %>% 
   name_2_rgn(fld_name = "country") %>% 
   mutate(prop_change_2020 = pct_change_2020 / 100,
          prop_change_2021 = pct_change_2021 / 100) %>% 
-  select(-c(pct_change_2020, pct_change_2021))
-  
-tr_jobs_pct_est <- tr_jobs_pct_change %>% 
-  left_join(tr_jobs_pct_tour) %>% 
+  select(-c(pct_change_2020, pct_change_2021, country, rgn_name))
+
+# calculate 2020 Ep estimates using 2019 values and proportion change, and then repeat for missing 2021 values using the 2020 estimates
+tr_jobs_pct_est <- tr_jobs_pct_tour %>% 
+  left_join(tr_jobs_pct_change) %>% 
   pivot_wider(names_from = year, values_from = Ep) %>% 
   rename("Ep_2019" = "2019", "Ep_2020" = "2020", "Ep_2021" = "2021") %>% 
-  mutate("Ep_est_2020" = Ep_2019 * (1 + prop_change_2020)) %>% 
-  mutate("Ep_est_2021" = Ep_est_2020 * (1 + prop_change_2021))
+  mutate("Ep_gf_2020" = Ep_2019 * (1 + prop_change_2020)) %>% 
+  mutate("Ep_gf_2021" = case_when(!is.na(Ep_2021) ~ Ep_2021,
+                                  TRUE ~ Ep_gf_2020 * (1 + prop_change_2021)))
 
+# create df that indicates which values were gapfilled
+tr_jobs_pct_gf <- tr_jobs_pct_est %>% 
+  mutate(gf_2020 = case_when(!is.na(Ep_gf_2020) ~ "gapfilled")) %>% 
+  mutate(gf_2021 = case_when(is.na(Ep_2021) & !is.na(Ep_gf_2021) ~ "gapfilled")) %>% 
+  select(rgn_id, gf_2020, gf_2021,
+         "2019" = Ep_2019,
+         "2020" = Ep_gf_2020,
+         "2021" = Ep_gf_2021)
 
-plot(tr_jobs_pct_est$Ep_est_2021, tr_jobs_pct_est$Ep_2021)
-abline(0, 1)
+# because we used the final (gapfilled) output from the previous update to supplement the 2019 TTDI data we need to pull in the associated gf table to show which 2019 values were gapfilled originally
+prev_version_year <- as.character(as.numeric(version_year) - 1)
 
+# vector of rgn_ids that had values in the 2019 TTDI - used below to exclude them from being labeled gapfilled
+ttdi_reported <- ttdi_emp_rgn$rgn_id
+
+tr_jobs_pct_gf_2019 <- read_csv(here(paste0("globalprep/tr/v", prev_version_year, "/output/tr_jobs_pct_tourism_gf.csv"))) %>% 
+  filter(year == 2019, 
+         !rgn_id %in% ttdi_reported) %>% 
+  rename("gf_2019" = "gapfilled") %>% 
+  select(-year)
+
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>% 
+  left_join(tr_jobs_pct_gf_2019, by = "rgn_id")
+
+# separate gf and other data into separate dataframes, pivot both, and then rejoin
+gf <- tr_jobs_pct_gf %>% 
+  select(rgn_id, gf_2019, gf_2020, gf_2021) %>% 
+  rename("2019" = gf_2019,
+         "2020" = gf_2020,
+         "2021" = gf_2021) %>% 
+  pivot_longer(cols = c("2019","2020","2021"), names_to = "year", values_to = "gapfilled")
+
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>% 
+  select(-c(gf_2019, gf_2020, gf_2021)) %>% 
+  pivot_longer(cols = c("2019","2020","2021"), names_to = "year", values_to = "Ep") %>% 
+  left_join(gf, by = c("rgn_id", "year")) %>% 
+  mutate(method = case_when(!is.na(method) ~ method,
+                            !is.na(gapfilled) ~ "WTTC Percent Change"))
 
 ```
 
-
-### 2019 Comparsion
+### Assessing gapfill method efficacy
 
 ```{r}
-# quick comparison with job percents from the previous data which were directly from WTTC
-tr_jobs_pct_prev <- read_csv(here('globalprep/tr/v2020/intermediate/wttc_empd_rgn.csv')) %>% 
-  dplyr::select(rgn_id, year, Ep)
+# create df with entirely gapfilled values for 2021
+tr_jobs_2021_test <- tr_jobs_pct_tour %>% 
+  left_join(tr_jobs_pct_change) %>% 
+  pivot_wider(names_from = year, values_from = Ep) %>% 
+  rename("Ep_2019" = "2019", "Ep_2020" = "2020", "Ep_2021" = "2021") %>% 
+  mutate("Ep_gf_2020" = Ep_2019 * (1 + prop_change_2020)) %>% 
+  mutate("Ep_gf_2021" = Ep_gf_2020 * (1 + prop_change_2021))
 
-compare <- tr_jobs_pct_tour %>% 
-  filter(year == 2019) %>% 
-  mutate(year = as.numeric(year)) %>% 
-  left_join(tr_jobs_pct_prev, by = c("rgn_id"))
-
-plot(compare$Ep, compare$jobs_pct)
-abline(0,1)
-# major outlier is Philippines - the discrepancy could be related to reporting before and after the tourism crash associated with the pandemic which hit the Philippines particularly hard: (https://wttc.org/News-Article/WTTCs-latest-Economic-Impact-Report-reveals-significant-recovery-in-the-Philippines-Travel-and-Tourism-sector-in-2021)
-
-
-
-## format data to have complete years/regions and convert percentage of jobs to proportion of jobs
-rgn_names <- read_csv('https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv') %>%
-    dplyr::select(rgn_id)
-
-# create data frame with a row for each combination of region id and year
-rgn_names <- expand.grid(rgn_id = rgn_names$rgn_id, 
-                             year = min(tr_jobs_pct_tour$year):max(tr_jobs_pct_tour$year)) 
-      
-tr_jobs_pct_tour <- tr_jobs_pct_tour %>%
-  full_join(rgn_names, by = c("rgn_id", "year")) %>%
-                rename(Ep = jobs_pct) %>%
-                mutate(Ep = Ep/100) %>%
-                mutate(Ep = ifelse(Ep > 1, NA, Ep)) %>% 
-  filter(!rgn_id == 213) %>% 
-  filter(!rgn_id == 255) # ditch disputed regions and Antarctica
-
-## v2019: >2500 NAs in Ep column
-## v2020: 2738 NAs in Ep column
-## v2021: 480 NAs in Ep column (only 2019 and 2021)
-# summary(tr_jobs_pct_all)
-
+# see how they compare with the reported values
+ggplot(tr_jobs_2021_test, aes(x = Ep_gf_2021, y = Ep_2021)) +
+  geom_point() +
+  geom_abline() +
+  labs(x = "Gapfilled", y = "Reported", title = "Gapfilled vs reported values for 2021 proportion of\n
+       direct tourism employment to total employment") +
+  scale_x_continuous(limits = c(0, 0.15))
 
 ```
+
+### Gapfilling (pt. 2) using UN georegions
 
 ```{r}
 ## gapfill missing data using UN georegion data:
 georegions <- georegions
 georegion_labels <- georegion_labels
 
-tr_jobs_pct_tour <- tr_jobs_pct_tour %>%
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>%
   left_join(georegions, by = 'rgn_id') %>%
   left_join(georegion_labels, by = 'rgn_id') %>%
   select(-r0)
 
 # Calculate two different gapfill columns using r2 and r1
-tr_jobs_pct_tour_gf <- tr_jobs_pct_tour %>%
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>%
   group_by(year, r2) %>%
   mutate(Ep_pred_r2 = mean(Ep, na.rm=TRUE)) %>%
   ungroup() %>%
@@ -257,14 +277,20 @@ tr_jobs_pct_tour_gf <- tr_jobs_pct_tour %>%
   ungroup()
 
 # first gapfill with r2, if no value available use r1; create column indicating whether value was gapfilled and if so, by what method.
-tr_jobs_pct_tour_gf <- tr_jobs_pct_tour_gf %>%
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>%
   mutate(Ep_all = ifelse(is.na(Ep), Ep_pred_r2, Ep)) %>%
   mutate(Ep_all = ifelse(is.na(Ep_all), Ep_pred_r1, Ep_all)) %>% 
-  mutate(gapfilled = ifelse(is.na(Ep) & !is.na(Ep_all), "gapfilled", NA)) %>%
-  mutate(method = ifelse(is.na(Ep) & !is.na(Ep_pred_r2), "UN georegion (r2)", NA)) %>%
-  mutate(method = ifelse(is.na(Ep) & is.na(Ep_pred_r2) & !is.na(Ep_pred_r1), "UN georegion (r1)", method)) 
+  mutate(gapfilled = case_when(!is.na(gapfilled) ~ "gapfilled",
+                               is.na(Ep) & !is.na(Ep_all) ~ "gapfilled")) %>%
+  mutate(method = case_when(!is.na(method) ~ method,
+                            is.na(Ep) & !is.na(Ep_pred_r2) ~ "UN georegion (r2)",
+                            is.na(Ep) & is.na(Ep_pred_r2) & !is.na(Ep_pred_r1) ~ "UN georegion (r1)"))
 
-######################################
+```
+
+### Removing low population / uninhabited regions
+
+```{r}
 
 ### After gap-filling, make sure low/uninhabited regions are NA
 # Create df for unpopulated/low populated regions
@@ -273,12 +299,12 @@ low_pop <- low_pop %>%
   filter(est_population < 3000 | is.na(est_population)) %>%  #filter out regions that have populations > 3000 and keep NA values 
   rename(rgn_label = rgn_nam)
 
-summary(tr_jobs_pct_tour_gf)
+summary(tr_jobs_pct_gf)
 # v2020 371 NAs
-# v2022 234 NAs
+# v2022 21 NAs (new gapfilling method)
 
 # make sure all the NAs are uninhabited regions
-tr_jobs_pct_nas <- tr_jobs_pct_tour_gf %>% 
+tr_jobs_pct_nas <- tr_jobs_pct_gf %>% 
   filter(is.na(Ep_all)) %>% 
   select(rgn_id, year, r1_label, r2_label, rgn_label) %>% 
   left_join(low_pop, by = c("rgn_id", "rgn_label"))
@@ -290,19 +316,17 @@ tr_jobs_pct_nas %>%
 max(tr_jobs_pct_nas$est_population, na.rm=TRUE) < 3000 # should be true
 
 # make sure all the uninhabited regions are NA (along with gapfill and method if they were gapfilled above)
-tr_jobs_pct_tour_gf <- tr_jobs_pct_tour_gf %>% 
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>% 
   mutate(Ep_all = ifelse(rgn_id %in% low_pop$rgn_id, NA, Ep_all)) %>% 
   mutate(gapfilled = ifelse(is.na(Ep_all), NA, gapfilled)) %>% 
   mutate(method = ifelse(is.na(Ep_all), NA, method))
 
 
-
-
 # check NAs once more 
-summary(tr_jobs_pct_tour_gf)
+summary(tr_jobs_pct_gf)
 # v2019: Adding the low pop df identifies 13 additional regions that should be NA instead of gapfilled, taking the total number of NAs in the data set from 245 to 700
 # v2020: Adding the low pop df takes the total number of NAs in the data set from 371 to 832
-# v2022: Adding the low pop df takes the total number of NAs in the data set from 234 to 260
+# v2022: Adding the low pop df takes the total number of NAs in the data set from 21 to 60
 
 ```
 
@@ -310,13 +334,13 @@ summary(tr_jobs_pct_tour_gf)
 
 ```{r}
 # save the gapfill report data
-tr_jobs_pct_tourism_gf <- tr_jobs_pct_tour_gf %>%
+tr_jobs_pct_tourism_gf <- tr_jobs_pct_gf %>%
   select(rgn_id, year, gapfilled, method) 
 
 write_csv(tr_jobs_pct_tourism_gf, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism_gf.csv")))
 
-tr_jobs_pct_tourism <- tr_jobs_pct_tour_gf %>%
-  select(rgn_id, year, Ep=Ep_all) 
+tr_jobs_pct_tourism <- tr_jobs_pct_gf %>%
+  select(rgn_id, year, Ep = Ep_all) 
 
 # Save gap-filled data
 write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv")))
@@ -325,10 +349,7 @@ write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/ou
 
 ## Data check and outlier investigation
 ```{r data check, message=FALSE, echo=FALSE}
-
-
-## A quick check to make sure last year's values aren't too crazy different
-## (NOTE: the source data has been updated, so there are some changes, but they shouldn't be super different)
+# check to make sure values aren't too different between this year's assessment and the one prior - we expect some difference because of the switch to employment data from the TTDI, but because their original source is the WTTC it should be quite similar
 
 new <- read_csv(here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv"))) %>% 
   rename("Ep_new" = "Ep")
@@ -347,23 +368,9 @@ compare <- new %>%
 # Visualize data comparison 
 ggplotly(ggplot(compare, aes(x = Ep_new, y = Ep_old, labels = rgn_id)) +
   geom_point() +
-  geom_abline(slope = 1, intercept = 20, color = "red"))
+  geom_abline(slope = 1, intercept = 0, color = "red"))
 
-
-######## investigate outliers (if applicable)
-
-# new_diff <- new %>%
-#   mutate(difference = ep_old-Ep) %>% 
-#   filter(!is.na(ep_old)) %>% 
-#   filter(!is.na(Ep))
-# 
-# outliers <- tr_data_raw %>% 
-#   filter(rgn_id %in% c(15,116,117,118,119,122,125,127,173,250)) %>% 
-#   filter(year == 2018) %>% 
-#   select(rgn_id, rgn_label) %>% 
-#   left_join(new, by = "rgn_id", "year") %>% 
-#   mutate(difference = Ep-ep_old) %>% 
-#   mutate(avg_diff = mean(new_diff$difference))
+# the apparent outlier is the Philippines - this could potentially be related to reporting before and after the very start of the pandemic in late 2019, however nothing is specifically mentioned about that value in the TTDI dataset
 
 ```
 
