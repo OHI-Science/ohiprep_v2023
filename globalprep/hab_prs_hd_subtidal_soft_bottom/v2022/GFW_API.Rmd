@@ -156,20 +156,19 @@ source('http://ohi-science.org/ohiprep_v2022/workflow/R/common.R')
 ```
 
 ```{r}
-# try with cocos islands:
-# code_eez <- get_region_id(region_name = 'CCK', region_source = 'eez', key = key)
+# try with USA:
+# code_eez <- get_region_id(region_name = 'USA', region_source = 'eez', key = key)
 # 
 # # aus_eez_ids <- paste0(code_eez$id, collapse = ",")
 # 
-# fishing_hours_16_17 <- gfwr::get_raster(spatial_resolution = 'low',
+# fishing_hours_15_19 <- gfwr::get_raster(spatial_resolution = 'low',
 #                  temporal_resolution = 'yearly',
 #                  group_by = 'flag',
-#                  date_range = '2016-01-01,2017-12-31',
+#                  date_range = '2015-01-01,2019-12-31',
 #                  region = code_eez$id[1],
 #                  region_source = 'eez',
 #                  key = key)
 
-# did not work
 ```
 
 ```{r}
@@ -221,11 +220,11 @@ foreach(r = rgns_eez_subset$eez_iso3) %do% {
       # rename columns for clarity
       rename(year = "Time Range",
              fishing_rgn = flag,
-             apparent_fishing_hours = "Apparent Fishing hours") %>% 
+             apparent_fishing_hours = "Apparent Fishing hours",
+             lat = Lat,
+             lon = Lon) %>%
+      # keep track of the administrative country for each EEZ, even after we combine all data into one dataframe 
       mutate(eez_admin_rgn = r)
-    
-    # add country name to each row so we can keep track of the eez'a admin country group later in the analysis, even after we combine all data
-    #fishing_hours_16_17$eez_admin_rgn <- r # might be able to take this code out - we might not do anything with the admin country cause we just care about the fishing rgn
     
     print(paste0("Extracted all apparent fishing hours for ", r, " EEZ ", e))
     
@@ -234,31 +233,39 @@ foreach(r = rgns_eez_subset$eez_iso3) %do% {
 }
 
 # check out the output
-usa <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/USA_effort_16_17.csv"))
-chn <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/CHN_effort_16_17.csv"))
-tha <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/THA_effort_16_17.csv"))
-rus <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/RUS_effort_16_17.csv"))
+# usa <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/USA_effort_16_17.csv"))
+# chn <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/CHN_effort_16_17.csv"))
+# tha <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/THA_effort_16_17.csv"))
+# rus <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/RUS_effort_16_17.csv"))
+
+# consider removing any rows with NA - this might be done later anyway with na.rm when we do summary stats but also might be cleaner & faster looping to remove those rows now?
+# mihgt be easier to double check work (hours total) with other analyses if keep those rows in now?
 ```
 
-## group output CSV's by latitude, longitude, and year
+## group output CSV's by latitude, longitude, and year (we do this because at the moment our goal is to summarize fishing effort spatially to produce a raster, and later we can extract a df from the raster to calculate scores for each country)
 
 ```{r}
 # read in each csv and concatenate into one list
 fish_effort_df <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api"), pattern = ".csv", full = TRUE) %>%
   lapply(data.table::fread) %>%
   bind_rows()
+# double checked that the number of rows in this df is the sum of all the countries' df that were bound together! 
 
 # group by lat, long, and year
 fish_effort_annual <- fish_effort_df %>%
-  group_by(cell_ll_lat, cell_ll_lon, year) %>%
-   summarize(fishing_hours = sum(fishing_hours)) %>%
-    data.frame()
+  group_by(lat, lon, year) %>%
+  summarize(total_fishing_hours = sum(apparent_fishing_hours)) 
 
-# add region id to each column
+# wondering if I need to maintain variable fishing_rgn in order to do df - country specific analysis later (probably not cause can maybe extract that ad from a raster created by fish_effort_df instead of fish_effort_annual?)
+# fish_effort_annual_w_rgn <- fish_effort_df %>%
+#   group_by(lat, lon, year, fishing_rgn) %>%
+#   summarize(total_fishing_hours = sum(apparent_fishing_hours)) 
 
+# add region id to each column? maybe later?
 
-# save final dataframe
+# save final dataframe? or not yet?
 #write_csv(, ".csv")
+
 ```
 
 
