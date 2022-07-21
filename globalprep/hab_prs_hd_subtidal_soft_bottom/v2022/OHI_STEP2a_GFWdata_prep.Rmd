@@ -97,6 +97,8 @@ tic() # takes 14-27 minutes
 
 fish_effort <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/raw_daily"), pattern = ".csv", full = TRUE)
 
+test <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/raw_daily/2012-01-01.csv"))
+
 
 
 
