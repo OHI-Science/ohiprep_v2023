@@ -1,0 +1,185 @@
+---
+title: "GFW_API"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[Global Fishing Watch API](https://github.com/GlobalFishingWatch/gfwr)
+
+```{r}
+library(gfwr)
+library(here)
+library(raster)
+library(tidyverse)
+library(foreach)
+library(doParallel)
+library(tictoc)
+library(readr)
+library(dplyr)
+library(doSNOW)
+
+# Save API token information to an object every time you need to extract the token and pass it to `gfwr` functions:
+key <- gfw_auth()
+
+source('http://ohi-science.org/ohiprep_v2022/workflow/R/common.R')
+
+#options(scipen = 999)
+
+# raster template
+#r_template <- raster::raster(ncol=720, nrow=360, vals=c(1:259200))
+```
+
+# Quick run through of methods that will be applied to every country and year
+## Use a combination of the Vessels & Events APIs to extract fishing events from all trawlers between the dates of interest
+
+```{r}
+# extract unique trawler ID's for fishing vessels
+# when we eventually execute this for the final script, we might need/want to edit the next function to loop through this function for each country, so subsetting the query for example "flag = 'USA' AND geartype = 'trawlers'"
+trawlers <- get_vessel_info(query = "geartype = 'trawlers'",
+                            search_type = "advanced",
+                            dataset = "fishing_vessel") # omit carrier vessels and support vessels
+
+# combine all unique trawler ID's into a comma separated list that we will use for the next query
+trawler_ids <- paste0(trawlers$id[1:100], collapse = ",")
+# change this to unique(trawler$id)?
+# query all fishing events for just trawlers 
+fishing_events_trawler <- get_event(event_type = "fishing",
+                                    vessel = trawler_ids,
+                                    include_region = TRUE,
+                                    start_date = "2012-01-01",
+                                    end_date = "2013-01-01",
+                                    key = key)
+
+# seems that we NEED to subset the list of trawler$id's in order for the next function get_event() to work. consider opening issue about that if it is not fixed?
+# subsetting 1:100 worked but 1:1000 took ages
+
+# check that trawlers$id values are the vessel ID's and not the fishing event ID's
+#id_check <- trawlers %>% 
+#  filter(id == "a6be75fec-cab1-83bc-6e10-17687e4814e1") # that is the case!
+```
+
+## get fishing hours from diff in time stamps
+
+```{r}
+# wrangle data for total fishing hours per vessel
+fishing_events_trawler <- fishing_events_trawler %>%
+  # calculate time for each fishing event
+  mutate(fishing_event_time = end - start) %>% 
+  # change name of column to be able to have unique colnames in next step when we unnest th elist column with the vessel ID
+  rename(fishing_event_id = id) %>%
+  # unlist column that contains the vessel id so we can sum total hours by vessel
+  unnest_wider(vessel) %>% 
+  select("fishing_event_id", lat, lon, vessel_id = id, fishing_event_time) %>% 
+  group_by(vessel_id) %>% 
+  # sum total fishing hours by vessel!
+  summarize(total_vessel_fishing_time = sum(fishing_event_time))
+
+```
+
+## Start over process to repeat these steps for each country individually by year, then create a dataframe of all total sums with column names (rgn_id, year, total_fishing_hours)
+
+```{r}
+# load all OHI regions df:
+region_data()
+
+#rgn = # convert OHI region to GFW 3-letter region code
+  
+foreach(r = rgns_all$rgn_id)
+
+trawlers <- get_vessel_info(query = paste0("flag = ", rgn, " AND geartype = 'trawlers'"),
+                            search_type = "advanced",
+                            dataset = "fishing_vessel") # omit carrier vessels and support vessels
+
+# combine all unique trawler ID's into a comma separated list that we will use for the next query
+trawler_ids <- paste0(trawlers$id[1:100], collapse = ",")
+
+year <- 2012:2020
+
+# query all fishing events for just trawlers 
+fishing_events_trawler <- get_event(event_type = "fishing",
+                                    vessel = trawler_ids,
+                                    include_region = TRUE,
+                                    start_date = paste0(year, "-01-01"),
+                                    end_date = paste(year, "-12-31"),
+                                    key = key)
+```
+
+```{r}
+usa_fishing <- get_vessel_info(query = "flag = 'USA'",
+                               search_type = "advanced",
+                               dataset = "fishing_vessel")
+
+usa_ids <- paste0(usa_fishing$id[100], collapse = ',')
+usa_ids
+
+usa_fishing$id
+
+fishing_events_trawler <- get_event(event_type = "fishing",
+                                    vessel = usa_ids,
+                                    include_region = TRUE,
+                                    start_date = "2017-01-01",
+                                    end_date = "2017-02-01",
+                                    key = key)
+
+fishing_events_trawler$time_diff <- fishing_events_trawler$end - fishing_events_trawler$start
+```
+
+## Switch to using the Map Visualization API
+
+```{r}
+# try one country's eez first
+# retrieve the eez code for usa
+code_eez <- get_region_id(region_name = 'CIV', region_source = 'eez', key = key)
+
+fishing_hours_2017 <- gfwr::get_raster(spatial_resolution = 'low',
+                 temporal_resolution = 'yearly',
+                 group_by = 'flag',
+                 date_range = '2017-01-01,2017-12-31',
+                 region = code_eez$id, # this runs bc CIV has only 1 EEZ, if you are applying this function to a country with many, need to index which EEZ from the df code_eez or type in manually
+                 region_source = 'eez',
+                 key = key)
+
+# this df represents all countries' fishing hours in that EEZ, but rows separate the lat and lon, so group by country to get the total per country by year
+# in order to expand out to all eez's, i wonder if i can make a list with c() for the region argument 
+
+# try with all USA:
+code_eez <- get_region_id(region_name = 'USA', region_source = 'eez', key = key)
+
+# convert the vector of eez ID's to a comma separated character string?
+usa_eez_ids <- paste0(code_eez$id, collapse = ',')
+usa_eez_ids
+
+usa_eez_fishing_hours_2017 <- gfwr::get_raster(spatial_resolution = 'low',
+                 temporal_resolution = 'yearly',
+                 group_by = 'flag',
+                 date_range = '2017-01-01,2017-12-31',
+                 region = usa_eez_ids,
+                 region_source = 'eez',
+                 key = key)
+
+# did not work, maybe need to iterate through all eez id values in column for each country, and can expand range to 2012-2020 in one query
+
+foreach(r = code_eez$id, )
+
+
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+Notes:
+- can we assume that the time difference between stamps is ALL fishing hours? there is also a variable called hours or something in the files downloaded from GFW manually, perhaps look again on website for this difference in variables or contact GFW to inquire
+- consider open issue about needing to subset the id list in order to plug it all into get_event()?
+
+
+
