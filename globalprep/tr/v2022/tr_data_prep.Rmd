@@ -330,17 +330,28 @@ summary(tr_jobs_pct_gf)
 
 ```
 
-### Write output files
+### Bind data from previous years and Write output files
 
 ```{r}
-# save the gapfill report data
+# read in data from previous years
+tr_jobs_prev_years <- read_csv(here("globalprep/tr/v2020/output/tr_jobs_pct_tourism.csv"))
+tr_jobs_prev_years_gf <- read_csv(here("globalprep/tr/v2020/output/tr_jobs_pct_tourism_gf.csv"))
+
+tr_jobs_prev_combined <- tr_jobs_prev_years %>% 
+  left_join(tr_jobs_prev_years_gf) %>% 
+  filter(year < 2019 & year >= 2008)
+
+tr_jobs_pct_gf <- tr_jobs_pct_gf %>%
+  select(rgn_id, Ep = Ep_all, year, gapfilled, method) %>% 
+  rbind.data.frame(tr_jobs_prev_combined)
+
 tr_jobs_pct_tourism_gf <- tr_jobs_pct_gf %>%
-  select(rgn_id, year, gapfilled, method) 
+  select(rgn_id, year, gapfilled, method)
 
 write_csv(tr_jobs_pct_tourism_gf, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism_gf.csv")))
 
 tr_jobs_pct_tourism <- tr_jobs_pct_gf %>%
-  select(rgn_id, year, Ep = Ep_all) 
+  select(rgn_id, year, Ep) 
 
 # Save gap-filled data
 write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv")))
