@@ -138,10 +138,16 @@ tr_jobs_pct_tour <- ttdi_emp_rgn %>%
   summarize(Ep = weighted.mean(Ep, population))
 
 
+
 # read in last year's data and join with new data - this is being done because the previous data were retrieved directly from the WTTC (before they required membership) and include territories separately
+
+ttdi_reported <- ttdi_emp_rgn$rgn_id
+
 tr_jobs_pct_v2021 <- read_csv(here("globalprep/tr/v2021/output/tr_jobs_pct_tourism.csv")) %>% 
-  filter(year == 2019) %>% 
-  rename("Ep_prev" = "Ep")
+  filter(year == 2019, 
+         !is.na(Ep),
+         !rgn_id %in% ttdi_reported) %>% 
+  rename("Ep_prev" = "Ep") 
 
 
 tr_jobs_pct_tour <- tr_jobs_pct_tour %>% 
@@ -348,6 +354,7 @@ tr_jobs_pct_gf <- tr_jobs_pct_gf %>%
 tr_jobs_pct_tourism_gf <- tr_jobs_pct_gf %>%
   select(rgn_id, year, gapfilled, method)
 
+# save gapfill info
 write_csv(tr_jobs_pct_tourism_gf, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism_gf.csv")))
 
 tr_jobs_pct_tourism <- tr_jobs_pct_gf %>%
