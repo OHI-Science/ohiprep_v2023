@@ -188,7 +188,22 @@ tr_jobs_pct_change <- read_csv(here(paste0("globalprep/tr/v", version_year,
   name_2_rgn(fld_name = "country") %>% 
   mutate(prop_change_2020 = pct_change_2020 / 100,
          prop_change_2021 = pct_change_2021 / 100) %>% 
-  select(-c(pct_change_2020, pct_change_2021, country, rgn_name))
+  select(-c(pct_change_2020, pct_change_2021, rgn_name))
+
+## get weighted mean values for duplicated regions
+weight_data <- tribble(~country, ~rgn_id, ~population, # estimates from UN (http://data.un.org/Data.aspx?d=POP&f=tableCode%3a1)
+                       "Guadeloupe", 140, 412682,
+                       "Martinique", 140, 359821,
+                       "Puerto Rico", 116, 3285874, 
+                       "US Virgin Islands", 116, 106669)
+
+tr_jobs_pct_change <- tr_jobs_pct_change %>%
+  arrange(country) %>%
+  left_join(weight_data, by = c("country", "rgn_id")) %>%
+  mutate(population = ifelse(is.na(population), 1, population)) %>%
+  group_by(rgn_id) %>%
+  summarize(across(c(prop_change_2020, prop_change_2021), ~ weighted.mean(.x, population)))
+
 
 # calculate 2020 Ep estimates using 2019 values and proportion change, and then repeat for missing 2021 values using the 2020 estimates
 tr_jobs_pct_est <- tr_jobs_pct_tour %>% 

@@ -440,8 +440,6 @@ rgn_id,year,gapfilled,method
 116,2019,NA,NA
 116,2020,gapfilled,WTTC Percent Change
 116,2021,gapfilled,WTTC Percent Change
-116,2020,gapfilled,WTTC Percent Change
-116,2021,gapfilled,WTTC Percent Change
 117,2019,NA,NA
 117,2020,gapfilled,WTTC Percent Change
 117,2021,gapfilled,WTTC Percent Change
@@ -473,8 +471,6 @@ rgn_id,year,gapfilled,method
 127,2020,gapfilled,WTTC Percent Change
 127,2021,gapfilled,WTTC Percent Change
 140,2019,NA,NA
-140,2020,gapfilled,WTTC Percent Change
-140,2021,gapfilled,WTTC Percent Change
 140,2020,gapfilled,WTTC Percent Change
 140,2021,gapfilled,WTTC Percent Change
 141,2019,gapfilled,UN georegion (r2)
