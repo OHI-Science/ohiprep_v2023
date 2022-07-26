@@ -265,26 +265,6 @@ tr_jobs_pct_gf <- tr_jobs_pct_gf %>%
 
 ```
 
-### Assessing gapfill method efficacy
-
-```{r}
-# # create df with entirely gapfilled values for 2021
-# tr_jobs_2021_test <- tr_jobs_pct_tour %>% 
-#   left_join(tr_jobs_pct_change) %>% 
-#   pivot_wider(names_from = year, values_from = Ep) %>% 
-#   rename("Ep_2019" = "2019", "Ep_2020" = "2020", "Ep_2021" = "2021") %>% 
-#   mutate("Ep_gf_2020" = Ep_2019 * (1 + prop_change_2020)) %>% 
-#   mutate("Ep_gf_2021" = Ep_gf_2020 * (1 + prop_change_2021))
-# 
-# # see how they compare with the reported values
-# ggplot(tr_jobs_2021_test, aes(x = Ep_gf_2021, y = Ep_2021)) +
-#   geom_point() +
-#   geom_abline() +
-#   labs(x = "Gapfilled", y = "Reported", title = "Gapfilled vs reported values for 2021 proportion of\n
-#        direct tourism employment to total employment") +
-#   scale_x_continuous(limits = c(0, 0.15))
-
-```
 
 ### Gapfilling (pt. 2) using UN georegions
 
@@ -361,7 +341,7 @@ summary(tr_jobs_pct_gf)
 
 ```
 
-### Bind data from previous years and Write output files
+### Bind data from previous years and write output files
 
 ```{r}
 # read in data from previous years
@@ -389,33 +369,41 @@ tr_jobs_pct_tourism <- tr_jobs_pct_gf %>%
 write_csv(tr_jobs_pct_tourism, here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv")))
 ```
 
+### Look at changes in values and outliers
 
-## Data check and outlier investigation
-```{r data check, message=FALSE, echo=FALSE}
-# check to make sure values aren't too different between this year's assessment and the one prior - we expect some difference because of the switch to employment data from the TTDI, but because their original source is the WTTC it should be quite similar
+From the plot created below we can see that the majority of regions saw decreased values between 2019 and 2021 - this is to be expected as the pandemic was catastrophic for many tourism industries. There are however several regions which appear to have increased
 
-new <- read_csv(here(paste0("globalprep/tr/v", version_year, "/output/tr_jobs_pct_tourism.csv"))) %>% 
-  rename("Ep_new" = "Ep")
+```{r}
 
-prev_version_year <- as.character(as.numeric(version_year) - 1)
-
-old <- read_csv(here(paste0("globalprep/tr/v", prev_version_year, "/output/tr_jobs_pct_tourism.csv"))) %>% 
-  rename("Ep_old" = "Ep")
-
-
-compare <- new %>%
-  left_join(old) %>% 
+tr_jobs_pct_2019 <- tr_jobs_pct_tourism %>% 
   filter(year == 2019) %>%
-  arrange(Ep_old)
+  select(-year) %>% 
+  rename("Ep_2019" = "Ep")
 
-# Visualize data comparison 
-ggplotly(ggplot(compare, aes(x = Ep_new, y = Ep_old, labels = rgn_id)) +
-  geom_point() +
-  geom_abline(slope = 1, intercept = 0, color = "red"))
+compare <- tr_jobs_pct_tourism %>% 
+  filter(year == 2021) %>% 
+  select(-year) %>% 
+  rename("Ep_2021" = "Ep") %>% 
+  left_join(tr_jobs_pct_2019)
 
-# the apparent outlier is the Philippines - this could potentially be related to reporting before and after the very start of the pandemic in late 2019, however nothing is specifically mentioned about that value in the TTDI dataset
+plot(compare$Ep_2019, compare$Ep_2021)
+abline(0, 1)
+
+# look at which regions saw increases
+compare <- compare %>% 
+  mutate(diff = Ep_2021 - Ep_2019)
+
+rgns <- rgn_master %>% 
+  select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013)
+
+lg_incrs_rgns <- compare %>% 
+  filter(diff > 0.015) %>%  # greater than 1.5% increase
+  left_join(rgns)
+
+# regions with increases are Thailand, Netherlands, Georgia, Montenegro, and Malaysia - should look into why they increased
 
 ```
+
 
 # Ts: Tourism sustainability
 
