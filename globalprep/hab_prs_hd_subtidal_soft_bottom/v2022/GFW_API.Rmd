@@ -280,45 +280,75 @@ esp <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_wa
 bih <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions/BIH_effort_2012_2020.csv"))
 ```
 
-## Group apparent fishing effort by latitude, longitude, and year for spatial analysis
+## Combine country csv's into one dataframe in order to group by latitude, longitude, and year
 
 We do this because at the moment our goal is to summarize fishing effort spatially to produce annual rasters of fishing effort. Later, we will extract a dataframe that summarizes fishing hours by administrative region for each EEZ in order to calculate scores for each OHI region. 
 
 ```{r}
+fish_effort_files <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions"), pattern = ".csv", full = TRUE)
+
+# first check the length to see how many files we start with
+num_files_start <- length(fish_effort_files)
+print(paste0("Starting with ", num_files_start, " files."))
+
+# delete files that do not have any rows (because no fishing has been recorded in that EEZ)
+for (i in seq_along(fish_effort_files)) {
+  
+  # read each file and check number of rows
+  filename <- fish_effort_files[i]
+  
+  print(paste0(filename))
+  
+  rows <- nrow(data.table::fread(filename))
+  
+  print(paste0(rows, " rows in this file."))
+  
+  # if there are 0 rows, delete the file
+  if (rows == "0") {
+      unlink(filename) 
+    }
+}
+
+# redefine variable after deleting some files
+fish_effort_files <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions"), pattern = ".csv", full = TRUE)
+
+# check length again to see how many files we end with
+  num_files_end <- length(fish_effort_files)
+  print(paste0("Ending with ", num_files_end, " files."))
+```
+
+```{r}
+usa <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions/USA_effort_2012_2020.csv"))
+chn <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions/CHN_effort_2012_2020.csv"))
+```
+
+
+```{r}
+
 # read in each csv and concatenate into one list
 fish_effort_all <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions"), pattern = ".csv", full = TRUE) %>%
-  lapply(data.table::fread) %>% 
+  lapply(data.table::fread) %>%
   bind_rows() %>% 
   # we only want trawler fishing, as that damages the seafloor:
   filter(geartype == "trawlers") %>%
   dplyr::select(-geartype) # now that all observations are trawlers, we can drop this variable
 
 head(fish_effort_all)
+unique(fish_effort_all$eez_admin_rgn)
 ```
+## Examine China's trawling
 
 ```{r}
-# troubleshoot error: Error in `vec_rbind()`:
-# ! Can't combine `..1$eez_admin_rgn` <character> and `..7$eez_admin_rgn` <logical>.
-# Backtrace:
-#  1. ... %>% dplyr::select(-geartype)
-#  4. dplyr::bind_rows(.)
-#  5. vctrs::vec_rbind(!!!dots, .names_to = .id)
-
-fish_effort_files <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions"), pattern = ".csv", full = TRUE)
-
-foreach(f = fish_effort_files) %do% {
-  data <- data.table::fread(f)
-  data$eez_admin_rgn <- as.character(data$eez_admin_rgn)
-  paste0("the class of eez_admin_rgn column now is ", class(data$eez_admin_rgn))
-}
-
-
- 
+USA <- fish_effort_all %>% 
+  filter(eez_admin_rgn == "USA") %>% 
+  group_by(year) %>% 
+  summarize(total_fishing_hours = sum(apparent_fishing_hours))
 ```
 
 
-```{r}
+## Group apparent fishing effort by latitude, longitude, and year for raster analysis
 
+```{r}
 # group all countries and years by lat, long, and year (this df does not have the EEZ admin country anymore, since we don't need that at the moment)
 fish_effort_annual <- fish_effort_all %>%
   group_by(lat, lon, year) %>%
@@ -331,7 +361,7 @@ fish_effort_annual <- fish_effort_all %>%
 #write_csv(, ".csv")
 ```
 
-## Check one annual raster of trawler fishing effort: 2015
+## Check one annual raster of trawler fishing effort: 2015 as a test before doing all years in loop
 
 ```{r}
 # try with just 2015 first before loop:
@@ -346,8 +376,25 @@ fish_effort_annual <- fish_effort_all %>%
 #raster::writeRaster(fish_effort_2015, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/test.tif'), overwrite = TRUE)
 ```
 
+```{r}
+fish_effort_2015 <- fish_effort_annual %>%
+  dplyr::filter(year == "2015") %>%
+  dplyr::select(-year) %>% 
+  raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6)
+
+# assign EPSG 4326 as hte CRS
+proj4string(fish_effort) = CRS("+init=epsg:4326") # code from Gage's footprint project
+
+plot(fish_effort_2015, col = "red") # plot in red to visualize points easier
+
+#raster::writeRaster(fish_effort_2015, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/test.tif'), overwrite = TRUE)
+```
+
+
 ## Write annual raster files for trawling fishing effort for 2015-2018
+
 - would like to add checks to this, progress bar, more cores for parallelization, and potentially convert to terra if can find the equivalent function for `rasterFromXYZ()`
+
 ```{r}
 tic()
 
@@ -382,18 +429,23 @@ https://tmieno2.github.io/R-as-GIS-for-Economists/geom-raster.html
 ```
 
 ```{r}
+# loop to separate fishing effort rasters by year and save each as a .tif:
 # try with nromal for loop, unparallelized:
-# ensure years are factors because that is the class of the columnsd in fidsh_effort_annual:
-years = as.factor(2015:2018)
 
+# ensure years are factors because that is the class of the columns in fidsh_effort_annual:
+#years = as.factor(2015:2018)
+
+years = 2015:2018
+class(years)
 for(i in years){
   fish_effort <- fish_effort_annual %>%
      dplyr::filter(year == i) %>%
-     # rename columns as x and y so that rasterFromXYZ can recognize those variables
      dplyr::select(-year) %>%
      #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
      raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
-
+     # assign EPSG 4326 as hte CRS
+     proj4string(fish_effort) = CRS("+init=epsg:4326") # code from Gage's footprint project
+  
      # save annual raster file that encompasses trawling fishing effort for all countries
      raster::writeRaster(fish_effort, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_', i ,'.tif'), overwrite = TRUE)
  }
@@ -402,56 +454,56 @@ for(i in years){
 Since the for loop above took so much time to run (but was inconsistent, sometimes took only a few minutes) try to do this subset of years manually just to move forward with the analysis.
 
 ```{r}
-# 2015
-fish_effort_15 <- fish_effort_annual %>% 
-    dplyr::filter(year == 2015) %>%
-    # rename columns as x and y so that rasterFromXYZ can recognize those variables
-    dplyr::select(-year, x = lon, y = lat) %>%
-    #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
-    raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
-
-    # save annual raster file that encompasses trawling fishing effort for all countries
-    raster::writeRaster(fish_effort_15, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2015.tif'), overwrite = TRUE)
-
-# 2016
-fish_effort_16 <- fish_effort_annual %>% 
-    dplyr::filter(year == 2016) %>%
-    # rename columns as x and y so that rasterFromXYZ can recognize those variables
-    dplyr::select(-year, x = lon, y = lat) %>%
-    #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
-    raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
-
-    # save annual raster file that encompasses trawling fishing effort for all countries
-    raster::writeRaster(fish_effort_16, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2016.tif'), overwrite = TRUE)
-
-# 2017:
-fish_effort_17 <- fish_effort_annual %>% 
-    dplyr::filter(year == 2017) %>%
-    # rename columns as x and y so that rasterFromXYZ can recognize those variables
-    dplyr::select(-year, x = lon, y = lat) %>%
-    #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
-    raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
-
-    # save annual raster file that encompasses trawling fishing effort for all countries
-    raster::writeRaster(fish_effort_17, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2017.tif'), overwrite = TRUE)
-    
-# 2018:
-fish_effort_18 <- fish_effort_annual %>% 
-    dplyr::filter(year == 2018) %>%
-    # rename columns as x and y so that rasterFromXYZ can recognize those variables
-    dplyr::select(-year, x = lon, y = lat) %>%
-    #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
-    raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
-
-    # save annual raster file that encompasses trawling fishing effort for all countries
-    raster::writeRaster(fish_effort_18, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2018.tif'), overwrite = TRUE)
+# # 2015
+# fish_effort_15 <- fish_effort_annual %>% 
+#     dplyr::filter(year == 2015) %>%
+#     # rename columns as x and y so that rasterFromXYZ can recognize those variables
+#     dplyr::select(-year, x = lon, y = lat) %>%
+#     #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
+#     raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
+# 
+#     # save annual raster file that encompasses trawling fishing effort for all countries
+#     raster::writeRaster(fish_effort_15, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2015.tif'), overwrite = TRUE)
+# 
+# # 2016
+# fish_effort_16 <- fish_effort_annual %>% 
+#     dplyr::filter(year == 2016) %>%
+#     # rename columns as x and y so that rasterFromXYZ can recognize those variables
+#     dplyr::select(-year, x = lon, y = lat) %>%
+#     #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
+#     raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
+# 
+#     # save annual raster file that encompasses trawling fishing effort for all countries
+#     raster::writeRaster(fish_effort_16, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2016.tif'), overwrite = TRUE)
+# 
+# # 2017:
+# fish_effort_17 <- fish_effort_annual %>% 
+#     dplyr::filter(year == 2017) %>%
+#     # rename columns as x and y so that rasterFromXYZ can recognize those variables
+#     dplyr::select(-year, x = lon, y = lat) %>%
+#     #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
+#     raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
+# 
+#     # save annual raster file that encompasses trawling fishing effort for all countries
+#     raster::writeRaster(fish_effort_17, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2017.tif'), overwrite = TRUE)
+#     
+# # 2018:
+# fish_effort_18 <- fish_effort_annual %>% 
+#     dplyr::filter(year == 2018) %>%
+#     # rename columns as x and y so that rasterFromXYZ can recognize those variables
+#     dplyr::select(-year, x = lon, y = lat) %>%
+#     #terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
+#     raster::rasterFromXYZ(crs = "EPSG:4326", digits = 6) # include res argument as 0.01 when figure out how to enter that in the format c(value,value)
+# 
+#     # save annual raster file that encompasses trawling fishing effort for all countries
+#     raster::writeRaster(fish_effort_18, filename = paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2018.tif'), overwrite = TRUE)
 ```
 
 
 ```{r}
 # read in a raster to plot 
 #fish_effort_2015 <- raster::raster(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/fish_effort_2015.tif'))
-plot(fish_effort_2015, col = "red")
+#plot(fish_effort_2015, col = "red")
 
 # plot raster on top of world map:
 #ocean <- raster::raster(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif"))
@@ -462,16 +514,25 @@ plot(fish_effort_2015, col = "red")
 
 ## Plot annual rasters for apparent fishing hours layered on EEZ shapefile to visualize time series
 
-First pull in EEZ shapefile to serve as a base layer for the annual maps. 
-
 ```{r}
-# might need to multiply this by the ocean raster or something similar to get rid of the 25 mile inland buffer
-# plot eez & fishing effort as layers on same map: first define the eez raster:
-eez <- raster::shapefile(file.path(dir_M, "git-annex/globalprep/spatial/v2017/EEZ_inland_25mi/EEZ_inland_25mi.shp")) %>% 
+# First pull in EEZ shapefile to serve as a base layer for the annual maps using regions_shape() and filter for only eez's and land
+regions_shape()
+
+eez <- regions %>%
+  filter(rgn_type %in% c("eez", 'land')) %>% 
   st_transform(crs = 4326)
 
 # check the CRS:
 crs(eez) # WGS84
+
+plot(eez, col = "grey96", axes = FALSE, main = "fishing effort 2015", legend = FALSE)		
+plot(fish_effort_2015, axes = FALSE, col = "red", add = TRUE)
+
+# delete:
+# might need to multiply this by the ocean raster or something similar to get rid of the 25 mile inland buffer
+# plot eez & fishing effort as layers on same map: first define the eez raster:
+#eez <- raster::shapefile(file.path(dir_M, "git-annex/globalprep/spatial/v2017/EEZ_inland_25mi/EEZ_inland_25mi.shp")) %>% 
+#  st_transform(crs = 4326)
 
 # produce df from raster:
 #eez_df <- raster::as.data.frame(eez, xy = TRUE, na.rm = FALSE) %>% rename(eez = )
