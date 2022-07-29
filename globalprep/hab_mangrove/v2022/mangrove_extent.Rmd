@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Mangrove extent'
+title: 'OHI `r format(Sys.Date(), %Y)`: Mangrove extent'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -20,7 +20,7 @@ editor_options:
 
 # Summary
 
-This script generates the extent of mangrove for each OHI region for the latest year of data (year == 2016). We do this using polygon data. We extract the area of each polygon per each ohi region using our combined land and eez raster.
+This script generates the extent of mangrove for each OHI region for the latest year of data (year == 2020). We do this using polygon data. We extract the area of each polygon per each ohi region using our combined land and eez raster.
 
 
 ## Updates from previous assessment
@@ -34,7 +34,7 @@ Using a new dataset from global mangrove watch.
 **Downloaded**: 03/09/2021
 
 **Description**:  
-Global Mangrove Watch (1996 - 2016)	
+Global Mangrove Watch (1996 - 2020)	
 https://data.unep-wcmc.org/datasets/45
 Reported at spatial cell scale. 
 
@@ -51,7 +51,7 @@ PALSAR and Landsat (optical) data, and changes from this baseline for seven epoc
 between 1996 and 2017 derived from JERS-1, ALOS and ALOS-2. Annual maps are
 planned from 2018 and onwards
 
-**Time range**: 1996-2016
+**Time range**: 1996-2020
 
 
 ***
@@ -70,25 +70,26 @@ library(mapview)
 library(sp)
 library(rgeos)
 
-source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
+version_year <- "2022"
 
-goal     <- 'globalprep/hab_mangrove/v2021'
-dir_git  <- file.path('~/github/ohiprep_v2021', goal)
+source(here("workflow/R/common.R"))
+
+dir_hab_mangrove <- here(paste0("globalprep/hab_mangrove/v", version_year))
 dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_mangrove'))
 ohi_rasters() # call the region zones raster
 regions_shape()
 region_data()
 
-land_ocean <- raster("/home/shares/ohi/git-annex/globalprep/spatial/v2017/regions_land_ocean.tif")
-plot(log(land_ocean+1)) # i think this is the one i want
+land_ocean <- terra::rast("/home/shares/ohi/git-annex/globalprep/spatial/v2017/regions_land_ocean.tif")
 
-land_ocean
+# the values in this raster are rgn_ids for countries and their eezs, but it includes high seas and Antarctica which have really large numbers as ids
+land_ocean[land_ocean > 250] <- NA
+# plot(land_ocean)
 ```
 
 Read in GMW data and explore
 ```{r, eval = FALSE}
-
-files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/wcmc_mangrove/01_Data/")
+files <- list.files("/home/shares/ohi/git-annex/globalprep/_raw_data/wcmc_mangrove/2017-2020/")
 
 files_2 <- files[grepl(".shp", files) & !grepl(".xml", files)]
 ```
@@ -97,78 +98,82 @@ files_2 <- files[grepl(".shp", files) & !grepl(".xml", files)]
 Loop over all years of data and match their regions to OHI regions 
 
 ```{r, eval = FALSE}
-  
-for(i in 1:7){ ## there are 7 files 
- # i = 1
-  
-gmw_file = files_2[i]  
+dir_annex_int <- paste0(dir_M, "/git-annex/globalprep/Mangrove/v", version_year, "/int/")
 
-gmw_year = gsub("_v2.shp", "", gmw_file)
-
-d_year <- gsub("GMW_", "", gmw_year)
-
-fasterize_file = file.path(dir_M, "/git-annex/globalprep/Mangrove/v2021/int", sprintf("py_mangrove_rast_%s.tif", gmw_year))
-  
-if(!file.exists(fasterize_file)) {
-
-gmw_shp <- st_read(file.path(dir_wcmc, "01_Data", gmw_file))
-  
-## transform 2016 data to our projections
-gmw_moll <- st_transform(gmw_shp, crs = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
-
-
-#fasterize our polygon dataset into a raster
-fasterize_py <- fasterize::fasterize(gmw_moll, raster = land_ocean, 
-                                     field = NULL) # all polygons given value of 1
-
-fasterize_py
-
-print(cellStats(fasterize_py, "sum", na.rm=TRUE)*0.934478877011218970**2) 
-
-writeRaster(fasterize_py, filename = file.path(dir_M, "/git-annex/globalprep/Mangrove/v2021/int", sprintf("py_mangrove_rast_%s.tif", gmw_year)), overwrite=TRUE) 
-
-
-
-
-# Calculate zonal stats with zones raster and new combined seagrass. Convert to km^2 and save int/output files*
-
-zonal_sums_combined <- raster::zonal(fasterize_py, 
-                                     land_ocean,
-                                     fun = "sum",
-                                     na.rm = TRUE,
-                                     progress="text") #sum all mangrove cells for each ohi zone
-zonal_sums_combined_df <- data.frame(zonal_sums_combined)
-
-zonal_sums_km2 <- zonal_sums_combined_df %>%
-  mutate(year = d_year, habitat = "mangrove",
-         km2 = (0.934478877011218970**2*sum)) %>% #one cell is equal to ~0.93 km
-  rename("rgn_id" = "zone") %>%
-  select(-sum)
-
-print(sum(zonal_sums_km2$km2))
-
-
-## Testing year 2016:
-#136804.3 km2.. worked perfectly!
-
-# From GMW website: 
-# "The area of mangrove habitat in Indonesia was 26,508.12  km² in 2016"
-
-# Our estimates say indonesia has 26684.8 km2... nearly perfect... i believe it worked. Now I will do this with every year... 
-
-write.csv(zonal_sums_km2, file.path(here("globalprep/hab_mangrove/v2021/int", sprintf("habitat_extent_mangrove_%s.csv", d_year))), row.names = FALSE)
-
-
-}else{
-  print("file exists, skipping")
+if(!dir.exists(dir_annex_int)) {
+  dir.create(dir_annex_int, recursive = TRUE)
 }
+
+for (i in seq_along(files_2)) {
+  
+  gmw_file = files_2[i]  
+  
+  gmw_year = gsub(c("_v\\d"), "", gmw_file)
+  gmw_year = gsub(".shp", "", gmw_year)
+  
+  d_year <- gsub("GMW_", "", gmw_year, ignore.case = TRUE)
+  
+  rasterize_file = paste0(dir_annex_int, "py_mangrove_rast_", gmw_year, ".tif")
+  
+  if(!file.exists(rasterize_file)) {
+    
+    gmw_shp <- terra::vect(file.path(dir_wcmc, "2017-2020", gmw_file))
+    
+    ## transform 2016 data to our projections
+    gmw_moll <- terra::project(gmw_shp, "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+    
+    
+    # rasterize our polygon dataset
+    raster_poly <- terra::rasterize(gmw_moll, land_ocean, 
+                                         field = NULL) # all polygons given value of 1
+    
+    raster_poly
+    
+    sum(terra::values(raster_poly, na.rm = TRUE)) * 0.934478877011218970 ** 2
+    
+    terra::writeRaster(raster_poly, filename = rasterize_file, overwrite = TRUE) 
+    
+    
+    
+    
+    # Calculate zonal stats with zones raster and new combined seagrass. Convert to km^2 and save int/output files*
+    
+    zonal_sums_combined <- terra::zonal(raster_poly, 
+                                         land_ocean,
+                                         fun = "sum",
+                                         na.rm = TRUE) # sum all mangrove cells for each ohi zone
+    
+    zonal_sums_km2 <- zonal_sums_combined %>%
+      mutate(year = d_year, habitat = "mangrove",
+             km2 = (0.934478877011218970 ** 2 * layer)) %>% # one cell is equal to ~0.93 km
+      rename("rgn_id" = "regions_land_ocean") %>%
+      select(-layer)
+    
+    print(sum(zonal_sums_km2$km2))
+    
+    
+    ## Testing year 2016:
+    #136804.3 km2.. worked perfectly!
+    
+    # From GMW website: 
+    # "The area of mangrove habitat in Indonesia was 26,508.12  km² in 2016"
+    
+    # Our estimates say indonesia has 26684.8 km2... nearly perfect... i believe it worked. Now I will do this with every year... 
+    
+    write.csv(zonal_sums_km2, (here(paste0("globalprep/hab_mangrove/v", version_year,
+                                             "/int/habitat_extent_mangrove_", d_year, ".csv"))), row.names = FALSE)
+    
+    
+  } else {
+    print("file exists, skipping")
+  }
 }
 ```
 
 Save 2016 as most current year to use in global
 
 ```{r, eval = FALSE}
-gmw_ohi_2016 <- read.csv(file.path(here("globalprep/hab_mangrove/v2021/int/habitat_extent_mangrove_2016.csv"))) 
+gmw_ohi_2016 <- read.csv(here(paste("globalprep/hab_mangrove/v", version_year, "/int/habitat_extent_mangrove_2016.csv")))
 
 gmw_ohi_2016 <- gmw_ohi_2016 %>%
   filter(rgn_id <= 250)
