@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2022 - Sea ice habitat (coastal protection goal and habitat subgoal)'
+title: "OHI `r format(Sys.Date(), '%Y')` - Sea ice habitat (coastal protection goal and habitat subgoal)"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
