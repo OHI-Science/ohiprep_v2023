@@ -156,7 +156,7 @@ The following bash script will download the raw data for the tidal wetland chang
 mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_wetland_change && cd $_
 
 ### Use gsutil (MAZU only) to download the shard data 
-gsutil -m cp "gs://gic-archive/gic-2019-v1-0/v1-0-0/*.tif"
+gsutil -m cp "gs://gic-archive/gic-2019-v1-0/v1-0-1/*.tif" .
 ```
 
 ## Filter habitat to tidal marsh
@@ -170,7 +170,7 @@ tictoc::tic()
 
 registerDoParallel(4)
 
-files <- list.files(paste0(dir_data, "/raw"), pattern = "Type")
+files <- list.files(paste0(dir_data, "/raw/tidal_wetland_change"), pattern = "Type")
 
 foreach (i = files) %dopar% { 
   
@@ -182,7 +182,7 @@ foreach (i = files) %dopar% {
   
   if(!file.exists(file_name)){
     
-    img <- terra::rast(paste0(dir_data, "/raw/", i))
+    img <- terra::rast(paste0(dir_data, "/raw/tidal_wetland_change/", i))
     
     terra::subst(
       x = img,
@@ -221,7 +221,7 @@ tictoc::tic()
 
 registerDoParallel(4)
 
-files <- list.files(paste0(dir_data, "/raw"), pattern = "Year")
+files <- list.files(paste0(dir_data, "/raw/tidal_wetland_change"), pattern = "Year")
 years <- c(4, 7, 10, 13, 16, 19)
 
 foreach (i = files) %dopar% { 
@@ -235,7 +235,7 @@ foreach (i = files) %dopar% {
     
     if(!file.exists(file_name)){
       
-      img <- terra::rast(paste0(dir_data, "/raw/", i))
+      img <- terra::rast(paste0(dir_data, "/raw/tidal_wetland_change/", i))
       
       ### Delete current year from list of years
       yrs <- years %>% magrittr::extract(. != yr) 
@@ -284,8 +284,8 @@ tictoc::tic()
 
 registerDoParallel(4)
 
-loss_files <- list.files(paste0(dir_data, "/raw"), pattern = "loss-")
-gain_files <- list.files(paste0(dir_data, "/raw"), pattern = "gain-")
+loss_files <- list.files(paste0(dir_data, "/raw/tidal_wetland_change"), pattern = "loss-")
+gain_files <- list.files(paste0(dir_data, "/raw/tidal_wetland_change"), pattern = "gain-")
 
 years <- c(4, 7, 10, 13, 16, 19)
 
@@ -328,7 +328,7 @@ foreach (i = c(loss_files, gain_files)) %dopar% {
                                 full.names = TRUE)
       }
       
-      gain_loss_img <- terra::rast(paste0(dir_data, "/raw/", i))
+      gain_loss_img <- terra::rast(paste0(dir_data, "/raw/tidal_wetland_change/", i))
       
       type_img <- terra::rast(type_file)
       
@@ -409,7 +409,7 @@ tictoc::toc()
 The above script makes two files, one with the aggregate function, and one after the cells have been converted to area. This chunk deletes the redundant and useless rasters with a shell script. 
 
 ```{bash eval = FALSE}
-cd /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/int/down_sample
+cd /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/int/down_sample
 # Declare an array
 declare -a Array=(4 7 10 13 16 19)
 # Iterate the array using for loop
