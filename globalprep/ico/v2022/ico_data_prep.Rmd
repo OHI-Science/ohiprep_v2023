@@ -753,16 +753,22 @@ table(ico_status_raw1$category)
 ### Iconic Species full list (year == 2018)
 
 ```{r, eval=F}
-DT::datatable(ico_status_raw %>% filter(year == 2018))
+DT::datatable(ico_status_raw %>% 
+                filter(year == 2018))
 ```
 
 
 ### Iconic Species processed status and trend by region
 
 ```{r, eval=FALSE}
-DT::datatable(ico_status_calc %>% filter(year == 2018), caption = 'ICO status')
+ico_status_calc %>% 
+  filter(year == 2018) %>%
+  DT::datatable(caption = 'ICO status')
 
-DT::datatable(ico_trend %>% filter(year == 2018) %>% select(-trend_lm), caption = 'ICO trend')
+ico_trend %>%
+  filter(year == 2018) %>% 
+  select(-trend_lm) %>% 
+  DT::datatable(, caption = 'ICO trend')
 ```
 
 ***
@@ -773,9 +779,9 @@ To examine results of the new methods (including API-based data scraping and tre
 
 ``` {r spp_plot_scores_over_time, fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
 
-status_ts_plot <- ggplot(ico_sum %>%
-                           filter(!is.na(rgn_id)),
-                         aes(x = year, y = ico_status, color = rgn_id, group = rgn_id)) +
+status_ts_plot <- ggplot(
+  ico_sum %>% filter(!is.na(rgn_id)),
+  aes(x = year, y = ico_status, color = rgn_id, group = rgn_name)) +
   geom_line(size = 1.2, alpha = .4) +
   labs(x = 'year',
        y = 'ICO status',
@@ -783,9 +789,9 @@ status_ts_plot <- ggplot(ico_sum %>%
        color = 'Region')
 plotly::ggplotly(status_ts_plot)
 
-trend_ts_plot <- ggplot(ico_sum %>%
-                          filter(!is.na(rgn_id) &!is.na(ico_trend)),
-                        aes(x = year, y = ico_trend, color = rgn_id, group = rgn_id)) +
+trend_ts_plot <- ggplot(
+  ico_sum %>% filter(!is.na(rgn_id) &!is.na(ico_trend)),
+  aes(x = year, y = ico_trend, color = rgn_id, group = rgn_name)) +
   geom_line(size = 1.2, alpha = .4) +
   labs(x = 'year',
        y = 'ICO trend',
@@ -831,7 +837,10 @@ compare_status_plot <- ggplot(ico_compare) +
 plotly::ggplotly(compare_status_plot)
 
 trend_compare_plot <- ggplot(ico_compare) +
-  geom_point(aes(previous_trend, ico_trend, color = d_nspp, label = rgn_id), alpha = .6) +
+  geom_point(
+    aes(x = previous_trend, y = ico_trend, 
+        color = d_nspp, label = rgn_id, text = rgn_name),
+    alpha = .6) +
   geom_abline(slope = 1, intercept = 0, color = 'red') +
   labs(x = sprintf('ICO trend %s', previous_scen),
        y = sprintf('ICO trend %s', version_year),
@@ -842,7 +851,7 @@ plotly::ggplotly(trend_compare_plot)
 
 ***
 
-## Data forensics - why are outliers occurring? 
+## Data forensics - why are outliers occurring?  
 v2021
 *No need to run this section of the code; for data exploration purposes only*.
 
