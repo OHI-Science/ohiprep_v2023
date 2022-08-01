@@ -3247,48 +3247,6 @@ iucn_sid,count,code,country,presence,origin,distribution_code,rgn_id,rgn_name,co
 46967863,12,TF,Kerguelen Islands,Extant,Native,Native,93,Kerguelen Islands,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Indian Ocean subpopulation,CR
 6494,134,TF,Kerguelen Islands,Extant,Native,Native,93,Kerguelen Islands,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 8005,76,TF,Kerguelen Islands,Extant,Native,Native,93,Kerguelen Islands,Hawksbill Turtle,Eretmochelys imbricata,TRUE,NA,NA,CR
-13006,165,SH,Ascension,Extant,Native,Native,85,Ascension,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
-142121866,31,SH,Ascension,Extant,Native,Native,85,Ascension,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
-19488,127,SH,Ascension,Extant,Native,Native,85,Ascension,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
-20738,138,SH,Ascension,Extant,Native,Native,85,Ascension,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
-2475,43,SH,Ascension,Extant,Native,Native,85,Ascension,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
-2478,68,SH,Ascension,Extant,Native,Native,85,Ascension,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
-39341,157,SH,Ascension,Extant,Native,Native,85,Ascension,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
-39381,177,SH,Ascension,Extant,Native,Native,85,Ascension,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
-4292,134,SH,Ascension,Extant,Native,Native,85,Ascension,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
-4615,107,SH,Ascension,Extant,Native,Native,85,Ascension,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
-46967838,23,SH,Ascension,Extant,Native,Native,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
-46967848,24,SH,Ascension,Extant,Native,Native,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
-60225,127,SH,Ascension,Extant,Native,Native,85,Ascension,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
-6494,134,SH,Ascension,Extant,Native,Native,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
-13006,165,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
-142121866,31,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
-19488,127,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
-20738,138,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
-2475,43,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
-2478,68,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
-39341,157,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
-39381,177,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
-4292,134,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
-4615,107,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
-46967838,23,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
-46967848,24,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
-60225,127,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
-6494,134,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
-13006,165,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
-142121866,31,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
-19488,127,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
-20738,138,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
-2475,43,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
-2478,68,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
-39341,157,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
-39381,177,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
-4292,134,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
-4615,107,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
-46967838,23,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
-46967848,24,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
-60225,127,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
-6494,134,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 13006,165,UM,Wake Island,Extant,Native,Native,12,Wake Island,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
 39341,157,UM,Wake Island,Extant,Native,Native,12,Wake Island,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
 39365,68,UM,Wake Island,Extant,Native,Native,12,Wake Island,Gray reef shark,Carcharhinus amblyrhynchos,TRUE,NA,NA,EN
@@ -3339,3 +3297,45 @@ iucn_sid,count,code,country,presence,origin,distribution_code,rgn_id,rgn_name,co
 4292,134,UM,Johnston Atoll,Extant,Native,Native,159,Johnston Atoll,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
 4592,59,UM,Johnston Atoll,Extant,Native,Native,159,Johnston Atoll,"Humphead wrasse, Napoleon Wrasse",Cheilinus undulatus,TRUE,NA,NA,EN
 4615,107,UM,Johnston Atoll,Extant,Native,Native,159,Johnston Atoll,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
+13006,165,SH,Ascension,Extant,Native,Native,85,Ascension,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
+142121866,31,SH,Ascension,Extant,Native,Native,85,Ascension,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
+19488,127,SH,Ascension,Extant,Native,Native,85,Ascension,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
+20738,138,SH,Ascension,Extant,Native,Native,85,Ascension,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
+2475,43,SH,Ascension,Extant,Native,Native,85,Ascension,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
+2478,68,SH,Ascension,Extant,Native,Native,85,Ascension,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
+39341,157,SH,Ascension,Extant,Native,Native,85,Ascension,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
+39381,177,SH,Ascension,Extant,Native,Native,85,Ascension,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
+4292,134,SH,Ascension,Extant,Native,Native,85,Ascension,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
+4615,107,SH,Ascension,Extant,Native,Native,85,Ascension,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
+46967838,23,SH,Ascension,Extant,Native,Native,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
+46967848,24,SH,Ascension,Extant,Native,Native,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
+60225,127,SH,Ascension,Extant,Native,Native,85,Ascension,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
+6494,134,SH,Ascension,Extant,Native,Native,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
+13006,165,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
+142121866,31,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
+19488,127,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
+20738,138,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
+2475,43,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
+2478,68,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
+39341,157,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
+39381,177,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
+4292,134,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
+4615,107,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
+46967838,23,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
+46967848,24,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
+60225,127,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
+6494,134,SH,Saint Helena,Extant,Native,Native,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
+13006,165,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
+142121866,31,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
+19488,127,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
+20738,138,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
+2475,43,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
+2478,68,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
+39341,157,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
+39381,177,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
+4292,134,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
+4615,107,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
+46967838,23,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
+46967848,24,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
+60225,127,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
+6494,134,SH,Tristan da Cunha,Extant,Native,Native,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
