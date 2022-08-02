@@ -418,11 +418,11 @@ for val in ${Array[@]}; do rm *_${val}_[0-9]*.tif; done
 
 ## Mosaic the rasters
 
-This step usually fails if you try to do all of the raster. Here we break it up into two steps. 
-
 - 1 global raster per year for with gain-loss difference at 1 km$^2$ resolution
 - `terra::mosaic()` is still crashing my R session at this resolution so need to look into a better way to do this
 - write new `.tif` files into `int/output` folder
+
+This step usually fails if you try to do all of the raster. Here we break it up into two steps. 
 
 ### Step 1
 
@@ -566,8 +566,8 @@ rgns <- ohicore::rgn_master %>%
   dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>% 
   dplyr::distinct()
 
-loss_files <- list.files(paste0(dir_data, "/output"), pattern = "loss_")
-gain_files <- list.files(paste0(dir_data, "/output"), pattern = "gain_")
+loss_files <- list.files(paste0(dir_data, "/output/tidal_wetland_change"), pattern = "loss_")
+gain_files <- list.files(paste0(dir_data, "/output/tidal_wetland_change"), pattern = "gain_")
 
 years <- c(4, 7, 10, 13, 16, 19)
 
@@ -577,7 +577,7 @@ foreach (yr = years) %dopar% {
   ###### LOSS
   yr_loss_files <- grep(paste0("in_", yr, "_"), loss_files, value = TRUE)
   
-  loss <- paste0(dir_data, "/output/", yr_loss_files)
+  loss <- paste0(dir_data, "/output/tidal_wetland_change/", yr_loss_files)
   
   file_name_loss <- here::here(dir_here, "int", paste0("saltmarsh_loss_", yr, ".csv"))
   
@@ -604,7 +604,7 @@ foreach (yr = years) %dopar% {
   ###### GAIN
   yr_gain_files <- grep(paste0("in_", yr, "_"), gain_files, value = TRUE)
   
-  gain <- paste0(dir_data, "/output/", yr_gain_files)
+  gain <- paste0(dir_data, "/output/tidal_wetland_change/", yr_gain_files)
   
   file_name_gain <- here::here(dir_here, "int", paste0("saltmarsh_gain_", yr, ".csv"))
   
@@ -699,4 +699,3 @@ gain_minus_loss %>%
   dplyr::select(rgn_id, year, difference) %>% 
   readr::write_csv(here::here(dir_here, 'output', "saltmarsh_trend.csv"))
 ```
-
