@@ -101,7 +101,8 @@ The following bash script will download the raw data for the tidal wetland chang
 
 ```{bash eval = FALSE}
 ### Make the new directory and move into it
-mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
+# mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
+mkdir /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
 
 ### Declare an array of strings
 declare -a StringArray=(
@@ -126,20 +127,22 @@ for val in ${StringArray[@]}; do
 done
 
 ### Make down_sample folde with subfolders
-mkdir ../../int/tidal_flat_down_sample && cd $_
+mkdir /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/int/tidal_flat_down_sample && cd $_
 ### Iterate the string array using for loop
 for val in ${StringArray[@]}; do
   echo $val
   mkdir $val
 done
 
-### Make mosaic folde with subfolders
-mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/int/tidal_flat_mosaic && cd $_
+### Make mosaic partial folder with subfolders
+mkdir /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/int/tidal_flat_partial_mosaic && cd $_
 ### Iterate the string array using for loop
 for val in ${StringArray[@]}; do
   echo $val
   mkdir $val
 done
+### Make mosaic folder
+mkdir /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/int/tidal_flat_mosaic
 ```
 
 ## Down sample rasters
@@ -200,39 +203,48 @@ tictoc::toc()
 
 ## Mosaic the rasters
 
-This step usually fails if you try to do all of the raster. Here we break it up into two steps. 
-
-- 1 global raster per year for with gain-loss difference at 1 km$^2$ resolution
-- `terra::mosaic()` is still crashing my R session at this resolution so need to look into a better way to do this
-- write new `.tif` files into `int/output` folder
+This step usually fails if you try to do all of the rasters. Here we break it up into two steps. 
 
 ### Step 1
 
-The first step takes the 147 files per group and breaks them into 7 parts (21 images each), and mosaics those parts together.
+The first step takes the 108 files per group and breaks them into 9 parts (12 images each), and mosaics those parts together.
 
 ```{r}
 tictoc::tic()
 
 registerDoParallel(3)
 
-folders <- list.files(paste0(dir_data, "/int/tidal_flat_down_sample"))
+folders <- here::here(dir_data, "int", "tidal_flat_down_sample") %>% 
+  list.files()
+
+num_files <- here::here(dir_data, "int", "tidal_flat_down_sample", "1984-1986") %>% 
+  list.files() %>% 
+  length()
+
+num_files_in_part <- 12
+start_file <- num_files_in_part - 1
+num_parts <- num_files / num_files_in_part
 
 foreach (dir = folders) %dopar% { 
   
-  files <- list.files(paste0(dir_data, "/raw/tidal_flats/", dir), full.names = T)
+  files <- here::here(dir_data, "int", "tidal_flat_down_sample", dir) %>% 
+    list.files(full.names = T)
   
-  for (part in 1:9) {
+  for (part in 1:num_parts) {
     
-    files_chunk = files[(12*part-11):(12*part)]
+    begin <- num_files_in_part*part-start_file
+    end <- num_files_in_part*part
     
-    file_name <- paste0(dir_data, "/int/tidal_flat_mosaic/", dir, "/", part, "_mosaic.tif")
+    files_chunk = files[begin:end]
+    
+    file_name <- paste0(dir_data, "/int/tidal_flat_partial_mosaic/", dir, "/mosaics/", part, "_mosaic.tif")
     
     if(!file.exists(file_name)){
       
-      img_rast_agg <- terra::sprc(lapply(files_chunk, terra::rast))
+      img_sprc <- terra::sprc(lapply(files_chunk, terra::rast))
       
       raster_mos <- terra::merge(
-        img_rast_agg,
+        img_sprc,
         filename = file_name
       )
       
@@ -242,122 +254,35 @@ foreach (dir = folders) %dopar% {
 tictoc::toc()
 ```
 
-```{r eval = FALSE}
-tictoc::tic()
-
-registerDoParallel(6)
-
-loss_files <- list.files(paste0(dir_data, "/int/down_sample"), pattern = "loss_in_")
-gain_files <- list.files(paste0(dir_data, "/int/down_sample"), pattern = "gain_in_")
-
-years <- c(4, 7, 10, 13, 16, 19)
-
-foreach (yr = years) %dopar% {
-  
-  yr_loss_files <- grep(paste0("_", yr, "_"), loss_files, value = TRUE)
-  yr_gain_files <- grep(paste0("_", yr, "_"), gain_files, value = TRUE)
-  
-  for (part in 1:9) {
-    
-    yr_loss_files_chunk = yr_loss_files[(12*part-11):(12*part)]
-    
-    fn_loss <- yr_loss_files_chunk %>%
-      stringr::str_replace(
-        pattern = paste0("murray-gic-v1.0.1-loss_in_", yr, "_"),
-        replacement = paste0("loss_in_", yr, "_part_", part, "_"))
-
-    file_name_loss <- paste0(dir_data, "/int/partial_mosaic/", fn_loss[1])
-    
-    if(!file.exists(file_name_loss)){
-      
-      img_rast_agg <- sprc(lapply(paste0(dir_data, "/int/down_sample/", yr_loss_files_chunk), terra::rast))
-      
-      raster_mos <- terra::merge(
-        img_rast_agg,
-        filename = file_name_loss
-      )
-    } else {cat(paste0(fn_loss[1], " already exists!\n"))}
-    
-    
-    yr_gain_files_chunk = yr_gain_files[(7*part-6):(7*part)]
-    
-    fn_gain <- yr_gain_files_chunk %>%
-      stringr::str_replace(
-        pattern = paste0("murray-gic-v1.0.1-gain_in_", yr, "_"),
-        replacement = paste0("gain_in_", yr, "_part_", part, "_"))
-
-    file_name_gain <- paste0(dir_data, "/int/partial_mosaic/", fn_gain[1])
-    
-    if(!file.exists(file_name_gain)){
-      
-      img_rast_agg <- sprc(lapply(paste0(dir_data, "/int/down_sample/", yr_gain_files_chunk), terra::rast))
-      
-      raster_mos <- terra::merge(
-        img_rast_agg,
-        filename = file_name_gain
-      )
-    } else {cat(paste0(fn_gain[1], " already exists!\n"))}
-  }
-}
-
-tictoc::toc()
-```
-
 ### Step 2
 
-The second step takes the 7 files per group and mosaics those parts together.
+The second step takes the 9 files per group and mosaics those parts together.
 
-```{r eval = FALSE}
+```{r}
 tictoc::tic()
 
 registerDoParallel(3)
 
-loss_files <- list.files(paste0(dir_data, "/int/partial_mosaic"), pattern = "loss_in_")
-gain_files <- list.files(paste0(dir_data, "/int/partial_mosaic"), pattern = "gain_in_")
+folders <- here::here(dir_data, "int", "tidal_flat_partial_mosaic") %>% 
+  list.files()
 
-years <- c(4, 7, 10, 13, 16, 19)
-
-foreach (yr = years) %dopar% {
+foreach (dir = folders) %dopar% { 
   
-  yr_loss_files <- grep(paste0("in_", yr, "_"), loss_files, value = TRUE)
-  yr_gain_files <- grep(paste0("in_", yr, "_"), gain_files, value = TRUE)
+  files <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir) %>% 
+    list.files(full.names = T)
   
-  fn_loss <- yr_loss_files %>%
-    stringr::str_replace(
-      pattern = paste0("_part_[:digit:]_down_sampled_\\d+-\\d+.tif"),
-      replacement = "_global.tif")
+  file_name <- paste0(dir_data, "/output/tidal_flat_extent/", dir, "_tidal_flat_down_sample_mosaic.tif")
   
-  file_name_loss <- paste0(dir_data, "/output/", fn_loss[1])
-  
-  if(!file.exists(file_name_loss)){
+  if(!file.exists(file_name)){
     
-    spat_raster_collection <- sprc(lapply(paste0(dir_data, "/int/partial_mosaic/", yr_loss_files), terra::rast))
+    img_sprc <- terra::sprc(lapply(files, terra::rast))
     
-    raster_mosaic <- terra::merge(
-      spat_raster_collection,
-      filename = file_name_loss
+    raster_mos <- terra::merge(
+      img_sprc,
+      filename = file_name
     )
-  } else {cat(paste0(fn_loss[1], " already exists!\n"))}
-  
-  fn_gain <- yr_gain_files %>%
-    stringr::str_replace(
-      pattern = paste0("_part_[:digit:]_down_sampled_\\d+-\\d+.tif"),
-      replacement = "_global.tif")
-  
-  file_name_gain <- paste0(dir_data, "/output/", fn_gain[1])
-  
-  if(!file.exists(file_name_gain)){
-    
-    spat_raster_collection <- sprc(lapply(paste0(dir_data, "/int/partial_mosaic/", yr_gain_files), terra::rast))
-    
-    raster_mosaic <- terra::merge(
-      spat_raster_collection,
-      filename = file_name_gain
-    )
-  } else {cat(paste0(fn_gain[1], " already exists!\n"))}
-  
+  } else {cat(paste0(file_name, " already exists!\n"))}
 }
-
 tictoc::toc()
 ```
 
@@ -365,12 +290,13 @@ tictoc::toc()
 
 - Take the sum of the cells in each country for each year for gain and loss
 
-```{r eval = FALSE}
-### call the region shape file to import regions
+Step 2 above made it impossible to find the intersection with the regions (too many tidal flat points). This is an alternative approach for finding the intersection on the partial mosaics. This approach outputs intermediate files that can be concatenated. 
+
+```{r}
+tictoc::tic()
+
 regions_shape()
 
-### filter for only eez shapes and land shapes
-### we want both to ensure all of the intertidal zone is captured
 regions_eez_and_land <- regions %>%
   dplyr::filter(rgn_type %in% c("eez", 'land')) %>% 
   sf::st_transform(crs = 4326)  
@@ -380,130 +306,95 @@ rgns <- ohicore::rgn_master %>%
   dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>% 
   dplyr::distinct()
 
-loss_files <- list.files(paste0(dir_data, "/output"), pattern = "loss_")
-gain_files <- list.files(paste0(dir_data, "/output"), pattern = "gain_")
+# registerDoParallel(3)
 
-years <- c(4, 7, 10, 13, 16, 19)
+folders <- here::here(dir_data, "int", "tidal_flat_partial_mosaic") %>% 
+  list.files()
 
-registerDoParallel(2)
+# foreach (dir = folders) %dopar% { 
 
-foreach (yr = years) %dopar% {
-  ###### LOSS
-  yr_loss_files <- grep(paste0("in_", yr, "_"), loss_files, value = TRUE)
+for (dir in folders) { 
   
-  loss <- paste0(dir_data, "/output/", yr_loss_files)
+  files <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir, 'mosaics') %>% 
+    list.files(full.names = T)
   
-  file_name_loss <- here::here(dir_here, "int", paste0("saltmarsh_loss_", yr, ".csv"))
+  i <- 1
   
-  if(!file.exists(file_name_loss)){
+  for (file in files) {
     
-    loss_image <- terra::rast(loss)
+    fn <- paste0(i, "_tidal_flat_extent.csv")
     
-    loss_image[loss_image==0] <- NA
+    file_name <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir, "extent", fn)
     
-    loss_image_sf <- loss_image %>% 
-      terra::as.points(na.rm = T) %>% 
-      sf::st_as_sf()
-    
-    loss_country <- sf::st_intersection(loss_image_sf, regions_eez_and_land)
-    
-    loss_summary <- loss_country %>%
-      as.data.frame() %>% 
-      dplyr::group_by(rgn_id) %>% 
-      dplyr::summarise(loss = sum(loss)) %>% 
-      dplyr::left_join(rgns) %>% 
-      readr::write_csv(file_name_loss)
-  } else {cat(paste0(yr_loss_files, " already exists!\n"))}
+    end_year = stringr::str_split(dir, pattern = "-", n = 2)[[1]][2]
   
-  ###### GAIN
-  yr_gain_files <- grep(paste0("in_", yr, "_"), gain_files, value = TRUE)
-  
-  gain <- paste0(dir_data, "/output/", yr_gain_files)
-  
-  file_name_gain <- here::here(dir_here, "int", paste0("saltmarsh_gain_", yr, ".csv"))
-  
-  if(!file.exists(file_name_gain)){ 
+    i <- i + 1
     
-    gain_image <- terra::rast(gain)
-    
-    gain_image[gain_image==0] <- NA
-    
-    gain_image_sf <- gain_image %>% 
-      terra::as.points(na.rm = T) %>% 
-      sf::st_as_sf()
-    
-    gain_country <- sf::st_intersection(gain_image_sf, regions_eez_and_land)
-    
-    gain_summary <- gain_country %>%
-      as.data.frame() %>% 
-      dplyr::group_by(rgn_id) %>% 
-      dplyr::summarise(gain = sum(gain)) %>% 
-      dplyr::left_join(rgns) %>% 
-      readr::write_csv(file_name_gain)
-  } else {cat(paste0(yr_gain_files, " already exists!\n"))}
-
+    if(!file.exists(file_name)){
+      
+      image <- terra::rast(file)
+      
+      image[image==0] <- NA
+      
+      image_sf <- image %>% 
+        terra::as.points(na.rm = T) %>% 
+        sf::st_as_sf() 
+      
+      rm(image)
+      gc()
+      
+      cat(paste0(dir, "/extent/", fn, " is being created!\n"))
+      
+      countries <- sf::st_intersection(image_sf, regions_eez_and_land) 
+      
+      countries %>%
+        as.data.frame() %>% 
+        dplyr::group_by(rgn_id) %>% 
+        dplyr::summarise(tidal_flat = sum(classification)) %>% 
+        dplyr::left_join(rgns) %>% 
+        dplyr::mutate(year = end_year) %>% 
+        readr::write_csv(file_name)
+      
+      rm(countries)
+      gc()
+      
+    } else {cat(paste0(dir, "/extent/", fn, " already exists!\n"))}
+  }
 }
+
+tictoc::toc()
 ```
 
 ```{r eval = FALSE}
-### Whoops, forgot to add year as a column above lol
-loss_files <- list.files(paste0(dir_here, "/int"), pattern = "loss_")
-gain_files <- list.files(paste0(dir_here, "/int"), pattern = "gain_")
+directories <- here::here(dir_data, "int", "tidal_flat_partial_mosaic") %>% 
+  list.files()
 
-years <- c(4, 7, 10, 13, 16, 19)
-
-loss_output <- dplyr::tibble()
-gain_output <- dplyr::tibble()
-
-for (yr in years){
-  ### LOSS
-  yr_loss_files <- grep(paste0(yr), loss_files, value = TRUE)
+output <- dplyr::tibble()
   
-  loss_tmp <- here::here(dir_here, 'int', yr_loss_files) %>% 
-    readr::read_csv() %>% 
-    dplyr::full_join(rgns) %>% 
-    dplyr::mutate(loss = case_when(is.na(loss) ~ 0,T ~ loss),
-                  year = 2000 + yr)
+for (dir in directories[6]) {
   
-  loss_output <- rbind(loss_output, loss_tmp)
+  files <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir, "extent") %>% 
+    list.files(full.names = T)
   
-  ### GAIN
-  yr_gain_files <- grep(paste0(yr), gain_files, value = TRUE)
+  end_year = stringr::str_split(dir, pattern = "-", n = 2)[[1]][2]
   
-  gain_tmp <- here::here(dir_here, 'int', yr_gain_files) %>% 
-    readr::read_csv() %>% 
-  dplyr::full_join(rgns) %>% 
-  dplyr::mutate(gain = case_when(is.na(gain) ~ 0,T ~ gain),
-                year = 2000 + yr)
+  int_output <- dplyr::tibble()
   
-  gain_output <- rbind(gain_output, gain_tmp)
+  for (file in files){
+    
+    tmp <- readr::read_csv(file, col_types = cols()) 
+    
+    int_output <- rbind(int_output, tmp)
+    
+  }
+  output <- rbind(output, int_output) %>%
+    dplyr::group_by(rgn_id, rgn_name, year) %>%
+    dplyr::summarise(tidal_flat = sum(tidal_flat, na.rm = T)) %>%
+    dplyr::full_join(rgns, by = c("rgn_id", "rgn_name")) %>%
+    dplyr::mutate(tidal_flat = case_when(is.na(tidal_flat) ~ 0, T ~ tidal_flat),
+                  year = case_when(is.na(year) ~ as.numeric(end_year), T ~ year)) 
 }
-```
-
-## Subtract gain from loss
-
-- gain - loss
-- left with a difference for each country
-- write the results as a `.csv` in the output directory
-- left with a gain or loss for each country
-
-```{r eval = FALSE}
-gain_minus_loss <- gain_output %>% 
-  dplyr::left_join(loss_output) %>% 
-  dplyr::mutate(difference = gain - loss)
-
-### extra for the curious
-loss_summary <- gain_minus_loss %>% 
-  dplyr::group_by(rgn_id, rgn_name) %>% 
-  dplyr::summarise(loss = sum(loss))
-
-gain_summary <- gain_minus_loss %>% 
-  dplyr::group_by(rgn_id, rgn_name) %>% 
-  dplyr::summarise(gain = sum(gain))
-
-difference_summary <- gain_minus_loss %>% 
-  dplyr::group_by(rgn_id, rgn_name) %>% 
-  dplyr::summarise(difference = sum(difference))
+readr::write_csv(output, here::here(dir_here, 'output', paste0("tidal_flat_extent.csv")))
 ```
 
 ## Write the results to output
