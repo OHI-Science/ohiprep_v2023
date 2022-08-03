@@ -1,5 +1,5 @@
 ---
-title: 'OHI `r format(Sys.Date(), %Y)`: Mangrove extent'
+title: 'OHI `r format(Sys.Date(), "%Y")`: Mangrove extent'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -39,18 +39,9 @@ Global Mangrove Watch (1996 - 2020)
 https://data.unep-wcmc.org/datasets/45
 Reported at spatial cell scale. 
 
-The GMW aims to provide geospatial information about mangrove extent and
-changes to the Ramsar Convention, national wetland practitioners, decision makers
-and NGOs. It is part of the Ramsar Science and Technical Review Panel (STRP) work
-plan for 2016-2018 and a Pilot Project to the Ramsar Global Wetlands Observation
-System (GWOS), which is implemented under the GEO-Wetlands Initiative. The
-primary objective of the GMW has been to provide countries lacking a national
-mangrove monitoring system with first cut mangrove extent and change maps, to
-help safeguard against further mangrove forest loss and degradation.
-The GMW has generated a global baseline map of mangroves for 2010 using ALOS
-PALSAR and Landsat (optical) data, and changes from this baseline for seven epochs
-between 1996 and 2017 derived from JERS-1, ALOS and ALOS-2. Annual maps are
-planned from 2018 and onwards
+The GMW aims to provide geospatial information about mangrove extent and changes to the Ramsar Convention, national wetland practitioners, decision makers and NGOs. It is part of the Ramsar Science and Technical Review Panel (STRP) work plan for 2016-2018 and a Pilot Project to the Ramsar Global Wetlands Observation System (GWOS), which is implemented under the GEO-Wetlands Initiative. The primary objective of the GMW has been to provide countries lacking a national mangrove monitoring system with first cut mangrove extent and change maps, to help safeguard against further mangrove forest loss and degradation.
+
+The GMW has generated a global baseline map of mangroves for 2010 using ALOS PALSAR and Landsat (optical) data, and changes from this baseline for epochs between 1996 and 2020 derived from JERS-1 SAR, ALOS PALSAR and ALOS-2 PALSAR-2. Annual maps are planned from 2018 and onwards.
 
 **Time range**: 1996-2020
 
@@ -190,7 +181,7 @@ write.csv(habitat_extent_mangrove_updated, here(paste0("globalprep/hab_mangrove/
 
 Compare total areas with paper
 
-```{r}
+```{r, eval=FALSE}
 habitat_extent_mangrove_updated <- read_csv(here(paste0("globalprep/hab_mangrove/v", version_year, 
                                     "/data/habitat_extent_mangrove_updated.csv")))
 
@@ -216,15 +207,13 @@ compare_extents <- habitat_extent_mangrove_updated %>%
   left_join(paper_extents) %>% 
   mutate(diff = km2 - km2_paper) %>% 
   mutate(pct_diff = abs(diff) / km2 * 100)
-  
-View(compare_extents)
 ```
 
-*These differences look reasonable*
+**These differences look reasonable**
 
 Compare a few country values with those in the paper
 
-```{r}
+```{r, eval=FALSE}
 
 indonesia <- habitat_extent_mangrove_updated %>% 
   filter(rgn_id == 216)
@@ -246,5 +235,5 @@ Brazil 1996 (paper): 11,474.56
 Brazil 2020 (workflow): 11,497.22
 Brazil 2020 (paper): 11,414.71
 
-*Everything looks good*
+**Everything looks good**
 
