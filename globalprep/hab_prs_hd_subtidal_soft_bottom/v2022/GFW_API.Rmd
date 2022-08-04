@@ -519,7 +519,7 @@ plot(fish_effort_trawl_2015_rast, axes = FALSE, col = "red", add = TRUE)
 
 ```{r}
 tic()
-
+# this loop sometimes randomly errors but just run again and it should work (might error when Mazu's RAM is almost full...)
 years = as.factor(2012:2020) # make it factor in order to match the class of year column in the fish_effort_annual dataframe
 
 for(i in years){
@@ -538,13 +538,13 @@ for(i in years){
     dplyr::filter(year == i) %>%
     dplyr::select(-year) %>%
     terra::rast(type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
-  
+
   # save annual raster file for dredging:
-  terra::writeRaster(dredge_annual_raster, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging/fish_effort_dredge_", i , ".tif"), overwrite = TRUE)
+  terra::writeRaster(dredge_annual_raster, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_dredge_", i , ".tif"), overwrite = TRUE) # put in folder that will be the destination of the trawling data as well, after it is corrected, so the dredging and trawling by year can be summed easily in a stack
 
 }
-# note that the trawling data is separated into annual folders within the trawling folder, and the dredging data is not separated into annual folders. This is because we will be subsetting the trawling data for just bottom trawling later by making a spatRaster stack of the trawling and catch data matched by year, and its easier to create those stacked objects using terra if the matching annual files are within the same directory
-toc()
+
+toc() # 594 seconds
 ```
 
 ### Correct Trawling Data: Subset trawling fishing effort by catch data for the corresponding year to distinguish between mid-water trawling and bottom trawling
@@ -633,15 +633,16 @@ terra::plot(trawling_corrected_2012, col = "red")
 ```{r}
 tic()
 
-# use this subset because we only have trawling proportion data for these years
+# use this subset because we only have trawling proportion data for these years from Watson
 years_subset = as.factor(2012:2017)
-  
+
 # for years with trawling depth proportion data:
 for (j in years_subset){
   
   print(paste0("Processing trawling fishing effort for ", j))
   # read in the GFW apparent fishing effort raster for trawling, we need this read in to resample the Watson catch data to the same resolution
   fish_effort_trawl <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", j, "/fish_effort_trawl_", j, ".tif"))
+  
   # read in the annual file that represents the proportion of bottom trawling to midwater trawling, based on catch data, from Watson 
   trawl_depth_proportion <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_", j, ".tif"))
   
@@ -675,7 +676,13 @@ for (j in years_subset){
                                                       y = fish_effort_trawl, # use the GFW data as the sample geometry
                                                       method = "near") # nearest neighbor
   
-  # document how many NA values were filled 
+  # document how many NA values were produced by resampling
+  print(paste0("Now there are ", terra::global(trawl_depth_proportion_resampled, fun = "isNA")[1,1], " NA values remaining, need to fill NA's one final time."))
+  
+  # get rid of the rest of the NA values produced by resample:
+  trawl_depth_proportion_resampled[is.na(trawl_depth_proportion_resampled)] <- global_trawl_proportion_avg[1,1]
+  
+  # document how many NA values remain (should be 0)
   print(paste0("Now there are ", terra::global(trawl_depth_proportion_resampled, fun = "isNA")[1,1], " NA values remaining."))
   
   # save the adjusted bottom trawling proportion raster in the folder of the corresponding year of GFW data, & save the most recent year of proportion data (2017) for 2017-2020 GFW data
@@ -696,87 +703,85 @@ for (j in years_subset){
   }  
 }
 
-  
 # clear some memory
 rm(trawl_depth_proportion_resampled)
 gc()
 
-toc()
+toc() # 14 minutes
 ```
 
 ```{r}
 # scratch code
 # check the origin and resolution of the rasters btw data sources
 # read in the GFW apparent fishing effort raster for trawling, we need this read in to resample the Watson catch data to the same resolution
-fish_effort_trawl <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/fish_effort_trawl_2012.tif"))
-# read in the annual file that represents the proportion of bottom trawling to midwater trawling, based on catch data, from Watson 
-trawl_depth_proportion <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif"))
+# fish_effort_trawl <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/fish_effort_trawl_2012.tif"))
+# # read in the annual file that represents the proportion of bottom trawling to midwater trawling, based on catch data, from Watson 
+# trawl_depth_proportion <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif"))
+# 
+# fish_effort_trawl # res 0.01, 0.01, ext -179.985, 180.005, -55.305, 73.065  (xmin, xmax, ymin, ymax)
+# trawl_depth_proportion # res 0.5, 0.5, ext -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
+# 
+# origin(fish_effort_trawl) 
+# fish_effort_trawl_disagg <- terra::disagg(fish_effort_trawl, fact = 50, method = "near")
+# 
+# 
+# 
+# origin(trawl_depth_proportion)
+# 
+# terra::global(fish_effort_trawl, fun = "isNA")
 
-fish_effort_trawl # res 0.01, 0.01, ext -179.985, 180.005, -55.305, 73.065  (xmin, xmax, ymin, ymax)
-trawl_depth_proportion # res 0.5, 0.5, ext -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
-
-origin(fish_effort_trawl)
-origin(trawl_depth_proportion)
-
-terra::global(fish_effort_trawl, fun = "isNA")
-
+# 2017
+# test that raster that was saved looks like we would expect compared to unprocessed raster from Watson
+# watson_unprocessed_2017 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2017.tif"))
+# 
+# plot(watson_unprocessed_2017)
+# 
+# terra::global(watson_unprocessed_2017, fun = "isNA") # 201,000
+# 
+# watson_processed_2017 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2017/trawl_depth_proportion_resampled_2017.tif"))
+# 
+# plot(watson_processed_2017)
+# 
+# terra::global(watson_processed_2017, fun = "isNA") # 156,880,905
+# 
+# # 2012
+# # test that raster that was saved looks like we would expect compared to unprocessed raster from Watson
+# watson_unprocessed_2012 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif"))
+# 
+# plot(watson_unprocessed_2012)
+# 
+# terra::global(watson_unprocessed_2012, fun = "isNA") # 191377
+# 
+# watson_processed_2012 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/trawl_depth_proportion_resampled_2012.tif"))
+# 
+# plot(watson_processed_2012)
+# 
+# terra::global(watson_processed_2012, fun = "isNA") # 135,657,275
 ```
 
 
 ```{r}
-# 2017
-# test that raster that was saved looks like we would expect compared to unprocessed raster from Watson
-watson_unprocessed_2017 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2017.tif"))
-
-plot(watson_unprocessed_2017)
-
-terra::global(watson_unprocessed_2017, fun = "isNA") # 201,000
-
-watson_processed_2017 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2017/trawl_depth_proportion_resampled_2017.tif"))
-
-plot(watson_processed_2017)
-
-terra::global(watson_processed_2017, fun = "isNA") # 156,880,905
-
-# 2012
-# test that raster that was saved looks like we would expect compared to unprocessed raster from Watson
-watson_unprocessed_2012 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif"))
-
-plot(watson_unprocessed_2012)
-
-terra::global(watson_unprocessed_2012, fun = "isNA") # 191377
-
-watson_processed_2012 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/trawl_depth_proportion_resampled_2012.tif"))
-
-plot(watson_processed_2012)
-
-terra::global(watson_processed_2012, fun = "isNA") # 135,657,275			
-
-
-
-
-
-
-
-
-
-
-# check extents of the rasters in this folder 2018
-rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2018"), pattern = ".tif", full = TRUE)
-fish_effort_raster <- terra::rast(rasters[1])
-trawl_depth_proportion_raster <- terra::rast(rasters[2])
-extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE)
-print(paste0("Raster extent comparison results: ", extent_comparison))
-
-if (extent_comparison == FALSE){ 
-    print("Cropping extent of trawling proportion raster to match the extent of the trawling fishing effort raster.")
-  
-    trawl_depth_proportion_cropped <- terra::crop(trawl_depth_proportion_raster, fish_effort_raster)
-    
-    # check the extents now
-    ext(fish_effort_raster)
-    ext(trawl_depth_proportion_cropped)
-  }
+# check extents of the rasters in folders 2020
+# rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2020"), pattern = ".tif", full = TRUE)
+# fish_effort_raster <- terra::rast(rasters[1])
+# trawl_depth_proportion_raster <- terra::rast(rasters[2])
+# print(ext(fish_effort_raster))
+# print(ext(trawl_depth_proportion_raster))
+# extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE)
+# print(paste0("Raster extent comparison results: ", extent_comparison))
+# 
+# if (extent_comparison == FALSE){ 
+#     print("Extending extent of trawling proportion raster to match the extent of the trawling fishing effort raster.")
+#   
+#     trawl_depth_proportion_extended <- terra::extend(trawl_depth_proportion_raster, fish_effort_raster)
+#     fish_effort_extended <- terra::extend(fish_effort_raster, trawl_depth_proportion_extended) # extend both rasters to the extent of the other
+#     
+#     # check the extents now
+#     print(ext(fish_effort_extended))
+#     print(ext(trawl_depth_proportion_extended))
+#     extent_comparison <- terra::compareGeom(fish_effort_extended, trawl_depth_proportion_extended, stopOnError = FALSE)
+#     print(paste0("Raster extent comparison results: ", extent_comparison))
+#   }
 
 
 
@@ -788,112 +793,150 @@ if (extent_comparison == FALSE){
 ```{r}
 tic()
 
-years_all = as.factor(2012:2020)
-years_test = as.factor(2017:2018)
+years_all = as.factor(2018:2020) # change this back to 2012:2020
 
-for (i in years_test){
+for (i in years_all){
   # read in the GFW apparent fishing effort raster for trawling, we need this read in because we will multiple GFW rasters with the corresponding Watson catch data rasters 
   #print(paste0("Reading trawling fishing effort for ", i))
   #fish_effort_trawl <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_", i, ".tif"))
   
-  # stack the resampled interpolated raster of bottom trawling with all trawling data for that year from GFW, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of GFW trawling data for which we do not have more recent trawling proportion data
-  print(paste0("Stacking trawling data for ", i))
-  # first read in both rasters within the annual folders and save the list of 2 as an object 
+  print(paste0("Checking if extents match for ", i, " trawling and fishing catch rasters."))
+  # first read in both rasters within the annual folders and save the list of 2 as an object
   rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
-  
-  # read in the rasters individually in order to check if extents match
   fish_effort_raster <- terra::rast(rasters[1])
   trawl_depth_proportion_raster <- terra::rast(rasters[2])
-  # check if the extents match
+  print(ext(fish_effort_raster))
+  print(ext(trawl_depth_proportion_raster))
   extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE)
-  print(paste("Raster extent comparison results: ", extent_comparison))
-  
-  # if the extents do not match, crop the trawl depth proportion raster to match the extent of the fishing effort raster from GFW
+  print(paste0("Raster extent comparison results: ", extent_comparison))
+
   if (extent_comparison == FALSE){ 
-    print(paste0("Cropping extent of trawling proportion raster to match the extent of the trawling fishing effort raster."))
-    trawl_depth_proportion_cropped <- terra::crop(trawl_depth_proportion_raster, fish_effort_raster)
+      print("Extending trawling proportion raster to match the extent of the trawling fishing effort raster and vice versa.")
+      trawl_depth_proportion_extended <- terra::extend(trawl_depth_proportion_raster, fish_effort_raster)
+      fish_effort_extended <- terra::extend(fish_effort_raster, trawl_depth_proportion_extended) # extend both rasters to the extent of the other in all dimensions
     
-    # re-write the cropped raster to that folder, with a different name to keep track of which rasters were cropped
-    terra::writeRaster(trawl_depth_proportion_cropped, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/trawl_depth_proportion_raster_cropped.tif"), overwrite = TRUE)
+      # check the extents now
+      print(ext(fish_effort_extended))
+      print(ext(trawl_depth_proportion_extended))
+      extent_comparison <- terra::compareGeom(fish_effort_extended, trawl_depth_proportion_extended, stopOnError = FALSE)
+      print(paste0("Raster extent comparison results: ", extent_comparison)) # should be TRUE
+      
+      #print(paste0("Deleting the old trawl depth proportion raster and old fish effort rasters that did not have matching extents."))
+      # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster and vice versa
+      #unlink(rasters[2])
+      #unlink(rasters[1])
     
-    print(paste0("Deleting the old trawl depth proportion raster that was not the same extent as the GFW raster."))
-    # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster
-    unlink(rasters[2])
-    
-    # check extents again in case it only cropped the raster in certain dimensions and needs to be further manipulated
-    # first read in both rasters within the annual folders and save the list of 2 as an object 
-    rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
-  
-    # read in the rasters individually in order to check if extents match
-    fish_effort_raster <- terra::rast(rasters[1])
-    trawl_depth_proportion_raster <- terra::rast(rasters[2])
-    # check if the extents match
-    extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE)
-    print(paste("Raster extent comparison results: ", extent_comparison))
+      # clear some memory
+      rm(rasters)
+      gc()
+      
+      # re-write the extended rasters to that same folder, with a different name to keep track of which rasters were cropped
+      terra::writeRaster(trawl_depth_proportion_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/trawl_depth_proportion_resampled_2017.tif"), overwrite = TRUE)
+      print("Re-wrote trawl_depth_proportion_resampled_2017.tif")
+      terra::writeRaster(fish_effort_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_2018_extended.tif"), overwrite = TRUE)
+      print("Re-wrote fish_effort_trawl_2018_extended.tif")
+      
+      print("Deleting old file fish_effort_trawl_yr.tif")
+      # delete old file now that is has been replaced (could not save it as the same name because the original file was in memory, a limitation of terra)
+      #unlink(paste0("/home/shares/ohi/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_", i, ".tif"))
+      file.remove(paste0("/home/shares/ohi/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_", i, ".tif"))
+      print("Deleted old file fish_effort_trawl_yr.tif")
+      # since the rasters have been rewritten, need to redefine the object that represents them
+      rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
+      print("Redefined rasters obj")
   }
-  
-  # create the stack of 2 rasters in the annual folder
+  print("stacking...")
+  # stack the resampled interpolated raster of bottom trawling with all trawling data for that year from GFW, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of GFW trawling data for which we do not have more recent trawling proportion data
   trawl_stack <- terra::rast(rasters)
   
   print(paste0("Correcting trawling effort data for ", i))
   
   # multiply the rasters in order to only maintain the proportion of trawling fishing effort that is attributed to bottom trawling rather than midwater trawling
-  terra::lapp(trawl_stack, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/trawling_corrected/trawling_corrected_", i, ".tif"), overwrite = TRUE)
+  terra::lapp(trawl_stack, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
   
+  #terra::writeRaster(x = corrected_trawling, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawl_sum/", i, "/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
+
   # clear some memory
   rm(trawl_stack)
   gc()
   
-  print(paste0("Saved corrected trawling data for ", i, " to ", dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/trawling_corrected/trawling_corrected_", i, ".tif"))
+  print(paste0("Saved corrected trawling data for ", i, " to ", paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_trawl_", i, ".tif")))
 }
   
 toc()
 ```
 
+## Combine the corrected trawling data with the dredging data by summing the fishing effort by coordinate
+
 ```{r}
-# scratch code 
-# check extents of 2017 trawl prop data with 2018-2020
-rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012"), pattern = ".tif", full = TRUE)
-raster_1 <- terra::rast(rasters[1])
-raster_2 <- terra::rast(rasters[2])
-result <- terra::compareGeom(raster_1, raster_2)
-result
-terra::ext(raster_1)
-terra::ext(raster_2)
-# trawl depth proportion is larger
-# extend GFW raster to trawl depth proportion raster extent
-raster_3 <- terra::extend(raster_1, raster_2)
-raster_4 <- terra::extend(raster_2, raster_3)
-terra::ext(raster_3)
+# check that the dredging raster and corrected trawling raster have the same extent
+tic()
+
+years_all = as.factor(2012:2020)
+
+for (i in years_all){
+  print(paste0("Checking if extents match for ", i, " dredging and trawling rasters."))
+  # first read in both rasters within the annual folders and save the list of 2 as an object
+  rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/2017"), pattern = ".tif", full = TRUE)
+  dredge <- terra::rast(rasters[1])
+  trawl <- terra::rast(rasters[2])
+  print(ext(dredge))
+  print(ext(trawl))
+  extent_comparison <- terra::compareGeom(trawl, dredge, stopOnError = FALSE)
+  print(paste0("Raster extent comparison results: ", extent_comparison))
+
+  if (extent_comparison == FALSE){ 
+      print("Extending dredging raster to match the extent of the trawling raster and vice versa.")
+      dredge_extended <- terra::extend(dredge, trawl)
+      trawl_extended <- terra::extend(trawl, dredge_extended) # extend both rasters to the extent of the other in all dimensions
+    
+      # check the extents now
+      print(ext(dredge_extended))
+      print(ext(trawl_extended))
+      extent_comparison <- terra::compareGeom(dredge_extended, trawl_extended, stopOnError = FALSE)
+      print(paste0("Raster extent comparison results: ", extent_comparison)) # should be TRUE
+      
+      #print(paste0("Deleting the old trawl depth proportion raster and old fish effort rasters that did not have matching extents."))
+      # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster and vice versa
+      #unlink(rasters[2])
+      #unlink(rasters[1])
+    
+      # re-write the extended rasters to that same folder, with a different name to keep track of which rasters were cropped
+      terra::writeRaster(dredge_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/trawl_depth_proportion_extended.tif"), overwrite = TRUE)
+      terra::writeRaster(trawl_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_extended.tif"), overwrite = TRUE)
+      
+      # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster and vice versa
+      unlink(paste0())
+      unlink(paste0())
+  }
+  
+  # since the rasters have been rewritten, need to redefine the object that represents them
+  rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
+  
+  # stack the resampled interpolated raster of bottom trawling with all trawling data for that year from GFW, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of GFW trawling data for which we do not have more recent trawling proportion data
+  trawl_stack <- terra::rast(rasters)
+  
+  print(paste0("Correcting trawling effort data for ", i))
+  
+  # multiply the rasters in order to only maintain the proportion of trawling fishing effort that is attributed to bottom trawling rather than midwater trawling
+  terra::lapp(trawl_stack, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/dredging_trawl_sum/", i, "/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
+  
+  # clear some memory
+  rm(trawl_stack)
+  gc()
+  
+  print(paste0("Saved corrected trawling data for ", i, " to ", dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/dredging_trawl_sum/", i, "/fish_effort_trawl_", i, ".tif"))
+}
+  
+toc()
+
 ```
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
-# rasterize the dredging fishing effort dataframe - data from GFW
-terra::rast(fish_effort_dredge_annual, )
 
-
-
-
-
-
-## Gage's code:
+## Gage's code to combine dredging and trawling
 
 #Sum the corrected trawl with the dredge effort to get the total demersal destructive fishing effort.
 corrected_trawl <- raster("/home/shares/food-systems/Food_footprint/all_food_systems/dataprep/fisheries/marine/disturbance/global_fishing_watch/FishingWatch_annual_effort_destructive_trawlers_2017.tif")
