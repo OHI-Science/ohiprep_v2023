@@ -1,0 +1,97 @@
+---
+title: "OHI `r format(Sys.Date(), '%Y')` - tidal flat condition"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+  pdf_document:
+    toc: true
+---
+
+# Summary
+
+This script generates the tidal flat condition for each OHI region. 
+
+
+## Updates from previous assessment
+
+2022 - Completely new!
+
+***
+## Data Source 
+
+**Reference**: Murray, N.J., Phinn, S.R., DeWitt, M., Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. & Fuller, R.A. (2019) The global distribution and trajectory of tidal flats. Nature, 565, 222-225.
+
+**Downloaded**: 2022-07-26
+
+**Description**:  
+The Murray Global Intertidal Change Dataset contains global maps of tidal flat ecosystems produced via a supervised classification of 707,528 Landsat Archive images. Each pixel was classified into tidal flat, permanent water or other with reference to a globally distributed set of training data.
+
+The classification was implemented along the entire global coastline between 60° North and 60° South from 1 January 1984 to 31 December 2016. The image collection consists consists of a time-series of 11 global maps of tidal flats at 30m pixel resolution for set time-periods (1984−1986; 1987−1989; 1990−1992; 1993−1995; 1996−1998; 1999−2001; 2002−2004; 2005−2007; 2008−2010; 2011−2013; 2014−2016)
+
+This product depicts tidal flat ecosystems around the global coastline.
+
+Pixels classified as tidal flat in the analysis represent several types of tidal flat ecosystems, including unconsolidated fine-grain sediments (tidal mudflats), unconsolidated coarse-grain sediments (tidal sand flats), and consolidated sediments, organic material or rocks (wide tidal rock-platforms), while excluding spectral signatures indicating the presence of vegetation dominated intertidal ecosystems such as mangroves and vegetated marshes. The analysis aimed to identify pixels that are subject to regular tidal inundation, and therefore may also include other intertidal systems where intertidal dynamics are observable.
+
+**Time range**: 1984-2016
+
+**Download link**: https://www.intertidal.app/download/direct-download (download done in `tidal_flat_extent.Rmd`)
+
+**Variables**:
+
+- Update me... 
+
+***
+
+# Methods
+
+## Overview
+
+IDK lol
+
+## Setup
+
+``` {r setup, eval = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, eval = FALSE, echo = TRUE)
+
+if (!require(librarian)){install.packages("librarian")}
+
+librarian::shelf(
+  tidyverse,
+  here,
+  janitor,
+  plotly,
+  sf,
+  fasterize,
+  terra,
+  raster,
+  tictoc,
+  foreach,
+  doParallel
+) 
+### directory paths and relevant files
+current_year <- 2022
+version_year <- paste0("v", current_year)
+data_year <- paste0("d", current_year)
+
+source(here::here('workflow', 'R', 'common.R'))
+
+### Mazu
+dir_here  <- here::here('globalprep', 'hab_saltmarsh', version_year)
+dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
+
+### Aurora
+# dir_here <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change')
+# dir_data <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022')
+```
+
+
+## Find the condition
+
+
+
