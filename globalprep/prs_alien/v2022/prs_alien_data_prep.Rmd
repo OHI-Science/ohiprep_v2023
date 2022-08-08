@@ -54,13 +54,14 @@ Harmonised, representative data on the state of biological invasions remain inad
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, eval = FALSE, echo = TRUE)
 
 if (!require(librarian)){install.packages("librarian")}
+if (!require(ohicore)){devtools::install_github('ohi-science/ohicore@dev')}
 
 librarian::shelf(
   tidyverse,
   here,
   janitor,
   # plotly,
-  # sf,
+  sf,
   # fasterize,
   # terra,
   # raster,
@@ -70,7 +71,8 @@ librarian::shelf(
   # htmltools,
   # purrr, 
   # rgbif,
-  countrycode
+  countrycode,
+  ohicore
 ) 
 ### directory paths and relevant files
 current_year <- 2022
@@ -85,6 +87,8 @@ data_year <- paste0("d", current_year)
 ### PC
 dir_here  <- here::here()
 ```
+
+## Download the data
 
 ```{bash}
 mkdir /c/Users/Cullen/Desktop/GitHub/OHI/prs_alien/v2022/data && cd $_
@@ -104,12 +108,18 @@ done
 rm *.zip
 ```
 
+## Clean raw data
+
+Read in country codes from the `countrycode` package.
+
 ```{r}
 codes <- countrycode::codelist %>% 
   janitor::clean_names() %>% 
-  dplyr::select(country_name_en, country_code = iso2c) %>% 
+  dplyr::select(country = country_name_en, country_code = iso2c) %>% 
   tidyr::drop_na()
 ```
+
+Loop through the raw data files and join them into one large file. 
 
 ```{r}
 files <- list.files("data", full.names = T)
@@ -122,6 +132,7 @@ for (file in files) {
 }
 ```
 
+Make the data consistent and tidy. 
 
 ```{r}
 df <- output %>%
@@ -143,41 +154,262 @@ df <- output %>%
     habitat = str_replace_all(habitat, "freshhwater\\|brackish\\|marine", "marine\\|freshwater\\|brackish"),
     habitat = str_replace_all(habitat, "freshwater\\|brackish\\|marine", "marine\\|freshwater\\|brackish"),
     habitat = str_replace_all(habitat, "freshwater\\|brackish", "brackish\\|freshwater"),
+    establishment_means = case_when(establishment_means == "Present" ~ occurrence_status, T ~ establishment_means),
+    establishment_means = tolower(establishment_means),
+    establishment_means = str_replace_all(establishment_means, "/", "|"),
+    establishment_means = str_replace_all(establishment_means, "uncerain", "uncertain"),
+    establishment_means = str_replace_all(establishment_means, "cryptogenic\\|", ""),
+    establishment_means = str_replace_all(establishment_means, "native\\|", ""),
+    establishment_means = replace_na(establishment_means, "uncertain"),
     is_invasive = tolower(is_invasive),
-    is_invasive = str_replace_all(is_invasive, "null", as.character(FALSE)),
-    is_invasive = str_replace_all(is_invasive, "false", as.character(FALSE)),
-    is_invasive = str_replace_all(is_invasive, "to be evaluated", as.character(FALSE)),
-    is_invasive = replace_na(is_invasive, as.character(FALSE)),
-    is_invasive = str_replace_all(is_invasive, "yes", as.character(TRUE)),
-    is_invasive = str_replace_all(is_invasive, "invasive", as.character(TRUE)),
+    is_invasive = str_replace_all(is_invasive, "null", "0"),
+    is_invasive = str_replace_all(is_invasive, "false", "0"),
+    is_invasive = str_replace_all(is_invasive, "to be evaluated", "0"),
+    is_invasive = replace_na(is_invasive, "0"),
+    is_invasive = str_replace_all(is_invasive, "yes", "1"),
+    is_invasive = str_replace_all(is_invasive, "invasive", "1"),
+    is_invasive = as.numeric(is_invasive),
     country_code = toupper(country_code),
     country_code = case_when(location_id == "Namibia" ~ "NA", T ~ country_code),
-    country_name_en = case_when(
-      is.na(country_name_en) & !is.na(location_id)~ location_id,
+    country = str_replace_all(country, "St. Lucia", "Saint Lucia"),
+    country = str_replace_all(country, "&", "and"),
+    country = str_replace_all(country, "Congo - Kinshasa", "Democratic Republic of the Congo"),
+    country = str_replace_all(country, "Côte d’Ivoire", "	Ivory Coast"),
+    country = str_replace_all(country, "Curaçao", "Curacao"),
+    country = str_replace_all(country, "Myanmar \\(Burma\\)", "Myanmar"),
+    country = str_replace_all(country, "Saint Martin \\(French part\\)", "Northern Saint-Martin"),
+    country = str_replace_all(country, "São Tomé and Príncipe", "Sao Tome and Principe"),
+    country = str_replace_all(country, "St. Vincent and Grenadines", "Saint Vincent and the Grenadines"),
+    country = str_replace_all(country, "Svalbard & Jan Mayen", "Jan Mayen"),
+    country = case_when(
+      country_code == "EC-W" ~ "Ecuador", # NEEDS to be first
+      is.na(country) & !is.na(location_id) ~ location_id,
       country_code == "BQ-BO" ~ "Bonaire",
       country_code == "BQ-SE" ~ "Sint Eustatius",
       country_code == "BQ-SA" ~ "Saba",
       country_code == "FM-PNI" ~ "Micronesia",
       country_code == "FM-TRK" ~ "Micronesia",
       country_code == "YE-SU" ~ "Yemen",
-      T ~ country_name_en
-      )
-    ) %>% 
-  dplyr::filter(
-    !habitat %in% c(
-      "terrestrial", "freshwater","terrestrial|freshwater", "freshwater|terrestrial", "host", NA),
-    !is.na(country_code))
+      T ~ country)) %>% 
+  dplyr::filter(!habitat %in% c("terrestrial", "freshwater", "terrestrial|freshwater", "freshwater|terrestrial", "host", NA)) %>% 
+  dplyr::select(-c(location_id, country_code))
+
 ```
 
-
+## Match countries to OHI regions
 
 ```{r}
-# Weighted average 10/90 for now
-# re-scale to between 0 and 1 by dividing by global average
+# region_data() ## load rgns_eez from common.R
+rgns_eez <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv")
+
+rgns <- rgns_eez %>% 
+  dplyr::select(rgn_id, rgn_name)
 ```
 
+```{r}
+df_ohi <- ohicore::name_2_rgn(df_in = df)
+
+# v2022
+# These data were removed for not having any match in the lookup tables:
+# French Southern Territories (will be split up later)   North Macedonia (landlocked)   St. Barthélemy (IDK lol)
+```
+
+Break up French Southern Territories into 8 regions and Kiribati into 2, each repeating the data of the larger region. 
+
+```{r}
+### Report these regions at higher spatial resolution:
+country_split_data <- dplyr::tibble(
+  country = c(
+    rep("French Southern Territories", 8),
+    rep("Kiribati", 3)), 
+  region = c(
+    'Glorioso Islands', 'Juan de Nova Island', 'Bassas da India', 
+    'Ile Europa', 'Ile Tromelin', 'Crozet Islands',
+    'Amsterdam Island and Saint Paul Island', 'Kerguelen Islands',
+    "Line Islands (Kiribati)", "Phoenix Islands (Kiribati)", "Gilbert Islands (Kiribati)")) %>%
+  dplyr::left_join(df) %>%
+  dplyr::select(-country) %>%
+  dplyr::rename(country = region) %>% 
+  dplyr::left_join(rgns, by = c('country' = 'rgn_name')) %>% 
+  dplyr::mutate(rgn_name = country)
+```
+
+Bind French Southern Territories and kiribati back to the full dataset. 
+
+```{r}
+alien_sp_df <- rbind(df_ohi, country_split_data) %>%
+  dplyr::select(-country) %>% 
+  dplyr::filter(rgn_name != 'Kiribati') %>% 
+  dplyr::distinct()
+```
+
+Summarize the number of alien/invasive species to each region. 
+
+```{r}
+alien_sp_summary <- alien_sp_df %>% 
+  dplyr::group_by(rgn_id, rgn_name) %>% 
+  dplyr::summarise(spp_count = n(),
+                   invasive_count = sum(is_invasive))
+```
+
+Fill missing regions with NA values.
+
+```{r}
+alien_sp_summary %>% 
+  dplyr::full_join(rgns) ->
+  alien_sp_summary
+```
+
+## Gapfilling
+
+Gapfill region values from the regional average
+
+### Step 1
+
+First try "intermediate regions" (i.e. Caribbean countries filled with Caribbean islands mean).
+
+```{r, eval = F}
+gf_step_1 <- alien_sp_summary %>% 
+  dplyr::mutate(
+    score = dplyr::case_when(
+      is.na(score) ~ score_intermediate,
+      TRUE ~ score),
+    gapfilled = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
+      TRUE ~ gapfilled),
+    method = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ "Used intermediate region score", 
+      TRUE ~ method)
+    )
+```
+
+### Step 2
+
+Then try "sub regions" (i.e. "Southern Europe", "Western Asia")
+
+```{r eval = F}
+gf_step_2 <- gf_step_1 %>% 
+  dplyr::mutate(
+    score = dplyr::case_when(
+      is.na(score) ~ score_sub,
+      TRUE ~ score),
+    gapfilled = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
+      TRUE ~ gapfilled),
+    method = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ "Used sub-region score", 
+      TRUE ~ method))
+```
+
+### Step 3
+
+Finally try continental regions (i.e. "Europe", "Asia")   
 
 
+```{r eval = F}
+gf_step_3 <- gf_step_2 %>% 
+  dplyr::mutate(
+    score = dplyr::case_when(
+      is.na(score) ~ score_regional,
+      TRUE ~ score),
+    gapfilled = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
+      TRUE ~ gapfilled),
+    method = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ "Used region score", 
+      TRUE ~ method))
+```
 
+### Step 4
 
+If there remain any that can't be gapfilled in one of the regions, gapfill with the world score
 
+__Note:__ d. Is an aggressive strategy but also an unlikely scenario that will ensure complete data
+
+```{r eval = F}
+world_score = gf_step_4c_df %>%  
+  dplyr::summarise(score = mean(score, na.rm = TRUE) / 2) %>% 
+  dplyr::pull(score) %>% 
+  round(digits = 1) * 2
+
+gf_step_4d_df <- gf_step_4c_df %>% 
+  dplyr::mutate(
+    score = dplyr::case_when(
+      is.na(score) ~ world_score,
+      TRUE ~ score),
+    gapfilled = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
+      TRUE ~ gapfilled),
+    method = dplyr::case_when(
+      has_data == 0 & !is.na(score) & is.na(method) ~ "Used world score", 
+      TRUE ~ method))
+## v2022 this did not fill anything (already done by step 4.c)
+```
+
+## Save the prepped data
+
+```{r, eval = F}
+final_gf_df <- gf_step_4d_df %>%
+  dplyr::select(rgn_id, year = time_detail, value = score,
+                completeness_pre_gf = data_completeness, gapfilled, method)
+
+## save gapfilling flag dataset
+final_gf_flags <- final_gf_df %>%
+  dplyr::select(-value) %>%
+  readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao_gf.csv"))
+
+## save value dataset
+final_data <- final_gf_df %>%
+  dplyr::select(rgn_id, year, value) %>% 
+  readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao.csv"))
+```
+
+## Datacheck
+
+Lets compare to last years AO data. 
+
+```{r, eval = F}
+## This section is checking if we get the same values as last years assesment 
+## This is primarily to see how the gapfilling changed the data that matches 
+## from this assessment to last years assessment 
+version_year_new <- paste0("v", current_year - 0 )
+version_year_old <- paste0("v", current_year - 1 )
+
+region_data()
+
+new_data <- here::here("globalprep", "ao", version_year_new, "output", "sdg_14_b_1_ao.csv") %>% 
+  readr::read_csv() %>%
+  dplyr::left_join(rgns_eez)
+
+old_data <- here::here("globalprep", "ao", version_year_old, "output", "sdg_14_b_1_ao.csv") %>% 
+  readr::read_csv() %>%
+  dplyr::left_join(rgns_eez)
+
+compare <- new_data %>%
+  dplyr::filter(year < current_year) %>%
+  dplyr::left_join(old_data, by = c("rgn_id", "year", "rgn_name", "admin_country_name"), 
+            suffix = c(paste0("_", version_year_new), paste0("_", version_year_old))) %>%
+  dplyr::mutate(difference = !!rlang::sym(paste0("value_", version_year_old)) - !!rlang::sym(paste0("value_", version_year_new)))
+
+compare_diff <- compare %>% 
+  dplyr::filter(difference != 0) %>% 
+  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2021, value_v2022, difference)
+
+plot_diff <- 
+  ggplot2::ggplot(
+    compare, 
+    ggplot2::aes(x = !!rlang::sym(paste0("value_", version_year_old)), 
+        y = !!rlang::sym(paste0("value_", version_year_new)),
+        color = as.factor(year),
+        text = rgn_name,
+        label = rgn_id), color = "black") +
+  ggplot2::geom_jitter(width = 0.025, height = .025) +
+  ggplot2::geom_abline() +
+  ggplot2::labs(title = paste0("SDG 14.b.1 values (", version_year_old, " vs. ", version_year_new, ")"), 
+       x = paste(version_year_old, "values"), 
+       y = paste(version_year_new, "values"), 
+       color = "Data year") +
+  ggplot2::theme_bw() 
+
+plotly::ggplotly(plot_diff, tooltip = c("as.factor(year)", "rgn_id", "rgn_name", "x", "y"))
+```
