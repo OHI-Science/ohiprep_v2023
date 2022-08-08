@@ -1,0 +1,183 @@
+---
+title: "OHI `r format(Sys.Date(), '%Y')` - saltmarsh trend"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+  pdf_document:
+    toc: true
+---
+
+# Summary
+
+This script generates the pressure incurred from invasive species for each OHI region. 
+
+## Updates from previous assessment
+
+2022 - Updating the data with new dataset!
+
+***
+
+## Data Source 
+
+**Reference**: Pagad, S., Genovesi, P., Carnevali, L. et al. Introducing the Global Register of Introduced and Invasive Species. Sci Data 5, 170202 (2018). https://doi.org/10.1038/sdata.2017.202
+
+**Downloaded**: 2022-08-04
+
+**Description**:  
+Harmonised, representative data on the state of biological invasions remain inadequate at country and global scales, particularly for taxa that affect biodiversity and ecosystems. Information is not readily available in a form suitable for policy and reporting. The Global Register of Introduced and Invasive Species (GRIIS) provides the first country-wise checklists of introduced (naturalised) and invasive species. GRIIS was conceived to provide a sustainable platform for information delivery to support national governments. We outline the rationale and methods underpinning GRIIS, to facilitate transparent, repeatable analysis and reporting. Twenty country checklists are presented as exemplars; GRIIS Checklists for close to all countries globally will be submitted through the same process shortly. Over 11000 species records are currently in the 20 country exemplars alone, with environmental impact evidence for just over 20% of these. GRIIS provides significant support for countries to identify and prioritise invasive alien species, and establishes national and global baselines. In future this will enable a global system for sustainable monitoring of trends in biological invasions that affect the environment.
+
+**Time range**: 1999-2019
+
+**Download link**: 
+????
+
+**Variables**:
+- ???
+
+***
+
+# Methods
+
+## Overview
+
+1. saaaaa
+
+## Setup
+
+``` {r setup, eval = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, eval = FALSE, echo = TRUE)
+
+if (!require(librarian)){install.packages("librarian")}
+
+librarian::shelf(
+  tidyverse,
+  here,
+  janitor,
+  # plotly,
+  # sf,
+  # fasterize,
+  # terra,
+  # raster,
+  # tictoc,
+  # foreach,
+  # doParallel,
+  # htmltools,
+  # purrr, 
+  # rgbif,
+  countrycode
+) 
+### directory paths and relevant files
+current_year <- 2022
+version_year <- paste0("v", current_year)
+data_year <- paste0("d", current_year)
+# source(here::here('workflow', 'R', 'common.R'))
+
+### Mazu
+# dir_here  <- here::here('globalprep', 'hab_saltmarsh', version_year)
+# dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
+
+### PC
+dir_here  <- here::here()
+```
+
+```{bash}
+mkdir /c/Users/Cullen/Desktop/GitHub/OHI/prs_alien/v2022/data && cd $_
+
+wget --recursive --no-parent --level 1 --accept zip http://griis.org/download
+
+mv griis.org/assets/checklists/*.zip .
+
+rm -r griis.org
+
+for FILE in *; do 
+  echo $FILE 
+  unzip $FILE 
+  rm *.txt
+done 
+
+rm *.zip
+```
+
+```{r}
+codes <- countrycode::codelist %>% 
+  janitor::clean_names() %>% 
+  dplyr::select(country_name_en, country_code = iso2c) %>% 
+  tidyr::drop_na()
+```
+
+```{r}
+files <- list.files("data", full.names = T)
+
+output <- tibble("id" = character())
+
+for (file in files) {
+  tmp <- read_csv(file, col_types = cols(.default = "c")) 
+  output <- full_join(output, tmp)
+}
+```
+
+
+```{r}
+df <- output %>%
+  janitor::clean_names() %>% 
+  dplyr::select(
+    id, taxon_id, scientific_name,kingdom, phylum, class, order, 
+    family, taxon_rank, taxonomic_status, is_invasive, habitat,
+    location_id, country_code, occurrence_status, establishment_means) %>% 
+  dplyr::left_join(codes) %>% 
+  dplyr::mutate(
+    habitat = tolower(habitat),
+    habitat = str_replace_all(habitat, "/", "|"),
+    habitat = str_replace_all(habitat, "terrestriali", "terrestrial\\|"),
+    habitat = str_replace_all(habitat, "terrestrial,", "terrestrial"),
+    habitat = str_replace_all(habitat, "freshwatetr", "freshwater"),
+    habitat = str_replace_all(habitat, "terrestrial \\|freshwater \\|brackish", "terrestrial\\|freshwater\\|brackish"),
+    habitat = str_replace_all(habitat, "freshwater\\|marine", "marine\\|freshwater"),
+    habitat = str_replace_all(habitat, "brackish\\|marine\\|freshwater", "marine\\|freshwater\\|brackish"),
+    habitat = str_replace_all(habitat, "freshhwater\\|brackish\\|marine", "marine\\|freshwater\\|brackish"),
+    habitat = str_replace_all(habitat, "freshwater\\|brackish\\|marine", "marine\\|freshwater\\|brackish"),
+    habitat = str_replace_all(habitat, "freshwater\\|brackish", "brackish\\|freshwater"),
+    is_invasive = tolower(is_invasive),
+    is_invasive = str_replace_all(is_invasive, "null", as.character(FALSE)),
+    is_invasive = str_replace_all(is_invasive, "false", as.character(FALSE)),
+    is_invasive = str_replace_all(is_invasive, "to be evaluated", as.character(FALSE)),
+    is_invasive = replace_na(is_invasive, as.character(FALSE)),
+    is_invasive = str_replace_all(is_invasive, "yes", as.character(TRUE)),
+    is_invasive = str_replace_all(is_invasive, "invasive", as.character(TRUE)),
+    country_code = toupper(country_code),
+    country_code = case_when(location_id == "Namibia" ~ "NA", T ~ country_code),
+    country_name_en = case_when(
+      is.na(country_name_en) & !is.na(location_id)~ location_id,
+      country_code == "BQ-BO" ~ "Bonaire",
+      country_code == "BQ-SE" ~ "Sint Eustatius",
+      country_code == "BQ-SA" ~ "Saba",
+      country_code == "FM-PNI" ~ "Micronesia",
+      country_code == "FM-TRK" ~ "Micronesia",
+      country_code == "YE-SU" ~ "Yemen",
+      T ~ country_name_en
+      )
+    ) %>% 
+  dplyr::filter(
+    !habitat %in% c(
+      "terrestrial", "freshwater","terrestrial|freshwater", "freshwater|terrestrial", "host", NA),
+    !is.na(country_code))
+```
+
+
+
+```{r}
+# Weighted average 10/90 for now
+# re-scale to between 0 and 1 by dividing by global average
+```
+
+
+
+
+
+
