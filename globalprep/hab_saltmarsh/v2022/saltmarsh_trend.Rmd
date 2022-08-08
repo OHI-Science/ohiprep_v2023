@@ -1,5 +1,5 @@
 ---
-title: "OHI `r format(Sys.Date(), '%Y')` - saltmarsh extent"
+title: "OHI `r format(Sys.Date(), '%Y')` - saltmarsh trend"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -15,14 +15,14 @@ output:
 
 # Summary
 
-This script generates the extent of saltmarsh for each OHI region. 
-
+This script generates the trend of saltmarsh for each OHI region. 
 
 ## Updates from previous assessment
 
 2022 - Updating the data with new dataset!
 
 ***
+
 ## Data Source 
 
 **Reference**: Murray, N.J., Worthington, T.A., Bunting, P., Duce, S., Hagger, V., Lovelock, C.E., Lucas, R., Saunders, M.I., Sheaves, M., Spalding, M., Waltham, N.J., Lyons, M.B., 2022. High-resolution mapping of losses and gains of Earth's tidal wetlands. Science. doi:10.1126/science.abm9583
@@ -42,23 +42,25 @@ See also [UQ/murray/Intertidal/v1_1/global_intertidal](https://developers.google
 
 **Download link**: https://www.globalintertidalchange.org/data-usage use `gsutil -m cp "gs://gic-archive/gic-2019-v1-0/v1-0-1/*.tif" "PATH-TO-LOCAL-FOLDER"`
 
+- **Note**: Download should only be done once, either in this script or `saltmarsh_extent.Rmd`
+
 **Variables**:
-- gain/loss:
+- `gain` and `loss`:
   - 0 = no change
   - 1 = gain or loss in respective layers
 
-- gainType/lossType:
+- `gainType` and `lossType`:
   - 2 - Tidal flat
   - 3 - Mangrove
   - 5 - Tidal marsh
 
-- gainYear/lossYear
+- `gainYear` and `lossYear`
   - 19 = 2017-2019
   - 16 = 2014-2016 
   - etc
 
-- raster shards use a hash that represents extent
-  - `0000000000-0000000000` represents the same extent for gain, loss, gainType, lossType, gainYear, and lossYear
+- raster shards use a hash that represents spatial extent
+  - `0000000000-0000000000` represents the same spatial extent for `gain`, `loss`, `gainType`, `lossType`, `gainYear`, and `lossYear`
   - Not human readable but we can use this to loop over areas for our calculations
 
 ***
@@ -111,6 +113,8 @@ See also [UQ/murray/Intertidal/v1_1/global_intertidal](https://developers.google
     - left with a difference for each country
     - write the results as a `.csv` in the output directory
     - left with a gain or loss for each country
+    
+8. Use extent to calculate final trend...
 
 ## Setup
 
