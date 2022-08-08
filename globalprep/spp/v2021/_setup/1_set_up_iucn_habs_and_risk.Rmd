@@ -150,7 +150,7 @@ if(!file.exists(spp_habs_from_api_file) | reload) {
   
 
   
-  for(j in 234:n_chunks) { 
+  for(j in 1:n_chunks) { 
     
     options(timeout = 5000000)  
     ###j <- 518 ##234 didnt work... retry, chunk 58000 or something
