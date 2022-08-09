@@ -96,7 +96,7 @@ if(!file.exists(trends_file)) {
   chunk_size <- 250 ## pick a chunk size
   n_chunks <- ceiling(length(spp_ids_valid)/chunk_size)
   
-  for(j in 11:n_chunks) { 
+  for(j in 1:n_chunks) { 
     
     options(timeout = 5000000)  
     ###j <- 10 : 10 not working

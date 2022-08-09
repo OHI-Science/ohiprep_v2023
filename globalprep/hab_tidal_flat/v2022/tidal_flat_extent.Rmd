@@ -15,7 +15,7 @@ output:
 
 # Summary
 
-This script generates the extent of tidal flat extent for each OHI region. 
+This script generates the tidal flat extent for each OHI region. 
 
 
 ## Updates from previous assessment
@@ -259,31 +259,31 @@ tictoc::toc()
 The second step takes the 9 files per group and mosaics those parts together.
 
 ```{r}
-tictoc::tic()
-
-registerDoParallel(3)
-
-folders <- here::here(dir_data, "int", "tidal_flat_partial_mosaic") %>% 
-  list.files()
-
-foreach (dir = folders) %dopar% { 
-  
-  files <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir) %>% 
-    list.files(full.names = T)
-  
-  file_name <- paste0(dir_data, "/output/tidal_flat_extent/", dir, "_tidal_flat_down_sample_mosaic.tif")
-  
-  if(!file.exists(file_name)){
-    
-    img_sprc <- terra::sprc(lapply(files, terra::rast))
-    
-    raster_mos <- terra::merge(
-      img_sprc,
-      filename = file_name
-    )
-  } else {cat(paste0(file_name, " already exists!\n"))}
-}
-tictoc::toc()
+# tictoc::tic()
+# 
+# registerDoParallel(3)
+# 
+# folders <- here::here(dir_data, "int", "tidal_flat_partial_mosaic") %>% 
+#   list.files()
+# 
+# foreach (dir = folders) %dopar% { 
+#   
+#   files <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir) %>% 
+#     list.files(full.names = T)
+#   
+#   file_name <- paste0(dir_data, "/output/tidal_flat_extent/", dir, "_tidal_flat_down_sample_mosaic.tif")
+#   
+#   if(!file.exists(file_name)){
+#     
+#     img_sprc <- terra::sprc(lapply(files, terra::rast))
+#     
+#     raster_mos <- terra::merge(
+#       img_sprc,
+#       filename = file_name
+#     )
+#   } else {cat(paste0(file_name, " already exists!\n"))}
+# }
+# tictoc::toc()
 ```
 
 ## Summarize the grid cells within each country
@@ -313,7 +313,7 @@ folders <- here::here(dir_data, "int", "tidal_flat_partial_mosaic") %>%
 
 # foreach (dir = folders) %dopar% { 
 
-for (dir in folders) { 
+for (dir in folders[7]) { 
   
   files <- here::here(dir_data, "int", "tidal_flat_partial_mosaic", dir, 'mosaics') %>% 
     list.files(full.names = T)
