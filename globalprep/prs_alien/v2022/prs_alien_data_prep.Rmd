@@ -60,8 +60,8 @@ librarian::shelf(
   tidyverse,
   here,
   janitor,
-  # plotly,
   sf,
+  # plotly,
   # fasterize,
   # terra,
   # raster,
@@ -86,12 +86,15 @@ data_year <- paste0("d", current_year)
 
 ### PC
 dir_here  <- here::here()
+
+# rgns <- ohicore::georegion_labels # Kiribati is broke v2022
+rgns <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2017/output/georegion_labels.csv")
 ```
 
 ## Download the data
 
 ```{bash}
-mkdir /c/Users/Cullen/Desktop/GitHub/OHI/prs_alien/v2022/data && cd $_
+mkdir /c/Users/Cullen/Desktop/GitHub/OHI/prs_alien/v2022/raw && cd $_
 
 wget --recursive --no-parent --level 1 --accept zip http://griis.org/download
 
@@ -122,7 +125,7 @@ codes <- countrycode::codelist %>%
 Loop through the raw data files and join them into one large file. 
 
 ```{r}
-files <- list.files("data", full.names = T)
+files <- list.files("raw", full.names = T)
 
 output <- tibble("id" = character())
 
@@ -192,19 +195,13 @@ df <- output %>%
       country_code == "YE-SU" ~ "Yemen",
       T ~ country)) %>% 
   dplyr::filter(!habitat %in% c("terrestrial", "freshwater", "terrestrial|freshwater", "freshwater|terrestrial", "host", NA)) %>% 
-  dplyr::select(-c(location_id, country_code))
-
+  dplyr::select(-c(location_id)) %>% 
+  dplyr::left_join(rgns, by = c('country' = 'rgn_label')) %>% 
+  dplyr::select(-rgn_id)
 ```
 
 ## Match countries to OHI regions
 
-```{r}
-# region_data() ## load rgns_eez from common.R
-rgns_eez <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv")
-
-rgns <- rgns_eez %>% 
-  dplyr::select(rgn_id, rgn_name)
-```
 
 ```{r}
 df_ohi <- ohicore::name_2_rgn(df_in = df)
@@ -218,20 +215,23 @@ Break up French Southern Territories into 8 regions and Kiribati into 2, each re
 
 ```{r}
 ### Report these regions at higher spatial resolution:
-country_split_data <- dplyr::tibble(
-  country = c(
-    rep("French Southern Territories", 8),
-    rep("Kiribati", 3)), 
-  region = c(
+french_territories <- c(
     'Glorioso Islands', 'Juan de Nova Island', 'Bassas da India', 
     'Ile Europa', 'Ile Tromelin', 'Crozet Islands',
-    'Amsterdam Island and Saint Paul Island', 'Kerguelen Islands',
-    "Line Islands (Kiribati)", "Phoenix Islands (Kiribati)", "Gilbert Islands (Kiribati)")) %>%
+    'Amsterdam Island and Saint Paul Island', 'Kerguelen Islands')
+
+kiribati <- c(
+  "Line Islands (Kiribati)", "Phoenix Islands (Kiribati)", "Gilbert Islands (Kiribati)")
+
+country_split_data <- dplyr::tibble(
+  country = c(rep("French Southern Territories", 8),
+              rep("Kiribati", 3)), 
+  region = c(french_territories, kiribati)) %>%
   dplyr::left_join(df) %>%
-  dplyr::select(-country) %>%
+  dplyr::select(-c(country, r0_label, r1_label, r2_label)) %>%
   dplyr::rename(country = region) %>% 
-  dplyr::left_join(rgns, by = c('country' = 'rgn_name')) %>% 
-  dplyr::mutate(rgn_name = country)
+  dplyr::left_join(rgns, by = c('country' = 'rgn_label')) %>% 
+  dplyr::mutate(rgn_name = country) 
 ```
 
 Bind French Southern Territories and kiribati back to the full dataset. 
@@ -243,139 +243,124 @@ alien_sp_df <- rbind(df_ohi, country_split_data) %>%
   dplyr::distinct()
 ```
 
-Summarize the number of alien/invasive species to each region. 
+Summarize the number of alien/invasive species to each region and fill missing regions with NA values. 
 
 ```{r}
 alien_sp_summary <- alien_sp_df %>% 
-  dplyr::group_by(rgn_id, rgn_name) %>% 
-  dplyr::summarise(spp_count = n(),
-                   invasive_count = sum(is_invasive))
-```
-
-Fill missing regions with NA values.
-
-```{r}
-alien_sp_summary %>% 
-  dplyr::full_join(rgns) ->
-  alien_sp_summary
+  dplyr::group_by(rgn_id, rgn_name) %>%
+  dplyr::mutate() %>% 
+  dplyr::summarise(spp_count = n() - sum(is_invasive),
+                   invasive_count = sum(is_invasive)) %>% 
+  dplyr::full_join(rgns, by = c("rgn_id", 'rgn_name' = 'rgn_label')) %>% 
+  dplyr::ungroup() 
 ```
 
 ## Gapfilling
 
-Gapfill region values from the regional average
+Gapfill values from regional averages.
 
 ### Step 1
 
-First try "intermediate regions" (i.e. Caribbean countries filled with Caribbean islands mean).
+First try "r2 regions" (i.e. Caribbean countries filled with Caribbean islands mean).
 
 ```{r, eval = F}
 gf_step_1 <- alien_sp_summary %>% 
   dplyr::mutate(
-    score = dplyr::case_when(
-      is.na(score) ~ score_intermediate,
-      TRUE ~ score),
-    gapfilled = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
-      TRUE ~ gapfilled),
-    method = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ "Used intermediate region score", 
-      TRUE ~ method)
-    )
+    r0_spp = mean(spp_count, na.rm = T),
+    r0_inv = mean(invasive_count, na.rm = T)) %>% 
+  dplyr::group_by(r1_label) %>% 
+  dplyr::mutate(
+    r1_spp = mean(spp_count, na.rm = T),
+    r1_inv = mean(invasive_count, na.rm = T)) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::group_by(r2_label) %>% 
+  dplyr::mutate(
+    r2_spp = mean(spp_count, na.rm = T),
+    r2_inv = mean(invasive_count, na.rm = T)) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    has_data       = ifelse(is.na(spp_count), 0, 1),
+    gapfilled      = ifelse(is.na(spp_count), NA, "no"),
+    method         = ifelse(is.na(spp_count), NA, "not gapfilled"),
+    spp_count      = ifelse(is.na(spp_count), r2_spp, spp_count),
+    invasive_count = ifelse(is.na(invasive_count), r2_inv, invasive_count),
+    gapfilled      = ifelse(has_data == 0 & !is.na(spp_count), "yes", gapfilled),
+    method         = ifelse(has_data == 0 & !is.na(spp_count), "used r2 average", method))
 ```
+
+In v2022, everything was filled with step 1. Step 2 and 3 were written just in case step 1 stops filling everything. 
 
 ### Step 2
 
-Then try "sub regions" (i.e. "Southern Europe", "Western Asia")
+Then try "r1 regions" (i.e. "Oceania" or "Asia").
 
 ```{r eval = F}
 gf_step_2 <- gf_step_1 %>% 
   dplyr::mutate(
-    score = dplyr::case_when(
-      is.na(score) ~ score_sub,
-      TRUE ~ score),
-    gapfilled = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
-      TRUE ~ gapfilled),
-    method = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ "Used sub-region score", 
-      TRUE ~ method))
+    spp_count      = ifelse(is.na(spp_count), r1_spp, spp_count),
+    invasive_count = ifelse(is.na(invasive_count), r1_inv, invasive_count),
+    gapfilled      = ifelse(has_data == 0 & !is.na(spp_count) & is.na(gapfilled), "yes", gapfilled),
+    method         = ifelse(has_data == 0 & !is.na(spp_count) & is.na(method), "used r1 average", method))
 ```
 
 ### Step 3
 
-Finally try continental regions (i.e. "Europe", "Asia")   
+If there remain any that can't be gapfilled in one of the regions, gapfill with the world score.
 
+__Note:__ This is an aggressive strategy but also an unlikely scenario that will ensure complete data
 
 ```{r eval = F}
 gf_step_3 <- gf_step_2 %>% 
   dplyr::mutate(
-    score = dplyr::case_when(
-      is.na(score) ~ score_regional,
-      TRUE ~ score),
-    gapfilled = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
-      TRUE ~ gapfilled),
-    method = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ "Used region score", 
-      TRUE ~ method))
+    spp_count      = ifelse(is.na(spp_count), r0_spp, spp_count),
+    invasive_count = ifelse(is.na(invasive_count), r0_inv, invasive_count),
+    gapfilled      = ifelse(has_data == 0 & !is.na(spp_count) & is.na(gapfilled), "yes", gapfilled),
+    method         = ifelse(has_data == 0 & !is.na(spp_count) & is.na(method), "used r0 average", method),
+    year = 2022)
 ```
 
-### Step 4
+## Calculate the pressure
 
-If there remain any that can't be gapfilled in one of the regions, gapfill with the world score
+```{r}
+min_spp_count <- min(gf_step_3$spp_count)
+min_inv_count <- min(gf_step_3$invasive_count)
 
-__Note:__ d. Is an aggressive strategy but also an unlikely scenario that will ensure complete data
+max_spp_count <- max(gf_step_3$spp_count)
+max_inv_count <- max(gf_step_3$invasive_count)
 
-```{r eval = F}
-world_score = gf_step_4c_df %>%  
-  dplyr::summarise(score = mean(score, na.rm = TRUE) / 2) %>% 
-  dplyr::pull(score) %>% 
-  round(digits = 1) * 2
+spp_weight <- 0.1
+inv_weight <- 0.9
 
-gf_step_4d_df <- gf_step_4c_df %>% 
-  dplyr::mutate(
-    score = dplyr::case_when(
-      is.na(score) ~ world_score,
-      TRUE ~ score),
-    gapfilled = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ 1,
-      TRUE ~ gapfilled),
-    method = dplyr::case_when(
-      has_data == 0 & !is.na(score) & is.na(method) ~ "Used world score", 
-      TRUE ~ method))
-## v2022 this did not fill anything (already done by step 4.c)
+pressure <- gf_step_3 %>% 
+  dplyr::group_by(rgn_id, rgn_name, year) %>% 
+  dplyr::summarise(
+    value = (((spp_count-min_spp_count)/(max_spp_count-min_spp_count)) * spp_weight) + 
+      (((invasive_count-min_inv_count)/(max_inv_count-min_inv_count)) * inv_weight)) %>% 
+  dplyr::ungroup()
 ```
 
 ## Save the prepped data
 
 ```{r, eval = F}
-final_gf_df <- gf_step_4d_df %>%
-  dplyr::select(rgn_id, year = time_detail, value = score,
-                completeness_pre_gf = data_completeness, gapfilled, method)
-
 ## save gapfilling flag dataset
-final_gf_flags <- final_gf_df %>%
-  dplyr::select(-value) %>%
-  readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao_gf.csv"))
+gf_step_3 %>%
+  dplyr::select(rgn_id, rgn_name, year, gapfilled, method) %>%
+  readr::write_csv("prs_alien_gf.csv")
 
 ## save value dataset
-final_data <- final_gf_df %>%
+pressure %>%
   dplyr::select(rgn_id, year, value) %>% 
-  readr::write_csv(here::here("globalprep", "ao", version_year, "output", "sdg_14_b_1_ao.csv"))
+  # readr::write_csv(here::here("globalprep", "prs_alien", version_year, "output", "prs_alien.csv"))
+  readr::write_csv("prs_alien.csv")
 ```
 
 ## Datacheck
 
-Lets compare to last years AO data. 
+Lets compare to 2013 data. 
 
 ```{r, eval = F}
-## This section is checking if we get the same values as last years assesment 
-## This is primarily to see how the gapfilling changed the data that matches 
-## from this assessment to last years assessment 
 version_year_new <- paste0("v", current_year - 0 )
 version_year_old <- paste0("v", current_year - 1 )
-
-region_data()
 
 new_data <- here::here("globalprep", "ao", version_year_new, "output", "sdg_14_b_1_ao.csv") %>% 
   readr::read_csv() %>%
