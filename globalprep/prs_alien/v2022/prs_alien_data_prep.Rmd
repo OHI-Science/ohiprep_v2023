@@ -61,16 +61,7 @@ librarian::shelf(
   here,
   janitor,
   sf,
-  # plotly,
-  # fasterize,
-  # terra,
-  # raster,
-  # tictoc,
-  # foreach,
-  # doParallel,
-  # htmltools,
-  # purrr, 
-  # rgbif,
+  plotly,
   countrycode,
   ohicore
 ) 
@@ -89,6 +80,10 @@ dir_here  <- here::here()
 
 # rgns <- ohicore::georegion_labels # Kiribati is broke v2022
 rgns <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2017/output/georegion_labels.csv")
+
+rgns_eez <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep_v2022/gh-pages/globalprep/spatial/v2017/output/rgn_labels.csv") %>% 
+  dplyr::filter(type == "eez") %>% 
+  dplyr::select(-type, rgn_name = label)
 ```
 
 ## Download the data
@@ -342,7 +337,7 @@ pressure <- gf_step_3 %>%
 ## Save the prepped data
 
 ```{r, eval = F}
-## save gapfilling flag dataset
+## save gapfilling flags 
 gf_step_3 %>%
   dplyr::select(rgn_id, rgn_name, year, gapfilled, method) %>%
   readr::write_csv("prs_alien_gf.csv")
@@ -359,42 +354,26 @@ pressure %>%
 Lets compare to 2013 data. 
 
 ```{r, eval = F}
-version_year_new <- paste0("v", current_year - 0 )
-version_year_old <- paste0("v", current_year - 1 )
-
-new_data <- here::here("globalprep", "ao", version_year_new, "output", "sdg_14_b_1_ao.csv") %>% 
+new_data <- here::here("prs_alien.csv") %>% 
   readr::read_csv() %>%
   dplyr::left_join(rgns_eez)
 
-old_data <- here::here("globalprep", "ao", version_year_old, "output", "sdg_14_b_1_ao.csv") %>% 
+old_data <- here::here("p_sp_alien_2013a.csv") %>% 
   readr::read_csv() %>%
+  dplyr::rename(value = pressures.score) %>% 
   dplyr::left_join(rgns_eez)
 
 compare <- new_data %>%
-  dplyr::filter(year < current_year) %>%
-  dplyr::left_join(old_data, by = c("rgn_id", "year", "rgn_name", "admin_country_name"), 
-            suffix = c(paste0("_", version_year_new), paste0("_", version_year_old))) %>%
-  dplyr::mutate(difference = !!rlang::sym(paste0("value_", version_year_old)) - !!rlang::sym(paste0("value_", version_year_new)))
-
-compare_diff <- compare %>% 
-  dplyr::filter(difference != 0) %>% 
-  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2021, value_v2022, difference)
+  dplyr::bind_rows(old_data) %>% 
+  tidyr::pivot_wider(names_from = year, values_from = value)
 
 plot_diff <- 
   ggplot2::ggplot(
-    compare, 
-    ggplot2::aes(x = !!rlang::sym(paste0("value_", version_year_old)), 
-        y = !!rlang::sym(paste0("value_", version_year_new)),
-        color = as.factor(year),
-        text = rgn_name,
-        label = rgn_id), color = "black") +
+    compare, ggplot2::aes(x = `2022`, y = `2008`, text = rgn_name, label = rgn_id), color = "black") +
   ggplot2::geom_jitter(width = 0.025, height = .025) +
   ggplot2::geom_abline() +
-  ggplot2::labs(title = paste0("SDG 14.b.1 values (", version_year_old, " vs. ", version_year_new, ")"), 
-       x = paste(version_year_old, "values"), 
-       y = paste(version_year_new, "values"), 
-       color = "Data year") +
+  ggplot2::labs(title = "Invasive species pressure") +
   ggplot2::theme_bw() 
 
-plotly::ggplotly(plot_diff, tooltip = c("as.factor(year)", "rgn_id", "rgn_name", "x", "y"))
+plotly::ggplotly(plot_diff, tooltip = c("rgn_id", "rgn_name", "x", "y"))
 ```
