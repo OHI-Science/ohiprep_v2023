@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Mangrove trend'
+title: 'OHI `r format(Sys.Date(), "%Y")`: Mangrove condition'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -20,26 +20,26 @@ editor_options:
 
 # Summary
 
-We used Global Mangrove Watch mangrove cover data to estimate the proportional yearly change in mangrove area using a linear regression model of the most recent 12 years of data (2005, 2006, 2007, 2010, 2015, 2016) (i.e., slope divided by data from the earliest year included in the regression model). This length of data is longer than we usually do, but we feel we get a better estimate using this period of time. The slope was then multiplied by five to get the predicted change in 5 years. The original mangrove data are provided yearly (1996, 2005, 2006, 2007, 2010, 2015, 2016) within polygons (subsequently rasterized to match our regions, and extracted the area) .
+We used Global Mangrove Watch mangrove cover data to estimate the proportional yearly change in mangrove area using a linear regression model of the most recent 12 years of data (2005, 2006, 2007, 2010, 2015, 2016) (i.e., slope divided by data from the earliest year included in the regression model). This length of data is longer than we usually do, but we feel we get a better estimate using this period of time. The slope was then multiplied by five to get the predicted change in 5 years. The original mangrove data are provided yearly (1996, 2005, 2006, 2007, 2010, 2015, 2016) within polygons (subsequently rasterized to match our regions and extract the area).
 
 ## Updates from previous assessment
-2021: Using a new dataset from global mangrove watch. 
+2022: Using updated dataset from Global Mangrove Watch. 
 
 ***
 ## Data Source 
 
 **Reference**: Bunting, P., Rosenqvist, A., Lucas, R., Rebelo, L.-M., Hilarides, L., Thomas, N., Hardy, A., Itoh, T., Shimada, M., Finlayson, C., 2018. The Global Mangrove Watch—A New 2010 Global Baseline of Mangrove Extent. Remote Sensing 10, 1669. https://doi.org/10.3390/rs10101669
 
-**Downloaded**: 03/09/2021
+**Downloaded**: 08/02/2022
 
 **Description**:  
-Global Mangrove Watch (1996 - 2016)	
+Global Mangrove Watch (1996 - 2020)	
 https://data.unep-wcmc.org/datasets/45
 Reported at spatial cell scale. 
 
 "The GMW aims to provide geospatial information about mangrove extent and changes to the Ramsar Convention, national wetland practitioners, decision makers and NGOs. It is part of the Ramsar Science and Technical Review Panel (STRP) work plan for 2016-2018 and a Pilot Project to the Ramsar Global Wetlands Observation System (GWOS), which is implemented under the GEO-Wetlands Initiative. The primary objective of the GMW has been to provide countries lacking a national mangrove monitoring system with first cut mangrove extent and change maps, to help safeguard against further mangrove forest loss and degradation. The GMW has generated a global baseline map of mangroves for 2010 using ALOS PALSAR and Landsat (optical) data, and changes from this baseline for seven epochs between 1996 and 2017 derived from JERS-1, ALOS and ALOS-2. Annual maps are planned from 2018 and onwards"
 
-**Time range**: 1996-2016
+**Time range**: 1996-2020
 
 
 ***
@@ -48,53 +48,21 @@ Reported at spatial cell scale.
 
 ## Setup
 ``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
-library(readr)      # for read_csv()
-library(raster)
 library(here)
-library(sf)
-library(fasterize)
 library(tidyverse)
-library(mapview)
-library(sp)
-library(rgeos)
+library(ohicore)
+source(here("workflow/R/common.R"))
 
-source(file.path('~/github/ohiprep_v2021/workflow/R/common.R'))
+version_year <- "2022"
 
-goal     <- 'globalprep/hab_mangrove/v2021'
-dir_git  <- file.path('~/github/ohiprep_v2021', goal)
-dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_mangrove'))
-
+dir_hab_mangrove <- here(paste0("globalprep/hab_mangrove/v", version_year))
+dir_fao_mangrove <- file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mangrove")
 region_data()
-
 ```
 
 ```{r, eval = FALSE}
-gmw_ohi_2016 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2016.csv")))
-sum(gmw_ohi_2016$km2) # 136804.3
-
-gmw_ohi_1996 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_1996.csv")))
-sum(gmw_ohi_1996$km2) # 142919.7
-
-gmw_ohi_2007 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2007.csv")))
-sum(gmw_ohi_2007$km2) # 139059.1
-
-gmw_ohi_2008 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2008.csv")))
-sum(gmw_ohi_2008$km2) # 139264.3
-
-gmw_ohi_2009 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2009.csv")))
-sum(gmw_ohi_2009$km2) # 139033.7
-
-gmw_ohi_2010 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2010.csv")))
-sum(gmw_ohi_2010$km2) # 137775.4
-
-gmw_ohi_2015 <- read.csv(file.path(here(dir_git, "int/habitat_extent_mangrove_2015.csv")))
-sum(gmw_ohi_2015$km2) # 136855.9
-
-
-all_mangrove_extent <- rbind(gmw_ohi_1996, gmw_ohi_2007, gmw_ohi_2008, gmw_ohi_2009, gmw_ohi_2010, gmw_ohi_2015, gmw_ohi_2016) %>%
-  filter(rgn_id <= 250) %>%
-  filter(year >1996) %>% ## going to exclude 1996 from trend
-  filter(km2 != 0) # filter out the regions that have no extent and never have (all of them that have at least 1 zero have never had mangrove extent)
+mangrove_extent <- read_csv(file.path(dir_hab_mangrove, "data/habitat_extent_mangrove_updated.csv")) %>% 
+  filter(rgn_id <= 250, year >= 2009)
 
 ```
 
@@ -102,29 +70,55 @@ all_mangrove_extent <- rbind(gmw_ohi_1996, gmw_ohi_2007, gmw_ohi_2008, gmw_ohi_2
 Take an initial look at trend data and compare to old data
 ```{r, eval = FALSE}
 ## look at Benin since it had a large increase mangrove cover between 2010 and 2015 and is an outlier 
-benin <- all_mangrove_extent %>%
+benin <- mangrove_extent %>%
   filter(rgn_id == 99)
+
+## ↓ comments from v2021 ↓
 
 # This accounts for 0.02 km2 of reforestation in Benin: https://www.globalnature.org/en/manatees-mangroves-benin
 # This accounts for 0.3 km2 of reforestation in Benin: https://initiative-mangroves-ffem.com/en/costa-rica-benin-project/
 # This indicates that mangrove cover in Benin has been steadily decreasing: https://link.springer.com/article/10.1007%2Fs10668-017-0075-x
 # I dont trust the benin estimates... it seems that there is a lack of information there. And looking at our FAO mangrove health data, the numbers don't match up either. I will just assign Benin a 0 trend. 
 
+## --
+
+# v2022: the extents for Benin from the latest update (2017 - 2020) appear more reasonable - this assessment we will calculate trend based on 2016 through 2020
+
+# our datasets formerly reported Dominica having 0 extent, but the analysis of the polygons from the latest update now show a small extent. The paper associated with the GMW data (https://zenodo.org/record/6894273) shows Dominica having a consistent small extent (0.01 km2) for all years. Dominica's trend will be based on years after it's extent became non-zero.
 
 
-data_region_trend <-  all_mangrove_extent %>%
+mangrove_extent_rgns <-  mangrove_extent %>%
   left_join(rgns_eez) %>%
   dplyr::select(rgn_id, rgn_name, year, habitat, km2) %>%
+  filter(rgn_id != 99 | (rgn_id == 99 & year >= 2017)) %>% # crop Benin year range
+  filter(rgn_id != 123 | (rgn_id == 123 & year >= 2019)) %>%  # crop Dominica year range
   group_by(rgn_id, rgn_name) %>%
-  mutate(total_area = sum(km2)) %>% 
-  mutate(km2_rel = km2/km2[year==2007]) %>%
-  mutate(km2_rel = ifelse(total_area==0, 0, km2_rel)) %>% 
-  filter(rgn_id != 99) %>%
-  do(mdl = lm(km2_rel ~ year, data=.)) %>%
+  mutate(total_area = sum(km2),
+         km2_rel = km2 / km2[year == min(year)]) %>%
+  mutate(km2_rel = ifelse(total_area == 0, 0, km2_rel))
+
+
+# regression model to be used in pipe sequence below
+trend_function <- function(df) {
+  lm(km2_rel ~ year, data = df) %>% 
+    broom::tidy()
+  }
+
+mangrove_extent_trends <- mangrove_extent_rgns %>% 
+  group_by(rgn_id, rgn_name) %>% 
+  nest() %>% 
+  mutate(model = purrr::map(data, trend_function)) %>% 
+  unnest(cols = c(model)) %>% 
+  filter(term == "year") %>% 
+  dplyr::select(rgn_id, rgn_name, trend = estimate)
+  
+
+
+  plyr::dlply(mdl = lm(km2_rel ~ year, data = .)) %>%
   summarize(rgn_name = rgn_name,
             rgn_id = rgn_id,
             habitat = "mangrove",
-            trend = coef(mdl)['year']*5) %>%
+            trend = coef(mdl)['year'] * 5) %>%
   mutate(trend = round(trend, 6)) %>%
   ungroup()
 
