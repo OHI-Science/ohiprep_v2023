@@ -1,17 +1,86 @@
 ---
-title: "GFW_API"
-output: html_document
+title: "OHI 2022 - Soft bottom pressure data prep"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: false
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
 ---
+
+# Summary
+
+This habitat pressure layer is created from apparent fishing effort data from Global Fishing Watch. The apparent fishing effort contains trawling and dredging data within EEZ's because these types of fishing damage the seabed. GFW apparent fishing effort data does not distinguish between bottom and mid-water trawling, so the trawling data is corrected (subset) to just represent the trawling that is likely to be bottom trawling based on catch data from Watson & Tidd (2018). For this catch data, the total tonnes are calculated for each OHI region and then standardized by area (km^2) soft-bottom habitat in each region.
+
+# Updates from previous assessment
+
+New data source: [Global Fishing Watch API](https://github.com/GlobalFishingWatch/gfwr)
+Processing this new data requires a completely different data prep. Some methods were based on the `OHI-Science/food_systems` approach [here.](https://github.com/OHI-Science/food_systems/tree/master/fisheries/marine/disturbance). Methods were upscaled appropriately and switched from `raster` to `terra`.
+
+***
+
+# Data Sources 
+
+## Global Fishing Watch Apparent Fishing Effort
+
+**Reference**:
+1. Global Fishing Watch. [2022]. www.globalfishingwatch.org
+2. [`gfwr` API](https://github.com/GlobalFishingWatch/gfwr)
+
+**Downloaded**: July 21, 2022
+
+**Description**: API to extract apparent fishing effort within global EEZ's, labeled with geartype and date.
+
+**Native data resolution**: 0.01 degree
+
+**Time range**: 2012 - 2020
+
+**Format**:  API
+
+## Catch data:
+
+**Reference**: Watson, R. A. and Tidd, A. 2018. Mapping nearly a century and a half of global marine fishing: 1869–2015. Marine Policy, 93, pp. 171-177. [(Paper URL)](https://www.sciencedirect.com/science/article/pii/S0308597X18300605?via%3Dihub)
+
+**Downloaded**: July 29, 2022 from [IMAS portal](http://data.imas.utas.edu.au/portal/search?uuid=ff1274e1-c0ab-411b-a8a2-5a12eb27f2c0)
+
+**Description**:  Global fisheries landings data per cell separated by Industrial versus Non-Industrial catch, IUU, and discards.
+
+**Native data resolution**: 0.5 degree
+
+**Time range**: 2012 - 2017
+
+**Format**:  csv format
+
+***
+  
+# Methods 
+1. Pull apparent fishing effort data for all EEZ regions for 2012-2020 from the GFW API, combine into one dataframe, and filter for trawling and dredging geartypes
+2. Correct trawling data by subsetting for only bottom trawling using catch data from Watson & Tidd (2018) and combine with dreding data
+3. Layer the fishing effort data with OHI regional polygons and standardize by soft-bottom habitat of each region calculate fishing effort for each OHI region **(insert transformation approach here, like ln(x + 1) transformation if density data are extremely skewed)**
+4. Rescale the transformed data y dividing the maximum value across all years. **also consider using a second rescaling using the median values across years**
+
+This script provides pressure scores, health indicators, and trend values for soft-bottom habitats.  
+
+***
+
+## Setup
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-[Global Fishing Watch API](https://github.com/GlobalFishingWatch/gfwr)
-
 ```{r}
 library(gfwr)
-library(here)
 library(terra)
 library(raster)
 library(tidyverse)
@@ -19,322 +88,42 @@ library(foreach)
 library(doParallel)
 library(tictoc)
 library(readr)
-library(dplyr)
-#library(doSNOW)
 library(sf)
+library(exactextractr)
 
-# Save API token information to an object every time you need to extract the token and pass it to `gfwr` functions:
+# Save API token information to an object every time you need to extract the token and pass it to `gfwr` functions
+# jcohen's key is saved to jcohen's .Renviron file, which is read by this function
 key <- gfw_auth()
-
 source('http://ohi-science.org/ohiprep_v2022/workflow/R/common.R')
-
 options(scipen = 999)
-
-# raster template
-#r_template <- raster::raster(ncol=720, nrow=360, vals=c(1:259200))
 ```
 
-# Quick run through of methods that will be applied to every country and year
-## Use a combination of the Vessels & Events APIs to extract fishing events from all trawlers between the dates of interest
-
-```{r}
-# extract unique trawler ID's for fishing vessels
-# when we eventually execute this for the final script, we might need/want to edit the next function to loop through this function for each country, so subsetting the query for example "flag = 'USA' AND geartype = 'trawlers'"
-# trawlers <- get_vessel_info(query = "geartype = 'trawlers'",
-#                             search_type = "advanced",
-#                             dataset = "fishing_vessel") # omit carrier vessels and support vessels
-
-# combine all unique trawler ID's into a comma separated list that we will use for the next query
-# trawler_ids <- paste0(trawlers$id[1:100], collapse = ",")
-# # change this to unique(trawler$id)?
-# # query all fishing events for just trawlers 
-# fishing_events_trawler <- get_event(event_type = "fishing",
-#                                     vessel = trawler_ids,
-#                                     include_region = TRUE,
-#                                     start_date = "2012-01-01",
-#                                     end_date = "2013-01-01",
-#                                     key = key)
-
-# seems that we NEED to subset the list of trawler$id's in order for the next function get_event() to work. consider opening issue about that if it is not fixed?
-# subsetting 1:100 worked but 1:1000 took ages
-```
-
-```{r}
-# check that trawlers$id values are the vessel ID's and not the fishing event ID's
-#id_check <- trawlers %>% 
-#  filter(id == "a6be75fec-cab1-83bc-6e10-17687e4814e1") # that is the case!
-```
-
-## get fishing hours from diff in time stamps
-
-```{r}
-# wrangle data for total fishing hours per vessel
-# fishing_events_trawler <- fishing_events_trawler %>%
-#   # calculate time for each fishing event
-#   mutate(fishing_event_time = end - start) %>% 
-#   # change name of column to be able to have unique colnames in next step when we unnest th elist column with the vessel ID
-#   rename(fishing_event_id = id) %>%
-#   # unlist column that contains the vessel id so we can sum total hours by vessel
-#   unnest_wider(vessel) %>% 
-#   select("fishing_event_id", lat, lon, vessel_id = id, fishing_event_time) %>% 
-#   group_by(vessel_id) %>% 
-#   # sum total fishing hours by vessel!
-#   summarize(total_vessel_fishing_time = sum(fishing_event_time))
-
-```
-
-## Start over process to repeat these steps for each country individually by year, then create a dataframe of all total sums with column names (rgn_id, year, total_fishing_hours)
-
-```{r}
-# load all OHI regions df:
-# region_data()
-# 
-# #rgn = # convert OHI region to GFW 3-letter region code
-#   
-# #foreach(r = rgns_all$rgn_id)
-# 
-# trawlers <- get_vessel_info(query = paste0("flag = ", rgn, " AND geartype = 'trawlers'"),
-#                             search_type = "advanced",
-#                             dataset = "fishing_vessel") # omit carrier vessels and support vessels
-# 
-# # combine all unique trawler ID's into a comma separated list that we will use for the next query
-# trawler_ids <- paste0(trawlers$id[1:100], collapse = ",")
-# 
-# year <- 2012:2020
-# 
-# # query all fishing events for just trawlers 
-# fishing_events_trawler <- get_event(event_type = "fishing",
-#                                     vessel = trawler_ids,
-#                                     include_region = TRUE,
-#                                     start_date = paste0(year, "-01-01"),
-#                                     end_date = paste(year, "-12-31"),
-#                                     key = key)
-```
-
-### scratch code:
-
-```{r}
-# usa_fishing <- get_vessel_info(query = "flag = 'USA'",
-#                                search_type = "advanced",
-#                                dataset = "fishing_vessel")
-# 
-# usa_ids <- paste0(usa_fishing$id[100], collapse = ',')
-# usa_ids
-# 
-# usa_fishing$id
-# 
-# fishing_events_trawler <- get_event(event_type = "fishing",
-#                                     vessel = usa_ids,
-#                                     include_region = TRUE,
-#                                     start_date = "2017-01-01",
-#                                     end_date = "2017-02-01",
-#                                     key = key)
-# 
-# fishing_events_trawler$time_diff <- fishing_events_trawler$end - fishing_events_trawler$start
-```
-
-## Use the Map Visualization API to pull in apparent fishing effort in EEZ's
-
-```{r}
-# load all OHI regions df:
-# region_data()
-
-# try one country's eez first using the ISO3 code, with only 1 eez:
-# code_eez <- get_region_id(region_name = 'FJI', region_source = 'eez', key = key)
-# 
-# fishing_hours_16_17 <- gfwr::get_raster(spatial_resolution = 'low',
-#                  temporal_resolution = 'yearly',
-#                  group_by = 'flag',
-#                  date_range = '2016-01-01,2017-12-31',
-#                  region = code_eez$id,
-#                  region_source = 'eez',
-#                  key = key) %>% 
-#   rename(year = "Time Range",
-#          fishing_rgn = flag)
-
-
-# this df represents all countries' fishing hours in that EEZ, but rows separate the lat and lon, so group by country to get the total per country by year
-# in order to expand out to all eez's, i wonder if i can make a list with c() for the region argument
-```
-
-```{r}
-# try with USA:
-# code_eez <- get_region_id(region_name = 'USA', region_source = 'eez', key = key)
-# 
-# # aus_eez_ids <- paste0(code_eez$id, collapse = ",")
-# 
-# fishing_hours_15_19 <- gfwr::get_raster(spatial_resolution = 'low',
-#                  temporal_resolution = 'yearly',
-#                  group_by = 'flag',
-#                  date_range = '2015-01-01,2019-12-31',
-#                  region = code_eez$id[1],
-#                  region_source = 'eez',
-#                  key = key)
-
-```
-
-## Loop development: smaller subset of countries
-
-```{r}
-# region_data()
-# 
-# # test on subset of countries: choose large countries for which we know there is at least some fishing data
-# rgns_eez_subset <- rgns_eez %>%
-#   filter(eez_iso3 %in% c("USA", "CHN", "THA", "RUS"))
-# 
-# # add parallelization later:
-# # iterate through all EEZ codes (e, outer loop) for all regions (r, inner loop) to extract apparent fishing hours:
-# foreach(r = rgns_eez_subset$eez_iso3) %do% {
-#   code_eez <- get_region_id(region_name = r, region_source = 'eez', key = key)
-#   print(paste0("Processing apparent fishing hours for ", r, " EEZ ", code_eez$id))
-#   foreach(e = code_eez$id, .combine = rbind) %do% { # .combine argument appends all eez's for that country into 1 dataframe
-#     fishing_hours_15_18 <- gfwr::get_raster(spatial_resolution = 'high', # high = 0.01 degree resolution
-#                                             temporal_resolution = 'yearly',
-#                                             group_by = 'flagAndGearType', # since flag is the country that fished,
-#                                             date_range = '2015-01-01,2018-12-31', # expand this 2012-2020
-#                                             region = e,
-#                                             region_source = 'eez',
-#                                             key = key) %>%
-#       # rename columns for clarity:
-#       rename(year = "Time Range",
-#              apparent_fishing_hours = "Apparent Fishing hours",
-#              lat = Lat,
-#              lon = Lon,
-#              geartype = Geartype) %>%
-#       # keep track of the administrative country for each EEZ, even after we combine all data into one dataframe:
-#       mutate(eez_admin_rgn = r) %>%
-#       select(year, apparent_fishing_hours, lat, lon, eez_admin_rgn, geartype) # note: we do not care about which region did the actual fishing, just about which country controls that EEZ, which is why we do not maintain the fishing region in the data moving forward
-#     # convert admin region variable to factor to be able to join these columns in next step:
-#     #fishing_hours_15_18$eez_admin_rgn <- as.factor(fishing_hours_15_18$eez_admin_rgn)
-#     print(paste0("Extracted all apparent fishing hours for ", r, " EEZ ", e))
-#     write_csv(fishing_hours_15_18, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/", r, "_effort_15_18.csv"))
-#   }
-# }
-# 
-# # check out the output:
-# usa <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/USA_effort_15_18.csv"))
-# chn <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/CHN_effort_15_18.csv"))
-# tha <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/THA_effort_15_18.csv"))
-# rus <- read.csv(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/RUS_effort_15_18.csv"))
-
-# consider removing any rows with NA - this might be done later anyway with na.rm when we do summary stats but also might be cleaner & faster looping to remove those rows now?
-# might be easier to double check work (hours total) with other analyses if keep those rows in now?
-```
-
-## Try just Austrailia and china:
-
-```{r}
-# AUS
-# aus_code_eez <- get_region_id(region_name = "AUS", region_source = 'eez', key = key)
-# aus_code_eez <- as.data.frame(aus_code_eez)
-# #eez_1 <- aus_code_eez[1,]
-# 
-# aus_fe_2012_2020_eez1 <- gfwr::get_raster(spatial_resolution = 'high', # high = 0.01 degree resolution
-#                                      temporal_resolution = 'yearly',
-#                                      group_by = 'flagAndGearType', # do not need to group by flag because that would be the country that fished, which we don't care about
-#                                      date_range = '2012-01-01,2020-12-31', 
-#                                      region = aus_code_eez$id[1], 
-#                                      region_source = 'eez',
-#                                      key = key)
-# 
-# # bind all AUS EEZ outputs into one dataframe
-# # first create list of all dataframes that we want to merge
-# aus_df_list <- list(aus_fe_2012_2020_eez1, aus_fe_2012_2020_eez2, aus_fe_2012_2020_eez3, aus_fe_2012_2020_eez4, aus_fe_2012_2020_eez5, aus_fe_2012_2020_eez6, aus_fe_2012_2020_eez7)
-# # join
-# aus_fe_allgear <- aus_df_list %>% reduce(full_join)
-# 
-# 
-# 
-# 
-# # CHN
-# 
-chn_code_eez <- get_region_id(region_name = "CHN", region_source = 'eez', key = key)
-# 
-chn_2012_2020_eez1 <- gfwr::get_raster(spatial_resolution = 'high',
-                                       temporal_resolution = 'yearly',
-                                       group_by = 'flagAndGearType',
-                                       date_range = '2020-01-01,2020-12-31',
-                                       region = chn_code_eez$id[1],
-                                       region_source = 'eez',
-                                       key = key)
-
-```
-
-
-## Loop that is not subset: produces 1 csv per country of fishing effort for all years:
-
-```{r}
-# tic()
-# 
-# # load all rgn ISO codes
-# region_data()
-# 
-# # convert regional codes into characters first:
-# rgns_eez_all <- unique(rgns_eez$eez_iso3)
-# 
-# cl <- 3
-# registerDoParallel(cl)
-# 
-# # iterate through all EEZ codes (e, outer loop) for all regions (r, inner loop) to extract apparent fishing hours:
-# foreach(r = rgns_eez_all) %dopar% {
-#   code_eez <- get_region_id(region_name = r, region_source = 'eez', key = key)
-#   print(paste0("Processing apparent fishing hours for ", r, " EEZ ", code_eez$id))
-#   foreach(e = code_eez$id, .combine = rbind) %do% { # .combine argument appends all eez's for that country into 1 dataframe
-#     fishing_hours_2012_2020 <- gfwr::get_raster(spatial_resolution = 'high', # high = 0.01 degree resolution
-#                                                 temporal_resolution = 'yearly',
-#                                                 group_by = 'flagAndGearType', # do not need to group by flag because that would be the country that fished, which we don't care about
-#                                                 date_range = '2012-01-01,2020-12-31', 
-#                                                 region = e, 
-#                                                 region_source = 'eez',
-#                                                 key = key) %>%
-#       # rename columns for clarity:
-#       rename(year = "Time Range",
-#              apparent_fishing_hours = "Apparent Fishing hours",
-#              y = Lat,
-#              x = Lon,
-#              geartype = Geartype) %>%
-#       # keep track of the administrative country for each EEZ, even after we combine all data into one dataframe: 
-#       mutate(eez_admin_rgn = r) %>% 
-#       select(year, apparent_fishing_hours, y, x, eez_admin_rgn, geartype) # note: we do not care about which region did the actual fishing, just about which country controls that EEZ, which is why we do not maintain the fishing region in the data moving forward
-#     
-#     # specify column types before saving the csv so we can correctly concatenate the rows later
-#     fishing_hours_2012_2020$year <- as.numeric(fishing_hours_2012_2020$year)
-#     fishing_hours_2012_2020$apparent_fishing_hours <- as.numeric(fishing_hours_2012_2020$apparent_fishing_hours)
-#     fishing_hours_2012_2020$y <- as.numeric(fishing_hours_2012_2020$y)
-#     fishing_hours_2012_2020$x <- as.numeric(fishing_hours_2012_2020$x)
-#     fishing_hours_2012_2020$eez_admin_rgn <- as.character(fishing_hours_2012_2020$eez_admin_rgn)
-#     fishing_hours_2012_2020$geartype <- as.character(fishing_hours_2012_2020$geartype)
-#     
-#     print(paste0("Extracted all apparent fishing hours for ", r, " EEZ ", e))
-#     write_csv(fishing_hours_2012_2020, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/all_regions/", r, "_effort_2012_2020.csv")) 
-#   }
-# }
-# 
-# stopCluster(cl)
-```
-
-## fix loop to concatenate rows correctly for eez codes by country 
+## Iterate through all ISO3 regions' EEZ codes to extract all apparent fishing effort from 2012-2020 
 
 ```{r}
 tic()
+
 # load all rgn ISO codes
 region_data()
 
 # test on subset of countries: choose large countries for which we know there is at least some fishing data
-rgns_subset <- rgns_eez %>%
-  filter(eez_iso3 %in% c("AUS", "USA", "THA", "BIH", "GBR", "ITA"))
+#rgns_subset <- rgns_eez %>%
+#  filter(eez_iso3 %in% c("AUS", "USA", "THA", "BIH", "GBR", "ITA"))
 # removed CHN from list because cannot process one of the two EEZ: 8486 (first eez in list of 2 from API)
 
-rgns_subset <- unique(rgns_subset$eez_iso3)
-
 # convert regional codes into characters first:
-#rgns_eez_all <- unique(rgns_eez$eez_iso3)
+regions <- rgns_eez %>% 
+  # remove China from list because there is so much fishinf effort over the entire time period that the API cannot handle it & crashes
+  filter(eez_iso3 != 'CHN') %>% 
+  unique(eez_iso3)
+# after the loop extracts data for all other countries, we will manually extarct and save a csv for CHN only 
 
-#cl <- 3
-#registerDoParallel(cl)
+cl <- 3
+registerDoParallel(cl)
 
-# iterate through all EEZ codes (e, outer loop) for all regions (r, inner loop) to extract apparent fishing hours:
-for(i in rgns_subset) {
+# iterate through all EEZ codes for all regions to extract apparent fishing hours:
+for(i in regions) {
+  
   # create dataframe that contains the column `id` that is list of all EEZ codes for one region
   eez_code_df <- get_region_id(region_name = i, region_source = 'eez', key = key)
   # convert that column into a numeric list of EEZ codes to feed into the next loop:
@@ -343,7 +132,7 @@ for(i in rgns_subset) {
   print(paste0("Processing apparent fishing hours for ", i, " EEZ code ", eez_codes))
   
   for(j in eez_codes) { 
-    fishing_hours_2012_2020 <- gfwr::get_raster(spatial_resolution = 'high', # high = 0.01 degree resolution which we think is close to 30 m resolution
+    fishing_hours <- gfwr::get_raster(spatial_resolution = 'high', # high = 0.01 degree resolution which we think is close to 30 m resolution
                                                 temporal_resolution = 'yearly',
                                                 group_by = 'flagAndGearType', # maybe change to just geartype
                                                 date_range = '2012-01-01,2020-12-31', 
@@ -361,24 +150,51 @@ for(i in rgns_subset) {
       select(year, apparent_fishing_hours, y, x, eez_admin_rgn, geartype) # note: we do not care about which region did the actual fishing, just about which country controls that EEZ, which is why we do not maintain the fishing region in the data moving forward
     
     # specify column types before saving the csv so we can correctly concatenate the rows later
-    fishing_hours_2012_2020$year <- as.numeric(fishing_hours_2012_2020$year)
-    fishing_hours_2012_2020$apparent_fishing_hours <- as.numeric(fishing_hours_2012_2020$apparent_fishing_hours)
-    fishing_hours_2012_2020$y <- as.numeric(fishing_hours_2012_2020$y)
-    fishing_hours_2012_2020$x <- as.numeric(fishing_hours_2012_2020$x)
-    fishing_hours_2012_2020$eez_admin_rgn <- as.character(fishing_hours_2012_2020$eez_admin_rgn)
-    fishing_hours_2012_2020$geartype <- as.character(fishing_hours_2012_2020$geartype)
+    fishing_hours$year <- as.numeric(fishing_hours$year)
+    fishing_hours$apparent_fishing_hours <- as.numeric(fishing_hours$apparent_fishing_hours)
+    fishing_hours$y <- as.numeric(fishing_hours$y)
+    fishing_hours$x <- as.numeric(fishing_hours$x)
+    fishing_hours$eez_admin_rgn <- as.character(fishing_hours$eez_admin_rgn)
+    fishing_hours$geartype <- as.character(fishing_hours$geartype)
     
     print(paste0("Extracted all apparent fishing hours for ", i, " EEZ code ", j))
     
-    write_csv(fishing_hours_2012_2020, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/", i, "_", j, "_effort_2012_2020.csv")) 
+    write_csv(fishing_hours, paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/", i, "_", j, "_effort.csv")) 
   }
 }
 
-#stopCluster(cl)
+stopCluster(cl)
 
-toc() # 11 min
+toc()
 ```
 
+### Loop through China's apparent fishing effort separately due to the large quantity of data over all years 
+
+```{r}
+chn_code_eez <- get_region_id(region_name = "CHN", region_source = 'eez', key = key)
+
+# check how many eez codes are present, should be 2:
+
+chn_eez1 <- gfwr::get_raster(spatial_resolution = 'high',
+                             temporal_resolution = 'yearly',
+                             group_by = 'flagAndGearType',
+                             date_range = '2012-01-02,2020-12-30',
+                             region = chn_code_eez$id[1],
+                             region_source = 'eez',
+                             key = key)
+
+write_csv(chn_eez1, path = paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/CHN_", insert_code1, "_effort.csv"))
+
+chn_eez2 <- gfwr::get_raster(spatial_resolution = 'high',
+                             temporal_resolution = 'yearly',
+                             group_by = 'flagAndGearType',
+                             date_range = '2012-01-02,2020-12-30',
+                             region = chn_code_eez$id[2],
+                             region_source = 'eez',
+                             key = key)
+
+write_csv(chn_eez2, path = paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/CHN_", insert_code2, "_effort.csv"))
+```
 
 ## Exploration: Check what some of the country-specific dataframes contains:
 
@@ -406,7 +222,7 @@ for (i in seq_along(fish_effort_files)) {
   # read each file and check number of rows
   filename <- fish_effort_files[i]
   print(paste0("Counting rows (fishing effort observations) for ", substr(filename, -29, -21)))
-  # save the numbe of rows for that file to ab object
+  # save the numbe of rows for that file to an object
   rows <- nrow(data.table::fread(filename))
   print(paste0(rows, " rows in this file."))
   # if there are 0 rows, delete the file
@@ -426,10 +242,10 @@ fish_effort_files <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/g
 
 ## Data Wrangling: Combine regional csv's into one dataframe and filter by geartype
 
-We do this because our goal is to summarize fishing effort spatially to produce annual rasters of fishing effort. Later, we will use the fishing coordinates and EEZ boundaries to attribute fishing activity to certain OHI regions.
+We do this because our goal is to summarize fishing effort spatially to produce annual rasters of fishing effort. Later, we will use the fishing coordinates and OHI region polygons to attribute fishing activity to certain OHI regions.
 
 ```{r}
-# concatenate csv's into one list for trawling data, separate from dredging so we can correct the trawling data and then sum the corrected trawling data with the dredging data 
+# concatenate csv's into one list for trawling data, separate from dredging so we can correct the trawling data and then sum the corrected trawling data with the dredging data later on
 fish_effort_trawl <- fish_effort_files %>%
   lapply(data.table::fread) %>% # read in each file that represents data for 1 EEZ for 1 country
   bind_rows() %>% # combine all files into one dataframe
@@ -444,7 +260,7 @@ fish_effort_dredge <- fish_effort_files %>%
   dplyr::select(-geartype) # now that all observations are from dredging, we can drop this variable
 
 # take a look at the data
-head(fish_effort_dredge)
+head(fish_effort_dredge) # still contains admin rgn
 ```
 
 ## Group by coordinate and year for apparent fishing effort for both geartypes of interest
@@ -453,21 +269,23 @@ We do not group by the administrative region for each EEZ because the coordinate
 
 ```{r}
 # trawling
-fish_effort_trawl_annual <- fish_effort_trawl %>% # change to the relevant trawl data after filtering for that with catch data later
-  group_by(x, y, year) %>% # 2022 assessment: did not group by year (according to output) because no exact coordinate was repeated one multiple years, so we will do that in next step
+fish_effort_trawl_annual <- fish_effort_trawl %>% 
+  group_by(x, y, year) %>% # 2022 assessment: did not group by year (according to output) because no exact coordinate was repeated one multiple years
   summarize(total_fishing_hours = sum(apparent_fishing_hours, na.rm = TRUE)) 
 # convert year column from integer to factor in preparation for next steps:
 fish_effort_trawl_annual$year <- as.factor(fish_effort_trawl_annual$year)
 
+
 # dredging
-fish_effort_dredge_annual <- fish_effort_dredge %>% # all dredge data will be used, we will not be suubsetting it like we will for the trawling data 
-  group_by(x, y, year) %>% # 2022 assessment: did not group by year (according to output) because no exact coordinate was repeated one multiple years, so we will do that in next step
+fish_effort_dredge_annual <- fish_effort_dredge %>% # all dredge data will be used, we will not be subsetting it like we will for the trawling data
+  group_by(x, y, year) %>% # 2022 assessment: did not group by year (according to output) because no exact coordinate was repeated one multiple years
   summarize(total_fishing_hours = sum(apparent_fishing_hours, na.rm = TRUE)) 
 # convert year column from integer to factor in preparation for next steps:
 fish_effort_dredge_annual$year <- as.factor(fish_effort_dredge_annual$year)
 
+
 # take a look
-head(fish_effort_dredge_annual)
+head(fish_effort_dredge_annual) # no longer contains EEZ admin rgn
 ```
 
 ## Check one annual raster of trawler fishing effort: 2015 as a test before doing all years in loop
@@ -476,54 +294,54 @@ head(fish_effort_dredge_annual)
 # try with just 2015 trawling
 # rasterize the data:
 
-fish_effort_trawl_2015 <- fish_effort_trawl_annual %>%
-  dplyr::filter(year == "2015") %>%
-  dplyr::select(-year)
-
-# convert the dataframe to a SpatRaster
-# sometimes running this for the first time fails bur just run again and it works
-fish_effort_trawl_2015_rast <- terra::rast(fish_effort_trawl_2015, type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
-
-plot(fish_effort_trawl_2015_rast, col = "red") 
-
-# convert to points vector (a geometry column?)
-#fish_effort_2015_points <- terra::as.points(fish_effort_2015_rast)
-#plot(fish_effort_2015_points, col = "red") # looks like blobs where the fishing points were! I suppose the difference between coordinates and points is that points just appear larger when plotted
-
-# load the EEZ spatial data to layer on plot with fishing effort points for reference
-regions_shape()
-
-# check out df subset to not overwhelm Mazu by opening regions df in its entirety
-View(head(regions))
-
-# filter the regions dataframe for just EEZ polygons
-regions_eez <- regions %>%
-  filter(rgn_type == "eez") %>% 
-  st_transform(crs = 4326)
-
-# try plotting just geometry
-plot(regions_eez$geometry, col = "red")
-
-# try to plot points on polygons
-#plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "fishing effort 2015", legend = FALSE)		
-#plot(fish_effort_2015_points, axes = FALSE, col = "red", add = TRUE) # points are large! not great for viz
-
-# Plot the raster of fishing effort points (without making them terra points) on top of the EEZ polygons
-plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "Fishing Effort 2015: AUS, USA, THA, BIH, GBR, ITA", legend = FALSE)
-plot(fish_effort_trawl_2015_rast, axes = FALSE, col = "red", add = TRUE)
+# fish_effort_trawl_2015 <- fish_effort_trawl_annual %>%
+#   dplyr::filter(year == "2015") %>%
+#   dplyr::select(-year)
+# 
+# # convert the dataframe to a SpatRaster
+# # sometimes running this for the first time fails but just run again and it works
+# fish_effort_trawl_2015_rast <- terra::rast(fish_effort_trawl_2015, type = "xyz", crs = "EPSG:4326", digits = 6, extent = NULL)
+# 
+# plot(fish_effort_trawl_2015_rast, col = "red") 
+# 
+# # compare to depth proportion trawling raster
+# 
+# 
+# # convert to points vector (a geometry column?)
+# #fish_effort_2015_points <- terra::as.points(fish_effort_2015_rast)
+# #plot(fish_effort_2015_points, col = "red") # looks like blobs where the fishing points were! I suppose the difference between coordinates and points is that points just appear larger when plotted
+# 
+# # load the EEZ spatial data to layer on plot with fishing effort points for reference
+# regions_shape()
+# 
+# # check out df subset to not overwhelm Mazu by opening regions df in its entirety
+# View(head(regions))
+# 
+# # filter the regions dataframe for just EEZ polygons
+# regions_eez <- regions %>%
+#   filter(rgn_type == "eez") %>% 
+#   st_transform(crs = 4326)
+# 
+# # try plotting just geometry
+# plot(regions_eez$geometry, col = "red")
+# 
+# # try to plot points on polygons
+# #plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "fishing effort 2015", legend = FALSE)		
+# #plot(fish_effort_2015_points, axes = FALSE, col = "red", add = TRUE) # points are large! not great for viz
+# 
+# # Plot the raster of fishing effort points (without making them terra points) on top of the EEZ polygons
+# plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "Fishing Effort 2015: AUS, USA, THA, BIH, GBR, ITA", legend = FALSE)
+# plot(fish_effort_trawl_2015_rast, axes = FALSE, col = "red", add = TRUE)
 ```
 
 ### Save the trawling and dredging data as annual raster files before we can adjust them for mid-water versus bottom trawling.
 
-- would like to add checks to this, progress bar, more cores for parallelization
-
 ```{r}
 tic()
-# this loop sometimes randomly errors but just run again and it should work (might error when Mazu's RAM is almost full...)
+# this loop sometimes randomly errors but just run again and it should work (might error when Mazu's memory is almost full...)
 years = as.factor(2012:2020) # make it factor in order to match the class of year column in the fish_effort_annual dataframe
 
 for(i in years){
-  
   # trawling data:
   trawl_annual_raster <- fish_effort_trawl_annual %>%
     dplyr::filter(year == i) %>%
@@ -532,7 +350,9 @@ for(i in years){
   
   # save annual raster file for trawling:
   terra::writeRaster(trawl_annual_raster, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i,"/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
-  
+}
+
+for(i in years){
   # dredging data:
   dredge_annual_raster <- fish_effort_dredge_annual %>%
     dplyr::filter(year == i) %>%
@@ -541,15 +361,16 @@ for(i in years){
 
   # save annual raster file for dredging:
   terra::writeRaster(dredge_annual_raster, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_dredge_", i , ".tif"), overwrite = TRUE) # put in folder that will be the destination of the trawling data as well, after it is corrected, so the dredging and trawling by year can be summed easily in a stack
-
 }
 
-toc() # 594 seconds
+toc() # 9 minutes
 ```
 
 ### Correct Trawling Data: Subset trawling fishing effort by catch data for the corresponding year to distinguish between mid-water trawling and bottom trawling
 
-We use fisheries catch data from the paper by Watson et al. to distinguish between the two types of trawling, because the GFW data groups all trawling together. We only maintain bottom trawling because that is the type that destroys soft bottom habitat. We multiply a raster that represents a proxy for the proportion of mid-water trawling to bottom trawling by the Global Fishing Watch raster for that respective year. We then sum that data with all the dredging data in the next steps. We only have catch data (the trawling correction data) for 2012-2017, so we need to use 2017 data for 2018-2020 GFW data.
+We use fisheries catch data from the paper by Watson et al. to distinguish between the two types of trawling, because the GFW data groups all trawling together. We only maintain bottom trawling because that is the type that destroys soft bottom habitat. We multiply a raster that represents a proxy for the proportion of mid-water trawling to bottom trawling by the Global Fishing Watch raster for that respective year. We then sum that data with all the dredging data in the next steps. We only have catch data (the trawling correction data) for 2012-2017, so we use 2017 data for 2018-2020 GFW data.
+
+### Try 2012 alone before iterating in loop
 
 ```{r}
 # fish_effort_files <- list.files(paste0(dir_M, "/git-annex/globalprep/_raw_data/global_fishing_watch/d2022/annual_mapping_api/"), pattern = ".csv", full = TRUE)
@@ -557,117 +378,128 @@ We use fisheries catch data from the paper by Watson et al. to distinguish betwe
 # these files were created on July 29, 2022 from Watson et al. data by Gage
 # value of 0 = all mid-water trawling
 # value of 1 = all bottom trawling
-trawl_depth_proportion_2012 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif'))
-# plot 2012 data to get an idea of what it looks like
-# pretty interesting that the EEZ outlines can be distinguished in the trawling locality
-terra::plot(trawl_depth_proportion_2012)
-
-# check how many NA values we start with
-value <- terra::global(trawl_depth_proportion_2012, fun = "isNA") # 191,377
-value[1,1]
-terra::global(trawl_depth_proportion_2012, fun = "isNA")[1,1]
-# read in years 2013-2017
-# trawl_depth_proportion_2013 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2013.tif'))
-# trawl_depth_proportion_2014 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2014.tif'))
-# trawl_depth_proportion_2015 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2015.tif'))
-# trawl_depth_proportion_2016 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2016.tif'))
-# trawl_depth_proportion_2017 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2017.tif'))
-
-# make this into a loop when figured it out for 2012
-# check the number of na values in that raster
-#terra::global(trawl_depth_proportion_2012, fun = "isNA") # 191377	to start 
-# check the number of not na values
-#terra::global(trawl_depth_proportion_2012, fun = "notNA") # 67823 to start
-
-# try to take the mean gage did, with raster, to see what output is supposed to look like 
-# trawl_depth_proportion_2012_raster <- raster::raster(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif'))
-# avg_trawl_correction_raster <- cellStats(trawl_depth_proportion_2012_raster, "mean", na.rm=TRUE)
-# plot(avg_trawl_correction_raster) # 1 value not an actual raster 
-
-#terra::app() is not what we want
-#terra::mean() is not what we want 
-# maybe global is what we want?
-# maybe terra::approximate() is what we want?
-#trawl_depth_proportion_2012_interpolated <- terra::global(trawl_depth_proportion_2012, fun = "mean")
-# maybe terra::focal is what we want ? best option so far, would be even more accurate than taking mean across entire layer because takes a local avg with window
-trawl_depth_proportion_interpolated_2012 <- terra::focal(x = trawl_depth_proportion_2012, 
-                                                         w = 9, 
-                                                         fun = "mean", 
-                                                         na.policy = "only", 
-                                                         na.rm = T)
-
-# check how many NA values were interpolated
-terra::global(trawl_depth_proportion_interpolated_2012, fun = "isNA") # 102,832
-
-# na.only = "only" argument means we interpolate for only the NA values of the raster 
-# w = 9 means the moving window is 9 cells by 9 cells (a square) around the focal point we are interpolating
-# code help from: https://stackoverflow.com/questions/71801889/how-to-fill-in-missing-na-values-in-raster-with-terra-package
-terra::plot(trawl_depth_proportion_interpolated_2012)
-# check the number of na values in that raster after interpolation
-#terra::global(trawl_depth_proportion_2012_interpolated, fun = "isNA") # 102832, the number of na values decreased by 88545
-# check the number of not na values
-#terra::global(trawl_depth_proportion_2012_interpolated, fun = "notNA") # 156368, the number of not na values increased by 88454
-
-# now that the trawl proportion data has been interpolated, we need to adjust its spatial resolution to match that of the fishing effort data from GFW for the corresponding year 
-# first read in the GFW raster for the year of interest
-fish_effort_trawl_2012 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/fish_effort_trawl_2012.tif"))
-# resample the trawling proportion data to match the resolution and extent of the GFW fishing effort data (use the GFW as the sample geometry)
-trawl_depth_proportion_resampled_2012 <- terra::resample(x = trawl_depth_proportion_interpolated_2012, y = fish_effort_trawl_2012, method = "near", filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/trawl_depth_proportion_resampled_2012.tif"), overwrite = TRUE)
-# question: should we resample before we interpolate perhaps? - note to ask Gage & Mel
-terra::plot(trawl_depth_proportion_resampled_2012)
-
-# check extents of each - they match! 
-ext(terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/fish_effort_trawl_2012.tif")))
-ext(terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/trawl_depth_proportion_resampled_2012.tif")))
-
-# stack the resampled interpolated raster of bottom trawling with all trawling data from gfw, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of gfw trawling data for which we do not have watson data 
-trawl_stack_2012 <- terra::rast(list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012"), pattern = ".tif", full = TRUE))
-
-# multiply the rasters in order to only maintain the proportion of trawling fishing effort that is attributed to bottom trawling rather than midwater trawling
-trawling_corrected_2012 <- terra::lapp(trawl_stack_2012, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/trawling_corrected/trawling_corrected_2012.tif"), overwrite = TRUE)
-
-terra::plot(trawling_corrected_2012, col = "red")
+# try interpolating only 1 trawling proportion raster before doing all years in a loop
+# trawl_depth_proportion_2012 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif'))
+# # plot 2012 data to get an idea of what it looks like
+# # pretty interesting that the EEZ outlines can be distinguished in the trawling locality
+# terra::plot(trawl_depth_proportion_2012)
+# 
+# # check how many NA values we start with
+# value <- terra::global(trawl_depth_proportion_2012, fun = "isNA") # 191,377
+# value[1,1]
+# #terra::global(trawl_depth_proportion_2012, fun = "isNA")[1,1]
+# # read in years 2013-2017
+# # trawl_depth_proportion_2013 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2013.tif'))
+# # trawl_depth_proportion_2014 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2014.tif'))
+# # trawl_depth_proportion_2015 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2015.tif'))
+# # trawl_depth_proportion_2016 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2016.tif'))
+# # trawl_depth_proportion_2017 <- terra::rast(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2017.tif'))
+# 
+# # try to take the mean gage did, with raster, to see what output is supposed to look like 
+# # trawl_depth_proportion_2012_raster <- raster::raster(paste0(dir_M, '/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_2012.tif'))
+# # avg_trawl_correction_raster <- cellStats(trawl_depth_proportion_2012_raster, "mean", na.rm=TRUE)
+# # plot(avg_trawl_correction_raster) # 1 value not an actual raster 
+# 
+# #terra::app() is not what we want
+# #terra::mean() is not what we want 
+# # maybe global is what we want?
+# # maybe terra::approximate() is what we want?
+# #trawl_depth_proportion_2012_interpolated <- terra::global(trawl_depth_proportion_2012, fun = "mean")
+# # maybe terra::focal is what we want ? best option so far, would be even more accurate than taking mean across entire layer because takes a local avg with window
+# trawl_depth_proportion_interpolated_2012 <- terra::focal(x = trawl_depth_proportion_2012, 
+#                                                          w = 9, 
+#                                                          fun = "mean", 
+#                                                          na.policy = "only", 
+#                                                          na.rm = T)
+# 
+# terra::plot(trawl_depth_proportion_interpolated_2012)
+# 
+# # check how many NA values were interpolated
+# terra::global(trawl_depth_proportion_interpolated_2012, fun = "isNA") # 102,832
+# 
+# # fill in the rest of the NA values with global average
+# global_trawl_proportion_avg_2012 <- terra::global(trawl_depth_proportion_interpolated_2012, fun = "mean", na.rm = TRUE)
+# trawl_depth_proportion_interpolated_2012[is.na(trawl_depth_proportion_interpolated_2012)] <- global_trawl_proportion_avg_2012[1,1]
+# # 0 NA values left
+# # THIS STEP ABOVE IS WHAT FILLS IN THE CONTINENTS WITH VALUES, SO THE CONTINENTS MUST BE NA RATHER THAN 0, SO NEED TO CONVERT THE CONTINENTS TO 0 BEFORE DOING ANY INTERPOLATION ?? OR MAYET THIS DOESNT MATTER BECAUSE THESE LAND POINTS WILL NOT MATCH UP WITH THE TRAWLING POINTS ANYWAY
+# plot(trawl_depth_proportion_interpolated_2012)
+# # na.only = "only" argument means we interpolate for only the NA values of the raster 
+# # w = 9 means the moving window is 9 cells by 9 cells (a square) around the focal point we are interpolating
+# # code help from: https://stackoverflow.com/questions/71801889/how-to-fill-in-missing-na-values-in-raster-with-terra-package
+# 
+# # check the number of na values in that raster after interpolation
+# #terra::global(trawl_depth_proportion_2012_interpolated, fun = "isNA") # 102832, the number of na values decreased by 88545
+# # check the number of not na values
+# #terra::global(trawl_depth_proportion_2012_interpolated, fun = "notNA") # 156368, the number of not na values increased by 88454
+# 
+# # now that the trawl proportion data has been interpolated, we need to adjust its spatial resolution to match that of the fishing effort data from GFW for the corresponding year 
+# # first read in the GFW raster for the year of interest
+# fish_effort_trawl_2012 <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/fish_effort_trawl_2012.tif"))
+# # resample the trawling proportion data to match the resolution and extent of the GFW fishing effort data (use the GFW as the sample geometry)
+# trawl_depth_proportion_resampled_2012 <- terra::resample(x = trawl_depth_proportion_interpolated_2012, y = fish_effort_trawl_2012, method = "near")
+# # question: should we resample before we interpolate perhaps? - note to ask Gage & Mel
+# terra::plot(trawl_depth_proportion_resampled_2012)
+# terra::global(trawl_depth_proportion_resampled_2012, fun = "isNA") # 12837
+# # get rid of the rest of the NA values produced by resample:
+# trawl_depth_proportion_resampled_2012[is.na(trawl_depth_proportion_resampled_2012)] <- global_trawl_proportion_avg_2012[1,1]
+# 
+# # check extents of each - they match! 
+# ext(terra::rast(fish_effort_trawl_2012))
+# ext(terra::rast(trawl_depth_proportion_resampled_2012))
+# 
+# terra::writeRaster(trawl_depth_proportion_resampled_2012, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012/trawl_depth_proportion_resampled_2012.tif"))
+# 
+# # stack the resampled interpolated raster of bottom trawling with all trawling data from gfw, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of gfw trawling data for which we do not have watson data 
+# trawl_stack_2012 <- terra::rast(list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2012"), pattern = ".tif", full = TRUE))
+# 
+# # multiply the rasters in order to only maintain the proportion of trawling fishing effort that is attributed to bottom trawling rather than midwater trawling
+# trawling_corrected_2012 <- terra::lapp(trawl_stack_2012, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/trawling_corrected/trawling_corrected_2012.tif"), overwrite = TRUE)
+# 
+# terra::plot(trawling_corrected_2012, col = "red")
+# this plot represents the subsetted trawling for 2012
 ```
 
+### Iterate through 2012-2017 data years to subset trawling data for just bottom trawling
 
 ```{r}
 tic()
 
-# use this subset because we only have trawling proportion data for these years from Watson
+# use this subset because we only have trawling proportion data for these years from Watson et al.
 years_subset = as.factor(2012:2017)
 
 # for years with trawling depth proportion data:
 for (j in years_subset){
   
   print(paste0("Processing trawling fishing effort for ", j))
-  # read in the GFW apparent fishing effort raster for trawling, we need this read in to resample the Watson catch data to the same resolution
+  # read in the GFW apparent fishing effort raster for trawling
+  # we need this read in to resample the Watson catch data to the same resolution
   fish_effort_trawl <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", j, "/fish_effort_trawl_", j, ".tif"))
   
-  # read in the annual file that represents the proportion of bottom trawling to midwater trawling, based on catch data, from Watson 
+  # read in the annual file that represents the proportion of bottom trawling to midwater trawling, based on catch data, from Watson et al.
   trawl_depth_proportion <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/trawling_correction/bottom_trawl_props/bottom_trawl_prop_", j, ".tif"))
   
   print(paste0("Interpolating trawling depth proportion data for ", j))
   # interpolate many of the missing values in the trawling depth proportion raster by taking the local average of cells around it (using a window of 9 cells) that represent the proportion of bottom trawling to midwater trawling that occurred at that coordinate. This provides a more comprehensive raster which we will later multiply by the GFW trawling raster, cell by cell
   trawl_depth_proportion_interpolated <- terra::focal(x = trawl_depth_proportion, 
-                                                      w = 5, 
+                                                      w = 5, # sets a 5 cell window around NA pixel
                                                       fun = "mean", 
-                                                      na.policy = "only", 
+                                                      na.policy = "only", # only interpolate NA values
                                                       na.rm = T,
                                                       overwrite = TRUE)
   
-  # document how many NA values were filled by `focal`
+  # document how many NA values were filled by `terra::focal()`
   print(paste0("Started with ", terra::global(trawl_depth_proportion, fun = "isNA")[1,1], " NA values, and ended with ", terra::global(trawl_depth_proportion_interpolated, fun = "isNA")[1,1], " so filled ", terra::global(trawl_depth_proportion, fun = "isNA")[1,1] - terra::global(trawl_depth_proportion_interpolated, fun = "isNA")[1,1], " NA values using `terra::focal()`."))
   
   # clear some memory
   rm(trawl_depth_proportion)
   gc()
   
-  # fill in remaining NA values with the global mean of the non-NA values
+  # fill in remaining NA values with the global mean of the non-NA cell values
   global_trawl_proportion_avg <- terra::global(trawl_depth_proportion_interpolated, fun = "mean", na.rm = TRUE)
   trawl_depth_proportion_interpolated[is.na(trawl_depth_proportion_interpolated)] <- global_trawl_proportion_avg[1,1]
   
-  # document how many NA values remain after applying the local average
-  print(paste0("There are now ", terra::global(trawl_depth_proportion_interpolated, fun = "isNA"), " NA values present after filling the remaining Na's with the global average."))
+  # document how many NA values remain after applying the local average to remaining NA cells (should be 0)
+  print(paste0("There are now ", terra::global(trawl_depth_proportion_interpolated, fun = "isNA"), " NA values present after filling the remaining NA's with the global average."))
   
   print(paste0("Resampling trawling depth proportion data for ", j))
   
@@ -676,10 +508,10 @@ for (j in years_subset){
                                                       y = fish_effort_trawl, # use the GFW data as the sample geometry
                                                       method = "near") # nearest neighbor
   
-  # document how many NA values were produced by resampling
+  # document how many NA values were produced by resampling (NA values are produced for some years, but not all)
   print(paste0("Now there are ", terra::global(trawl_depth_proportion_resampled, fun = "isNA")[1,1], " NA values remaining, need to fill NA's one final time."))
   
-  # get rid of the rest of the NA values produced by resample:
+  # get rid of the rest of any NA values produced by resample:
   trawl_depth_proportion_resampled[is.na(trawl_depth_proportion_resampled)] <- global_trawl_proportion_avg[1,1]
   
   # document how many NA values remain (should be 0)
@@ -759,55 +591,25 @@ toc() # 14 minutes
 # terra::global(watson_processed_2012, fun = "isNA") # 135,657,275
 ```
 
+#### Apply the adjusted fishing catch rasters (which have been resampled and interpolated) to subset the GFW trawling data for just bottom trawling
 
-```{r}
-# check extents of the rasters in folders 2020
-# rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2020"), pattern = ".tif", full = TRUE)
-# fish_effort_raster <- terra::rast(rasters[1])
-# trawl_depth_proportion_raster <- terra::rast(rasters[2])
-# print(ext(fish_effort_raster))
-# print(ext(trawl_depth_proportion_raster))
-# extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE)
-# print(paste0("Raster extent comparison results: ", extent_comparison))
-# 
-# if (extent_comparison == FALSE){ 
-#     print("Extending extent of trawling proportion raster to match the extent of the trawling fishing effort raster.")
-#   
-#     trawl_depth_proportion_extended <- terra::extend(trawl_depth_proportion_raster, fish_effort_raster)
-#     fish_effort_extended <- terra::extend(fish_effort_raster, trawl_depth_proportion_extended) # extend both rasters to the extent of the other
-#     
-#     # check the extents now
-#     print(ext(fish_effort_extended))
-#     print(ext(trawl_depth_proportion_extended))
-#     extent_comparison <- terra::compareGeom(fish_effort_extended, trawl_depth_proportion_extended, stopOnError = FALSE)
-#     print(paste0("Raster extent comparison results: ", extent_comparison))
-#   }
-
-
-
-
-```
-
-#### Apply the adjusted (resampled and interpolated) Watson rasters to correct the GFW trawling data
+First, we extend the trawling depth proportion raster to the larger extent of the trawling fishing effort raster and vice versa to ensure all dimensions of both extents are maximized and match one another. We then multiply the proportion raster by the trawling raster to reflect the amount of trawling that is attributed to bottom trawling. Mid-water trawling does not damage the seafloor.
 
 ```{r}
 tic()
 
-years_all = as.factor(2018:2020) # change this back to 2012:2020
+years_all <- as.factor(2012:2020)
 
 for (i in years_all){
-  # read in the GFW apparent fishing effort raster for trawling, we need this read in because we will multiple GFW rasters with the corresponding Watson catch data rasters 
-  #print(paste0("Reading trawling fishing effort for ", i))
-  #fish_effort_trawl <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_", i, ".tif"))
   
   print(paste0("Checking if extents match for ", i, " trawling and fishing catch rasters."))
   # first read in both rasters within the annual folders and save the list of 2 as an object
   rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
   fish_effort_raster <- terra::rast(rasters[1])
   trawl_depth_proportion_raster <- terra::rast(rasters[2])
-  print(ext(fish_effort_raster))
+  print(ext(fish_effort_raster)) # peek at the raster extents
   print(ext(trawl_depth_proportion_raster))
-  extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE)
+  extent_comparison <- terra::compareGeom(fish_effort_raster, trawl_depth_proportion_raster, stopOnError = FALSE) # set stopOnError = FALSE in order to produce "FALSE" from function if extents don't match
   print(paste0("Raster extent comparison results: ", extent_comparison))
 
   if (extent_comparison == FALSE){ 
@@ -820,139 +622,289 @@ for (i in years_all){
       print(ext(trawl_depth_proportion_extended))
       extent_comparison <- terra::compareGeom(fish_effort_extended, trawl_depth_proportion_extended, stopOnError = FALSE)
       print(paste0("Raster extent comparison results: ", extent_comparison)) # should be TRUE
-      
-      #print(paste0("Deleting the old trawl depth proportion raster and old fish effort rasters that did not have matching extents."))
-      # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster and vice versa
-      #unlink(rasters[2])
-      #unlink(rasters[1])
     
       # clear some memory
       rm(rasters)
       gc()
       
-      # re-write the extended rasters to that same folder, with a different name to keep track of which rasters were cropped
-      terra::writeRaster(trawl_depth_proportion_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/trawl_depth_proportion_resampled_2017.tif"), overwrite = TRUE)
-      print("Re-wrote trawl_depth_proportion_resampled_2017.tif")
-      terra::writeRaster(fish_effort_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_2018_extended.tif"), overwrite = TRUE)
-      print("Re-wrote fish_effort_trawl_2018_extended.tif")
+      # re-write the extended rasters to a nested folder called "extended" within the trawling annual folders so we don't need to overwrite the original raster files
+      terra::writeRaster(trawl_depth_proportion_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/extended/trawl_depth_proportion_extended_", i, ".tif"), overwrite = TRUE)
+      print("Output raster for trawl proportion data with extent to match fishing effort data.")
+      terra::writeRaster(fish_effort_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/extended/fish_effort_extended_", i, ".tif"), overwrite = TRUE)
+      print("Output raster for fishing effort raster with extent to match trawl proportion data.")
       
-      print("Deleting old file fish_effort_trawl_yr.tif")
-      # delete old file now that is has been replaced (could not save it as the same name because the original file was in memory, a limitation of terra)
-      #unlink(paste0("/home/shares/ohi/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_", i, ".tif"))
-      file.remove(paste0("/home/shares/ohi/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_trawl_", i, ".tif"))
-      print("Deleted old file fish_effort_trawl_yr.tif")
-      # since the rasters have been rewritten, need to redefine the object that represents them
-      rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
-      print("Redefined rasters obj")
+      # since the rasters have been rewritten as new filenames, need to redefine the object that represents them
+      rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/extended/"), pattern = ".tif", full = TRUE)
+      print("Redefined rasters list object.")
   }
-  print("stacking...")
+
   # stack the resampled interpolated raster of bottom trawling with all trawling data for that year from GFW, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of GFW trawling data for which we do not have more recent trawling proportion data
   trawl_stack <- terra::rast(rasters)
   
   print(paste0("Correcting trawling effort data for ", i))
   
   # multiply the rasters in order to only maintain the proportion of trawling fishing effort that is attributed to bottom trawling rather than midwater trawling
-  terra::lapp(trawl_stack, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
+  terra::lapp(trawl_stack, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_trawl_corrected_", i, ".tif"), overwrite = TRUE)
   
-  #terra::writeRaster(x = corrected_trawling, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawl_sum/", i, "/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
+  print(paste0("Saved corrected trawling data for ", i, " to ", paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_trawl_corrected_", i, ".tif")))
 
   # clear some memory
   rm(trawl_stack)
   gc()
-  
-  print(paste0("Saved corrected trawling data for ", i, " to ", paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/fish_effort_trawl_", i, ".tif")))
 }
   
-toc()
+toc() # 12 min
 ```
 
 ## Combine the corrected trawling data with the dredging data by summing the fishing effort by coordinate
 
-```{r}
-# check that the dredging raster and corrected trawling raster have the same extent
-tic()
+Similarly to the last step, we extend the annual dredging rasters to the extent of the corrected trawling raster and vice versa. Since the dredging rasters generally have smaller extents than the trawling fishing effort rasters, many NA values are produced by extending it. The presence of NA values requires us to sum using the argument na.rm = TRUE in order to avoid nullifying a large proportion of the trawling fishing effort data points in the calculation. Since both the dredging data and the trawling data were pulled from the Global Fising Watch database, these files already have the same resolution and were assigned the same CRS earlier in the data processing.
 
-years_all = as.factor(2012:2020)
+```{r}
+tic()
+years_all <-  as.factor(2012:2020)
 
 for (i in years_all){
-  print(paste0("Checking if extents match for ", i, " dredging and trawling rasters."))
+  
+  print(paste0("Checking if extents match for ", i, " trawling and dredging rasters."))
   # first read in both rasters within the annual folders and save the list of 2 as an object
-  rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/2017"), pattern = ".tif", full = TRUE)
-  dredge <- terra::rast(rasters[1])
-  trawl <- terra::rast(rasters[2])
-  print(ext(dredge))
-  print(ext(trawl))
-  extent_comparison <- terra::compareGeom(trawl, dredge, stopOnError = FALSE)
+  rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i), pattern = ".tif", full = TRUE)
+  dredge_effort_raster <- terra::rast(rasters[1])
+  trawl_effort_raster <- terra::rast(rasters[2])
+  print(ext(dredge_effort_raster)) # smaller extent so extend this raster first
+  print(ext(trawl_effort_raster))
+  extent_comparison <- terra::compareGeom(dredge_effort_raster, trawl_effort_raster, stopOnError = FALSE)
   print(paste0("Raster extent comparison results: ", extent_comparison))
 
   if (extent_comparison == FALSE){ 
-      print("Extending dredging raster to match the extent of the trawling raster and vice versa.")
-      dredge_extended <- terra::extend(dredge, trawl)
-      trawl_extended <- terra::extend(trawl, dredge_extended) # extend both rasters to the extent of the other in all dimensions
+      print("Extending trawling proportion raster to match the extent of the dredging effort raster and vice versa.")
+      dredge_effort_extended <- terra::extend(dredge_effort_raster, trawl_effort_raster)
+      trawl_effort_extended <- terra::extend(trawl_effort_raster, dredge_effort_extended) # extend both rasters to the extent of the other in all dimensions
     
       # check the extents now
-      print(ext(dredge_extended))
-      print(ext(trawl_extended))
-      extent_comparison <- terra::compareGeom(dredge_extended, trawl_extended, stopOnError = FALSE)
+      print(ext(dredge_effort_extended))
+      print(ext(trawl_effort_extended))
+      extent_comparison <- terra::compareGeom(dredge_effort_extended, trawl_effort_extended, stopOnError = FALSE)
       print(paste0("Raster extent comparison results: ", extent_comparison)) # should be TRUE
-      
-      #print(paste0("Deleting the old trawl depth proportion raster and old fish effort rasters that did not have matching extents."))
-      # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster and vice versa
-      #unlink(rasters[2])
-      #unlink(rasters[1])
     
-      # re-write the extended rasters to that same folder, with a different name to keep track of which rasters were cropped
-      terra::writeRaster(dredge_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/trawl_depth_proportion_extended.tif"), overwrite = TRUE)
-      terra::writeRaster(trawl_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i, "/fish_effort_extended.tif"), overwrite = TRUE)
+      # clear some memory
+      rm(rasters)
+      gc()
       
-      # delete the old trawl depth proportion raster that was not yet cropped to the extent of the fishing effort raster and vice versa
-      unlink(paste0())
-      unlink(paste0())
+      # re-write the extended rasters to a nested folder called "extended" to avoid overwriting the original files 
+      terra::writeRaster(trawl_effort_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/extended/fish_effort_dredge_", i, "_extended.tif"), overwrite = TRUE)
+      print("Re-wrote trawling effort file.")
+      terra::writeRaster(dredge_effort_extended, paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/extended/fish_effort_trawl_", i, "_extended.tif"), overwrite = TRUE)
+      print("Re-wrote dredging effort file.")
+      
+      # since the rasters have been rewritten, need to redefine the object that represents them
+      rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/", i, "/extended/"), pattern = ".tif", full = TRUE)
+      print("Redefined rasters list object.")
   }
-  
-  # since the rasters have been rewritten, need to redefine the object that represents them
-  rasters <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/", i), pattern = ".tif", full = TRUE)
-  
-  # stack the resampled interpolated raster of bottom trawling with all trawling data for that year from GFW, matching the data by year for 2012-2017 and then using 2017 for the rest of the years of GFW trawling data for which we do not have more recent trawling proportion data
-  trawl_stack <- terra::rast(rasters)
+
+  # stack the corrected trawling data with the dredging data from GFW, matching the data by year
+  effort_stack <- terra::rast(rasters)
   
   print(paste0("Correcting trawling effort data for ", i))
-  
-  # multiply the rasters in order to only maintain the proportion of trawling fishing effort that is attributed to bottom trawling rather than midwater trawling
-  terra::lapp(trawl_stack, fun = function(x,y){return(x*y)}, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/dredging_trawl_sum/", i, "/fish_effort_trawl_", i, ".tif"), overwrite = TRUE)
-  
+
+  terra::app(effort_stack, fun = "sum", na.rm = TRUE, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_", i, ".tif"), overwrite = TRUE)
+
   # clear some memory
-  rm(trawl_stack)
+  rm(effort_stack)
   gc()
   
-  print(paste0("Saved corrected trawling data for ", i, " to ", dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/dredging_trawl_sum/", i, "/fish_effort_trawl_", i, ".tif"))
+  print(paste0("Saved corrected fishing effort data for ", i, " to ", paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_", i, ".tif")))
 }
   
-toc()
-
+toc() # 15 minutes
 ```
 
-
+### Plot the annual rasters to visualize fishing effort over time
 
 ```{r}
+# load the EEZ spatial data to layer on plot with fishing effort points for reference
+regions_shape()
 
-## Gage's code to combine dredging and trawling
+# define function to be used in loop:
+#map <- function(i){
+#    plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = paste0("Trawling & Dredging Fishing Effort ", i, ": AUS, USA, THA, BIH, GBR, ITA", legend = FALSE)
+#    plot(fishing_effort_annual, axes = FALSE, col = "red", add = TRUE)
+#    }
 
-#Sum the corrected trawl with the dredge effort to get the total demersal destructive fishing effort.
-corrected_trawl <- raster("/home/shares/food-systems/Food_footprint/all_food_systems/dataprep/fisheries/marine/disturbance/global_fishing_watch/FishingWatch_annual_effort_destructive_trawlers_2017.tif")
+# Plot the raster of fishing effort points (without making them terra points) on top of the EEZ polygons
+#plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "Fishing Effort 2015: AUS, USA, THA, BIH, GBR, ITA", legend = FALSE)
+#plot(fish_effort_trawl_2015_rast, axes = FALSE, col = "red", add = TRUE)
 
-dredge <- raster("/home/shares/food-systems/Food_footprint/all_food_systems/dataprep/fisheries/marine/disturbance/global_fishing_watch/FishingWatch_annual_effort_dredge_2017.tif")
+# look into the original trawling_data, before correction with the catch proportion data
+#trawling_og <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/trawling/2013/fish_effort_trawl_2013.tif"))
+#plot(trawling_og, col = "red")
 
-newextent=c(-180.005, 179.995, -89.995, 90.005)
+# look into the corrected catch data raster
+#trawling_corrected <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fish_effort_annual/dredging_trawling_sum/2013/fish_effort_trawl_corrected_2013.tif"))
+#plot(trawling_corrected, col = "red")
 
-dredge_extend <- extend(dredge, newextent, value=0)
-corrected_trawl_extend <- extend(corrected_trawl, newextent, value=0)
+for (i in years_all){
+  # read in the annual file for combined trawling and dredging fishing effort
+  fishing_effort_annual <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_", i, ".tif"))
+  plot(fishing_effort_annual, col = "red") 
+  
+  # Plot the raster of fishing effort points (without making them terra points) on top of the EEZ polygons
+  plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = paste0("Trawling & Dredging Fishing Effort ", i, ": AUS, USA, THA, BIH, GBR, ITA", legend = FALSE))
+  plot(fishing_effort_annual, axes = FALSE, col = "red", add = TRUE)
+  }
 
-damage_stack <- stack(dredge_extend, corrected_trawl_extend)
-
-calc(damage_stack, sum, na.rm=TRUE,
- filename = "/home/shares/food-systems/Food_footprint/all_food_systems/dataprep/fisheries/marine/disturbance/global_fishing_watch/FishingWatch_annual_effort_destructive_hours_2017.tif", overwrite=TRUE, progress="text")
 ```
+
+```{r}
+# delete:
+
+# convert to points vector (a geometry column?)
+#fish_effort_2015_points <- terra::as.points(fish_effort_2015_rast)
+#plot(fish_effort_2015_points, col = "red") # looks like blobs where the fishing points were! I suppose the difference between coordinates and points is that points just appear larger when plotted
+
+# load the EEZ spatial data to layer on plot with fishing effort points for reference
+regions_shape()
+
+# check out df subset to not overwhelm Mazu by opening regions df in its entirety
+View(head(regions))
+
+# filter the regions dataframe for just EEZ polygons
+regions_eez <- regions %>%
+  filter(rgn_type == "eez") %>% 
+  st_transform(crs = 4326)
+
+# try plotting just geometry
+plot(regions_eez$geometry, col = "red")
+
+# try to plot points on polygons
+#plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "fishing effort 2015", legend = FALSE)		
+#plot(fish_effort_2015_points, axes = FALSE, col = "red", add = TRUE) # points are large! not great for viz
+
+# Plot the raster of fishing effort points (without making them terra points) on top of the EEZ polygons
+plot(regions_eez$geometry, col = "grey96", axes = FALSE, main = "Fishing Effort 2015: AUS, USA, THA, BIH, GBR, ITA", legend = FALSE)
+plot(fish_effort_trawl_2015_rast, axes = FALSE, col = "red", add = TRUE)
+```
+
+
+Next steps:
+- iterate over all countries (see if there are more countries that have too much fishing for the API)
+- adjust to quantile if necessary
+- add eval = false to each chunk, delete old commented out code, fix yaml, knit
+- trend
+
+### Calculate fishing effort for each OHI region
+
+```{r}
+# Read in the combined trawling and dredging raster that will serve as a CRS reference, this could be any year of data because they all have the same CRS 
+#fishing_raster <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_2012.tif"))
+
+# Read in OHI regions polygon
+ohi_regions <- st_read(dsn = file.path(dir_M, "git-annex/globalprep/spatial/v2017"), layer = "regions_2017_update") # geometry type = multipolygon
+
+# Make the region coordinate reference system the same as the trawling & dredging raster
+ohi_regions_wgs <-  st_transform(x = ohi_regions, crs = "EPSG:4326")
+# check:
+#crs(ohi_regions_wgs)
+class(ohi_regions_wgs) # sf dataframe
+View(head(ohi_regions_wgs))
+unique(ohi_regions_wgs$type_w_ant)
+
+# convert the dataframe into a spatVector so we can extract the fishing points from the OHI region polygons 
+#ohi_regions_vec <- terra::vect(ohi_regions_wgs)
+# convert the daatframe into a --?
+
+
+# 2012 only before doing in loop
+print(paste("Processing ", i))
+
+fishing_raster <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_2012.tif"))
+
+# extract the fishing effort that falls within the polygons of OHI regions
+#extracted <- terra::extract(fishing_raster, ohi_regions_vec, weights = TRUE)
+
+# cannot extract the spatRaster from the `sf dataframe` object ohi_regions_wgs with the argument weights = area because error is returned:
+# Error in weights == "area" : comparison (1) is possible only for atomic and list types
+
+
+# check the geom in ohi_regions_wgs is valid before running extact_extract
+#ohi_regions_valid <- sf::st_is_valid(ohi_regions_wgs)
+#ohi_regions_valid # all valid 
+# checks if geometries are valid for an sf object (returns true or false for each polygon row)
+
+class(ohi_regions_wgs)
+extracted <- exactextractr::exact_extract(fishing_raster, ohi_regions_wgs, fun = "weighted_sum", weights = "area")
+
+# assign names to be the cell terrain type (eez or land), and the OHI region ID to each value in the vector so we can differentiate between those we need and those we don't
+names(extracted) <- paste(ohi_regions_wgs$type_w_ant, ohi_regions_wgs$rgn_ant_id, sep = " ") 
+extracted
+# create a df of all these cell values and 
+fishing_regional <- plyr::ldply(extracted, rbind) %>% 
+  rename(fishing_effort = "1",
+         "rgn_type rgn_id" = ".id") %>% 
+  tidyr::separate(col = "rgn_type rgn_id", 
+                  into = c("rgn_type", "rgn_id"),
+                  sep = " ")
+
+unique(fishing_regional$rgn_type) # [1] "eez"           "land"          "eez-inland"    "eez-ccamlr"    "land-ccamlr"   "eez-disputed"  "land-disputed" "land-noeez"   # [9] "fao"
+
+# The following code keeps the raster information when the raster lands partially on the land polygons
+fishing_regional_summary <- fishing_regional %>%
+  #tidyr::separate(.id, c("rgn_type", "rgn_id"), sep = "_") %>%
+  #dplyr::mutate(effort = value*weight) %>%
+  dplyr::group_by(rgn_id) %>%
+  dplyr::summarize(effort = sum(fishing_effort, na.rm = TRUE)) %>% # why are there over 220 rgns? maybe old regions that arent part of modern ohi analysis?
+  dplyr::ungroup() %>%
+  dplyr::arrange(as.numeric(rgn_id)) #%>%
+ # dplyr::mutate(year = effort_year)
+
+# Guernsey (rgn 228) sure does fish a lot?
+
+# convert this raster info into a csv that represents the trawling and dredging fishing effort for each OHI region for year i 
+write.csv(fishing_regional_summary, file = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_effort_annual/fishing_annual_csv/fishing_effort_", i, ".csv"), row.names = FALSE)
+
+
+
+
+
+ 
+## Gage's code to extract values for each OHI region
+
+## Loop to extract values for each OHI region
+foreach(sb_catch = catch_rasts) %dopar% { 
+   # sb_catch = catch_rasts[12] if you just want to run one year's raster without looping through all of them
+
+cat(sb_catch)
+
+#catch_year <- str_extract(basename(sb_catch), "(\\d)+") # Extract the corresponding year for each file
+
+catch <- raster(sb_catch)
+
+data <- raster::extract(catch, ohi_regions_wgs, weights = TRUE, normalizeWeights = FALSE, progress = 'text') 
+
+names(data) <- paste(ohi_regions$type_w_ant, ohi_regions$rgn_ant_id, sep="_") 
+sb_catch_rgn   <- plyr::ldply(data, rbind)
+
+# The following code keeps the raster information when the raster lands partially on the land polygons
+sb_catch_rgn <- sb_catch_rgn %>%
+  tidyr::separate(.id, c("rgn_type", "rgn_id"), sep="_") %>%
+  dplyr::mutate(tonnes = value*weight) %>%
+  dplyr::group_by(rgn_type, rgn_id) %>%
+  dplyr::summarize(tonnes = sum(tonnes, na.rm = TRUE)) %>%
+  dplyr::group_by(rgn_id) %>%
+  dplyr::summarize(tonnes = sum(tonnes, na.rm=TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(as.numeric(as.character(rgn_id))) %>%
+  dplyr::mutate(year = catch_year)
+
+write.csv(sb_catch_rgn, file = file.path(here(), "globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/int", sprintf("sb_catch_rgn_%s.csv", catch_year)), row.names=FALSE)
+
+}
+
+
+```
+
+
+
 
 
 
