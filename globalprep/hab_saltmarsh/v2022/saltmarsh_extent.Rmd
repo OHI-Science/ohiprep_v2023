@@ -86,6 +86,7 @@ See also [UQ/murray/Intertidal/v1_1/global_intertidal](https://developers.google
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, eval = FALSE, echo = TRUE)
 
 if (!require(librarian)){install.packages("librarian")}
+if (!require(ohicore)){devtools::install_github('ohi-science/ohicore@dev')}
 
 librarian::shelf(
   tidyverse,
@@ -110,30 +111,11 @@ source(here::here('workflow', 'R', 'common.R'))
 ### Mazu
 dir_here  <- here::here('globalprep', 'hab_saltmarsh', version_year)
 dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
-# dir_wcmc <- file.path(file.path(dir_M, 'git-annex/globalprep/_raw_data/wcmc_saltmarsh'))
 
 ### Aurora
 # dir_here <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change')
 # dir_data <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022')
 ```
-
-```{bash}
-#mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/griis/d2022 && cd $_
-#wget --recursive --no-parent --level 1 --accept zip http://griis.org/download
-
-#mv griis.org/assets/checklists/*.zip .
-
-#rm -r griis.org
-
-#for FILE in *; do 
-#  echo $FILE 
-#  unzip $FILE 
-#  rm *.txt
-#done 
-
-#rm *.zip
-```
-
 
 ### Download the data
 
@@ -147,229 +129,175 @@ mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_chang
 gsutil -m cp "gs://gic-archive/gic-2019-v1-0/v1-0-1/*.tif" .
 ```
 
+### Load OHI region data
+
+```{r eval = FALSE}
+regions_shape()
+
+regions_eez_and_land <- regions %>%
+  dplyr::filter(rgn_type %in% c("eez", 'land')) %>% 
+  sf::st_transform(crs = 4326) 
+
+dummy_df <- regions_eez_and_land %>% 
+  as_tibble() %>% 
+  dplyr::select(rgn_id, rgn_name) 
+
+rgns <- ohicore::rgn_master %>% 
+  dplyr::filter(rgn_typ == "eez") %>% 
+  dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>% 
+  dplyr::distinct() %>% 
+  dplyr::filter(!rgn_id %in% c(213, 255)) # Antarctica and DISPUTED
+```
+
 ## Find tidal wetlands
 
 - replace numbers greater than 50 with 0.0009, NA otherwise
 - left with either tidal wetland, or not tidal wetland
 - units are in km$^2$
-- If the native raster cells are 30x30 m$^2$ area, then a raster cell with a value of 1 would be equivalent to 0.0009 km$^2$ habitat area: (30*30)/(1000*1000) = 0.0009
-- write new `.tif` files into `int/tw_start` folder
+- If the native raster cells are 30 m by 30 m (900 m$^2$ area), then a raster cell would be equivalent to 0.0009 km$^2$ habitat area
+  - (30*30)/(1000*1000) = 0.0009
+- Down sample rasters from 30 m$^2$ ground sample distance (GSD) to ~ 1 km$^2$ GSD. Take the sum of the pixels. 
 
 ```{r eval = FALSE}
 ### Example twprobabilityStart-0000065536-0001114112 has lots of tw
 tictoc::tic()
 
-registerDoParallel(2)
+files <- here::here(dir_data, "raw", "tidal_wetland_change") %>% 
+  list.files(pattern = "Start")
 
-files <- list.files(paste0(dir_data, "/raw/tidal_wetland_change"), pattern = "Start")
+j <- 1
 
-foreach (i = files) %dopar% { 
+# doParallel::registerDoParallel(2)
+# 
+# foreach::foreach (i = files) %dopar% {
+
+for (i in files) {
   
-  fn <- stringr::str_replace(
-    string      = i, 
-    pattern     = "murray-gic-v1.0.1-twprobabilityStart",
-    replacement = "tw_start"
-  ) 
+  fn <- i %>% 
+    stringr::str_replace(
+      pattern     = "murray-gic-v1.0.1-twprobabilityStart",
+      replacement = "tw_start_ds") %>% 
+    stringr::str_replace(
+      pattern     = ".tif",
+      replacement = ".csv")
   
-  file_name <- here::here(dir_data, "int", "tw_start", fn)
+  cat(j, "/", length(files), "\n")
+  
+  j <- j + 1
+  
+  file_name <- here::here(dir_data, "int", "tw", fn)
   
   if(!file.exists(file_name)){
+    cat(fn, " is being created!\n")
     ## classify the values into two groups 
-    ## all values >= 0 and <= 50 become NA
+    ## all values >= 0 and <= 50 become 0
     ## all values > 50 and <= 100 become 0.0009
-    ##     from-to-becomes
-    mat <- c(0, 50, NA,
+    ##     from,  to, becomes
+    mat <- c( 0,  50, 0,
              50, 100, 0.0009)
     
     reclassification_mat <- matrix(mat, ncol=3, byrow=TRUE)
     
-    here::here(dir_data, "raw", "tidal_wetland_change", i) %>% 
+    cat("    classifying...\n")
+    
+    image <- here::here(dir_data, "raw", "tidal_wetland_change", i) %>% 
       terra::rast() %>% 
       terra::classify(
         rcl = reclassification_mat,
         include.lowest=TRUE,
-        right = TRUE,
-        filename = file_name
+        right = TRUE
       )
     
-  } else {cat(paste0(fn, " already exists!\n"))}
-}
-tictoc::toc()
-```
-
-## Down sample rasters
-
-Down sample rasters from 30 m$^2$ ground sample distance (GSD) to ~ 1 km$^2$ GSD. Take the sum of the pixels. 
-
-```{r eval = FALSE}
-tictoc::tic()
-
-registerDoParallel(4)
-
-scale_factor = 30
-
-files <- list.files(here::here(dir_data, "int", "tw_start"))
-
-foreach (i = files) %dopar% { 
-  
-  fn <- stringr::str_replace(
-    string      = i, 
-    pattern     = "tw_start",
-    replacement = "tw_start_down_sampled"
-  )
-  
-  file_name <- here::here(dir_data, "int", "tw_start_down_sampled", fn)
-  
-  if(!file.exists(file_name)){
+    # image <- (image / 100) * 0.0009
     
-    img <- here::here(dir_data, "int", "tw_start/", i) %>% 
-      terra::rast() 
+    cat("    down sampling...\n")
     
-    down_sampled_img <- terra::aggregate(
-      x = img, 
-      fact = scale_factor, 
+    down_sampled_image <- terra::aggregate(
+      x = image, 
+      fact = 30, 
       fun = sum,
-      na.rm = T,
-      filename = file_name
+      na.rm = T
     )
     
+    cat("    extracting...\n")
+    
+    extracted_values <- exactextractr::exact_extract(
+      x = down_sampled_image, y = regions_eez_and_land, fun = 'sum'
+    )
+    
+    cbind("km2" = extracted_values, dummy_df) %>% 
+      dplyr::group_by(rgn_id, rgn_name) %>% 
+      dplyr::summarise(km2 = sum(km2)) %>% 
+      readr::write_csv(file_name)
+    
   } else {cat(paste0(fn, " already exists!\n"))}
 }
-
 tictoc::toc()
 ```
 
 ## Summarize the grid cells within each country
 
-```{r}
-tictoc::tic()
+```{r eval = FALSE}
+files <- here::here(dir_data, "int", "tw") %>% 
+  list.files(full.names = T)
 
-regions_shape()
-
-regions_eez_and_land <- regions %>%
-  dplyr::filter(rgn_type %in% c("eez", 'land')) %>% 
-  sf::st_transform(crs = 4326)  
-
-rgns <- ohicore::rgn_master %>% 
-  dplyr::filter(rgn_typ == "eez") %>% 
-  dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>% 
-  dplyr::distinct()
-
-files <- here::here(dir_data, "int", "tw_start_down_sampled") %>% 
-  list.files()
-
-# registerDoParallel(3)
-
-# foreach (file = files) %dopar% { 
+output <- tibble()
 
 for (file in files) { 
   
-  fn <- stringr::str_replace(
-    string      = file, 
-    pattern     = ".tif",
-    replacement = ".csv"
-  )
+  fn <- "tidal_wetland_extent_2001.csv"
   
-  file_name <- here::here(dir_data, "int", "tw_extent_summaries", fn)
+  tmp <- readr::read_csv(file)
   
-  if(!file.exists(file_name)){
-    
-    image_sf <- here::here(dir_data, "int", "tw_start_down_sampled", file) %>% 
-      terra::rast(file) %>%
-      terra::as.points(na.rm = T) %>%
-      sf::st_as_sf()
-    
-    cat(paste0(fn, " is being created!\n"))
-    
-    countries <- sf::st_intersection(image_sf, regions_eez_and_land)
-    
-    if (nrow(countries) > 0) {
-      
-      countries %>%
-        as.data.frame() %>%
-        dplyr::group_by(rgn_id) %>%
-        dplyr::summarise(tidal_wetland = sum(twprobability_2001)) %>%
-        dplyr::left_join(rgns) %>%
-        dplyr::mutate(year = 2001) %>%
-        readr::write_csv(file_name)
-    } else {
-      cat("    This file does not have any tidal wetland!\n")
-      tibble('rgn_id' = character(), 'tidal_wetland' = character(),
-             'rgn_name' = character(), 'year' = character()) %>% 
-        write_csv(file_name)
-    }
-  } else {cat(paste0(fn, " already exists!\n"))}
+  output <- rbind(tmp, output)
 }
 
-tictoc::toc()
+tidal_wetland_2001 <- output %>% 
+  dplyr::group_by(rgn_id) %>% 
+  dplyr::summarise(km2 = sum(km2)) %>% 
+  dplyr::full_join(dplyr::select(rgns, rgn_id)) %>% 
+  dplyr::mutate(year = 2001, 
+                habitat = "tidal wetland",
+                km2 = ifelse(is.na(km2), 0, km2)) %>% 
+  readr::write_csv(here::here(dir_here, "output", "tidal_wetland_2001.csv"))
 ```
 
+## Load mangrove and tidal flat data
 
+Load the extent of mangroves and tidal flat for 2001-ish.
 
+```{r eval = FALSE}
+tidal_wetland_2001 <- here::here(dir_here, "output", "tidal_wetland_2001.csv") %>%
+  readr::read_csv()
 
-```{r}
-"
-w_start_down_sampled-0000000000-0000851968.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000000000-0000917504.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000000000-0000983040.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000000000-0001048576.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000000000.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000065536.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000131072.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000983040.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000000000-0001048576.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000000000.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000065536.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000131072.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0000458752.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0001245184.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000065536-0001310720.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000131072-0000000000.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000131072-0000131072.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000131072-0000458752.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000131072-0000655360.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000131072-0000720896.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000131072-0001310720.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000196608-0000000000.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000196608-0000131072.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000196608-0000196608.csv is being created!
-    This file does not have any tidal wetland!
-tw_start_down_sampled-0000196608-0000262144.csv is being created!
-    This file does not have any tidal wetland!
+mangrove_2001 <- here::here("globalprep", "hab_mangrove", "v2022", "data", "habitat_extent_mangrove_updated.csv") %>% 
+  readr::read_csv() %>% 
+  dplyr::filter(year == 1996) %>% 
+  dplyr::mutate(year = 2001) 
 
+tidal_flat_2001 <- here::here("globalprep", "hab_tidal_flat", version_year, "output", "tidal_flat_extent.csv") %>% 
+  readr::read_csv() %>% 
+  dplyr::filter(year == 2001)
 
+saltmarsh_2001 <- rbind(tidal_wetland_2001, mangrove_2001, tidal_flat_2001) %>% 
+  tidyr::pivot_wider(names_from = habitat, values_from = km2) %>% 
+  dplyr::mutate(`salt marsh` = `tidal wetland` - `tidal flat` - mangrove) %>% 
+  tidyr::pivot_longer(cols = 3:6, names_to = 'habitat', values_to = 'km2') %>% 
+  dplyr::filter(habitat == "salt marsh") %>% 
+  dplyr::left_join(rgns) %>% 
+  tidyr::drop_na()
 
-
-
-"
+sum(tidal_wetland_2001$km2)
+sum(mangrove_2001$km2)
+sum(tidal_flat_2001$km2)
+sum(saltmarsh_2001$km2)
 ```
 
-
-
-
+```{r eval = FALSE}
+saltmarsh_trend_data <- here::here(dir_here, "output", "saltmarsh_trend.csv") %>% 
+  readr::read_csv()
+sum(saltmarsh_trend_data$difference)
+```
 
 
 
