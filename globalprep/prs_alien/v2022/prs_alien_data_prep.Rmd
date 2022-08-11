@@ -337,7 +337,7 @@ pressure <- gf_step_3 %>%
 ## save gapfilling flags 
 gf_step_3 %>%
   dplyr::select(rgn_id, rgn_name, year, gapfilled, method) %>%
-  readr::write_csv("prs_alien_gf.csv")
+  readr::write_csv(here::here(dir_here, "output", "prs_alien_gf.csv"))
 
 ## save value dataset
 pressure %>%
