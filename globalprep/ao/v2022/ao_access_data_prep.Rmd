@@ -282,7 +282,7 @@ rgns_data <- match_country_data %>%
 
 ## There is still a region "Kiribati" which needs to be split. For some reason, trying to do so with match2rgn does not work. 
 ## filter for these regions in country_df and prep so they match rgns_data. What we have to do is:
-## Split "Kiribati" into "Line Islands (Kiribati)" and "Phoenix Islands (Kiribati)", Gilbert Islands (Kiribati)
+## Split "Kiribati" into "Line Islands (Kiribati)", "Phoenix Islands (Kiribati)", and "Gilbert Islands (Kiribati)"
 kiribati_split <- country_df %>%
   dplyr::filter(geo_area_name %in% c("Kiribati")) %>%
   dplyr::mutate(
