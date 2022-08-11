@@ -72,11 +72,8 @@ data_year <- paste0("d", current_year)
 # source(here::here('workflow', 'R', 'common.R'))
 
 ### Mazu
-# dir_here  <- here::here('globalprep', 'hab_saltmarsh', version_year)
-# dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
-
-### PC
-dir_here  <- here::here()
+dir_here  <- here::here('globalprep', 'prs_alien', version_year)
+dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'griis', data_year)
 
 # rgns <- ohicore::georegion_labels # Kiribati is broke v2022
 rgns <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2017/output/georegion_labels.csv")
@@ -89,7 +86,7 @@ rgns_eez <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep_v202
 ## Download the data
 
 ```{bash}
-mkdir /c/Users/Cullen/Desktop/GitHub/OHI/prs_alien/v2022/raw && cd $_
+mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/griis/d2022 && cd $_
 
 wget --recursive --no-parent --level 1 --accept zip http://griis.org/download
 
@@ -120,7 +117,7 @@ codes <- countrycode::codelist %>%
 Loop through the raw data files and join them into one large file. 
 
 ```{r}
-files <- list.files("raw", full.names = T)
+files <- list.files(dir_data, full.names = T)
 
 output <- tibble("id" = character())
 
@@ -346,7 +343,7 @@ gf_step_3 %>%
 pressure %>%
   dplyr::select(rgn_id, year, value) %>% 
   # readr::write_csv(here::here("globalprep", "prs_alien", version_year, "output", "prs_alien.csv"))
-  readr::write_csv("prs_alien.csv")
+  readr::write_csv(here::here(dir_here, "output", "prs_alien.csv"))
 ```
 
 ## Datacheck
@@ -354,11 +351,11 @@ pressure %>%
 Lets compare to 2013 data. 
 
 ```{r, eval = F}
-new_data <- here::here("prs_alien.csv") %>% 
+new_data <- here::here(dir_here, "output", "prs_alien.csv") %>% 
   readr::read_csv() %>%
   dplyr::left_join(rgns_eez)
 
-old_data <- here::here("p_sp_alien_2013a.csv") %>% 
+old_data <- here::here('globalprep', 'prs_alien', 'v2013', 'data', "p_sp_alien_2013a.csv") %>% 
   readr::read_csv() %>%
   dplyr::rename(value = pressures.score) %>% 
   dplyr::left_join(rgns_eez)
