@@ -214,7 +214,6 @@ compare_extents <- habitat_extent_mangrove_updated %>%
 Compare a few country values with those in the paper
 
 ```{r, eval=FALSE}
-
 indonesia <- habitat_extent_mangrove_updated %>% 
   filter(rgn_id == 216)
 
@@ -235,5 +234,21 @@ Brazil 1996 (paper): 11,474.56
 Brazil 2020 (workflow): 11,497.22
 Brazil 2020 (paper): 11,414.71
 
-**Everything looks good**
+**Everything looks good here**
+
+Look for any major discrepancies in specific regions by reading in datatable from GMW paper
+
+```{r, eval=FALSE}
+# read in extents calculated in the 2022 GMW paper for reference - data scraped from pdf in R/scrape_gmw_paper.R
+gmw_paper_extents <- read_csv(here(dir_hab_mangrove, "data/gmw_paper_extents_1996-2020.csv")) %>% 
+  rename(km2_paper = km2)
+
+compare_rgn_extents <- habitat_extent_mangrove_updated %>% 
+  left_join(gmw_paper_extents, by = c("rgn_id", "year")) %>% 
+  mutate(diff = km2 - km2_paper) %>% 
+  filter(abs(diff) > 1) %>% 
+  mutate(pct_diff = abs(diff) / km2 * 100)
+```
+
+
 
