@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Jul 28 13:30:12 2022 by molitor" />
+<meta name="author" content="Compiled on Fri Aug 12 15:31:55 2022 by molitor" />
 
 
-<title>OHI 2022 - saltmarsh extent</title>
+<title>OHI 2022 - saltmarsh trend</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -426,8 +426,8 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">OHI 2022 - saltmarsh extent</h1>
-<h4 class="author"><em>Compiled on Thu Jul 28 13:30:12 2022 by
+<h1 class="title toc-ignore">OHI 2022 - saltmarsh trend</h1>
+<h4 class="author"><em>Compiled on Fri Aug 12 15:31:55 2022 by
 molitor</em></h4>
 
 </div>
@@ -469,8 +469,7 @@ output</a></li>
 
 <div id="summary" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Summary</h1>
-<p>This script generates the extent of saltmarsh for each OHI
-region.</p>
+<p>This script generates the trend of saltmarsh for each OHI region.</p>
 <div id="updates-from-previous-assessment" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> Updates from previous
 assessment</h2>
@@ -510,25 +509,32 @@ for global maps of the distribution of tidal flat ecosystems.</p>
 <p><strong>Time range</strong>: 1999-2019</p>
 <p><strong>Download link</strong>: <a href="https://www.globalintertidalchange.org/data-usage" class="uri">https://www.globalintertidalchange.org/data-usage</a> use
 <code>gsutil -m cp &quot;gs://gic-archive/gic-2019-v1-0/v1-0-1/*.tif&quot; &quot;PATH-TO-LOCAL-FOLDER&quot;</code></p>
-<p><strong>Variables</strong>: - gain/loss: - 0 = no change - 1 = gain
-or loss in respective layers</p>
 <ul>
-<li>gainType/lossType:
+<li><strong>Note</strong>: Download should only be done once, either in
+this script or <code>saltmarsh_extent.Rmd</code></li>
+</ul>
+<p><strong>Variables</strong>: - <code>gain</code> and
+<code>loss</code>: - 0 = no change - 1 = gain or loss in respective
+layers</p>
+<ul>
+<li><code>gainType</code> and <code>lossType</code>:
 <ul>
 <li>2 - Tidal flat</li>
 <li>3 - Mangrove</li>
 <li>5 - Tidal marsh</li>
 </ul></li>
-<li>gainYear/lossYear
+<li><code>gainYear</code> and <code>lossYear</code>
 <ul>
 <li>19 = 2017-2019</li>
 <li>16 = 2014-2016</li>
 <li>etc</li>
 </ul></li>
-<li>raster shards use a hash that represents extent
+<li>raster shards use a hash that represents spatial extent
 <ul>
-<li><code>0000000000-0000000000</code> represents the same extent for
-gain, loss, gainType, lossType, gainYear, and lossYear</li>
+<li><code>0000000000-0000000000</code> represents the same spatial
+extent for <code>gain</code>, <code>loss</code>, <code>gainType</code>,
+<code>lossType</code>, <code>gainYear</code>, and
+<code>lossYear</code></li>
 <li>Not human readable but we can use this to loop over areas for our
 calculations</li>
 </ul></li>
@@ -607,6 +613,7 @@ loss</li>
 directory</li>
 <li>left with a gain or loss for each country</li>
 </ul></li>
+<li><p>Use extent to calculate final trend…</p></li>
 </ol>
 </div>
 <div id="setup" class="section level2" number="2.2">
@@ -626,21 +633,22 @@ directory</li>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  raster,</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  tictoc,</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  foreach,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  doParallel</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>) </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="do">### directory paths and relevant files</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>current_year <span class="ot">&lt;-</span> <span class="dv">2022</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>data_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_year)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;workflow&#39;</span>, <span class="st">&#39;R&#39;</span>, <span class="st">&#39;common.R&#39;</span>))</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="do">### Mazu</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;hab_saltmarsh&#39;</span>, version_year)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex&#39;</span>, <span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;_raw_data&#39;</span>, <span class="st">&#39;global_tidal_wetland_change&#39;</span>, data_year)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="do">### Aurora</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_here &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change&#39;)</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_data &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022&#39;)</span></span></code></pre></div>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  doParallel,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  exactextractr</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="do">### directory paths and relevant files</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>current_year <span class="ot">&lt;-</span> <span class="dv">2022</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>data_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_year)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;workflow&#39;</span>, <span class="st">&#39;R&#39;</span>, <span class="st">&#39;common.R&#39;</span>))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="do">### Mazu</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;hab_saltmarsh&#39;</span>, version_year)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex&#39;</span>, <span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;_raw_data&#39;</span>, <span class="st">&#39;global_tidal_wetland_change&#39;</span>, data_year)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="do">### Aurora</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_here &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change&#39;)</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_data &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022&#39;)</span></span></code></pre></div>
 <div id="download-the-data" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Download the
 data</h3>
@@ -666,7 +674,7 @@ folder</li>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;Type&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;Type&quot;</span>)</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span> (<span class="at">i =</span> files) <span class="sc">%dopar%</span> { </span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -678,7 +686,7 @@ folder</li>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(file_name)){</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/&quot;</span>, i))</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change/&quot;</span>, i))</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">subst</span>(</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> img,</span>
@@ -718,7 +726,7 @@ folder</li>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;Year&quot;</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;Year&quot;</span>)</span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">13</span>, <span class="dv">16</span>, <span class="dv">19</span>)</span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">foreach</span> (<span class="at">i =</span> files) <span class="sc">%dopar%</span> { </span>
@@ -732,7 +740,7 @@ folder</li>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(file_name)){</span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/&quot;</span>, i))</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change/&quot;</span>, i))</span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>      </span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="do">### Delete current year from list of years</span></span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      yrs <span class="ot">&lt;-</span> years <span class="sc">%&gt;%</span> magrittr<span class="sc">::</span><span class="fu">extract</span>(. <span class="sc">!=</span> yr) </span>
@@ -780,8 +788,8 @@ for each year - write new <code>.tif</code> files into
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(<span class="dv">4</span>)</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>loss_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;loss-&quot;</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>gain_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;gain-&quot;</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>loss_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;loss-&quot;</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>gain_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;gain-&quot;</span>)</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">13</span>, <span class="dv">16</span>, <span class="dv">19</span>)</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
@@ -824,7 +832,7 @@ for each year - write new <code>.tif</code> files into
 <span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>                                <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>      }</span>
 <span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>      gain_loss_img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/&quot;</span>, i))</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>      gain_loss_img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/raw/tidal_wetland_change/&quot;</span>, i))</span>
 <span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>      </span>
 <span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>      type_img <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(type_file)</span>
 <span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>      </span>
@@ -911,7 +919,7 @@ folder</li>
 <p>The above script makes two files, one with the aggregate function,
 and one after the cells have been converted to area. This chunk deletes
 the redundant and useless rasters with a shell script.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/int/down_sample</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/int/down_sample</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Declare an array</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">declare</span> <span class="at">-a</span> <span class="va">Array</span><span class="op">=</span><span class="va">(</span>4 7 10 13 16 19<span class="va">)</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate the array using for loop</span></span>
@@ -920,8 +928,6 @@ the redundant and useless rasters with a shell script.</p>
 <div id="mosaic-the-rasters" class="section level2" number="2.7">
 <h2><span class="header-section-number">2.7</span> Mosaic the
 rasters</h2>
-<p>This step usually fails if you try to do all of the raster. Here we
-break it up into two steps.</p>
 <ul>
 <li>1 global raster per year for with gain-loss difference at 1 km<span class="math inline">\(^2\)</span> resolution</li>
 <li><code>terra::mosaic()</code> is still crashing my R session at this
@@ -929,6 +935,8 @@ resolution so need to look into a better way to do this</li>
 <li>write new <code>.tif</code> files into <code>int/output</code>
 folder</li>
 </ul>
+<p>This step usually fails if you try to do all of the raster. Here we
+break it up into two steps.</p>
 <div id="step-1" class="section level3" number="2.7.1">
 <h3><span class="header-section-number">2.7.1</span> Step 1</h3>
 <p>The first step takes the 147 files per group and breaks them into 7
@@ -1070,8 +1078,8 @@ loss</li>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">rgn_id =</span> rgn_id_2013, <span class="at">rgn_name =</span> rgn_nam_2013) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>()</span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>loss_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;loss_&quot;</span>)</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>gain_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;gain_&quot;</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>loss_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output/tidal_wetland_change&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;loss_&quot;</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>gain_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output/tidal_wetland_change&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;gain_&quot;</span>)</span>
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">13</span>, <span class="dv">16</span>, <span class="dv">19</span>)</span>
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
@@ -1081,7 +1089,7 @@ loss</li>
 <span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="do">###### LOSS</span></span>
 <span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  yr_loss_files <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="fu">paste0</span>(<span class="st">&quot;in_&quot;</span>, yr, <span class="st">&quot;_&quot;</span>), loss_files, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  loss <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output/&quot;</span>, yr_loss_files)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  loss <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output/tidal_wetland_change/&quot;</span>, yr_loss_files)</span>
 <span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  file_name_loss <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;int&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;saltmarsh_loss_&quot;</span>, yr, <span class="st">&quot;.csv&quot;</span>))</span>
 <span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -1108,7 +1116,7 @@ loss</li>
 <span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  <span class="do">###### GAIN</span></span>
 <span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>  yr_gain_files <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="fu">paste0</span>(<span class="st">&quot;in_&quot;</span>, yr, <span class="st">&quot;_&quot;</span>), gain_files, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>  gain <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output/&quot;</span>, yr_gain_files)</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>  gain <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_data, <span class="st">&quot;/output/tidal_wetland_change/&quot;</span>, yr_gain_files)</span>
 <span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>  file_name_gain <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;int&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;saltmarsh_gain_&quot;</span>, yr, <span class="st">&quot;.csv&quot;</span>))</span>
 <span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>  </span>

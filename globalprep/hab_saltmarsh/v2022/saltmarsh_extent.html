@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Aug 11 16:34:11 2022 by molitor" />
+<meta name="author" content="Compiled on Fri Aug 12 15:33:58 2022 by molitor" />
 
 
 <title>OHI 2022: saltmarsh extent</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022: saltmarsh extent</h1>
-<h4 class="author"><em>Compiled on Thu Aug 11 16:34:11 2022 by
+<h4 class="author"><em>Compiled on Fri Aug 12 15:33:58 2022 by
 molitor</em></h4>
 
 </div>
@@ -636,7 +636,7 @@ ground sample distance (GSD) to ~ 1 km<span class="math inline">\(^2\)</span> GS
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> j <span class="sc">+</span> <span class="dv">1</span></span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  file_name <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tw&quot;</span>, fn)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  file_name <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_wetland&quot;</span>, fn)</span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(file_name)){</span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(fn, <span class="st">&quot; is being created!</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
@@ -688,7 +688,7 @@ ground sample distance (GSD) to ~ 1 km<span class="math inline">\(^2\)</span> GS
 <div id="summarize-the-grid-cells-within-each-country" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Summarize the grid
 cells within each country</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tw&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_wetland&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>(<span class="at">full.names =</span> T)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
@@ -725,20 +725,21 @@ tidal flat data</h2>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>tidal_flat_2001 <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;hab_tidal_flat&quot;</span>, version_year, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;tidal_flat_extent.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2001</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>saltmarsh_2001 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(tidal_wetland_2001, mangrove_2001, tidal_flat_2001) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> habitat, <span class="at">values_from =</span> km2) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">salt marsh</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">tidal wetland</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">tidal flat</span><span class="st">`</span> <span class="sc">-</span> mangrove) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">names_to =</span> <span class="st">&#39;habitat&#39;</span>, <span class="at">values_to =</span> <span class="st">&#39;km2&#39;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(habitat <span class="sc">==</span> <span class="st">&quot;salt marsh&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(rgns) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">drop_na</span>()</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(tidal_wetland_2001<span class="sc">$</span>km2)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(mangrove_2001<span class="sc">$</span>km2)</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(tidal_flat_2001<span class="sc">$</span>km2)</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(saltmarsh_2001<span class="sc">$</span>km2)</span></code></pre></div>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1995</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2001</span>) </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>saltmarsh_2001 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(tidal_wetland_2001, mangrove_2001, tidal_flat_2001) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> habitat, <span class="at">values_from =</span> km2) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">salt marsh</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">tidal wetland</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">tidal flat</span><span class="st">`</span> <span class="sc">-</span> mangrove) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">names_to =</span> <span class="st">&#39;habitat&#39;</span>, <span class="at">values_to =</span> <span class="st">&#39;km2&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(habitat <span class="sc">==</span> <span class="st">&quot;salt marsh&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(rgns) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">drop_na</span>()</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(tidal_wetland_2001<span class="sc">$</span>km2)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(mangrove_2001<span class="sc">$</span>km2)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(tidal_flat_2001<span class="sc">$</span>km2)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(saltmarsh_2001<span class="sc">$</span>km2)</span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>saltmarsh_trend_data <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;saltmarsh_trend.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(saltmarsh_trend_data<span class="sc">$</span>difference)</span></code></pre></div>

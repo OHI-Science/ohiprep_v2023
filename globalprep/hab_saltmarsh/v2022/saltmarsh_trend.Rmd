@@ -134,7 +134,8 @@ librarian::shelf(
   raster,
   tictoc,
   foreach,
-  doParallel
+  doParallel,
+  exactextractr
 ) 
 ### directory paths and relevant files
 current_year <- 2022

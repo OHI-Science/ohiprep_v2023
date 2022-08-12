@@ -99,7 +99,8 @@ librarian::shelf(
   raster,
   tictoc,
   foreach,
-  doParallel
+  doParallel,
+  exactextractr
 )
 ### directory paths and relevant files
 current_year <- 2022
@@ -185,7 +186,7 @@ for (i in files) {
   
   j <- j + 1
   
-  file_name <- here::here(dir_data, "int", "tw", fn)
+  file_name <- here::here(dir_data, "int", "tidal_wetland", fn)
   
   if(!file.exists(file_name)){
     cat(fn, " is being created!\n")
@@ -238,7 +239,7 @@ tictoc::toc()
 ## Summarize the grid cells within each country
 
 ```{r eval = FALSE}
-files <- here::here(dir_data, "int", "tw") %>% 
+files <- here::here(dir_data, "int", "tidal_wetland") %>% 
   list.files(full.names = T)
 
 output <- tibble()
@@ -277,7 +278,8 @@ mangrove_2001 <- here::here("globalprep", "hab_mangrove", "v2022", "data", "habi
 
 tidal_flat_2001 <- here::here("globalprep", "hab_tidal_flat", version_year, "output", "tidal_flat_extent.csv") %>% 
   readr::read_csv() %>% 
-  dplyr::filter(year == 2001)
+  dplyr::filter(year == 1995) %>% 
+  dplyr::mutate(year = 2001) 
 
 saltmarsh_2001 <- rbind(tidal_wetland_2001, mangrove_2001, tidal_flat_2001) %>% 
   tidyr::pivot_wider(names_from = habitat, values_from = km2) %>% 
