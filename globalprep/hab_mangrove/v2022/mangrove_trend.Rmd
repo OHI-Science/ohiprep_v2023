@@ -62,8 +62,7 @@ region_data()
 
 ```{r, eval = FALSE}
 mangrove_extent <- read_csv(file.path(dir_hab_mangrove, "data/habitat_extent_mangrove_updated.csv")) %>% 
-  filter(rgn_id <= 250, year >= 2009)
-
+  filter(rgn_id <= 250, year >= 2007)
 ```
 
 
@@ -82,72 +81,74 @@ benin <- mangrove_extent %>%
 
 ## --
 
-# v2022: the extents for Benin from the latest update (2017 - 2020) appear more reasonable - this assessment we will calculate trend based on 2016 through 2020
+# v2022: the extents for Benin from the latest update (2017 - 2020) appear more reasonable - this assessment we will calculate trend for Benin based on 2016 through 2020
 
 # our datasets formerly reported Dominica having 0 extent, but the analysis of the polygons from the latest update now show a small extent. The paper associated with the GMW data (https://zenodo.org/record/6894273) shows Dominica having a consistent small extent (0.01 km2) for all years. Dominica's trend will be based on years after it's extent became non-zero.
 
+# Bonaire has a suspicious jump in extent in 2018 that will be removed - this issue was identified later in the workflow after initially calculating trends and finding Bonaire had a relatively large positive trend
 
 mangrove_extent_rgns <-  mangrove_extent %>%
   left_join(rgns_eez) %>%
   dplyr::select(rgn_id, rgn_name, year, habitat, km2) %>%
   filter(rgn_id != 99 | (rgn_id == 99 & year >= 2017)) %>% # crop Benin year range
   filter(rgn_id != 123 | (rgn_id == 123 & year >= 2019)) %>%  # crop Dominica year range
+  filter(rgn_id != 245 | (rgn_id == 245 & year != 2018)) %>%  # remove 2018 for Bonaire
   group_by(rgn_id, rgn_name) %>%
   mutate(total_area = sum(km2),
          km2_rel = km2 / km2[year == min(year)]) %>%
   mutate(km2_rel = ifelse(total_area == 0, 0, km2_rel))
 
 
-# regression model to be used in pipe sequence below
+# function to create linear regression and tidy the output - to be used in pipe sequence below
 trend_function <- function(df) {
   lm(km2_rel ~ year, data = df) %>% 
     broom::tidy()
-  }
+}
 
 mangrove_extent_trends <- mangrove_extent_rgns %>% 
   group_by(rgn_id, rgn_name) %>% 
-  nest() %>% 
-  mutate(model = purrr::map(data, trend_function)) %>% 
-  unnest(cols = c(model)) %>% 
+  nest() %>% # create nested df based on groupings
+  mutate(model = purrr::map(data, trend_function)) %>% # perform linear regression on each region
+  unnest(cols = c(model)) %>% # unnest contents of model column
   filter(term == "year") %>% 
-  dplyr::select(rgn_id, rgn_name, trend = estimate)
-  
-
-
-  plyr::dlply(mdl = lm(km2_rel ~ year, data = .)) %>%
-  summarize(rgn_name = rgn_name,
-            rgn_id = rgn_id,
-            habitat = "mangrove",
-            trend = coef(mdl)['year'] * 5) %>%
-  mutate(trend = round(trend, 6)) %>%
+  mutate(trend = estimate * 5 %>% 
+           round(6)) %>% 
+  dplyr::select(rgn_id, rgn_name, trend) %>% 
   ungroup()
 
-mean(data_region_trend$trend)
+```
 
-## now gapfill Benin
-benin_gf <- data.frame(rgn_name = "Benin", rgn_id = 99, habitat = "mangrove", trend = 0)
+Look at regions with most positive trends and make sure they make sense
 
-data_region_trend_gf <- data_region_trend %>%
-  rbind(benin_gf) 
+```{r, eval = FALSE}
+
+growing_extents <- mangrove_extent_trends %>% 
+  slice_max(n = 10, order_by = trend)
+
+# investigate Bonaire
+bonaire <- mangrove_extent %>% 
+  filter(rgn_id == 245)
+
+# 2018 looks suspicious - this increase isn't reflected in the GMW paper, and I can't find anything to support it elsewhere - this year is now removed above 
+
+```
+ 
+Compare with trends from the last update
+ 
+```{r, eval = FALSE}
+version_year_dirs <- list.dirs(here("globalprep/hab_mangrove"), recursive = FALSE, full.names = FALSE)
+prev_version_year <- version_year_dirs[length(version_year_dirs) - 1]
+
+old_trends <- read_csv(here("globalprep/hab_mangrove", prev_version_year, "data/habitat_trend_mangrove_updated.csv")) %>% 
+  filter(year == max(year)) %>% 
+  rename(old_trend = trend)
   
+compare_trends <- mangrove_extent_trends %>% 
+  left_join(old_trends, by = "rgn_id")
 
-## compare to old 
-old <- read.csv('globalprep/hab_mangrove/v2015/data/habitat_trend_mangrove_v2015.csv')
+plot(compare_trends$old_trend, compare_trends$trend)
 
-## note compare these when we obtain the new extents...
-# 
-setdiff(old$rgn_id, data_region_trend$rgn_id) 
-# [1]  39  62  98  99 108 118 119 124 127 221 244 250 - We lost less regions than we did in 2015
-setdiff(data_region_trend$rgn_id, old$rgn_id)
-# [1]  37 123 152 155
-
-old <- old %>%
-  left_join(data_region_trend, by='rgn_id') %>%
-  left_join(rgns_eez) %>%
-  mutate(differece = trend.x - trend.y)
-
-plot(old$trend.x, old$trend.y, ylab="new trend", xlab="old trend") ## trend is wildly different... but that is expected given the new data.... the same thing happened in 2015 when the data was updated. 
-
+# things look quite different, but this isn't surprising as GMW updated their methods and back-calculated extents / redefined polygons for past years
 
 ```
 
@@ -159,44 +160,49 @@ plot(old$trend.x, old$trend.y, ylab="new trend", xlab="old trend") ## trend is w
 #############################################
 
 # function that calculates trend for each scenario year and saves data
-# NOTE: scenario 2021 = 2007:2016 years.  
-#       scenario 2020 = 2007:2016 years. 
-#       scenario 2019 = 2007:2016 years. 
-#       scenario 2018 = 2007:2016 years. 
-#       scenario 2017 = 2007:2016 years. 
+# NOTE: scenario 2021 = 2007:2020 years.  
+#       scenario 2020 = 2007:2020 years. 
+#       scenario 2019 = 2007:2019 years. 
+#       scenario 2018 = 2007:2018 years. 
+#       scenario 2017 = 2007:2017 years. 
 #       scenario 2016 = 2007:2016 years. 
 #       scenario 2015 = 2007:2015 years. 
 #       scenario 2014 = 2007:2015 years. 
 #       scenario 2013 = 2007:2015 years. 
 #       scenario 2012 = 2007:2015 years. 
 
-## so I just need to calculate 2 trends, 1 for 2007:2015 and 1 for 2007:2016
+# create vector of assessment years we need trends for
+assessment_years <- unique(mangrove_extent$year[mangrove_extent$year >= 2015])
 
-yearlyMangrove <- function(dataYear=2015){
-  yearRange <- (dataYear):min(all_mangrove_extent$year)
+# list to be populated with dfs created in loop below
+extent_df_list <- list()
 
-data_region_trend <-  all_mangrove_extent %>%
-  left_join(rgns_eez) %>%
-  filter(year %in% yearRange) %>%  
-  group_by(rgn_id, rgn_name) %>%
-  mutate(total_area = sum(km2)) %>% 
-  mutate(km2_rel = km2/km2[year==min(year)]) %>%
-  mutate(km2_rel = ifelse(rgn_id == 99, 0, km2_rel)) %>%  # Benin (99) is an outlier and has unreliable estimates
-  do(mdl = lm(km2_rel ~ year, data=.)) %>%
-  summarize(rgn_name = rgn_name,
-            rgn_id = rgn_id,
-            habitat = "mangrove",
-            trend = coef(mdl)['year']*5) %>%
-  mutate(trend = round(trend, 6)) %>%
-  ungroup()
-
-final_data <- data_region_trend %>%
-  dplyr::select(rgn_id, habitat, trend)
-
-write.csv(final_data, 
-          sprintf('globalprep/hab_mangrove/v2021/int/habitat_trend_mangrove_d%s.csv', dataYear),
-                  row.names=FALSE)
+# loop to filter extent df to just years that will be used in regression to find trend for the year in question, calculate trend, and add new df with trends to list
+for (i in seq_along(assessment_years)) {
+  
+  df <- mangrove_extent_rgns %>% 
+    filter(year <= assessment_years[i]) %>% 
+    group_by(rgn_id, rgn_name) %>% 
+    nest() %>% # create nested df based on groupings
+    mutate(model = purrr::map(data, trend_function)) %>% # perform linear regression on each region
+    unnest(cols = c(model)) %>% # unnest contents of model column
+    filter(term == "year") %>% 
+    mutate(trend = estimate * 5 %>% 
+             round(6)) %>% 
+    dplyr::select(rgn_id, rgn_name, trend) %>% 
+    ungroup() %>% 
+    mutate(year = assessment_years[i])
+  
+  df_name <- paste0("extent_trends_", assessment_years[i])
+  
+  assign(df_name, df)
+  
+  extent_df_list[[df_name]] <- get(df_name)
+  
 }
+
+habitat_trend_mangrove_updated <- bind_rows(extent_df_list)
+
 
 ```
 
