@@ -114,12 +114,12 @@ data_year <- paste0("d", current_year)
 # source(here::here('workflow', 'R', 'common.R'))
 
 ### Mazu
-# dir_here  <- here::here('globalprep', 'hab_saltmarsh', version_year)
-# dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
+dir_here  <- here::here('globalprep', 'hab_tidal_flat', version_year)
+dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
 
 ### Aurora
-dir_here <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change')
-dir_data <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022')
+# dir_here <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change')
+# dir_data <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022')
 ```
 
 ### Download the data
@@ -153,7 +153,7 @@ done
 ### Load OHI region data
 
 ```{r eval = FALSE}
-# regions_shape()
+regions_shape()
 
 regions <- read_sf(here::here(dir_here, 'regions_2017_update.shp'))
 
@@ -221,7 +221,7 @@ foreach::foreach (dir = folders) %dopar% {
         pattern     = ".tif",
         replacement = paste0("_", year, ".csv"))
     
-    file_name <- here::here(dir_data, "int", "tf", fn)
+    file_name <- here::here(dir_data, "int", "tidal_flat", fn)
     
     if(!file.exists(file_name)){
       
@@ -266,7 +266,7 @@ tictoc::toc()
 Read in the tidal flat files, concatenate files, summarize to OHI regions, and output final tidal flat extent summary
 
 ```{r eval = FALSE}
-files <- here::here(dir_data, "int", "tf") %>% 
+files <- here::here(dir_data, "int", "tidal_flat") %>% 
   list.files(full.names = T)
 
 output <- dplyr::tibble()
@@ -275,7 +275,7 @@ for (file in files) {
   
   tmp <- readr::read_csv(file, col_types = cols()) 
 
-  output <- rbind(int_output, tmp) 
+  output <- rbind(output, tmp) 
   
 }
 

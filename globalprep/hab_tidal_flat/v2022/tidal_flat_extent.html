@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Fri Aug 12 10:04:44 2022 by molitor" />
+<meta name="author" content="Compiled on Fri Aug 12 15:31:02 2022 by molitor" />
 
 
 <title>OHI 2022 - tidal flat extent</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - tidal flat extent</h1>
-<h4 class="author"><em>Compiled on Fri Aug 12 10:04:44 2022 by
+<h4 class="author"><em>Compiled on Fri Aug 12 15:31:02 2022 by
 molitor</em></h4>
 
 </div>
@@ -584,12 +584,12 @@ shard</p>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># source(here::here(&#39;workflow&#39;, &#39;R&#39;, &#39;common.R&#39;))</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="do">### Mazu</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_here  &lt;- here::here(&#39;globalprep&#39;, &#39;hab_saltmarsh&#39;, version_year)</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_data &lt;- file.path(dir_M, &#39;git-annex&#39;, &#39;globalprep&#39;, &#39;_raw_data&#39;, &#39;global_tidal_wetland_change&#39;, data_year)</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;hab_tidal_flat&#39;</span>, version_year)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex&#39;</span>, <span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;_raw_data&#39;</span>, <span class="st">&#39;global_tidal_wetland_change&#39;</span>, data_year)</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="do">### Aurora</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>dir_here <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change&#39;</span>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022&#39;</span>)</span></code></pre></div>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_here &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change&#39;)</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_data &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022&#39;)</span></span></code></pre></div>
 <div id="download-the-data" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Download the
 data</h3>
@@ -620,7 +620,7 @@ wetland change dataset.</p>
 <div id="load-ohi-region-data" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Load OHI region
 data</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># regions_shape()</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">regions_shape</span>()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>regions <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;regions_2017_update.shp&#39;</span>))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -696,7 +696,7 @@ of 1 would be equivalent to 0.0009 km<span class="math inline">\(^2\)</span> hab
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">pattern     =</span> <span class="st">&quot;.tif&quot;</span>,</span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">replacement =</span> <span class="fu">paste0</span>(<span class="st">&quot;_&quot;</span>, year, <span class="st">&quot;.csv&quot;</span>))</span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    file_name <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tf&quot;</span>, fn)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    file_name <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_flat&quot;</span>, fn)</span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(file_name)){</span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      </span>
@@ -740,7 +740,7 @@ of 1 would be equivalent to 0.0009 km<span class="math inline">\(^2\)</span> hab
 inside each region</h2>
 <p>Read in the tidal flat files, concatenate files, summarize to OHI
 regions, and output final tidal flat extent summary</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tf&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_flat&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>(<span class="at">full.names =</span> T)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">tibble</span>()</span>
@@ -749,7 +749,7 @@ regions, and output final tidal flat extent summary</p>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(file, <span class="at">col_types =</span> <span class="fu">cols</span>()) </span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">&lt;-</span> <span class="fu">rbind</span>(int_output, tmp) </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">&lt;-</span> <span class="fu">rbind</span>(output, tmp) </span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
