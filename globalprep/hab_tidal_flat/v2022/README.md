@@ -8,9 +8,9 @@ Information about [condition component](http://ohi-science.github.io/ohiprep_v20
 
 ### Layers Created
 
-* habitat_extent_tidal_flat_updated.csv
-* habitat_trend_tidal_flat_updated.csv
-* habitat_health_tidal_flat_updated.csv
+* tidal_flat_extent.csv
+* tidal_flat_trend.csv
+* tidal_flat_condition.csv
 
 ### Additional information
 
