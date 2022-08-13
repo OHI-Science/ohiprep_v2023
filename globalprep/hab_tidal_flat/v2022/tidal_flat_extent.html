@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Fri Aug 12 15:33:58 2022 by molitor" />
+<meta name="author" content="Compiled on Fri Aug 12 15:34:01 2022 by molitor" />
 
 
-<title>OHI 2022: saltmarsh extent</title>
+<title>OHI 2022 - tidal flat extent</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -426,8 +426,8 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">OHI 2022: saltmarsh extent</h1>
-<h4 class="author"><em>Compiled on Fri Aug 12 15:33:58 2022 by
+<h1 class="title toc-ignore">OHI 2022 - tidal flat extent</h1>
+<h4 class="author"><em>Compiled on Fri Aug 12 15:34:01 2022 by
 molitor</em></h4>
 
 </div>
@@ -442,307 +442,321 @@ assessment</a></li>
 </ul></li>
 <li><a href="#methods" id="toc-methods"><span class="toc-section-number">2</span> Methods</a>
 <ul>
-<li><a href="#overview" id="toc-overview"><span class="toc-section-number">2.1</span> overview</a></li>
+<li><a href="#overview" id="toc-overview"><span class="toc-section-number">2.1</span> Overview</a></li>
 <li><a href="#setup" id="toc-setup"><span class="toc-section-number">2.2</span> Setup</a>
 <ul>
 <li><a href="#download-the-data" id="toc-download-the-data"><span class="toc-section-number">2.2.1</span> Download the data</a></li>
 <li><a href="#load-ohi-region-data" id="toc-load-ohi-region-data"><span class="toc-section-number">2.2.2</span> Load OHI region data</a></li>
 </ul></li>
-<li><a href="#find-tidal-wetlands" id="toc-find-tidal-wetlands"><span class="toc-section-number">2.3</span> Find tidal wetlands</a></li>
-<li><a href="#summarize-the-grid-cells-within-each-country" id="toc-summarize-the-grid-cells-within-each-country"><span class="toc-section-number">2.4</span> Summarize the grid cells within
-each country</a></li>
-<li><a href="#load-mangrove-and-tidal-flat-data" id="toc-load-mangrove-and-tidal-flat-data"><span class="toc-section-number">2.5</span> Load mangrove and tidal flat
-data</a></li>
+<li><a href="#find-tidal-flat-area-in-each-raster" id="toc-find-tidal-flat-area-in-each-raster"><span class="toc-section-number">2.3</span> Find tidal flat area in each
+raster</a></li>
+<li><a href="#summarise-tidal-flat-inside-each-region" id="toc-summarise-tidal-flat-inside-each-region"><span class="toc-section-number">2.4</span> Summarise tidal flat inside each
+region</a></li>
 </ul></li>
 </ul>
 </div>
 
 <div id="summary" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Summary</h1>
-<p>This script generates the extent of saltmarsh for each OHI
+<p>This script generates the extent of tidal flat for each OHI
 region.</p>
 <div id="updates-from-previous-assessment" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> Updates from previous
 assessment</h2>
-<p>2022 - Updating with new dataset!</p>
+<p>2022 - Completely new dataset and layer!</p>
 <hr />
 </div>
 <div id="data-source" class="section level2" number="1.2">
 <h2><span class="header-section-number">1.2</span> Data Source</h2>
-<p><strong>Reference</strong>: Murray, N.J., Worthington, T.A., Bunting,
-P., Duce, S., Hagger, V., Lovelock, C.E., Lucas, R., Saunders, M.I.,
-Sheaves, M., Spalding, M., Waltham, N.J., Lyons, M.B., 2022.
-High-resolution mapping of losses and gains of Earth’s tidal wetlands.
-Science. <a href="doi:10.1126/science.abm9583" class="uri">doi:10.1126/science.abm9583</a></p>
-<p><strong>Downloaded</strong>: 2022-08-03</p>
+<p><strong>Reference</strong>: Murray, N.J., Phinn, S.R., DeWitt, M.,
+Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. &amp;
+Fuller, R.A. (2019) The global distribution and trajectory of tidal
+flats. Nature, 565, 222-225.</p>
+<p><strong>Downloaded</strong>: 2022-07-26</p>
 <p><strong>Description</strong>:<br />
-The Murray Global Tidal Wetland Change Dataset contains maps of the
-global extent of tidal wetlands and their change. The maps were
-developed from a three stage classification that sought to (i) estimate
-the global distribution of tidal wetlands (defined as either tidal
-marsh, tidal flat or mangrove ecosystems), (ii) detect their change over
-the study period, and (iii) estimate the ecosystem type and timing of
-tidal wetland change events.</p>
-<p>The dataset was produced by combining observations from 1,166,385
-satellite images acquired by Landsat 5 to 8 with environmental data of
-variables known to influence the distributions of each ecosystem type,
-including temperature, slope, and elevation. The image contains bands
-for a tidal wetland extent product (random forest probability of tidal
-wetland occurrence) for the start and end time-steps of the study period
-and a tidal wetland change product over the full study period (loss and
-gain of tidal wetlands).</p>
-<p>Please see the usage notes on the <a href="https://www.globalintertidalchange.org/">project website</a>. A
-full description of the methods, validation, and limitations of the data
-produced by this software is available in the associated scientific
-paper.</p>
-<p>See also <a href="https://developers.google.com/earth-engine/datasets/catalog/UQ_murray_Intertidal_v1_1_global_intertidal">UQ/murray/Intertidal/v1_1/global_intertidal</a>
-for global maps of the distribution of tidal flat ecosystems.</p>
+The Murray Global Intertidal Change Dataset contains global maps of
+tidal flat ecosystems produced via a supervised classification of
+707,528 Landsat Archive images. Each pixel was classified into tidal
+flat, permanent water or other with reference to a globally distributed
+set of training data.</p>
+<p>The classification was implemented along the entire global coastline
+between 60° North and 60° South from 1 January 1984 to 31 December 2016.
+The image collection consists consists of a time-series of 11 global
+maps of tidal flats at 30m pixel resolution for set time-periods
+(1984−1986; 1987−1989; 1990−1992; 1993−1995; 1996−1998; 1999−2001;
+2002−2004; 2005−2007; 2008−2010; 2011−2013; 2014−2016)</p>
+<p>This product depicts tidal flat ecosystems around the global
+coastline.</p>
+<p>Pixels classified as tidal flat in the analysis represent several
+types of tidal flat ecosystems, including unconsolidated fine-grain
+sediments (tidal mudflats), unconsolidated coarse-grain sediments (tidal
+sand flats), and consolidated sediments, organic material or rocks (wide
+tidal rock-platforms), while excluding spectral signatures indicating
+the presence of vegetation dominated intertidal ecosystems such as
+mangroves and vegetated marshes. The analysis aimed to identify pixels
+that are subject to regular tidal inundation, and therefore may also
+include other intertidal systems where intertidal dynamics are
+observable.</p>
 <p><strong>Time range</strong>: 1984-2016</p>
-<p><strong>Download link</strong>: <a href="https://www.globalintertidalchange.org/data-usage" class="uri">https://www.globalintertidalchange.org/data-usage</a> use
-<code>gsutil -m cp &quot;gs://gic-archive/gic-2019-v1-0/v1-0-1/*.tif&quot; &quot;PATH-TO-LOCAL-FOLDER&quot;</code></p>
+<p><strong>Download link</strong>: <a href="https://www.intertidal.app/download/direct-download" class="uri">https://www.intertidal.app/download/direct-download</a> (use
+the provided shell script in this file)</p>
+<p><strong>Variables</strong>:</p>
 <ul>
-<li><strong>Note</strong>: Download should only be done once, either in
-this script or <code>saltmarsh_trend.Rmd</code></li>
-</ul>
-<p><strong>Variables</strong>: - <code>twprobabilityStart</code> - 0 to
-100 - integer which represents the agreement of random forest decision
-trees for the tidal wetland class in time step 1 of the analysis,
-1999-2001 - we will use <code>twprobabilityStart</code> &gt; 50 as a
-threshold to define all types of tidal wetland (tidal flat, mangrove,
-and tidal marsh)</p>
+<li><p>classification occurrence: intertertidal area classification for
+the interval.</p>
 <ul>
-<li><p><code>twprobabilityEnd</code>:</p></li>
-<li><p>0 to 100 - integer which represents the agreement of random
-forest decision trees for the tidal wetland class in time step 7 of the
-analysis, 2017-2019</p></li>
-<li><p>we will use <code>twprobabilityEnd</code> &gt; 50 as a threshold
-to define all types of tidal wetland (tidal flat, mangrove, and tidal
-marsh)</p></li>
-<li><p>raster shards use a hash that represents spatial extent</p></li>
-<li><p><code>0000000000-0000000000</code> represents the same spatial
-extent for <code>twprobabilityStart</code> and
-<code>twprobabilityEnd</code></p></li>
-<li><p>Not human readable but we can use this to loop over areas for our
-calculations</p></li>
+<li>0 is not tidal flat</li>
+<li>1 is tidal flat</li>
+</ul></li>
+<li><p>raster shards use geodetic extent in the file names</p></li>
 </ul>
-<p><strong>Other data</strong>: Calculating saltmarsh extent also
-requires the summarized mangrove extent and summarized tidal flat extent
-for 2001.</p>
 <hr />
 </div>
 </div>
 <div id="methods" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Methods</h1>
 <div id="overview" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> overview</h2>
+<h2><span class="header-section-number">2.1</span> Overview</h2>
+<p>The goal is to find tidal flat area in each raster</p>
 <ol style="list-style-type: decimal">
-<li>Find <code>twprobabilityStart</code> &gt; 50</li>
-</ol>
+<li><p>Down sample rasters from 30 m<span class="math inline">\(^2\)</span> ground sample distance (GSD) to ~ 1
+km<span class="math inline">\(^2\)</span> GSD</p>
 <ul>
-<li>replace numbers greater than 50 with 1, 0 otherwise</li>
-<li>left with either tidal wetland, or not tidal wetland</li>
-</ul>
-<ol start="2" style="list-style-type: decimal">
-<li>Down sample rasters from 30 m<span class="math inline">\(^2\)</span>
-ground sample distance (GSD) to ~ 1 km<span class="math inline">\(^2\)</span> GSD</li>
-</ol>
+<li>Group 30 pixels into 1 to get 900 m<span class="math inline">\(^2\)</span> resolution
 <ul>
-<li>30 pixels is 900 m<span class="math inline">\(^2\)</span></li>
-<li>(900*900)/1000000 = 0.81 km<span class="math inline">\(^2\)</span></li>
-<li>file size is reduced from 27-57 MB per shard to about 340 KB per
-shard</li>
-<li>take the sum of the pixels</li>
-<li>convert to area (multiply sum of pixels by 0.0009)</li>
+<li><span class="math inline">\(\frac{(900 * 900)}{(1,000 *
+1,000)}\)</span> = 0.81 km<span class="math inline">\(^2\)</span></li>
+<li>take the sum of the pixels in the group</li>
+</ul></li>
+</ul></li>
+<li><p>Convert to area</p>
+<ul>
+<li>multiply sum of grouped pixels by 0.0009</li>
 <li>If the native raster cells are 30x30 m<span class="math inline">\(^2\)</span> area, then a raster cell with a value
-of 1 would be equivalent to 0.0009 km<span class="math inline">\(^2\)</span> habitat area:
-(30<em>30)/(1000</em>1000) = 0.0009</li>
-</ul>
-<ol start="3" style="list-style-type: decimal">
-<li>Summarize tidal wetland extent to country level</li>
+of 1 would be equivalent to 0.0009 km<span class="math inline">\(^2\)</span> habitat area
+<ul>
+<li><span class="math inline">\(\frac{(30*30)}{(1000*1000)}\)</span> =
+0.0009 km<span class="math inline">\(^2\)</span></li>
+</ul></li>
+</ul></li>
+<li><p>Summarize the grid cells within each region of the raster
+shard</p>
+<ul>
+<li>Take the sum of the cells in each country for each year</li>
+<li>Output a <code>.csv</code> file for each raster</li>
+</ul></li>
+<li><p>Summarize tidal flat inside each region</p>
+<ul>
+<li>read in the tidal flat files</li>
+<li>concatenate files</li>
+<li>summarize to OHI regions</li>
+<li>output final tidal flat extent summary</li>
+</ul></li>
 </ol>
 </div>
 <div id="setup" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Setup</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>, <span class="at">eval =</span> <span class="cn">FALSE</span>, <span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){<span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)}</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(ohicore)){devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;ohi-science/ohicore@dev&#39;</span>)}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>librarian<span class="sc">::</span><span class="fu">shelf</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  tidyverse,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  here,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  janitor,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  plotly,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  sf,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  terra,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  exactextractr,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># fasterize,</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># raster,</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  tictoc,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  foreach,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  doParallel</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">### directory paths and relevant files</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>current_year <span class="ot">&lt;-</span> <span class="dv">2022</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>data_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_year)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># source(here::here(&#39;workflow&#39;, &#39;R&#39;, &#39;common.R&#39;))</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="do">### Mazu</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;hab_tidal_flat&#39;</span>, version_year)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex&#39;</span>, <span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;_raw_data&#39;</span>, <span class="st">&#39;global_tidal_wetland_change&#39;</span>, data_year)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="do">### Aurora</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_here &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change&#39;)</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_data &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022&#39;)</span></span></code></pre></div>
 <div id="download-the-data" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Download the
 data</h3>
 <p>The following bash script will download the raw data for the tidal
 wetland change dataset.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">### Make the new directory and move into it</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_wetland_change <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> <span class="va">$_</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">### Use gsutil (MAZU only) to download the shard data </span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gsutil</span> <span class="at">-m</span> cp <span class="st">&quot;gs://gic-archive/gic-2019-v1-0/v1-0-1/*.tif&quot;</span> .</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">### Make the new directory and move into it</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">### MAZU</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_flats &amp;&amp; cd $_</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">### Aurora</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/raw/tidal_flats <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> <span class="va">$_</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">### Declare an array of strings</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">declare</span> <span class="at">-a</span> <span class="va">StringArray</span><span class="op">=</span><span class="va">(</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;1984-1986&quot;</span> <span class="st">&quot;1987-1989&quot;</span> <span class="st">&quot;1990-1992&quot;</span> <span class="st">&quot;1993-1995&quot;</span> <span class="st">&quot;1996-1998&quot;</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;1999-2001&quot;</span> <span class="st">&quot;2002-2004&quot;</span> <span class="st">&quot;2005-2007&quot;</span> <span class="st">&quot;2008-2010&quot;</span> <span class="st">&quot;2011-2013&quot;</span> <span class="st">&quot;2014-2016&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="va">)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">### Iterate the string array using for loop</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> val <span class="kw">in</span> <span class="va">${StringArray</span><span class="op">[@]</span><span class="va">}</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="va">$val</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">wget</span> https://storage.googleapis.com/uq-intertidal/v1_1/global_intertidal/<span class="va">$val</span>.zip</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unzip</span> <span class="va">$val</span>.zip <span class="at">-d</span> ./<span class="va">$val</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rm</span> <span class="va">$val</span>.zip</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
 </div>
 <div id="load-ohi-region-data" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Load OHI region
 data</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">regions_shape</span>()</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>regions_eez_and_land <span class="ot">&lt;-</span> regions <span class="sc">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;eez&quot;</span>, <span class="st">&#39;land&#39;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">4326</span>) </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>dummy_df <span class="ot">&lt;-</span> regions_eez_and_land <span class="sc">%&gt;%</span> </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name) </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>rgns <span class="ot">&lt;-</span> ohicore<span class="sc">::</span>rgn_master <span class="sc">%&gt;%</span> </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_typ <span class="sc">==</span> <span class="st">&quot;eez&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">rgn_id =</span> rgn_id_2013, <span class="at">rgn_name =</span> rgn_nam_2013) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>rgn_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">213</span>, <span class="dv">255</span>)) <span class="co"># Antarctica and DISPUTED</span></span></code></pre></div>
-</div>
-</div>
-<div id="find-tidal-wetlands" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Find tidal
-wetlands</h2>
-<ul>
-<li>replace numbers greater than 50 with 0.0009, NA otherwise</li>
-<li>left with either tidal wetland, or not tidal wetland</li>
-<li>units are in km<span class="math inline">\(^2\)</span></li>
-<li>If the native raster cells are 30 m by 30 m (900 m<span class="math inline">\(^2\)</span> area), then a raster cell would be
-equivalent to 0.0009 km<span class="math inline">\(^2\)</span> habitat
-area
-<ul>
-<li>(30<em>30)/(1000</em>1000) = 0.0009</li>
-</ul></li>
-<li>Down sample rasters from 30 m<span class="math inline">\(^2\)</span>
-ground sample distance (GSD) to ~ 1 km<span class="math inline">\(^2\)</span> GSD. Take the sum of the pixels.</li>
-</ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Example twprobabilityStart-0000065536-0001114112 has lots of tw</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">tic</span>()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;tidal_wetland_change&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>(<span class="at">pattern =</span> <span class="st">&quot;Start&quot;</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">regions_shape</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>regions <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;regions_2017_update.shp&#39;</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>regions_eez_and_land <span class="ot">&lt;-</span> regions <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;eez&quot;</span>, <span class="st">&#39;land&#39;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">4326</span>) </span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># doParallel::registerDoParallel(2)</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># foreach::foreach (i = files) %dopar% {</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>dummy_df <span class="ot">&lt;-</span> regions_eez_and_land <span class="sc">%&gt;%</span> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name) </span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> files) {</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  fn <span class="ot">&lt;-</span> i <span class="sc">%&gt;%</span> </span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    stringr<span class="sc">::</span><span class="fu">str_replace</span>(</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">pattern     =</span> <span class="st">&quot;murray-gic-v1.0.1-twprobabilityStart&quot;</span>,</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">replacement =</span> <span class="st">&quot;tw_start_ds&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    stringr<span class="sc">::</span><span class="fu">str_replace</span>(</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">pattern     =</span> <span class="st">&quot;.tif&quot;</span>,</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">replacement =</span> <span class="st">&quot;.csv&quot;</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(j, <span class="st">&quot;/&quot;</span>, <span class="fu">length</span>(files), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> j <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  file_name <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_wetland&quot;</span>, fn)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(file_name)){</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(fn, <span class="st">&quot; is being created!</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="do">## classify the values into two groups </span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="do">## all values &gt;= 0 and &lt;= 50 become 0</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="do">## all values &gt; 50 and &lt;= 100 become 0.0009</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="do">##     from,  to, becomes</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    mat <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="dv">0</span>,  <span class="dv">50</span>, <span class="dv">0</span>,</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>             <span class="dv">50</span>, <span class="dv">100</span>, <span class="fl">0.0009</span>)</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    reclassification_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(mat, <span class="at">ncol=</span><span class="dv">3</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;    classifying...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    image <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;tidal_wetland_change&quot;</span>, i) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>      terra<span class="sc">::</span><span class="fu">rast</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>      terra<span class="sc">::</span><span class="fu">classify</span>(</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">rcl =</span> reclassification_mat,</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>        <span class="at">include.lowest=</span><span class="cn">TRUE</span>,</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">right =</span> <span class="cn">TRUE</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># image &lt;- (image / 100) * 0.0009</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;    down sampling...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    down_sampled_image <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">aggregate</span>(</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> image, </span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>      <span class="at">fact =</span> <span class="dv">30</span>, </span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>      <span class="at">fun =</span> sum,</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>      <span class="at">na.rm =</span> T</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;    extracting...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    extracted_values <span class="ot">&lt;-</span> exactextractr<span class="sc">::</span><span class="fu">exact_extract</span>(</span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> down_sampled_image, <span class="at">y =</span> regions_eez_and_land, <span class="at">fun =</span> <span class="st">&#39;sum&#39;</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cbind</span>(<span class="st">&quot;km2&quot;</span> <span class="ot">=</span> extracted_values, dummy_df) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">km2 =</span> <span class="fu">sum</span>(km2)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>      readr<span class="sc">::</span><span class="fu">write_csv</span>(file_name)</span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {<span class="fu">cat</span>(<span class="fu">paste0</span>(fn, <span class="st">&quot; already exists!</span><span class="sc">\n</span><span class="st">&quot;</span>))}</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">toc</span>()</span></code></pre></div>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>rgns <span class="ot">&lt;-</span> ohicore<span class="sc">::</span>rgn_master <span class="sc">%&gt;%</span> </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_typ <span class="sc">==</span> <span class="st">&quot;eez&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">rgn_id =</span> rgn_id_2013, <span class="at">rgn_name =</span> rgn_nam_2013) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>rgn_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">213</span>, <span class="dv">255</span>)) <span class="co"># Antarctica and DISPUTED</span></span></code></pre></div>
 </div>
-<div id="summarize-the-grid-cells-within-each-country" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Summarize the grid
-cells within each country</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_wetland&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>(<span class="at">full.names =</span> T)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
+</div>
+<div id="find-tidal-flat-area-in-each-raster" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Find tidal flat area
+in each raster</h2>
+<p>Down sample rasters from 30 m<span class="math inline">\(^2\)</span>
+ground sample distance (GSD) to ~ 1 km<span class="math inline">\(^2\)</span> GSD</p>
+<ul>
+<li>Group 30 pixels into 1 to get 900 m<span class="math inline">\(^2\)</span> resolution
+<ul>
+<li><span class="math inline">\(\frac{(900 * 900)}{(1,000 *
+1,000)}\)</span> = 0.81 km<span class="math inline">\(^2\)</span></li>
+<li>take the sum of the pixels in the group</li>
+</ul></li>
+</ul>
+<p>Convert to area</p>
+<ul>
+<li>multiply sum of grouped pixels by 0.0009</li>
+<li>If the native raster cells are 30x30 m<span class="math inline">\(^2\)</span> area, then a raster cell with a value
+of 1 would be equivalent to 0.0009 km<span class="math inline">\(^2\)</span> habitat area
+<ul>
+<li><span class="math inline">\(\frac{(30*30)}{(1000*1000)}\)</span> =
+0.0009 km<span class="math inline">\(^2\)</span></li>
+</ul></li>
+</ul>
+<p>Summarize the grid cells within each country</p>
+<ul>
+<li>Take the sum of the cells in each country for each year</li>
+<li>Output a <code>.csv</code> file for each raster</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">tic</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>folders <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;tidal_flats&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>()</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (file <span class="cf">in</span> files) { </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  fn <span class="ot">&lt;-</span> <span class="st">&quot;tidal_wetland_extent_2001.csv&quot;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(file)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">&lt;-</span> <span class="fu">rbind</span>(tmp, output)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>tidal_wetland_2001 <span class="ot">&lt;-</span> output <span class="sc">%&gt;%</span> </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">km2 =</span> <span class="fu">sum</span>(km2)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">full_join</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(rgns, rgn_id)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2001</span>, </span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">habitat =</span> <span class="st">&quot;tidal wetland&quot;</span>,</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                <span class="at">km2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(km2), <span class="dv">0</span>, km2)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;tidal_wetland_2001.csv&quot;</span>))</span></code></pre></div>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>doParallel<span class="sc">::</span><span class="fu">registerDoParallel</span>(<span class="dv">11</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>foreach<span class="sc">::</span><span class="fu">foreach</span> (<span class="at">dir =</span> folders) <span class="sc">%dopar%</span> {</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># for (dir in folders) { </span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;tidal_flats&quot;</span>, dir) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list.files</span>()</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  year <span class="ot">=</span> stringr<span class="sc">::</span><span class="fu">str_split</span>(dir, <span class="at">pattern =</span> <span class="st">&quot;-&quot;</span>, <span class="at">n =</span> <span class="dv">2</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (file <span class="cf">in</span> files){</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(j, <span class="st">&quot;/&quot;</span>, <span class="fu">length</span>(files), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    j <span class="ot">&lt;-</span> j <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    fn <span class="ot">&lt;-</span> file <span class="sc">%&gt;%</span> </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      stringr<span class="sc">::</span><span class="fu">str_replace</span>(</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">pattern     =</span> <span class="st">&quot;.tif&quot;</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">replacement =</span> <span class="fu">paste0</span>(<span class="st">&quot;_&quot;</span>, year, <span class="st">&quot;.csv&quot;</span>))</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    file_name <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_flat&quot;</span>, fn)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(file_name)){</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(fn, <span class="st">&quot; is being created!</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">&quot;    down sampling...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>      image <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;tidal_flats&quot;</span>, dir, file) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">rast</span>() </span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>      down_sampled_image <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">aggregate</span>(</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> image, </span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        <span class="at">fact =</span> <span class="dv">30</span>, </span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun =</span> sum,</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> T</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">&quot;    converting to area (km2)...</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>      down_sampled_image <span class="ot">&lt;-</span> down_sampled_image <span class="sc">*</span> <span class="fl">0.0009</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">&quot;    extracting...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>      extracted_values <span class="ot">&lt;-</span> exactextractr<span class="sc">::</span><span class="fu">exact_extract</span>(</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> down_sampled_image, <span class="at">y =</span> regions_eez_and_land, <span class="at">fun =</span> <span class="st">&#39;sum&#39;</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cbind</span>(<span class="st">&quot;km2&quot;</span> <span class="ot">=</span> extracted_values, dummy_df) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">km2 =</span> <span class="fu">sum</span>(km2)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> year, <span class="at">habitat =</span> <span class="st">&quot;tidal flat&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>        readr<span class="sc">::</span><span class="fu">write_csv</span>(file_name)</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {<span class="fu">cat</span>(<span class="fu">paste0</span>(fn, <span class="st">&quot; already exists!</span><span class="sc">\n</span><span class="st">&quot;</span>))}</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">toc</span>()</span></code></pre></div>
 </div>
-<div id="load-mangrove-and-tidal-flat-data" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Load mangrove and
-tidal flat data</h2>
-<p>Load the extent of mangroves and tidal flat for 2001-ish.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tidal_wetland_2001 <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;tidal_wetland_2001.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
+<div id="summarise-tidal-flat-inside-each-region" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Summarise tidal flat
+inside each region</h2>
+<p>Read in the tidal flat files, concatenate files, summarize to OHI
+regions, and output final tidal flat extent summary</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_data, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;tidal_flat&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>(<span class="at">full.names =</span> T)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>mangrove_2001 <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;hab_mangrove&quot;</span>, <span class="st">&quot;v2022&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;habitat_extent_mangrove_updated.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1996</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2001</span>) </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>tidal_flat_2001 <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;hab_tidal_flat&quot;</span>, version_year, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;tidal_flat_extent.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1995</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2001</span>) </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">tibble</span>()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (file <span class="cf">in</span> files) {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(file, <span class="at">col_types =</span> <span class="fu">cols</span>()) </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">&lt;-</span> <span class="fu">rbind</span>(output, tmp) </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>saltmarsh_2001 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(tidal_wetland_2001, mangrove_2001, tidal_flat_2001) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> habitat, <span class="at">values_from =</span> km2) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">salt marsh</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">tidal wetland</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">tidal flat</span><span class="st">`</span> <span class="sc">-</span> mangrove) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">names_to =</span> <span class="st">&#39;habitat&#39;</span>, <span class="at">values_to =</span> <span class="st">&#39;km2&#39;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(habitat <span class="sc">==</span> <span class="st">&quot;salt marsh&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(rgns) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">drop_na</span>()</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(tidal_wetland_2001<span class="sc">$</span>km2)</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(mangrove_2001<span class="sc">$</span>km2)</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(tidal_flat_2001<span class="sc">$</span>km2)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(saltmarsh_2001<span class="sc">$</span>km2)</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>saltmarsh_trend_data <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;saltmarsh_trend.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(saltmarsh_trend_data<span class="sc">$</span>difference)</span></code></pre></div>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>final <span class="ot">&lt;-</span> output <span class="sc">%&gt;%</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id, year, habitat) <span class="sc">%&gt;%</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">km2 =</span> <span class="fu">sum</span>(km2, <span class="at">na.rm =</span> T)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;output&#39;</span>, <span class="fu">paste0</span>(<span class="st">&quot;tidal_flat_extent.csv&quot;</span>)))</span></code></pre></div>
 </div>
 </div>
 
