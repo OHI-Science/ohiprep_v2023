@@ -34,11 +34,15 @@ Harmonised, representative data on the state of biological invasions remain inad
 
 **Time range**: 1999-2019
 
-**Download link**: 
-????
+**Download link**: http://griis.org/download - There is a download shell script in this file, making manual download unnecessary. 
 
-**Variables**:
-- ???
+**Variables**: The most important variable names are:
+
+- `scientific_name`: the species name, sometimes with taxanomic source
+
+- `habitat`: the species habitat (marine, brackish, terrestrial, freshwater, or a combination of them)
+
+- `is_invasive`: weather or not the species is considered invasive (harmful) or simply alien (introduced, but not harmful)
 
 ***
 
@@ -46,7 +50,19 @@ Harmonised, representative data on the state of biological invasions remain inad
 
 ## Overview
 
-1. saaaaa
+1. Download the data and clean it up
+
+2. Identify habitat for species with none listed
+
+3. Match listed countries to OHI regions
+
+4. Gapfill by regional averages
+
+5. Calulate the pressure score for each country
+
+6. Save prepared data and associated gapfilling datasets
+
+7. Check how pressure scores have changed from previous assesments
 
 ## Setup
 
@@ -69,7 +85,7 @@ librarian::shelf(
 current_year <- 2022
 version_year <- paste0("v", current_year)
 data_year <- paste0("d", current_year)
-# source(here::here('workflow', 'R', 'common.R'))
+source(here::here('workflow', 'R', 'common.R'))
 
 ### Mazu
 dir_here  <- here::here('globalprep', 'prs_alien', version_year)
@@ -85,7 +101,7 @@ rgns_eez <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep_v202
 
 ## Download the data
 
-```{bash}
+```{bash eval = F}
 mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/griis/d2022 && cd $_
 
 wget --recursive --no-parent --level 1 --accept zip http://griis.org/download
@@ -107,7 +123,7 @@ rm *.zip
 
 Read in country codes from the `countrycode` package.
 
-```{r}
+```{r eval = F}
 codes <- countrycode::codelist %>% 
   janitor::clean_names() %>% 
   dplyr::select(country = country_name_en, country_code = iso2c) %>% 
@@ -116,7 +132,7 @@ codes <- countrycode::codelist %>%
 
 Loop through the raw data files and join them into one large file. 
 
-```{r}
+```{r eval = F}
 files <- list.files(dir_data, full.names = T)
 
 output <- tibble("id" = character())
@@ -127,10 +143,10 @@ for (file in files) {
 }
 ```
 
-Make the data consistent and tidy. 
+Make the data consistent and tidy. Some of this is unnecessary but facilitates richer data exploration. 
 
-```{r}
-df <- output %>%
+```{r eval = F}
+clean_output <- output %>%
   janitor::clean_names() %>% 
   dplyr::select(
     id, taxon_id, scientific_name,kingdom, phylum, class, order, 
@@ -185,27 +201,98 @@ df <- output %>%
       country_code == "FM-PNI" ~ "Micronesia",
       country_code == "FM-TRK" ~ "Micronesia",
       country_code == "YE-SU" ~ "Yemen",
-      T ~ country)) %>% 
-  dplyr::filter(!habitat %in% c("terrestrial", "freshwater", "terrestrial|freshwater", "freshwater|terrestrial", "host", NA)) %>% 
-  dplyr::select(-c(location_id)) %>% 
-  dplyr::left_join(rgns, by = c('country' = 'rgn_label')) %>% 
-  dplyr::select(-rgn_id)
+      T ~ country)) 
+```
+
+Some species from above do not come with an associated habitat type. This chunk queries GBIF and returns species names and their assosciated habitat. 
+
+```{r eval = F}
+na_df <- dplyr::filter(clean_output, is.na(habitat))
+
+na_species <- unique(na_spp$scientific_name)
+
+spp_out <- tibble()
+
+pb = txtProgressBar(min = 0, max = length(na_species), initial = 0, style = 3, width = 60) 
+
+for (spp in seq_along(na_species)) {
+  
+  setTxtProgressBar(pb, spp)
+  
+  data <- rgbif::name_lookup(query = na_species[spp])$data %>% 
+    janitor::clean_names() 
+  
+  if (length(data) == 0) {
+    
+    int <- tibble(scientific_name = na_species[spp], habitat_na = NA)
+    
+  } else {
+    
+    int <- data %>% 
+      tidyr::drop_na(habitats) %>% 
+      dplyr::select(scientific_name, habitat_na = habitats) %>% 
+      dplyr::mutate(habitat_na = tolower(habitat_na)) %>% 
+      dplyr::distinct()
+    
+  }
+  
+  spp_out <- rbind(int, spp_out)
+  
+}
+
+close(pb)
+```
+
+The above chunk returns many duplicate entries, with many messy habitat type options. This matches species names exactly, unlike the above query, and then declares any species with marine habitat, a marine species, even if it has more than one listed. 
+
+```{r eval = F}
+spp_out_marine <- spp_out %>% 
+  dplyr::filter(scientific_name %in% na_species) %>% 
+  dplyr::mutate(
+    habitat_na = dplyr::case_when(
+      stringr::str_detect(habitat_na, 'marine') ~ 'marine',
+      stringr::str_detect(habitat_na, 'freshwater') ~ 'freshwater',
+      stringr::str_detect(habitat_na, 'terrestrial') ~ 'terrestrial')) %>% 
+  dplyr::distinct() %>% 
+  dplyr::filter(habitat_na == 'marine')
+```
+
+We then join these names to the data of only NA habitat species and assign the marine species a marine habitat. 
+
+```{r eval = F}
+marine_spp <- na_df %>% 
+  dplyr::left_join(spp_out_marine) %>% 
+  dplyr::distinct() %>% 
+  dplyr::filter(habitat_na == 'marine') %>% 
+  dplyr::mutate(habitat = habitat_na) %>% 
+  dplyr::select(-habitat_na)
+```
+
+This binds the marine species back to the full dataset and does some final cleanup. 
+
+```{r eval = F}
+df <- clean_output %>% 
+  rbind(marine_spp) %>% 
+  dplyr::filter(!habitat %in% c("terrestrial", "freshwater", "terrestrial|freshwater", "freshwater|terrestrial", "host", NA)) %>%
+  dplyr::select(-c(location_id)) %>%
+  dplyr::left_join(rgns, by = c('country' = 'rgn_label')) %>%
+  dplyr::select(-rgn_id) %>% 
+  dplyr::mutate(country = ifelse(country_code == "IC", "Canary Islands", country))
 ```
 
 ## Match countries to OHI regions
 
-
-```{r}
+```{r eval = F}
 df_ohi <- ohicore::name_2_rgn(df_in = df)
 
 # v2022
 # These data were removed for not having any match in the lookup tables:
-# French Southern Territories (will be split up later)   North Macedonia (landlocked)   St. Barthélemy (IDK lol)
+# Eswatini (Landlocked), French Southern Territories (will be split up later), North Macedonia (landlocked), and St. Barthélemy (IDK lol)
 ```
 
 Break up French Southern Territories into 8 regions and Kiribati into 2, each repeating the data of the larger region. 
 
-```{r}
+```{r eval = F}
 ### Report these regions at higher spatial resolution:
 french_territories <- c(
     'Glorioso Islands', 'Juan de Nova Island', 'Bassas da India', 
@@ -228,7 +315,7 @@ country_split_data <- dplyr::tibble(
 
 Bind French Southern Territories and kiribati back to the full dataset. 
 
-```{r}
+```{r eval = F}
 alien_sp_df <- rbind(df_ohi, country_split_data) %>%
   dplyr::select(-country) %>% 
   dplyr::filter(rgn_name != 'Kiribati') %>% 
@@ -237,7 +324,7 @@ alien_sp_df <- rbind(df_ohi, country_split_data) %>%
 
 Summarize the number of alien/invasive species to each region and fill missing regions with NA values. 
 
-```{r}
+```{r eval = F}
 alien_sp_summary <- alien_sp_df %>% 
   dplyr::group_by(rgn_id, rgn_name) %>%
   dplyr::mutate() %>% 
@@ -313,7 +400,9 @@ gf_step_3 <- gf_step_2 %>%
 
 ## Calculate the pressure
 
-```{r}
+It was decided, somewhat arbitrarily to use a weighted avergae where species listed as invasive have a 90% weight, and alien species get a 10% weight. This allows us to account for species not listed as invasive (harmful), but that could still be harmful, despite the data. There may be a better way to determine weights, and this is an area that could be improved upon in future iterations. 
+
+```{r eval = F}
 min_spp_count <- min(gf_step_3$spp_count)
 min_inv_count <- min(gf_step_3$invasive_count)
 
@@ -348,7 +437,7 @@ pressure %>%
 
 ## Datacheck
 
-Lets compare to 2013 data. 
+Lets compare to 2013 scores.  
 
 ```{r, eval = F}
 new_data <- here::here(dir_here, "output", "prs_alien.csv") %>% 
