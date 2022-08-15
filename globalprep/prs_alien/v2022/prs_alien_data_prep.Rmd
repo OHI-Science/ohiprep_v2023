@@ -209,7 +209,7 @@ Some species from above do not come with an associated habitat type. This chunk 
 ```{r eval = F}
 na_df <- dplyr::filter(clean_output, is.na(habitat))
 
-na_species <- unique(na_spp$scientific_name)
+na_species <- unique(na_df$scientific_name)
 
 spp_out <- tibble()
 
@@ -398,7 +398,7 @@ gf_step_3 <- gf_step_2 %>%
     year = 2022)
 ```
 
-## Calculate the pressure
+## Calculate the pressure score
 
 It was decided, somewhat arbitrarily to use a weighted avergae where species listed as invasive have a 90% weight, and alien species get a 10% weight. This allows us to account for species not listed as invasive (harmful), but that could still be harmful, despite the data. There may be a better way to determine weights, and this is an area that could be improved upon in future iterations. 
 
@@ -415,7 +415,7 @@ inv_weight <- 0.9
 pressure <- gf_step_3 %>% 
   dplyr::group_by(rgn_id, rgn_name, year) %>% 
   dplyr::summarise(
-    value = (((spp_count-min_spp_count)/(max_spp_count-min_spp_count)) * spp_weight) + 
+    pressure_score = (((spp_count-min_spp_count)/(max_spp_count-min_spp_count)) * spp_weight) + 
       (((invasive_count-min_inv_count)/(max_inv_count-min_inv_count)) * inv_weight)) %>% 
   dplyr::ungroup()
 ```
@@ -428,10 +428,9 @@ gf_step_3 %>%
   dplyr::select(rgn_id, rgn_name, year, gapfilled, method) %>%
   readr::write_csv(here::here(dir_here, "output", "prs_alien_gf.csv"))
 
-## save value dataset
+## save pressure score dataset
 pressure %>%
-  dplyr::select(rgn_id, year, value) %>% 
-  # readr::write_csv(here::here("globalprep", "prs_alien", version_year, "output", "prs_alien.csv"))
+  dplyr::select(rgn_id, year, pressure_score) %>% 
   readr::write_csv(here::here(dir_here, "output", "prs_alien.csv"))
 ```
 
@@ -446,12 +445,12 @@ new_data <- here::here(dir_here, "output", "prs_alien.csv") %>%
 
 old_data <- here::here('globalprep', 'prs_alien', 'v2013', 'data', "p_sp_alien_2013a.csv") %>% 
   readr::read_csv() %>%
-  dplyr::rename(value = pressures.score) %>% 
+  dplyr::rename(pressure_score = pressures.score) %>% 
   dplyr::left_join(rgns_eez)
 
 compare <- new_data %>%
   dplyr::bind_rows(old_data) %>% 
-  tidyr::pivot_wider(names_from = year, values_from = value)
+  tidyr::pivot_wider(names_from = year, values_from = pressure_score)
 
 plot_diff <- 
   ggplot2::ggplot(

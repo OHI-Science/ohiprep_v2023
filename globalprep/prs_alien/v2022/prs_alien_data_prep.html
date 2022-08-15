@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Mon Aug 15 15:46:06 2022 by molitor" />
+<meta name="author" content="Compiled on Mon Aug 15 16:41:28 2022 by molitor" />
 
 
 <title>OHI 2022 - saltmarsh trend</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - saltmarsh trend</h1>
-<h4 class="author"><em>Compiled on Mon Aug 15 15:46:06 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 15 16:41:28 2022 by
 molitor</em></h4>
 
 </div>
@@ -454,7 +454,8 @@ regions</a></li>
 <li><a href="#step-2" id="toc-step-2"><span class="toc-section-number">2.6.2</span> Step 2</a></li>
 <li><a href="#step-3" id="toc-step-3"><span class="toc-section-number">2.6.3</span> Step 3</a></li>
 </ul></li>
-<li><a href="#calculate-the-pressure" id="toc-calculate-the-pressure"><span class="toc-section-number">2.7</span> Calculate the pressure</a></li>
+<li><a href="#calculate-the-pressure-score" id="toc-calculate-the-pressure-score"><span class="toc-section-number">2.7</span> Calculate the pressure
+score</a></li>
 <li><a href="#save-the-prepped-data" id="toc-save-the-prepped-data"><span class="toc-section-number">2.8</span> Save the prepped data</a></li>
 <li><a href="#datacheck" id="toc-datacheck"><span class="toc-section-number">2.9</span> Datacheck</a></li>
 </ul></li>
@@ -660,7 +661,7 @@ This chunk queries GBIF and returns species names and their assosciated
 habitat.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>na_df <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(clean_output, <span class="fu">is.na</span>(habitat))</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>na_species <span class="ot">&lt;-</span> <span class="fu">unique</span>(na_spp<span class="sc">$</span>scientific_name)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>na_species <span class="ot">&lt;-</span> <span class="fu">unique</span>(na_df<span class="sc">$</span>scientific_name)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>spp_out <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -824,9 +825,9 @@ unlikely scenario that will ensure complete data</p>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="dv">2022</span>)</span></code></pre></div>
 </div>
 </div>
-<div id="calculate-the-pressure" class="section level2" number="2.7">
+<div id="calculate-the-pressure-score" class="section level2" number="2.7">
 <h2><span class="header-section-number">2.7</span> Calculate the
-pressure</h2>
+pressure score</h2>
 <p>It was decided, somewhat arbitrarily to use a weighted avergae where
 species listed as invasive have a 90% weight, and alien species get a
 10% weight. This allows us to account for species not listed as invasive
@@ -845,7 +846,7 @@ improved upon in future iterations.</p>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>pressure <span class="ot">&lt;-</span> gf_step_3 <span class="sc">%&gt;%</span> </span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id, rgn_name, year) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> (((spp_count<span class="sc">-</span>min_spp_count)<span class="sc">/</span>(max_spp_count<span class="sc">-</span>min_spp_count)) <span class="sc">*</span> spp_weight) <span class="sc">+</span> </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">pressure_score =</span> (((spp_count<span class="sc">-</span>min_spp_count)<span class="sc">/</span>(max_spp_count<span class="sc">-</span>min_spp_count)) <span class="sc">*</span> spp_weight) <span class="sc">+</span> </span>
 <span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>      (((invasive_count<span class="sc">-</span>min_inv_count)<span class="sc">/</span>(max_inv_count<span class="sc">-</span>min_inv_count)) <span class="sc">*</span> inv_weight)) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span></code></pre></div>
 </div>
@@ -857,11 +858,10 @@ data</h2>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, year, gapfilled, method) <span class="sc">%&gt;%</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien_gf.csv&quot;</span>))</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">## save value dataset</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">## save pressure score dataset</span></span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>pressure <span class="sc">%&gt;%</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, value) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># readr::write_csv(here::here(&quot;globalprep&quot;, &quot;prs_alien&quot;, version_year, &quot;output&quot;, &quot;prs_alien.csv&quot;))</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>))</span></code></pre></div>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, pressure_score) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>))</span></code></pre></div>
 </div>
 <div id="datacheck" class="section level2" number="2.9">
 <h2><span class="header-section-number">2.9</span> Datacheck</h2>
@@ -872,12 +872,12 @@ data</h2>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>old_data <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;prs_alien&#39;</span>, <span class="st">&#39;v2013&#39;</span>, <span class="st">&#39;data&#39;</span>, <span class="st">&quot;p_sp_alien_2013a.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">value =</span> pressures.score) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">pressure_score =</span> pressures.score) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(rgns_eez)</span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(old_data) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> value)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> pressure_score)</span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>plot_diff <span class="ot">&lt;-</span> </span>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
