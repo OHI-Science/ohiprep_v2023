@@ -172,7 +172,7 @@ habitat_health_mangrove_updated <- mangrove_health %>%
   mutate(habitat = "mangrove")
 
 
-write.csv(habitat_health_mangrove_updated, file.path(dir_hab_mangrove, "data/habitat_health_mangrove_updated.csv"))
+write.csv(habitat_health_mangrove_updated, file.path(dir_hab_mangrove, "data/habitat_health_mangrove_updated.csv"), row.names = FALSE)
 ```
 
 ## Datacheck: compare to old health data
