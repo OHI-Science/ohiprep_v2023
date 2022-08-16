@@ -44,7 +44,7 @@ Pixels classified as tidal flat in the analysis represent several types of tidal
 
 **Variables**:
 
-- Update me... 
+- tidal flat extent, measured in km$^2$
 
 ***
 
@@ -52,7 +52,13 @@ Pixels classified as tidal flat in the analysis represent several types of tidal
 
 ## Overview
 
-IDK lol
+1. Load the tidal flat extent data
+
+2. Divide most recent time step by first time step
+
+3. replace NA with 0, and values > 1 with 1
+
+4. Save the results
 
 ## Setup
 
@@ -82,16 +88,45 @@ data_year <- paste0("d", current_year)
 source(here::here('workflow', 'R', 'common.R'))
 
 ### Mazu
-dir_here  <- here::here('globalprep', 'hab_saltmarsh', version_year)
-dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'global_tidal_wetland_change', data_year)
-
-### Aurora
-# dir_here <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change')
-# dir_data <- file.path('/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022')
+dir_here  <- here::here('globalprep', 'hab_tidal_flat', version_year)
 ```
 
+## Load data
+
+Load the regions data.
+
+```{r eval = FALSE}
+rgns <- ohicore::rgn_master %>% 
+  dplyr::filter(rgn_typ == "eez") %>% 
+  dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>% 
+  dplyr::distinct() 
+```
+
+Load the tidal flat extent data.
+
+```{r eval = FALSE}
+tidal_flat_extent <- here::here(dir_here, "output", "tidal_flat_extent.csv") %>%
+  readr::read_csv(col_types = cols()) %>% 
+  dplyr::left_join(rgns, by = "rgn_id") 
+```
 
 ## Find the condition
+
+```{r eval = FALSE}
+tidal_flat_condition <- tidal_flat_extent %>% 
+  tidyr::pivot_wider(names_from = year, values_from = km2) %>% 
+  dplyr::mutate(health = `2016` / `1986`) %>% 
+  tidyr::replace_na(list(health = 0)) %>% 
+  dplyr::select(rgn_id, habitat, health) %>% 
+  dplyr::mutate(health = case_when(health > 1 ~ 1, T ~ health),
+                year = 2016) 
+```
+
+## Write the results
+
+```{r eval = FALSE}
+readr::write_csv(tidal_flat_condition, here::here(dir_here, "output", "tidal_flat_health.csv"))
+```
 
 
 

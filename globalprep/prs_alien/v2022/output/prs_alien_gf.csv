@@ -10,6 +10,7 @@ rgn_id,rgn_name,year,gapfilled,method
 17,Papua New Guinea,2022,no,not gapfilled
 19,Tuvalu,2022,no,not gapfilled
 24,Cambodia,2022,no,not gapfilled
+25,Thailand,2022,no,not gapfilled
 28,Comoro Islands,2022,no,not gapfilled
 29,Mayotte,2022,no,not gapfilled
 30,Glorioso Islands,2022,no,not gapfilled
@@ -35,6 +36,7 @@ rgn_id,rgn_name,year,gapfilled,method
 55,Azores,2022,no,not gapfilled
 56,Cape Verde,2022,no,not gapfilled
 57,Madeira,2022,no,not gapfilled
+58,Canary Islands,2022,no,not gapfilled
 59,Belgium,2022,no,not gapfilled
 61,Tunisia,2022,no,not gapfilled
 62,Morocco,2022,no,not gapfilled
@@ -165,14 +167,12 @@ rgn_id,rgn_name,year,gapfilled,method
 18,Fiji,2022,yes,used r2 average
 20,South Korea,2022,yes,used r2 average
 21,North Korea,2022,yes,used r2 average
-25,Thailand,2022,yes,used r2 average
 26,Andaman and Nicobar,2022,yes,used r2 average
 32,R_union,2022,yes,used r2 average
 41,Mozambique,2022,yes,used r2 average
 44,Somalia,2022,yes,used r2 average
 51,Kuwait,2022,yes,used r2 average
 52,Bahrain,2022,yes,used r2 average
-58,Canary Islands,2022,yes,used r2 average
 60,Gibraltar,2022,yes,used r2 average
 63,Western Sahara,2022,yes,used r2 average
 64,Mauritania,2022,yes,used r2 average

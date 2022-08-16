@@ -99,19 +99,17 @@ librarian::shelf(
   sf,
   terra,
   exactextractr,
-  # fasterize,
-  # raster,
   tictoc,
   foreach,
   doParallel
 ) 
 
-### directory paths and relevant files
+### directories, paths, and relevant files
 current_year <- 2022
 version_year <- paste0("v", current_year)
 data_year <- paste0("d", current_year)
 
-# source(here::here('workflow', 'R', 'common.R'))
+source(here::here('workflow', 'R', 'common.R'))
 
 ### Mazu
 dir_here  <- here::here('globalprep', 'hab_tidal_flat', version_year)
@@ -129,13 +127,13 @@ The following bash script will download the raw data for the tidal wetland chang
 ```{bash eval = FALSE}
 ### Make the new directory and move into it
 
-### MAZU
-# mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
+### Mazu
+mkdir /home/shares/ohi/git-annex/globalprep/_raw_data/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
 
 ### Aurora
-mkdir /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
+# mkdir /home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022/raw/tidal_flats && cd $_
 
-### Declare an array of strings
+### Declare an array of strings, these are the folders for each time step
 declare -a StringArray=(
   "1984-1986" "1987-1989" "1990-1992" "1993-1995" "1996-1998" 
   "1999-2001" "2002-2004" "2005-2007" "2008-2010" "2011-2013" "2014-2016"
@@ -143,33 +141,35 @@ declare -a StringArray=(
 
 ### Iterate the string array using for loop
 for val in ${StringArray[@]}; do
-  echo $val
-  wget https://storage.googleapis.com/uq-intertidal/v1_1/global_intertidal/$val.zip
-  unzip $val.zip -d ./$val
-  rm $val.zip
+  ### print the folder
+  echo $val 
+  ### download the zip folder
+  wget https://storage.googleapis.com/uq-intertidal/v1_1/global_intertidal/$val.zip 
+  ### unzip the folder
+  unzip $val.zip -d ./$val 
+  ### delete the zip folder
+  rm $val.zip 
 done
 ```
 
 ### Load OHI region data
 
 ```{r eval = FALSE}
+### load in regions shapefile
 regions_shape()
 
-regions <- read_sf(here::here(dir_here, 'regions_2017_update.shp'))
-
+### filter regions for only EEZ and land. We need both polygons for each region
+### because our habitat sits at the intersection of the two
 regions_eez_and_land <- regions %>%
-  dplyr::filter(rgn_type %in% c("eez", 'land')) %>% 
-  sf::st_transform(crs = 4326) 
+  dplyr::filter(rgn_type %in% c("eez", 'land'),
+                ### Antarctica and DISPUTED
+                !rgn_id %in% c(213, 255)) %>% 
+  sf::st_transform(crs = 4326)  
 
+### this will be used to construct our outputs from exactextractr
 dummy_df <- regions_eez_and_land %>% 
-  as_tibble() %>% 
+  tibble::as_tibble() %>% 
   dplyr::select(rgn_id, rgn_name) 
-
-rgns <- ohicore::rgn_master %>% 
-  dplyr::filter(rgn_typ == "eez") %>% 
-  dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>% 
-  dplyr::distinct() %>% 
-  dplyr::filter(!rgn_id %in% c(213, 255)) # Antarctica and DISPUTED
 ```
 
 ## Find tidal flat area in each raster
@@ -194,61 +194,76 @@ Summarize the grid cells within each country
 ```{r eval = FALSE}
 tictoc::tic()
 
+### list folders in raw data
 folders <- here::here(dir_data, "raw", "tidal_flats") %>% 
   list.files()
 
+### start an iterator for pretty outputs
 j <- 1
 
+### if doing in parallel, you loose pretty outputs :(
 doParallel::registerDoParallel(11)
-
 foreach::foreach (dir = folders) %dopar% {
 
 # for (dir in folders) { 
   
+  ### list files in the folder
   files <- here::here(dir_data, "raw", "tidal_flats", dir) %>% 
     list.files()
   
+  ### find the end year of the current time step
   year = stringr::str_split(dir, pattern = "-", n = 2)[[1]][2]
   
+  ### loop through files in the folder
   for (file in files){
     
+    ### pretty output
     cat(j, "/", length(files), "\n")
     
     j <- j + 1
     
+    ### new file name
     fn <- file %>% 
       stringr::str_replace(
         pattern     = ".tif",
         replacement = paste0("_", year, ".csv"))
     
+    ### new file path
     file_name <- here::here(dir_data, "int", "tidal_flat", fn)
     
+    ### check if file path exists
     if(!file.exists(file_name)){
       
-      cat(fn, " is being created!\n")
+      ### pretty output
+      cat(fn, " is being created!\n    down sampling...\n")
       
-      cat("    down sampling...\n")
-      
+      ### open file as SpatRaster
       image <- here::here(dir_data, "raw", "tidal_flats", dir, file) %>% 
         terra::rast() 
        
+      ### Downsample from 30 m resolution to ~1 km resolution
       down_sampled_image <- terra::aggregate(
         x = image, 
         fact = 30, 
         fun = sum,
         na.rm = T
       )
-
+      
+      ### pretty output
       cat("    converting to area (km2)...\n\n")
       
+      ### convert to area
       down_sampled_image <- down_sampled_image * 0.0009
       
+      ### pretty output
       cat("    extracting...\n")
       
+      ### extract value sin each polygon
       extracted_values <- exactextractr::exact_extract(
         x = down_sampled_image, y = regions_eez_and_land, fun = 'sum'
       )
       
+      ### bind extracted values to the dummy data frame we made earlier
       cbind("km2" = extracted_values, dummy_df) %>% 
         dplyr::group_by(rgn_id, rgn_name) %>% 
         dplyr::summarise(km2 = sum(km2)) %>% 
@@ -266,25 +281,43 @@ tictoc::toc()
 Read in the tidal flat files, concatenate files, summarize to OHI regions, and output final tidal flat extent summary
 
 ```{r eval = FALSE}
+### list csv files with extracted tidal flat values
 files <- here::here(dir_data, "int", "tidal_flat") %>% 
   list.files(full.names = T)
 
+### make an empty tibble to fill through iteration
 output <- dplyr::tibble()
-  
+
+### loop through files
 for (file in files) {
   
+  ### read in files, suppress messages with col_types argument
   tmp <- readr::read_csv(file, col_types = cols()) 
-
-  output <- rbind(output, tmp) 
   
+  ### bind temporary output to complete output
+  output <- rbind(output, tmp) 
 }
 
+### summarize results and write final output
 final <- output %>%
   dplyr::group_by(rgn_id, year, habitat) %>%
   dplyr::summarise(km2 = sum(km2, na.rm = T)) %>% 
   readr::write_csv(here::here(dir_here, 'output', paste0("tidal_flat_extent.csv")))
 ```
 
+## Data check
 
+Look for large scale changes in single countries.
+
+```{r}
+rgns <- dplyr::distinct(dummy_df)
+
+final <- dplyr::left_join(final, rgns)
+
+p <- ggplot(data = final, aes(x = year, y = km2, color = rgn_id, text = rgn_name)) +
+  geom_line()
+
+plotly::ggplotly(p, width = 800, height = 450)
+```
 
 
