@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 16 13:22:53 2022 by molitor" />
+<meta name="author" content="Compiled on Tue Aug 16 14:29:20 2022 by molitor" />
 
 
 <title>OHI 2022 - tidal flat condition</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - tidal flat condition</h1>
-<h4 class="author"><em>Compiled on Tue Aug 16 13:22:53 2022 by
+<h4 class="author"><em>Compiled on Tue Aug 16 14:29:20 2022 by
 molitor</em></h4>
 
 </div>
@@ -562,7 +562,8 @@ condition</h2>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">health =</span> <span class="st">`</span><span class="at">2016</span><span class="st">`</span> <span class="sc">/</span> <span class="st">`</span><span class="at">1986</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">health =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, habitat, health) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">health =</span> <span class="fu">case_when</span>(health <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>, T <span class="sc">~</span> health)) </span></code></pre></div>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">health =</span> <span class="fu">case_when</span>(health <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>, T <span class="sc">~</span> health),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">year =</span> <span class="dv">2016</span>) </span></code></pre></div>
 </div>
 <div id="write-the-results" class="section level2" number="2.5">
 <h2><span class="header-section-number">2.5</span> Write the
