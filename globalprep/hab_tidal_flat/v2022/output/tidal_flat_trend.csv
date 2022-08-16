@@ -1,0 +1,222 @@
+rgn_id,rgn_name,habitat,trend
+1,Cocos Islands,tidal flat,0
+2,Christmas Island,tidal flat,0
+3,Norfolk Island,tidal flat,0
+4,Macquarie Island,tidal flat,0
+5,New Caledonia,tidal flat,17.652148813006285
+6,Vanuatu,tidal flat,55.65449972947014
+7,Solomon Islands,tidal flat,87.70952733357078
+8,Palau,tidal flat,6.903149843215876
+9,Micronesia,tidal flat,11.260199864704543
+10,Nauru,tidal flat,0
+11,Marshall Islands,tidal flat,60.46019840240017
+12,Wake Island,tidal flat,0
+13,Northern Mariana Islands and Guam,tidal flat,2.8146000703173706
+14,Taiwan,tidal flat,-32.9097000757838
+15,Philippines,tidal flat,529.0825326044935
+16,Australia,tidal flat,1233.366534550884
+17,Papua New Guinea,tidal flat,333.0132471720128
+18,Fiji,tidal flat,57.29851714769442
+19,Tuvalu,tidal flat,8.768400076776203
+20,South Korea,tidal flat,-14.76011657714923
+21,North Korea,tidal flat,-20.439962645372116
+24,Cambodia,tidal flat,33.520071864125626
+25,Thailand,tidal flat,113.72885640461406
+26,Andaman and Nicobar,tidal flat,71.01600124438066
+28,Comoro Islands,tidal flat,4.987799723942808
+29,Mayotte,tidal flat,4.223999977111492
+30,Glorioso Islands,tidal flat,0
+31,Seychelles,tidal flat,29.906699498492173
+32,Reunion,tidal flat,0.6221999923387688
+33,Juan de Nova Island,tidal flat,0
+34,Bassas da India,tidal flat,0
+35,Ile Europa,tidal flat,0
+36,Ile Tromelin,tidal flat,0
+37,Mauritius,tidal flat,3.9843000372247817
+38,British Indian Ocean Territory,tidal flat,16.734900474547054
+39,Maldives,tidal flat,26.318399578331043
+40,Sri Lanka,tidal flat,79.69229888915405
+41,Mozambique,tidal flat,126.22425333657758
+42,Madagascar,tidal flat,-857.4865633646466
+43,Kenya,tidal flat,6.013630231219871
+44,Somalia,tidal flat,35.949844519295446
+45,Eritrea,tidal flat,76.97061411539194
+46,Djibouti,tidal flat,3.0636081298189737
+47,Yemen,tidal flat,-0.26284917195607105
+48,Oman,tidal flat,13.143449346223527
+49,Sudan,tidal flat,93.51944897571668
+50,Saudi Arabia,tidal flat,180.2836697896305
+51,Kuwait,tidal flat,-1.5228640238452025
+52,Bahrain,tidal flat,-4.278409719466342
+53,Pakistan,tidal flat,97.61487833658319
+54,United Arab Emirates,tidal flat,63.70700200398361
+55,Azores,tidal flat,2.7653999328611167
+56,Cape Verde,tidal flat,6.007200082142687
+57,Madeira,tidal flat,1.8699000676471549
+58,Canary Islands,tidal flat,2.0481000542637706
+59,Belgium,tidal flat,-0.38728205362952345
+60,Gibraltar,tidal flat,0
+61,Tunisia,tidal flat,-18.76216252644799
+62,Morocco,tidal flat,1.0684407552091373
+63,Western Sahara,tidal flat,-9.96228281656601
+64,Mauritania,tidal flat,-1.755278746285094
+65,Gambia,tidal flat,23.04616387684993
+66,Senegal,tidal flat,27.695095062255717
+67,Libya,tidal flat,-189.8003656665437
+68,Malta,tidal flat,-0.031200000065532044
+69,Latvia,tidal flat,-0.25459023316717766
+70,Estonia,tidal flat,-22.125528971355486
+71,Bulgaria,tidal flat,0
+72,Romania,tidal flat,0
+73,Russia,tidal flat,327.93271669743535
+74,Georgia,tidal flat,0
+75,Ukraine,tidal flat,0
+76,Turkey,tidal flat,-3.106879452864307
+77,Syria,tidal flat,-0.047100006825836975
+78,Lebanon,tidal flat,-0.11430000762144905
+79,Israel,tidal flat,-1.2905952706932624
+80,Greece,tidal flat,-4.3760180175305425
+81,Cyprus,tidal flat,0.26655004111419944
+82,Albania,tidal flat,-3.3958019912240207
+84,Algeria,tidal flat,-3.0745498451092637
+85,Ascension,tidal flat,0
+86,Saint Helena,tidal flat,3.880350132783055
+88,Tristan da Cunha,tidal flat,0.0882000029086999
+89,South Georgia and the South Sandwich Islands,tidal flat,94.58820215860277
+90,Prince Edward Islands,tidal flat,0
+91,Crozet Islands,tidal flat,0
+92,Amsterdam Island and Saint Paul Island,tidal flat,0
+93,Kerguelen Islands,tidal flat,11.898299853006087
+94,Heard and McDonald Islands,tidal flat,0
+95,Falkland Islands,tidal flat,27.740099906919255
+96,Sierra Leone,tidal flat,18.91058349609516
+97,Liberia,tidal flat,5.091710726419811
+98,Togo,tidal flat,0.9284560158848159
+99,Benin,tidal flat,2.7960957686106735
+100,Republique du Congo,tidal flat,1.1392739812530364
+101,Namibia,tidal flat,1.8578727642703907
+102,South Africa,tidal flat,0.7629502614338906
+103,Sao Tome and Principe,tidal flat,0
+104,Equatorial Guinea,tidal flat,39.51636759439908
+105,Bouvet Island,tidal flat,0
+106,Ghana,tidal flat,9.32954223950608
+107,Clipperton Island,tidal flat,0
+108,Bermuda,tidal flat,2.2716000055272034
+110,Bahamas,tidal flat,168.33374929426216
+111,Turks and Caicos Islands,tidal flat,-250.7297916412365
+112,Cuba,tidal flat,61.88624667375922
+113,Cayman Islands,tidal flat,2.5333499113716975
+114,Haiti,tidal flat,-0.5516528704512518
+115,Dominican Republic,tidal flat,5.100403308868133
+116,Puerto Rico and Virgin Islands of the United States,tidal flat,7.338449954986217
+117,British Virgin Islands,tidal flat,2.0521499514579213
+118,Anguilla,tidal flat,0.980400005976284
+119,Saint Kitts and Nevis,tidal flat,1.1955000559488018
+120,Antigua and Barbuda,tidal flat,24.06329981485818
+121,Montserrat,tidal flat,0.9675000111261262
+122,Saint Lucia,tidal flat,4.058400154113459
+123,Dominica,tidal flat,2.6298000216482054
+124,Barbados,tidal flat,1.8353999853132752
+125,Grenada,tidal flat,1.28909997145325
+126,Trinidad and Tobago,tidal flat,12.341400146483426
+127,Saint Vincent and the Grenadines,tidal flat,3.95939989884664
+129,Panama,tidal flat,138.00656382241786
+130,Costa Rica,tidal flat,12.878055572509181
+131,Nicaragua,tidal flat,-23.743542989093314
+132,Colombia,tidal flat,101.63271200656061
+133,Honduras,tidal flat,-5.689025878906799
+134,El Salvador,tidal flat,2.861674944559782
+135,Mexico,tidal flat,-50.0637621084871
+136,Guatemala,tidal flat,7.115290482838511
+137,Ecuador,tidal flat,213.81090239682146
+138,Peru,tidal flat,121.46260746319216
+139,Venezuela,tidal flat,177.0339226665104
+140,Guadeloupe and Martinique,tidal flat,4.5248999595638635
+141,Faeroe Islands,tidal flat,0
+143,Iceland,tidal flat,0
+144,Jan Mayen,tidal flat,0
+145,Greenland,tidal flat,1.632449984550375
+146,Pitcairn,tidal flat,0
+147,French Polynesia,tidal flat,114.32760309054598
+148,Line Group,tidal flat,20.35620053609056
+149,Jarvis Island,tidal flat,0
+150,Palmyra Atoll,tidal flat,0
+151,American Samoa,tidal flat,0.7135500088333567
+152,Samoa,tidal flat,-11.10075030724226
+153,Cook Islands,tidal flat,-1.091400073841239
+154,Niue,tidal flat,0
+155,Tonga,tidal flat,124.09455378849607
+156,Tokelau,tidal flat,1.3581000169117328
+157,Phoenix Group,tidal flat,0.6101999878882894
+158,Howland Island and Baker Island,tidal flat,0
+159,Johnston Atoll,tidal flat,0
+161,Wallis and Futuna,tidal flat,6.145799954731787
+162,New Zealand,tidal flat,85.45438949266469
+163,United States,tidal flat,-571.9472729668887
+164,Belize,tidal flat,-6.416725476582777
+166,Jamaica,tidal flat,0.8258999784785379
+167,Guyana,tidal flat,250.09790039062128
+168,Suriname,tidal flat,110.02421061197532
+169,French Guiana,tidal flat,129.80270767211212
+171,Brazil,tidal flat,165.3220087687231
+172,Argentina,tidal flat,1162.7228418985103
+173,Uruguay,tidal flat,-8.069144566853396
+174,Finland,tidal flat,-1.9592998822529655
+175,Denmark,tidal flat,16.99452209472397
+176,Germany,tidal flat,28.380945841467366
+177,Netherlands,tidal flat,155.5894393920813
+178,Poland,tidal flat,-9.658277988433499
+179,France,tidal flat,40.676879882801195
+180,United Kingdom,tidal flat,4.590721130364767
+181,Ireland,tidal flat,50.60147603352082
+182,Spain,tidal flat,-25.91131392990469
+183,Portugal,tidal flat,6.896679878234609
+184,Italy,tidal flat,-54.44024988015131
+185,Monaco,tidal flat,0
+186,Montenegro,tidal flat,-0.5185976668724973
+187,Croatia,tidal flat,-1.1233206192651353
+188,Slovenia,tidal flat,-0.1252793582777154
+189,Lithuania,tidal flat,-7.191805481910569
+190,Qatar,tidal flat,-20.169894536334777
+191,Iran,tidal flat,28.61009899775066
+192,Iraq,tidal flat,-2.0143414338430494
+193,Guinea Bissau,tidal flat,91.55822245278969
+194,Guinea,tidal flat,67.53757476806071
+195,Ivory Coast,tidal flat,13.663122177122219
+196,Nigeria,tidal flat,168.52477773029375
+197,Cameroon,tidal flat,113.99163818358639
+198,Gabon,tidal flat,-0.47744401296561556
+199,Democratic Republic of the Congo,tidal flat,15.597990075745358
+200,Angola,tidal flat,-107.59465662636968
+202,Tanzania,tidal flat,61.32200082142653
+203,India,tidal flat,566.6523160934123
+204,Bangladesh,tidal flat,-80.75744628905582
+205,Myanmar,tidal flat,963.052658080986
+206,Malaysia,tidal flat,67.95551741122462
+207,Vietnam,tidal flat,506.2253125508189
+208,Singapore,tidal flat,-2.202315886815167
+209,China,tidal flat,-1476.6021765221271
+210,Japan,tidal flat,152.51520136990987
+212,Kiribati,tidal flat,79.8535517851432
+213,Antarctica,tidal flat,0
+214,Egypt,tidal flat,-41.767410278315666
+215,Jordan,tidal flat,-0.09000474090376646
+216,Indonesia,tidal flat,98.24420261380831
+218,Canada,tidal flat,-45.62898763021026
+219,Saint Pierre and Miquelon,tidal flat,0.06435004870096055
+220,Sint Maarten,tidal flat,1.1462217966714618
+221,Northern Saint-Martin,tidal flat,3.0234782695767946
+222,Sweden,tidal flat,-10.747802098591814
+223,Norway,tidal flat,-1.179750124613374
+224,Chile,tidal flat,76.85170104105399
+227,Jersey,tidal flat,1.1395502885181426
+228,Guernsey,tidal flat,-4.827038447061533
+231,East Timor,tidal flat,-3.417182286580274
+232,Bosnia and Herzegovina,tidal flat,-0.0014999999354258962
+237,Oecussi Ambeno,tidal flat,-0.025199994600069338
+244,Curacao,tidal flat,-1.6888501147424484
+245,Bonaire,tidal flat,2.3864999612170616
+247,Brunei,tidal flat,-1.892644802729163
+248,Saba,tidal flat,0
+249,Sint Eustatius,tidal flat,0.10590000450610303
+250,Aruba,tidal flat,0.6824999873836459
