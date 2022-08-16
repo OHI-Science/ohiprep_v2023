@@ -103,9 +103,16 @@ Load the tidal flat extent data.
 
 ```{r eval = FALSE}
 tidal_flat_extent <- here::here(dir_here, "output", "tidal_flat_extent.csv") %>%
-  readr::read_csv() %>% 
-  dplyr::left_join(rgns)
+  readr::read_csv(col_types = cols()) %>% 
+  dplyr::left_join(rgns, by = "rgn_id") 
 ```
+
+
+```{r eval = FALSE}
+tidal_flat_condition <- tidal_flat_extent %>% 
+  tidyr::pivot_wider(names_from = year, values_from = km2) 
+```
+
 
 ## Model the trend
 
