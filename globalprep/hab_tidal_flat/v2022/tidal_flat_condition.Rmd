@@ -117,7 +117,7 @@ tidal_flat_condition <- tidal_flat_extent %>%
   tidyr::pivot_wider(names_from = year, values_from = km2) %>% 
   dplyr::mutate(health = `2016` / `1986`) %>% 
   tidyr::replace_na(list(health = 0)) %>% 
-  dplyr::select(rgn_id, rgn_name, habitat, health) %>% 
+  dplyr::select(rgn_id, habitat, health) %>% 
   dplyr::mutate(health = case_when(health > 1 ~ 1, T ~ health),
                 year = 2016) 
 ```
