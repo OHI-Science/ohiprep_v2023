@@ -115,16 +115,16 @@ tidal_flat_extent <- here::here(dir_here, "output", "tidal_flat_extent.csv") %>%
 ```{r eval = FALSE}
 tidal_flat_condition <- tidal_flat_extent %>% 
   tidyr::pivot_wider(names_from = year, values_from = km2) %>% 
-  dplyr::mutate(condition = `2016` / `1986`) %>% 
-  tidyr::replace_na(list(condition = 0)) %>% 
-  dplyr::select(rgn_id, rgn_name, habitat, condition) %>% 
-  dplyr::mutate(condition = case_when(condition > 1 ~ 1, T ~ condition)) 
+  dplyr::mutate(health = `2016` / `1986`) %>% 
+  tidyr::replace_na(list(health = 0)) %>% 
+  dplyr::select(rgn_id, rgn_name, habitat, health) %>% 
+  dplyr::mutate(health = case_when(health > 1 ~ 1, T ~ health)) 
 ```
 
 ## Write the results
 
 ```{r eval = FALSE}
-readr::write_csv(tidal_flat_condition, here::here(dir_here, "output", "tidal_flat_condition.csv"))
+readr::write_csv(tidal_flat_condition, here::here(dir_here, "output", "tidal_flat_health.csv"))
 ```
 
 
