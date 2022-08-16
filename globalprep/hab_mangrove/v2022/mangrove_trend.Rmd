@@ -66,7 +66,8 @@ mangrove_extent <- read_csv(file.path(dir_hab_mangrove, "data/habitat_extent_man
 ```
 
 
-Take an initial look at trend data and compare to old data
+## Take an initial look at trend data and compare to old data
+
 ```{r, eval = FALSE}
 ## look at Benin since it had a large increase mangrove cover between 2010 and 2015 and is an outlier 
 benin <- mangrove_extent %>%
@@ -118,7 +119,7 @@ mangrove_extent_trends <- mangrove_extent_rgns %>%
 
 ```
 
-Look at regions with most positive trends and make sure they make sense
+## Look at regions with most positive trends and make sure they make sense
 
 ```{r, eval = FALSE}
 
@@ -133,7 +134,7 @@ bonaire <- mangrove_extent %>%
 
 ```
  
-Compare with trends from the last update
+## Compare with trends from the last update
  
 ```{r, eval = FALSE}
 version_year_dirs <- list.dirs(here("globalprep/hab_mangrove"), recursive = FALSE, full.names = FALSE)
@@ -152,24 +153,23 @@ plot(compare_trends$old_trend, compare_trends$trend)
 
 ```
 
+## Calculate trends for all scenario years and write final layer
+
+|Scenario year | Data years used to calculate trend|
+|:------------:|:---------------------------------:|
+|    2022      |           2007 - 2020             |
+|    2021      |           2007 - 2020             |
+|    2020      |           2007 - 2020             |
+|    2019      |           2007 - 2019             |
+|    2018      |           2007 - 2018             |
+|    2017      |           2007 - 2017             |
+|    2016      |           2007 - 2016             |
+|    2015      |           2007 - 2015             |
+|    2014      |           2007 - 2015             |
+|    2013      |           2007 - 2015             |
+|    2012      |           2007 - 2015             |
 
 ```{r, eval = FALSE}
-
-#############################################
-## Final formatting and save
-#############################################
-
-# function that calculates trend for each scenario year and saves data
-# NOTE: scenario 2021 = 2007:2020 years.  
-#       scenario 2020 = 2007:2020 years. 
-#       scenario 2019 = 2007:2019 years. 
-#       scenario 2018 = 2007:2018 years. 
-#       scenario 2017 = 2007:2017 years. 
-#       scenario 2016 = 2007:2016 years. 
-#       scenario 2015 = 2007:2015 years. 
-#       scenario 2014 = 2007:2015 years. 
-#       scenario 2013 = 2007:2015 years. 
-#       scenario 2012 = 2007:2015 years. 
 
 # create vector of assessment years we need trends for
 assessment_years <- unique(mangrove_extent$year[mangrove_extent$year >= 2015])
@@ -201,52 +201,12 @@ for (i in seq_along(assessment_years)) {
   
 }
 
-habitat_trend_mangrove_updated <- bind_rows(extent_df_list)
+# bind dfs created in loop
+habitat_trend_mangrove_updated <- bind_rows(extent_df_list) %>% 
+  select(-rgn_name) %>% 
+  mutate(habitat = "mangrove")
 
 
-```
-
-Final Formatting
-
-```{r, eval = FALSE}
-for(year in 2015:2016){ #year <- '2016'
-trend <- read.csv(sprintf('globalprep/hab_mangrove/v2021/int/habitat_trend_mangrove_d%s.csv', year))
-
-print(sprintf('year: %s', year))
-print('deleted: ') 
-print(setdiff(trend$rgn_id, all_mangrove_extent$rgn_id))
-print('gap-filled: ')
-print(setdiff(all_mangrove_extent$rgn_id, trend$rgn_id))
-
-trend_gaps <- trend %>%
-  mutate(gap_fill = ifelse(rgn_id %in% c(99), "unreliable data, given 0 trend", 0)) %>% # this region was given a trend of 0 based on unreliable extent data
-  mutate(habitat="mangrove") %>%
-  mutate(variable="trend") %>%
-  dplyr::select(rgn_id, habitat, variable, gap_fill)
-write.csv(trend_gaps, 'globalprep/hab_mangrove/v2021/data/trend_gap_fill.csv',  row.names=FALSE)  #same for all years, so save only one
-
-
-write.csv(trend, sprintf('globalprep/hab_mangrove/v2021/data/habitat_trend_mangrove_d%s.csv', year),
-          row.names=FALSE)
-}
-
-## write the final layer
-#trend:
-data <- data.frame()
-
-for (year in 2015:2016){ # year = 2016
-  trend <- read.csv(sprintf("globalprep/hab_mangrove/v2021/data/habitat_trend_mangrove_d%s.csv", year))
-  
-  trend <- trend %>%
-    mutate(year = year) %>%
-    dplyr::select(rgn_id, habitat, year, trend)
-  
-  data <- rbind(data, trend)
-  
-}
-
-write.csv(data, "globalprep/hab_mangrove/v2021/data/habitat_trend_mangrove_updated.csv", row.names=FALSE)
+write.csv(habitat_trend_mangrove_updated, here(dir_hab_mangrove, "data/habitat_trend_mangrove_updated.csv"), row.names=FALSE)
 
 ```
-
-
