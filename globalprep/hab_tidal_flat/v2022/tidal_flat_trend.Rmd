@@ -44,7 +44,7 @@ Pixels classified as tidal flat in the analysis represent several types of tidal
 
 **Variables**:
 
-- Update me...
+- tidal flat extent, measured in km$^2$
 
 ***
 
@@ -52,7 +52,15 @@ Pixels classified as tidal flat in the analysis represent several types of tidal
 
 ## Overview
 
-IDK lol
+1. Load the tidal flat extent data
+
+2. Model the trend
+
+3. Project 5 years past the last time step.
+
+4. Save the results
+
+5. Check the data for anomalies. 
 
 ## Setup
 
@@ -107,7 +115,7 @@ Use a nested dataframe and `purrr::map` to model the trend for the most recent 5
 trend_function <- function(df) {
   lm(km2 ~ year, data = df) %>% 
     broom::tidy()
-  }
+}
 
 tidal_flat_trend <- tidal_flat_extent %>%
   dplyr::filter(year >= 2004) %>% 

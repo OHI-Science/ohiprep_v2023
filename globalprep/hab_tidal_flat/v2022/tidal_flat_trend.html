@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 16 11:36:51 2022 by molitor" />
+<meta name="author" content="Compiled on Tue Aug 16 11:39:42 2022 by molitor" />
 
 
 <title>OHI 2022 - tidal flat trend</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - tidal flat trend</h1>
-<h4 class="author"><em>Compiled on Tue Aug 16 11:36:51 2022 by
+<h4 class="author"><em>Compiled on Tue Aug 16 11:39:42 2022 by
 molitor</em></h4>
 
 </div>
@@ -498,7 +498,7 @@ observable.</p>
 (download done in <code>tidal_flat_extent.Rmd</code>)</p>
 <p><strong>Variables</strong>:</p>
 <ul>
-<li>Update me…</li>
+<li>tidal flat extent, measured in km<span class="math inline">\(^2\)</span></li>
 </ul>
 <hr />
 </div>
@@ -507,7 +507,13 @@ observable.</p>
 <h1><span class="header-section-number">2</span> Methods</h1>
 <div id="overview" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Overview</h2>
-<p>IDK lol</p>
+<ol style="list-style-type: decimal">
+<li><p>Load the tidal flat extent data</p></li>
+<li><p>Model the trend</p></li>
+<li><p>Project 5 years past the last time step.</p></li>
+<li><p>Save the results</p></li>
+<li><p>Check the data for anomalies.</p></li>
+</ol>
 </div>
 <div id="setup" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Setup</h2>
@@ -553,7 +559,7 @@ to project 5 years past the last time step.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>trend_function <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(km2 <span class="sc">~</span> year, <span class="at">data =</span> df) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>tidal_flat_trend <span class="ot">&lt;-</span> tidal_flat_extent <span class="sc">%&gt;%</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2004</span>) <span class="sc">%&gt;%</span> </span>
