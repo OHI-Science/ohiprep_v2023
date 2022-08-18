@@ -142,9 +142,7 @@ fao_gmw <- fao_gmw %>%
 ref_areas <- fao_gmw %>% 
   mutate(km2_ref = case_when(!is.na(km2_1980) ~ km2_1980,
                                  is.na(km2_1980) & !is.na(km2_1996) ~ km2_1996)) %>% 
-  mutate(ref_year = case_when(!is.na(km2_1980) ~ 1980,
-                              is.na(km2_1980) & !is.na(km2_ref) ~ 1996)) %>% 
-  select(rgn_id, km2_ref, ref_year)
+  select(rgn_id, km2_ref)
 
 ```
 
