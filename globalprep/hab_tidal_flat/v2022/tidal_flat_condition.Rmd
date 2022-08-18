@@ -97,7 +97,8 @@ Load the tidal flat extent data.
 ```{r eval = FALSE}
 tidal_flat_extent <- here::here(dir_here, "output", "tidal_flat_extent.csv") %>%
   readr::read_csv(col_types = cols()) %>% 
-  dplyr::left_join(rgns, by = "rgn_id") 
+  dplyr::left_join(rgns, by = "rgn_id") %>% 
+  dplyr::filter(rgn_id != 213)
 ```
 
 ## Find the condition
@@ -114,6 +115,7 @@ tidal_flat_condition <- tidal_flat_extent %>%
                 health = case_when(health > 1 ~ 1, T ~ health),
                 year = 2013) %>% 
   tidyr::replace_na(list(health = 0)) %>% 
+  dplyr::ungroup() %>% 
   dplyr::select(rgn_id, year, habitat, health) 
 ```
 

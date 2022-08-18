@@ -1,222 +1,221 @@
-rgn_name,rgn_id,year,habitat,health
-Cocos Islands,1,2013,tidal flat,0
-Christmas Island,2,2013,tidal flat,0
-Norfolk Island,3,2013,tidal flat,0
-Macquarie Island,4,2013,tidal flat,0
-New Caledonia,5,2013,tidal flat,1
-Vanuatu,6,2013,tidal flat,1
-Solomon Islands,7,2013,tidal flat,0
-Palau,8,2013,tidal flat,1
-Micronesia,9,2013,tidal flat,0
-Nauru,10,2013,tidal flat,0
-Marshall Islands,11,2013,tidal flat,0
-Wake Island,12,2013,tidal flat,0
-Northern Mariana Islands and Guam,13,2013,tidal flat,0
-Taiwan,14,2013,tidal flat,0.7163134140608249
-Philippines,15,2013,tidal flat,0.6336502243012346
-Australia,16,2013,tidal flat,0.9026865783751828
-Papua New Guinea,17,2013,tidal flat,1
-Fiji,18,2013,tidal flat,1
-Tuvalu,19,2013,tidal flat,1
-South Korea,20,2013,tidal flat,0.8121111650419365
-North Korea,21,2013,tidal flat,1
-Cambodia,24,2013,tidal flat,1
-Thailand,25,2013,tidal flat,0.9387650147833134
-Andaman and Nicobar,26,2013,tidal flat,1
-Comoro Islands,28,2013,tidal flat,1
-Mayotte,29,2013,tidal flat,0
-Glorioso Islands,30,2013,tidal flat,0
-Seychelles,31,2013,tidal flat,0
-Reunion,32,2013,tidal flat,0
-Juan de Nova Island,33,2013,tidal flat,0
-Bassas da India,34,2013,tidal flat,0
-Ile Europa,35,2013,tidal flat,0
-Ile Tromelin,36,2013,tidal flat,0
-Mauritius,37,2013,tidal flat,0
-British Indian Ocean Territory,38,2013,tidal flat,0
-Maldives,39,2013,tidal flat,0.5109464721767268
-Sri Lanka,40,2013,tidal flat,0
-Mozambique,41,2013,tidal flat,1
-Madagascar,42,2013,tidal flat,1
-Kenya,43,2013,tidal flat,1
-Somalia,44,2013,tidal flat,1
-Eritrea,45,2013,tidal flat,0.6243924549120532
-Djibouti,46,2013,tidal flat,1
-Yemen,47,2013,tidal flat,0.9656522404666286
-Oman,48,2013,tidal flat,1
-Sudan,49,2013,tidal flat,1
-Saudi Arabia,50,2013,tidal flat,1
-Kuwait,51,2013,tidal flat,0.5728113067275357
-Bahrain,52,2013,tidal flat,0.9205101673290749
-Pakistan,53,2013,tidal flat,1
-United Arab Emirates,54,2013,tidal flat,1
-Azores,55,2013,tidal flat,0
-Cape Verde,56,2013,tidal flat,0
-Madeira,57,2013,tidal flat,0
-Canary Islands,58,2013,tidal flat,0.3406666044141842
-Belgium,59,2013,tidal flat,0.8926304920230516
-Gibraltar,60,2013,tidal flat,0
-Tunisia,61,2013,tidal flat,1
-Morocco,62,2013,tidal flat,0.3175845370371693
-Western Sahara,63,2013,tidal flat,1
-Mauritania,64,2013,tidal flat,1
-Gambia,65,2013,tidal flat,0.9076014663001388
-Senegal,66,2013,tidal flat,0.5993576119910727
-Libya,67,2013,tidal flat,1
-Malta,68,2013,tidal flat,0.008473750605960869
-Latvia,69,2013,tidal flat,0.24593499350774073
-Estonia,70,2013,tidal flat,0.45547898663313
-Bulgaria,71,2013,tidal flat,0
-Romania,72,2013,tidal flat,0
-Russia,73,2013,tidal flat,1
-Georgia,74,2013,tidal flat,0
-Ukraine,75,2013,tidal flat,0
-Turkey,76,2013,tidal flat,1
-Syria,77,2013,tidal flat,0.026139261758739367
-Lebanon,78,2013,tidal flat,0.045698725297510893
-Israel,79,2013,tidal flat,0.7373563580418558
-Greece,80,2013,tidal flat,0.42198777324450953
-Cyprus,81,2013,tidal flat,1
-Albania,82,2013,tidal flat,0.6355355020199746
-Algeria,84,2013,tidal flat,0.5990271208751793
-Ascension,85,2013,tidal flat,0
-Saint Helena,86,2013,tidal flat,1
-Tristan da Cunha,88,2013,tidal flat,0
-South Georgia and the South Sandwich Islands,89,2013,tidal flat,0
-Prince Edward Islands,90,2013,tidal flat,0
-Crozet Islands,91,2013,tidal flat,0
-Amsterdam Island and Saint Paul Island,92,2013,tidal flat,0
-Kerguelen Islands,93,2013,tidal flat,0
-Heard and McDonald Islands,94,2013,tidal flat,0
-Falkland Islands,95,2013,tidal flat,0
-Sierra Leone,96,2013,tidal flat,1
-Liberia,97,2013,tidal flat,0.9886580781366785
-Togo,98,2013,tidal flat,0.49530174510700564
-Benin,99,2013,tidal flat,0.7361778310899002
-Republique du Congo,100,2013,tidal flat,1
-Namibia,101,2013,tidal flat,0.6063185258672706
-South Africa,102,2013,tidal flat,0.7888002973625896
-Sao Tome and Principe,103,2013,tidal flat,0
-Equatorial Guinea,104,2013,tidal flat,0.2643060076358156
-Bouvet Island,105,2013,tidal flat,0
-Ghana,106,2013,tidal flat,0.8820152038167826
-Clipperton Island,107,2013,tidal flat,0
-Bermuda,108,2013,tidal flat,1
-Bahamas,110,2013,tidal flat,0.4851759926282259
-Turks and Caicos Islands,111,2013,tidal flat,0.3985252949853138
-Cuba,112,2013,tidal flat,0.987933714353596
-Cayman Islands,113,2013,tidal flat,1
-Haiti,114,2013,tidal flat,0.28404272691603055
-Dominican Republic,115,2013,tidal flat,0.17019741111724493
-Puerto Rico and Virgin Islands of the United States,116,2013,tidal flat,0.16204820744951473
-British Virgin Islands,117,2013,tidal flat,0.45986152185098444
-Anguilla,118,2013,tidal flat,0
-Saint Kitts and Nevis,119,2013,tidal flat,0
-Antigua and Barbuda,120,2013,tidal flat,0
-Montserrat,121,2013,tidal flat,0
-Saint Lucia,122,2013,tidal flat,0
-Dominica,123,2013,tidal flat,0
-Barbados,124,2013,tidal flat,0
-Grenada,125,2013,tidal flat,0
-Trinidad and Tobago,126,2013,tidal flat,0
-Saint Vincent and the Grenadines,127,2013,tidal flat,0
-Panama,129,2013,tidal flat,0.940953992233982
-Costa Rica,130,2013,tidal flat,0.7132221671409208
-Nicaragua,131,2013,tidal flat,0.8407337215331876
-Colombia,132,2013,tidal flat,0.47556271851574394
-Honduras,133,2013,tidal flat,1
-El Salvador,134,2013,tidal flat,0.7612842588724086
-Mexico,135,2013,tidal flat,0.9000281502771627
-Guatemala,136,2013,tidal flat,0.26015850935030793
-Ecuador,137,2013,tidal flat,0
-Peru,138,2013,tidal flat,1
-Venezuela,139,2013,tidal flat,0.9218550095843588
-Guadeloupe and Martinique,140,2013,tidal flat,0
-Faeroe Islands,141,2013,tidal flat,0
-Iceland,143,2013,tidal flat,0
-Jan Mayen,144,2013,tidal flat,0
-Greenland,145,2013,tidal flat,1
-Pitcairn,146,2013,tidal flat,0
-French Polynesia,147,2013,tidal flat,1
-Line Group,148,2013,tidal flat,0
-Jarvis Island,149,2013,tidal flat,0
-Palmyra Atoll,150,2013,tidal flat,0
-American Samoa,151,2013,tidal flat,1
-Samoa,152,2013,tidal flat,1
-Cook Islands,153,2013,tidal flat,0
-Niue,154,2013,tidal flat,0
-Tonga,155,2013,tidal flat,1
-Tokelau,156,2013,tidal flat,1
-Phoenix Group,157,2013,tidal flat,0
-Howland Island and Baker Island,158,2013,tidal flat,0
-Johnston Atoll,159,2013,tidal flat,0
-Wallis and Futuna,161,2013,tidal flat,0
-New Zealand,162,2013,tidal flat,1
-United States,163,2013,tidal flat,0.8510060495558861
-Belize,164,2013,tidal flat,0.5109839293419448
-Jamaica,166,2013,tidal flat,0.37363858287327356
-Guyana,167,2013,tidal flat,1
-Suriname,168,2013,tidal flat,1
-French Guiana,169,2013,tidal flat,1
-Brazil,171,2013,tidal flat,1
-Argentina,172,2013,tidal flat,1
-Uruguay,173,2013,tidal flat,0.9057255416327679
-Finland,174,2013,tidal flat,0.2152389133917845
-Denmark,175,2013,tidal flat,0.7899851024258345
-Germany,176,2013,tidal flat,1
-Netherlands,177,2013,tidal flat,1
-Poland,178,2013,tidal flat,0.27646461978735065
-France,179,2013,tidal flat,1
-United Kingdom,180,2013,tidal flat,0.8937892804581163
-Ireland,181,2013,tidal flat,0.7680587084162098
-Spain,182,2013,tidal flat,0.8976137973331355
-Portugal,183,2013,tidal flat,1
-Italy,184,2013,tidal flat,0.7247977023811172
-Monaco,185,2013,tidal flat,0
-Montenegro,186,2013,tidal flat,0.5474012966165683
-Croatia,187,2013,tidal flat,0.06262988548473429
-Slovenia,188,2013,tidal flat,0.23709582525893175
-Lithuania,189,2013,tidal flat,0.22919757187025122
-Qatar,190,2013,tidal flat,0.7126007189273228
-Iran,191,2013,tidal flat,0.9913690134179817
-Iraq,192,2013,tidal flat,0.8569369609199656
-Guinea Bissau,193,2013,tidal flat,1
-Guinea,194,2013,tidal flat,1
-Ivory Coast,195,2013,tidal flat,0.817150657585008
-Nigeria,196,2013,tidal flat,1
-Cameroon,197,2013,tidal flat,1
-Gabon,198,2013,tidal flat,0.7380037911901288
-Democratic Republic of the Congo,199,2013,tidal flat,1
-Angola,200,2013,tidal flat,0.9415509296088657
-Tanzania,202,2013,tidal flat,1
-India,203,2013,tidal flat,1
-Bangladesh,204,2013,tidal flat,1
-Myanmar,205,2013,tidal flat,1
-Malaysia,206,2013,tidal flat,0.994617457925067
-Vietnam,207,2013,tidal flat,0.8755211855485527
-Singapore,208,2013,tidal flat,0.7649954714031856
-China,209,2013,tidal flat,0.9669508647845723
-Japan,210,2013,tidal flat,0.5323885443815191
-Kiribati,212,2013,tidal flat,1
-Antarctica,213,2013,tidal flat,0
-Egypt,214,2013,tidal flat,1
-Jordan,215,2013,tidal flat,1
-Indonesia,216,2013,tidal flat,1
-Canada,218,2013,tidal flat,0.9007408075323459
-Saint Pierre and Miquelon,219,2013,tidal flat,0.6873886420191655
-Sint Maarten,220,2013,tidal flat,0
-Northern Saint-Martin,221,2013,tidal flat,0
-Sweden,222,2013,tidal flat,0.4264308992004993
-Norway,223,2013,tidal flat,0.27712746344748984
-Chile,224,2013,tidal flat,1
-Jersey,227,2013,tidal flat,1
-Guernsey,228,2013,tidal flat,0.7550832294063328
-East Timor,231,2013,tidal flat,0.7631679749796683
-Bosnia and Herzegovina,232,2013,tidal flat,0.02483394793558111
-Oecussi Ambeno,237,2013,tidal flat,0.9710982839485599
-Curacao,244,2013,tidal flat,0.5153733578923526
-Bonaire,245,2013,tidal flat,0
-Brunei,247,2013,tidal flat,0.7116706125372807
-Saba,248,2013,tidal flat,0
-Sint Eustatius,249,2013,tidal flat,0
-Aruba,250,2013,tidal flat,1
+rgn_id,year,habitat,health
+1,2013,tidal flat,0
+2,2013,tidal flat,0
+3,2013,tidal flat,0
+4,2013,tidal flat,0
+5,2013,tidal flat,1
+6,2013,tidal flat,1
+7,2013,tidal flat,0
+8,2013,tidal flat,1
+9,2013,tidal flat,0
+10,2013,tidal flat,0
+11,2013,tidal flat,0
+12,2013,tidal flat,0
+13,2013,tidal flat,0
+14,2013,tidal flat,0.7163134140608249
+15,2013,tidal flat,0.6336502243012346
+16,2013,tidal flat,0.9026865783751828
+17,2013,tidal flat,1
+18,2013,tidal flat,1
+19,2013,tidal flat,1
+20,2013,tidal flat,0.8121111650419365
+21,2013,tidal flat,1
+24,2013,tidal flat,1
+25,2013,tidal flat,0.9387650147833134
+26,2013,tidal flat,1
+28,2013,tidal flat,1
+29,2013,tidal flat,0
+30,2013,tidal flat,0
+31,2013,tidal flat,0
+32,2013,tidal flat,0
+33,2013,tidal flat,0
+34,2013,tidal flat,0
+35,2013,tidal flat,0
+36,2013,tidal flat,0
+37,2013,tidal flat,0
+38,2013,tidal flat,0
+39,2013,tidal flat,0.5109464721767268
+40,2013,tidal flat,0
+41,2013,tidal flat,1
+42,2013,tidal flat,1
+43,2013,tidal flat,1
+44,2013,tidal flat,1
+45,2013,tidal flat,0.6243924549120532
+46,2013,tidal flat,1
+47,2013,tidal flat,0.9656522404666286
+48,2013,tidal flat,1
+49,2013,tidal flat,1
+50,2013,tidal flat,1
+51,2013,tidal flat,0.5728113067275357
+52,2013,tidal flat,0.9205101673290749
+53,2013,tidal flat,1
+54,2013,tidal flat,1
+55,2013,tidal flat,0
+56,2013,tidal flat,0
+57,2013,tidal flat,0
+58,2013,tidal flat,0.3406666044141842
+59,2013,tidal flat,0.8926304920230516
+60,2013,tidal flat,0
+61,2013,tidal flat,1
+62,2013,tidal flat,0.3175845370371693
+63,2013,tidal flat,1
+64,2013,tidal flat,1
+65,2013,tidal flat,0.9076014663001388
+66,2013,tidal flat,0.5993576119910727
+67,2013,tidal flat,1
+68,2013,tidal flat,0.008473750605960869
+69,2013,tidal flat,0.24593499350774073
+70,2013,tidal flat,0.45547898663313
+71,2013,tidal flat,0
+72,2013,tidal flat,0
+73,2013,tidal flat,1
+74,2013,tidal flat,0
+75,2013,tidal flat,0
+76,2013,tidal flat,1
+77,2013,tidal flat,0.026139261758739367
+78,2013,tidal flat,0.045698725297510893
+79,2013,tidal flat,0.7373563580418558
+80,2013,tidal flat,0.42198777324450953
+81,2013,tidal flat,1
+82,2013,tidal flat,0.6355355020199746
+84,2013,tidal flat,0.5990271208751793
+85,2013,tidal flat,0
+86,2013,tidal flat,1
+88,2013,tidal flat,0
+89,2013,tidal flat,0
+90,2013,tidal flat,0
+91,2013,tidal flat,0
+92,2013,tidal flat,0
+93,2013,tidal flat,0
+94,2013,tidal flat,0
+95,2013,tidal flat,0
+96,2013,tidal flat,1
+97,2013,tidal flat,0.9886580781366785
+98,2013,tidal flat,0.49530174510700564
+99,2013,tidal flat,0.7361778310899002
+100,2013,tidal flat,1
+101,2013,tidal flat,0.6063185258672706
+102,2013,tidal flat,0.7888002973625896
+103,2013,tidal flat,0
+104,2013,tidal flat,0.2643060076358156
+105,2013,tidal flat,0
+106,2013,tidal flat,0.8820152038167826
+107,2013,tidal flat,0
+108,2013,tidal flat,1
+110,2013,tidal flat,0.4851759926282259
+111,2013,tidal flat,0.3985252949853138
+112,2013,tidal flat,0.987933714353596
+113,2013,tidal flat,1
+114,2013,tidal flat,0.28404272691603055
+115,2013,tidal flat,0.17019741111724493
+116,2013,tidal flat,0.16204820744951473
+117,2013,tidal flat,0.45986152185098444
+118,2013,tidal flat,0
+119,2013,tidal flat,0
+120,2013,tidal flat,0
+121,2013,tidal flat,0
+122,2013,tidal flat,0
+123,2013,tidal flat,0
+124,2013,tidal flat,0
+125,2013,tidal flat,0
+126,2013,tidal flat,0
+127,2013,tidal flat,0
+129,2013,tidal flat,0.940953992233982
+130,2013,tidal flat,0.7132221671409208
+131,2013,tidal flat,0.8407337215331876
+132,2013,tidal flat,0.47556271851574394
+133,2013,tidal flat,1
+134,2013,tidal flat,0.7612842588724086
+135,2013,tidal flat,0.9000281502771627
+136,2013,tidal flat,0.26015850935030793
+137,2013,tidal flat,0
+138,2013,tidal flat,1
+139,2013,tidal flat,0.9218550095843588
+140,2013,tidal flat,0
+141,2013,tidal flat,0
+143,2013,tidal flat,0
+144,2013,tidal flat,0
+145,2013,tidal flat,1
+146,2013,tidal flat,0
+147,2013,tidal flat,1
+148,2013,tidal flat,0
+149,2013,tidal flat,0
+150,2013,tidal flat,0
+151,2013,tidal flat,1
+152,2013,tidal flat,1
+153,2013,tidal flat,0
+154,2013,tidal flat,0
+155,2013,tidal flat,1
+156,2013,tidal flat,1
+157,2013,tidal flat,0
+158,2013,tidal flat,0
+159,2013,tidal flat,0
+161,2013,tidal flat,0
+162,2013,tidal flat,1
+163,2013,tidal flat,0.8510060495558861
+164,2013,tidal flat,0.5109839293419448
+166,2013,tidal flat,0.37363858287327356
+167,2013,tidal flat,1
+168,2013,tidal flat,1
+169,2013,tidal flat,1
+171,2013,tidal flat,1
+172,2013,tidal flat,1
+173,2013,tidal flat,0.9057255416327679
+174,2013,tidal flat,0.2152389133917845
+175,2013,tidal flat,0.7899851024258345
+176,2013,tidal flat,1
+177,2013,tidal flat,1
+178,2013,tidal flat,0.27646461978735065
+179,2013,tidal flat,1
+180,2013,tidal flat,0.8937892804581163
+181,2013,tidal flat,0.7680587084162098
+182,2013,tidal flat,0.8976137973331355
+183,2013,tidal flat,1
+184,2013,tidal flat,0.7247977023811172
+185,2013,tidal flat,0
+186,2013,tidal flat,0.5474012966165683
+187,2013,tidal flat,0.06262988548473429
+188,2013,tidal flat,0.23709582525893175
+189,2013,tidal flat,0.22919757187025122
+190,2013,tidal flat,0.7126007189273228
+191,2013,tidal flat,0.9913690134179817
+192,2013,tidal flat,0.8569369609199656
+193,2013,tidal flat,1
+194,2013,tidal flat,1
+195,2013,tidal flat,0.817150657585008
+196,2013,tidal flat,1
+197,2013,tidal flat,1
+198,2013,tidal flat,0.7380037911901288
+199,2013,tidal flat,1
+200,2013,tidal flat,0.9415509296088657
+202,2013,tidal flat,1
+203,2013,tidal flat,1
+204,2013,tidal flat,1
+205,2013,tidal flat,1
+206,2013,tidal flat,0.994617457925067
+207,2013,tidal flat,0.8755211855485527
+208,2013,tidal flat,0.7649954714031856
+209,2013,tidal flat,0.9669508647845723
+210,2013,tidal flat,0.5323885443815191
+212,2013,tidal flat,1
+214,2013,tidal flat,1
+215,2013,tidal flat,1
+216,2013,tidal flat,1
+218,2013,tidal flat,0.9007408075323459
+219,2013,tidal flat,0.6873886420191655
+220,2013,tidal flat,0
+221,2013,tidal flat,0
+222,2013,tidal flat,0.4264308992004993
+223,2013,tidal flat,0.27712746344748984
+224,2013,tidal flat,1
+227,2013,tidal flat,1
+228,2013,tidal flat,0.7550832294063328
+231,2013,tidal flat,0.7631679749796683
+232,2013,tidal flat,0.02483394793558111
+237,2013,tidal flat,0.9710982839485599
+244,2013,tidal flat,0.5153733578923526
+245,2013,tidal flat,0
+247,2013,tidal flat,0.7116706125372807
+248,2013,tidal flat,0
+249,2013,tidal flat,0
+250,2013,tidal flat,1
