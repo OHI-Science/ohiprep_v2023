@@ -995,7 +995,7 @@ plot(fishing_effort_2020, axes = FALSE, add = TRUE)
 ```
 
 ```{r}
-tic() 
+tic() # 21 min
 
 # Read in OHI regions polygons - several polygons (rows) for each region because one polygon exists for each region & land type combo (eez, land, etc.)
 ohi_regions <- st_read(dsn = file.path(dir_M, "git-annex/globalprep/spatial/v2017"), layer = "regions_2017_update")
@@ -1053,7 +1053,7 @@ for (i in years_all) {
   print(paste0("Saved ", i, " fishing effort csv to ", here(), "/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv/fishing_effort_", i, ".csv"))
 }
 
-toc() # 21 min
+toc() 
 ```
 
 ## Standarize catches per soft-bottom area
@@ -1071,121 +1071,236 @@ fishing_all <- bind_rows(annual_list)
 data_density <- fishing_all %>%
   left_join(area, by = "rgn_id") %>%
   filter(rgn_id <= 250) %>%
-  mutate(density = effort_sum/km2)
+  mutate(raw_density = effort_sum/km2)
 
-# annual_data_density <- data_density %>% 
-#   group_by(year) %>% 
-#   summarize(total_effort_km2 = sum(density, na.rm = TRUE))
-# 
-# annual_density_plot <- ggplot(annual_data_density, aes(year, total_effort_km2)) +
-#   geom_point() +
-#   labs(title = "Demersal Fishing Effort per Softbottom Habitat Area\nAll regions 2012-2020",
-#              x = "Year",
-#              y = "Fishing Effort\n(hours per km2 soft bottom habitat)") +
-#   theme(plot.title = element_text(hjust=0.5))
-# annual_density_plot
-# looks very skewed, likely due to outliers
-
-# get summary stats for the data density before winsorizing and summing by year
-summary(data_density$density)
+# get summary stats for the data density before rescaling using the quantile
+summary(data_density$raw_density)
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.      NA's 
 #    0.0000    0.0000    0.0005    4.4239    0.2861 2503.8848       135 
 
-# Winsorize the data density 
+## Checking for distribution of data. In the past density data happens to be very skewed
+hist(data_density$raw_density) # very skewed (right)
+
 data_density <- data_density %>%
-  # if the data is above the 99th quantile, replace it with the 99th quantile
-  mutate(quantDensity = if_else(
-    density > quantile(x = density, probs = c(0.99), na.rm = TRUE),
-    quantile(x = density, probs = c(0.99), na.rm = TRUE),
-    density))
+  mutate(log_density = log(raw_density + 1))
 
-annual_data_density_adjusted <- data_density %>% 
-  group_by(year) %>% 
-  summarize(quantDensity = sum(quantDensity, na.rm = TRUE))
+ref_point_95_all_years <- quantile(data_density$log_density, c(0.95), na.rm = TRUE)
 
-ggplot(annual_data_density_adjusted, aes(year, quantDensity)) + 
-  geom_line() +
-  labs(title = "Demersal Fishing Effort per km2 of Softbottom Habitat 2012-2020\nAdjusted for 99th Quantile",
-       x = "Year",
-       y = "Fishing Effort\n(Hours per km2 of soft bottom habitat)")
+# ref_point_90 <- data_density %>%
+#   group_by(year) %>%
+#   summarize(quantDensity = quantile(raw_density, c(0.90), na.rm = TRUE)) %>%
+#   data.frame()
 
-write.csv(annual_data_density_adjusted, file = here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/reference_point_quant_99.csv"), row.names = FALSE)
+#write.csv(ref_point_90, here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/reference_point_quant_95.csv"), row.names=FALSE)
 
-# compare to the same years from the 2020 data (99th quantile)
+# retrieve the median quantile from the annual quantiles:
+#ref_point_90_median <- median(ref_point_90$quantDensity)
 
-assessment_2020 <- read.csv(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/int/reference_point_quant_99.csv")) %>% 
-  filter(year %in% c(2012:2020))
+## Rescale the density:
+data_density <- data_density %>%
+  mutate(density_rescaled = log_density/ref_point_95_all_years) %>%
+  mutate(density_rescaled_capped = ifelse(density_rescaled > 1,
+                                                 1,
+                                                 density_rescaled))
 
-assessment_2022 <- annual_data_density_adjusted %>% 
-  filter(year %in% c(2012:2017))
+# assign each annual quantile value to that year
+# quant_90_2012 <- ref_point_90$quantDensity[1]
+# quant_90_2013 <- ref_point_90$quantDensity[2]
+# quant_90_2014 <- ref_point_90$quantDensity[3]
+# quant_90_2015 <- ref_point_90$quantDensity[4]
+# quant_90_2016 <- ref_point_90$quantDensity[5]
+# quant_90_2017 <- ref_point_90$quantDensity[6]
+# quant_90_2018 <- ref_point_90$quantDensity[7]
+# quant_90_2019 <- ref_point_90$quantDensity[8]
+# quant_90_2020 <- ref_point_90$quantDensity[9]
+# 
+# # Rescale the density:
+# data_density_2012 <- data_density %>%
+#   filter(year == 2012) %>% 
+#   mutate(density_rescaled_median = raw_density/quant_90_2012) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2013 <- data_density %>%
+#   filter(year == 2013) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2013) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2014 <- data_density %>%
+#   filter(year == 2014) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2014) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2015 <- data_density %>%
+#   filter(year == 2015) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2015) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2016 <- data_density %>%
+#   filter(year == 2016) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2016) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2017 <- data_density %>%
+#   filter(year == 2017) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2017) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2018 <- data_density %>%
+#   filter(year == 2018) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2018) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2019 <- data_density %>%
+#   filter(year == 2019) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2019) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density_2020 <- data_density %>%
+#   filter(year == 2020) %>%
+#   mutate(density_rescaled_median = raw_density/quant_90_2020) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
+# 
+# data_density <- rbind(data_density_2012,
+#                       data_density_2013,
+#                       data_density_2014,
+#                       data_density_2015,
+#                       data_density_2016,
+#                       data_density_2017,
+#                       data_density_2018,
+#                       data_density_2019,
+#                       data_density_2020)
 
-ggplot() +
-  geom_line(data = assessment_2020, aes(x = year, y = quantDensity)) +
-  geom_text(aes(2013, 115, label = "2022 Assessment\nGFW data", vjust = 1)) +
-  geom_line(data = assessment_2022, aes(x = year, y = quantDensity)) +
-  geom_text(aes(2014, 80, label = "2020 Assessment\nWatson catch data", vjust = 1)) +
-  labs(x = "Year",
-       y = "Fishing Effort\n(catch or fishing hours standardized by km2 of soft bottom habitat)",
-       title = "Comparison od 2020 and 2022 Assessment:\nDemersal Fishing Effort per km2 of Softbottom Habitat 2012-2017\nAdjusted for 99th Quantile")
+# ref_point_85 <- data_density %>% 
+#   group_by(year) %>%
+#   summarize(quantDensity = quantile(raw_density, c(0.85), na.rm = TRUE)) %>%
+#   data.frame()
+# 
+# write.csv(ref_point_85, here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/reference_point_quant_85.csv"), row.names=FALSE)
 
-# rescale the density data
-## Reference point = 99th quantile across all years
-ref_point <- read.csv(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/reference_point_quant_99.csv"))
-ref_point_median <- median(ref_point$quantDensity) # 2022 assessment: 154.01
+## Reference point = 95th quantile across all years
+#ref_point_95 <- read.csv(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/reference_point_quant_95.csv"))
+#ref_point_85_median <- median(ref_point_85$quantDensity) # v2022 95th: 3.84
                                                    
 # ref_point (max) 2018 = 7052.172 (year 2015)
 # ref_point (max) 2019 = 45.76575 (year 2015)
 # ref_point (max) 2020 = 4842.57385 (year 2015)
 # ref_point (95th quantile) 2020 = 19.62075 (year 2015)
-# ref_point (99th quantile max) 2022 = 225.32314 (year 2020)
 
-## Checking for distribution of data. In the past density data happens to be very skewed
-# 2020 assessment scaled the data desnsity (not using any quantile reference point data, the pure data density, that is not summarized by year)
-hist(data_density$density) # Yes, very skewed data
+# lump all years together and get the quantile and divide by that value 
+# try 90, 95, 99
+# post histograms
+
+#ref_point_95_all_years <- quantile(data_density$raw_density, c(0.95), na.rm = TRUE)
 
 ## Rescale the density:
-data_rescale <- data_density %>%
-  mutate(density_rescaled_median = density/ref_point_median) %>%
-  mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
-                                                   1,
-                                                   density_rescaled_median))
-# contains all 220 regions
-hist(data_rescale$density_rescaled_median_capped) # heavy skew still
+# data_density <- data_density %>%
+#   mutate(density_rescaled_median = raw_density/ref_point_85_all_years) %>%
+#   mutate(density_rescaled_median_capped = ifelse(density_rescaled_median > 1,
+#                                                  1,
+#                                                  density_rescaled_median))
 
+hist(data_density$density_rescaled_capped)
+
+# Winsorize in new column: if the data is above the 95th quantile, replace it with the 95th quantile
+# mutate(quantDensity = if_else(
+#                                 raw_density > quantile(x = raw_density, probs = c(0.95), na.rm = TRUE),
+#                                 quantile(x = raw_density, probs = c(0.95), na.rm = TRUE),
+#                                 raw_density))
+
+# plot just the 2022 assessment trend for fishing effort before rescaling
+# ggplot(annual_data_density_adjusted, aes(year, quantDensity)) + 
+#   geom_line() +
+#   labs(title = "Demersal Fishing Effort per km2 of Softbottom Habitat 2012-2020\nAdjusted for 99th Quantile",
+#        x = "Year",
+#        y = "Fishing Effort\n(Hours per km2 of soft bottom habitat)")
+
+# save that winsorized data to the 2022 folder
+#write.csv(annual_data_density_adjusted, file = here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/reference_point_quant_95.csv"), row.names = FALSE)
+
+# compare to the same years from the 2020 data (95th quantile, the lowest quantile used for that assessment year)
+#assessment_2020 <- read.csv(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/int/reference_point_quant_99.csv")) %>% 
+#  filter(year %in% c(2012:2020))
+
+#assessment_2022 <- annual_data_density_adjusted %>% 
+#  filter(year %in% c(2012:2017))
+
+# ggplot() +
+#   geom_line(data = assessment_2020, aes(x = year, y = quantDensity), col = "red") +
+#   geom_text(aes(2013, 90, label = "2022 Assessment\nGFW data\nquantile = 0.95", vjust = 1), col = "blue") +
+#   geom_line(data = assessment_2022, aes(x = year, y = quantDensity), col = "blue") +
+#   geom_text(aes(2014, 50, label = "2020 Assessment\nWatson catch data\nquantile = 0.99", vjust = 1), col = "red") +
+#   labs(x = "Year",
+#        y = "Fishing Effort\n(catch or fishing hours standardized by km2 of soft bottom habitat)",
+#        title = "Comparison od 2020 and 2022 Assessment:\nDemersal Fishing Effort per km2 of Softbottom Habitat 2012-2017\nAdjusted for 99th Quantile")
+
+
+# instead of using the median of the winsorized data to rescale, use the formula (x-min(x))/(max(x)-min(x))
+# data_rescale_formula <- data_density %>% 
+#   mutate(density_rescaled_formula = (density - min(density, na.rm = T))/(max(density, na.rm = T) - min(density, na.rm = T))) %>% 
+#   mutate(density_rescaled_formula_capped = ifelse(density_rescaled_formula > 1,
+#                                                     1,
+#                                                     density_rescaled_formula))
+```
+
+## Correct regions with no soft bottom habitat area
+
+```{r}
 # check which regions have NA values
-data_rescale_na <- data_rescale %>% 
-  filter(is.na(density_rescaled_median_capped)) 
+data_rescale_na <- data_density %>% 
+  filter(is.na(density_rescaled_capped)) 
+
 length(unique(data_rescale_na$rgn_id)) # 15 regions have NA values for fishing effort, this is just because those regions do not have soft bottom habitat in the spatial file
 
 # replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ's because it is not there to beign with
-data_rescale <- data_rescale %>% 
-  mutate(density_rescaled_median_capped = ifelse(is.na(density_rescaled_median_capped), 0, density_rescaled_median_capped))
+data_density <- data_density %>% 
+  mutate(density_rescaled_capped = ifelse(is.na(density_rescaled_capped), 0, density_rescaled_capped))
 
 # check it worked:
-data_rescale_na <- data_rescale %>% 
-  filter(is.na(density_rescaled_median_capped)) 
-length(unique(data_rescale_na$rgn_id))
+data_rescale_na <- data_density %>% 
+  filter(is.na(density_rescaled_capped)) 
+
+length(unique(data_rescale_na$rgn_id)) # 0
 ```
 
-## Calculate and save trend and health for softbottom habitat and subtidal habitat
-
-Save Trend and Health of Habitat Types
+# Calculate health and pressure 
 
 ```{r}
-condition_pressure <- data_rescale %>%
+health_pressure <- data_density %>%
   mutate(habitat = "soft_bottom") %>%
-  mutate(pressure = density_rescaled_median_capped) %>% 
-  mutate(health = 1 - density_rescaled_median_capped) %>% 
+  mutate(pressure = density_rescaled_capped) %>% 
+  mutate(health = 1 - density_rescaled_capped) %>% 
   dplyr::select(rgn_id, year, health, pressure, habitat)
 
 # check that all regions are present
-length(unique(condition_pressure$rgn_id)) # 220
+length(unique(health_pressure$rgn_id)) # 220
 
-hist(condition_pressure$pressure)
-hist(condition_pressure$health)
+hist(health_pressure$pressure)
+hist(health_pressure$health)
+```
 
+## Calculate and save trend 
+
+```{r}
 ## Get habitat trends
-stop_year <- max(condition_pressure$year)
+stop_year <- max(health_pressure$year)
 
 trend <- data.frame()
 
@@ -1193,7 +1308,7 @@ for (status_year in (stop_year-4):stop_year){
   trend_years <- status_year:(status_year - 4)
   first_trend_year <- min(trend_years)
   
-  trend_new <- condition_pressure %>%
+  trend_new <- health_pressure %>%
     filter(year %in% trend_years) %>%
     group_by(rgn_id) %>%
     do(mdl = lm(health ~ year, data=.),
@@ -1213,19 +1328,48 @@ for (status_year in (stop_year-4):stop_year){
 }
   
 write.csv(trend, file = here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv"), row.names = FALSE)
+```
 
+# Calculate and save health for softbottom habitat and subtidal habitat
+
+```{r}
 # calculate soft bottom habitat health
-health <- condition_pressure %>%
+health <- health_pressure %>%
     dplyr::select(rgn_id, year, habitat, health)
   
 write.csv(health, file = here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv"), row.names = FALSE)
   
-pressure <- condition_pressure %>%
+pressure <- health_pressure %>%
   dplyr::select(rgn_id, year, pressure_score = pressure) 
   
 write.csv(pressure, file = here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv"))
 ```
 
+## Compare trend, pressure, pressure output to last year's values
+
+```{r}
+## Health data
+old_health_data <- read.csv(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/habitat_health_softbottom.csv")) %>%
+  dplyr::filter(year == 2017) %>% # plot the first year that 2020 and 2022 assessment years have in common: 2017 
+  dplyr::select(rgn_id, old_health = health) # only 205 regions
+
+compare_health <- read.csv(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv")) %>%
+  filter(year == 2020) %>%
+  dplyr::select(rgn_id, new_health = health) %>%
+  left_join(old_health_data)
+
+
+
+
+
+
+
+# check range of health scores:
+plot(new_health ~ old_health, data = compare_health)
+abline(0,1, col = 'red')
+
+hist(compare_health$health)
+```
 
 
 
