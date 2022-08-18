@@ -1,6 +1,6 @@
 ## Ocean Health Index: Soft-bottom extent, health, trend for Habitat subgoal (Biodiversity goal) and as a pressure.
 
-See full data prep details in [here](https://ohi-science.github.io/ohiprep_v2020/globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/hab_prs_soft_bottom_data_prep.html)
+See full data prep details in [here](https://ohi-science.github.io/ohiprep_v2020/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/hab_prs_soft_bottom_data_prep.html)
 
 ## Layers Created
 * hab_softbottom_health

@@ -302,6 +302,7 @@ for (file in files) {
 final <- output %>%
   dplyr::group_by(rgn_id, year, habitat) %>%
   dplyr::summarise(km2 = sum(km2, na.rm = T)) %>% 
+  dplyr::filter(rgn_id != 213) %>% 
   readr::write_csv(here::here(dir_here, 'output', paste0("tidal_flat_extent.csv")))
 ```
 

@@ -71,24 +71,14 @@ librarian::shelf(
   tidyverse,
   here,
   janitor,
-  plotly,
-  sf,
-  fasterize,
-  terra,
-  raster,
-  tictoc,
-  foreach,
-  doParallel
+  plotly
 ) 
 ### directory paths and relevant files
 current_year <- 2022
 version_year <- paste0("v", current_year)
 data_year <- paste0("d", current_year)
-
-source(here::here('workflow', 'R', 'common.R'))
-
-### Mazu
 dir_here  <- here::here('globalprep', 'hab_tidal_flat', version_year)
+source(here::here('workflow', 'R', 'common.R'))
 ```
 
 ## Load data
@@ -107,19 +97,26 @@ Load the tidal flat extent data.
 ```{r eval = FALSE}
 tidal_flat_extent <- here::here(dir_here, "output", "tidal_flat_extent.csv") %>%
   readr::read_csv(col_types = cols()) %>% 
-  dplyr::left_join(rgns, by = "rgn_id") 
+  dplyr::left_join(rgns, by = "rgn_id") %>% 
+  dplyr::filter(rgn_id != 213)
 ```
 
 ## Find the condition
 
+Due to large variability in the first time step and the last, we have opted to take the mean of time step 2 and 3 as the reference status, and the mean of time step 9 and 10 as the current status. The health then becomes the mean of 2013 and 2010 divided by the mean of 1989 and 1992. This gives us the most stable range of condition values, though several are still `Inf`. 
+
 ```{r eval = FALSE}
 tidal_flat_condition <- tidal_flat_extent %>% 
-  tidyr::pivot_wider(names_from = year, values_from = km2) %>% 
-  dplyr::mutate(health = `2016` / `1986`) %>% 
-  tidyr::replace_na(list(health = 0)) %>% 
-  dplyr::select(rgn_id, habitat, health) %>% 
-  dplyr::mutate(health = case_when(health > 1 ~ 1, T ~ health),
-                year = 2016) 
+  tidyr::pivot_wider(names_from = year, values_from = km2) %>%
+  dplyr::group_by(rgn_id, rgn_name) %>% 
+  dplyr::mutate(reference = mean(c(`1989`, `1992`)),
+                recent = mean(c(`2013`, `2010`)),
+                health = recent / reference,
+                health = case_when(health > 1 ~ 1, T ~ health),
+                year = 2013) %>% 
+  # tidyr::replace_na(list(health = 0)) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(rgn_id, year, habitat, health) 
 ```
 
 ## Write the results
