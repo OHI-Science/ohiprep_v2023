@@ -148,7 +148,7 @@ tidal_flat_trend_2013 <- tidal_flat_extent %>%
   dplyr::filter(term == "year") %>% 
   dplyr::left_join(tf_ext_2001) %>% 
   dplyr::mutate(trend = (estimate / km2) * 5, year = 2013) %>% 
-  tidyr::replace_na(list(trend = 0)) %>% 
+  # tidyr::replace_na(list(trend = 0)) %>% 
   dplyr::select(r2_label, data, year, habitat, trend) %>% 
   tidyr::unnest() %>% 
   dplyr::ungroup() %>% 
@@ -170,7 +170,6 @@ After evaluating the results, we opted to use the 2013 trend values as they are 
 #   dplyr::filter(term == "year") %>% 
 #   dplyr::left_join(tf_ext_2004) %>% 
 #   dplyr::mutate(trend = (estimate / km2) * 5, year = 2016) %>% 
-#   tidyr::replace_na(list(trend = 0)) %>% 
 #   dplyr::select(r2_label, data, year, habitat, trend) %>% 
 #   tidyr::unnest() %>% 
 #   dplyr::ungroup() %>% 

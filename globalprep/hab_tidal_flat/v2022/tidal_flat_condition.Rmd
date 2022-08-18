@@ -114,7 +114,7 @@ tidal_flat_condition <- tidal_flat_extent %>%
                 health = recent / reference,
                 health = case_when(health > 1 ~ 1, T ~ health),
                 year = 2013) %>% 
-  tidyr::replace_na(list(health = 0)) %>% 
+  # tidyr::replace_na(list(health = 0)) %>% 
   dplyr::ungroup() %>% 
   dplyr::select(rgn_id, year, habitat, health) 
 ```
