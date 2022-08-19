@@ -76,8 +76,6 @@ library(here)
 source('mar_fxs.R') # functions specific to mariculture dealing with compound countries
 source('../../../workflow/R/fao_fxn.R') # function for cleaning FAO files
 source('../../../workflow/R/common.R') # directory locations
-
-setwd(here("globalprep/mar/v2021"))
 ```
 
 # Import Raw Data: FAO Mariculture data
@@ -1123,7 +1121,7 @@ This analysis produces potential tonnes of aquaculture from growth potential est
 
 # Methods
 
-```{r setup ref, message=FALSE, warning=FALSE}
+```{r setup ref, message=FALSE, warning=FALSE, eval = FALSE}
 knitr::opts_chunk$set(eval=FALSE)
 #######regression inputs from VBGF_Fish.r
 
@@ -1162,7 +1160,7 @@ dir_git <- file.path(here(), "globalprep/mar/v2019")
 
 ## Establish variables and coefficients
 
-```{r}
+```{r, eval = FALSE}
 ## Variables needed to get from PHI to tonnes of production
 ## MRF: assumes 1 farm is 1km2  ##
 # (seems easier to just units of km2, rather than farm)
@@ -1178,7 +1176,7 @@ weight35cm <- 554.8  ## in grams see VBGF_Fish_Final. Paper reports 548 grams
 
 ## Finfish Production
 
-```{r}
+```{r, eval = FALSE}
 ## Global tiff file of PHI (Growth Potential) estimates
 FishPhiALLConstraints <- raster(file.path(dir_M, "git-annex/globalprep/mar/v2019/Spatial_Data/NewLayersWOHypoxia/FishPhiALLConstraints95LT2.tiff"))
 plot(FishPhiALLConstraints)
@@ -1322,7 +1320,7 @@ sum(CountryProdSummaryFAO$MaxProdPerCountry, na.rm = TRUE)
 
 ## Bivalve Production
 
-```{r}
+```{r, eval = FALSE}
 ##Now for Bivalves 
 BivalvePhiALLConstraints=raster(file.path(dir_M, "git-annex/globalprep/mar/v2019/Spatial_Data/NewLayersWOHypoxia/BivalvePhiALLConstraints95LT1.tif"))
 
@@ -1454,7 +1452,7 @@ To compare potential vs harvest, we need to convert bivalve units to metric tonn
 
 Averaging these gives about 27.5g per piece.
 
-```{r}
+```{r, eval = FALSE}
 aq_mass_per_pc <- 0.0275 * 1e-3 ### mass of bivalve piece in tonnes
 
 pot_b <- read_csv(file.path(dir_git, 'int/BivalveProdByCountrySummaryFAO.csv')) %>%

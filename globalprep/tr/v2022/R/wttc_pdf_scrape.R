@@ -3,15 +3,16 @@
 
 
 library(tidyverse)
-library(rvest)
-library(stringr)
-library(purrr)
 library(here)
+library(rvest)
+library(tabulizer)
+library(purrr)
 
+# pull the html from the page of interest
 page <- read_html("https://wttc.org/Research/Economic-Impact")
 
+# name and create our download destination folder
 pdf_dir <- here(paste0("globalprep/tr/v", version_year, "/wttc_pdfs/"))
-
 dir.create(pdf_dir)
 
 raw_list <- page %>% # takes the page above for which we've read the html
@@ -19,12 +20,12 @@ raw_list <- page %>% # takes the page above for which we've read the html
   html_attr("href") %>% # get the url for these links
   str_subset("/QuickDownload") %>% 
   unique() %>% 
-  walk2(., paste0(pdf_dir, "wttc_",
+  walk2(., paste0(pdf_dir, "wttc_", # extract unique identifier from URL for file name, and download file
                   (str_remove(., "https://wttc.org/Research/Economic-Impact/moduleId/704/itemId/") %>% 
                      str_remove("/controller/DownloadRequest/action/QuickDownload")), ".pdf"),
         download.file, mode = "wb")
 
-
+# vector of names of files we downloaded
 files <- list.files(here(paste0("globalprep/tr/v", version_year, "/wttc_pdfs")))
 
 n_countries <- length(files)
