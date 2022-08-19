@@ -50,8 +50,8 @@ In this directory are a sequence of files used to generate the bits and pieces t
     * bathymetry
     * NOTE: these layers are all saved in the `spp_risk_dists/_spatial` directory.
       * 4a_set_up_ocean_area_and_mpa_pct.Rmd
-      * 4b_set_up_eez_meow_rasts.Rmd
-5. Convert species range maps to rasters. (skip 5a .Rmd because all that is doing is checking the non-comprehensive data, which is not used for OHI and was not downloaded for the subgoal.)
+      * 4b_set_up_eez_meow_rasts.Rmd; You can skip this one. 
+5. Convert species range maps to rasters. 
     * For maps provided directly by IUCN, aggregate into multispecies files based on family.  There is some cleaning done at this stage to fix problematic extents and attributes.
     * From the list of all available maps, generate a master list of all mapped, assessed species for inclusion in the study.
     * Rasterize each species to a .csv that includes cell ID and presence.  A .csv format was used for file size and ease of reading and binding into dataframes.
