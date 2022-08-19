@@ -16,7 +16,30 @@ output:
     toc: true
 ---
 
+# Summary
 
+To define spatial areas more accurately, create rasters of WDPA and ocean area at Gall-Peters resolution of 0.25 km^2. These can then be aggregated back to Gall Peters 10 km^2 working rasters, summing the total ocean area and total protected area within each working cell.
+
+* Ocean area - use Natural Earth 10 m land polygons; mask over cell ID raster to exclude land.
+
+# Data Sources
+
+### WDPA
+# Data Source
+**Reference**: IUCN and UNEP-WCMC (2022), The World Database on Protected Areas (WDPA) [On-line], June 2022. Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.
+
+**Downloaded**: June 6, 2022
+
+**Description**:  Shapefile of World Database on Protected Areas
+
+**Time range**: 1800 - 2021; some protected areas do not have an associated "status year" and are reported as year 0.
+
+**Format**:  Shapefile
+
+**File location**: `Mazu:git-annex/globalprep/_raw_data/wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/`
+
+
+# Setup
 
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, eval=FALSE)
@@ -36,12 +59,12 @@ library(here)
 library(ggplot2)
 library(stringr)
 library(mapview)
-library(beepr)
+library(terra)
 
 source(here('workflow/R/common.R'))
 
 goal     <- 'spp'
-scenario <- 'v2021'
+scenario <- 'v2022'
 dir_goal <- here('globalprep', goal, scenario)
 
 ### goal specific folders and info
@@ -55,27 +78,6 @@ source(file.path(dir_setup, 'common_fxns.R'))
 
 ```
 
-# Summary
-
-To define spatial areas more accurately, create rasters of WDPA and ocean area at Gall-Peters resolution of 0.25 km^2.  These can then be aggregated back to Gall Peters 10 km^2 working rasters, summing the total ocean area and total protected area within each working cell.
-
-* Ocean area - use Natural Earth 10 m land polygons; mask over cell ID raster to exclude land.
-
-# Data Sources
-
-### WDPA
-# Data Source
-**Reference**: IUCN and UNEP-WCMC (2021), The World Database on Protected Areas (WDPA) [On-line], February 2021. Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.
-
-**Downloaded**: February 2, 2021
-
-**Description**:  Shapefile of World Database on Protected Areas
-
-**Time range**: 1819 - 2020; some protected areas do not have an associated "status year" and are reported as year 0.
-
-**Format**:  Shapefile
-
-**File location**: `Mazu:git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/`
 
 # Methods
 
