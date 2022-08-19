@@ -15,7 +15,7 @@ output:
 
 # Summary
 
-This script generates the extent of tidal flat trend for each OHI region. 
+This script generates the tidal flat trend for each OHI region. 
 
 
 ## Updates from previous assessment
