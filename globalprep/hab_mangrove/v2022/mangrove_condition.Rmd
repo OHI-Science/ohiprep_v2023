@@ -82,6 +82,8 @@ Here we create a set of reference areas from 1980 if the data are available and 
 
 Regions that have extents less than 1 km^2 in 1980 are dropped to prevent them receiving condition scores based on highly granular changes reported in two different datasets.
 
+Additionally, Seychelles and Qatar are removed from the 1980 data and their 1996 extents from the GMW are used instead. These decisions are discussed in the last section of this document.
+
 ### Read in FAO and GMW data and join
 
 ```{r, eval = FALSE}
@@ -97,7 +99,8 @@ fao_mangrove <- fao_mangrove_raw %>%
 fao_mangrove_rgns <- fao_mangrove %>%
   left_join(rgns_eez, by = c("country" = "rgn_name")) %>% 
   dplyr::select(country, "km2_1980", rgn_id) %>% 
-  filter(km2_1980 > 1)
+  filter(km2_1980 > 1,
+         !country %in% c("Seychelles", "Qatar"))
 
 # read in and wrangle global mangrove watch data and then join with fao data
 gmw <- read_csv(file.path(dir_hab_mangrove, "data/habitat_extent_mangrove_updated.csv")) %>% 
@@ -205,10 +208,10 @@ plotly::ggplotly(p)
 ```
 
 
-Based on this comparison plot, health scores have changed a lot across the board. This isn't entirely unexpected as current extents have been updated from 2005 to 2020, and the GMW data are likely much more accurate than the FAO data.
+Based on this comparison plot, health scores have changed a lot across the board. We expect relatively large changes in many regions because current extents have been updated from 2005 to 2020 and were derived using more reliable methods, and some reference extents have changed from 1980 to 1996 - however, we still need to look at drastic changes to see if they reflect real world changes or are primarily artifacts of the new dataset. 
 
 
-Certain health scores increased dramatically: Liberia, East Timor, and Oecussi Ambeno.
+#### Certain health scores increased dramatically: Liberia, East Timor, and Oecussi Ambeno.
 
 **Liberia**: 
 
@@ -221,6 +224,19 @@ The FAO data show Timor-Leste, which encompasses both East Timor and Oecussi Amb
 East Timor showed an increase of 0.87 km^2 from 6.11 km^2 to 6.98 km^2 between 1996 and 2020 based on the GMW data. This is why we see such a dramatic jump in the health score. 
 
 Oecussi Ambeno showed no change between 1996 and 2020, giving it a health score of 1 and a similarly large jump from the last assessment. 
+
+#### Health scores that decreased dramatically: Seychelles and Qatar
+
+
+**Seychelles**:
+
+Seychelles health score went from 1.00 to 0.035. The FAO reported ~25 km^2 in 1980 and our spatial calculation yielded ~0.87 km^2 (the GMW reported ~3km^2 based on their spatial analysis). This [2021 paper by Constance et al.](https://www.sciencedirect.com/science/article/pii/S2351989421001141#bib13) estimates mangrove extent on Aldabra Atoll, which hosts the majority of mangrove coverage in Seychelles. Their findings do not reflect the drastic decrease that comparing 1980 FAO to 2020 GMW extents does. They report far less change. For this reason we will only use GMW data for Seychelles, meaning the reference area will be that of 1996.  
+
+**Qatar**:
+
+Qatar similarly shows a pronounced decrease in health score. [Milani 2018](https://link.springer.com/chapter/10.1007/978-3-319-73016-5_3#Tab2) reports the opposite: a major increase in extent from 0.16 km^2 in 1977 to 10 km^2 in 2017. For this case we will also use only GMW data, with 1996 being the reference year. 
+
+
 
 
 
