@@ -20,21 +20,22 @@ editor_options:
 
 [REFERENCE RMD FILE](http://ohi-science.org/ohiprep_v2021/globalprep/prs_targetedharvest/v2021/targetharvest_dataprep.html)
 
-#Summary
+# Summary
+
 This analysis converts FAO capture production data into the OHI 2021 targeted harvest pressure data.  
 
+# Updates from previous assessment
 
-#Updates from previous assessment
-One more year of data
-
+2022 - One more year of data
 
 ***
 
-#Data Source 
+# Data Source 
+
     http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-     Release date: March 2021
-FAO Global Capture Production Quantity 1950_2019
-Information: http://www.fao.org/fishery/statistics/global-capture-production/en
+     Release date: March 2021  
+FAO Global Capture Production Quantity 1950_2019  
+Information: http://www.fao.org/fishery/statistics/global-capture-production/en  
 
 **Reference**: United Nations, 2021. FAO Fisheries & Aquaculture - Fishery Statistical Collections - Global Capture Production [WWW Document]. URL http://www.fao.org/fishery/statistics/global-capture-production/en (accessed 4.29.21).
 
@@ -46,6 +47,10 @@ Information: http://www.fao.org/fishery/statistics/global-capture-production/en
 **Time range**: 1950-2020
 
 ***
+
+# Methods
+
+## Setup
 
 ```{r, eval=FALSE}
 
@@ -64,8 +69,8 @@ version_year <- 2022
 latest_data_yr <- version_year - 2
 ```
 
+## Read in the raw data
 
-# Read in the raw data
 This includes the FAO capture production data and a list of the "target" species.
 
 ```{r, eval=FALSE}
@@ -85,8 +90,7 @@ sp2grp <- read_csv(here('globalprep', 'prs_targetedharvest', paste0('v', version
 
 ```
 
-
-# Clean the FAO data
+## Clean the FAO data
 
 ```{r, eval=FALSE}
 
@@ -123,7 +127,8 @@ fao_clean <- fao_clean %>%
 
 ```
 
-# Identify the target species
+## Identify the target species
+
 This analysis only includes target species.  The warning messages need to be checked and, if necessary, changes should be made to the raw/species2group.csv  
 
 ```{r, eval=FALSE}
@@ -172,8 +177,7 @@ unique(fao_clean$species) # 2384 species
 
 ```
 
-
-# Summarize data
+## Summarize data
 
 ```{r, eval=FALSE}
 
@@ -211,7 +215,7 @@ sum <- long %>%
 
 ```
 
-# Assign country names to OHI regions
+## Assign country names to OHI regions
 
 ```{r, eval=FALSE}
 
@@ -236,7 +240,8 @@ m_sum_rgn <- m_sum_rgn %>%
 
 ```
 
-# Scale the data and save files
+## Scale the data and save files
+
 Data is rescaled by dividing by the 95th quantile of values across all regions from 2011 to 2020 (most recent year of FAO data).
 
 ```{r, eval=FALSE}
@@ -290,7 +295,8 @@ write_csv(
 )
 ```
 
-# Data check
+## Data check
+
 The data from last year and this year should be the same unless there were changes to underlying FAO data or the master species list.
 
 In this case, all of the regions looked very similar.

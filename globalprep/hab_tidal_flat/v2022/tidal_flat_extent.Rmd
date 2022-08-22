@@ -18,12 +18,13 @@ output:
 This script generates the extent of tidal flat for each OHI region. 
 
 
-## Updates from previous assessment
+# Updates from previous assessment
 
 2022 - Completely new dataset and layer!
 
 ***
-## Data Source 
+
+# Data Source 
 
 **Reference**: Murray, N.J., Phinn, S.R., DeWitt, M., Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. & Fuller, R.A. (2019) The global distribution and trajectory of tidal flats. Nature, 565, 222-225.
 

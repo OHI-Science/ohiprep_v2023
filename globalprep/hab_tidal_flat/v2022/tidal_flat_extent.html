@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Fri Aug 19 09:17:39 2022 by molitor" />
+<meta name="author" content="Compiled on Mon Aug 22 11:18:54 2022 by molitor" />
 
 
 <title>OHI 2022 - tidal flat extent</title>
@@ -427,32 +427,30 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - tidal flat extent</h1>
-<h4 class="author"><em>Compiled on Fri Aug 19 09:17:39 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 22 11:18:54 2022 by
 molitor</em></h4>
 
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#summary" id="toc-summary"><span class="toc-section-number">1</span> Summary</a>
-<ul>
-<li><a href="#updates-from-previous-assessment" id="toc-updates-from-previous-assessment"><span class="toc-section-number">1.1</span> Updates from previous
+<li><a href="#summary" id="toc-summary"><span class="toc-section-number">1</span> Summary</a></li>
+<li><a href="#updates-from-previous-assessment" id="toc-updates-from-previous-assessment"><span class="toc-section-number">2</span> Updates from previous
 assessment</a></li>
-<li><a href="#data-source" id="toc-data-source"><span class="toc-section-number">1.2</span> Data Source</a></li>
-</ul></li>
-<li><a href="#methods" id="toc-methods"><span class="toc-section-number">2</span> Methods</a>
+<li><a href="#data-source" id="toc-data-source"><span class="toc-section-number">3</span> Data Source</a></li>
+<li><a href="#methods" id="toc-methods"><span class="toc-section-number">4</span> Methods</a>
 <ul>
-<li><a href="#overview" id="toc-overview"><span class="toc-section-number">2.1</span> Overview</a></li>
-<li><a href="#setup" id="toc-setup"><span class="toc-section-number">2.2</span> Setup</a>
+<li><a href="#overview" id="toc-overview"><span class="toc-section-number">4.1</span> Overview</a></li>
+<li><a href="#setup" id="toc-setup"><span class="toc-section-number">4.2</span> Setup</a>
 <ul>
-<li><a href="#download-the-data" id="toc-download-the-data"><span class="toc-section-number">2.2.1</span> Download the data</a></li>
-<li><a href="#load-ohi-region-data" id="toc-load-ohi-region-data"><span class="toc-section-number">2.2.2</span> Load OHI region data</a></li>
+<li><a href="#download-the-data" id="toc-download-the-data"><span class="toc-section-number">4.2.1</span> Download the data</a></li>
+<li><a href="#load-ohi-region-data" id="toc-load-ohi-region-data"><span class="toc-section-number">4.2.2</span> Load OHI region data</a></li>
 </ul></li>
-<li><a href="#find-tidal-flat-area-in-each-raster" id="toc-find-tidal-flat-area-in-each-raster"><span class="toc-section-number">2.3</span> Find tidal flat area in each
+<li><a href="#find-tidal-flat-area-in-each-raster" id="toc-find-tidal-flat-area-in-each-raster"><span class="toc-section-number">4.3</span> Find tidal flat area in each
 raster</a></li>
-<li><a href="#summarise-tidal-flat-inside-each-region" id="toc-summarise-tidal-flat-inside-each-region"><span class="toc-section-number">2.4</span> Summarise tidal flat inside each
+<li><a href="#summarise-tidal-flat-inside-each-region" id="toc-summarise-tidal-flat-inside-each-region"><span class="toc-section-number">4.4</span> Summarise tidal flat inside each
 region</a></li>
-<li><a href="#data-check" id="toc-data-check"><span class="toc-section-number">2.5</span> Data check</a></li>
+<li><a href="#data-check" id="toc-data-check"><span class="toc-section-number">4.5</span> Data check</a></li>
 </ul></li>
 </ul>
 </div>
@@ -461,14 +459,15 @@ region</a></li>
 <h1><span class="header-section-number">1</span> Summary</h1>
 <p>This script generates the extent of tidal flat for each OHI
 region.</p>
-<div id="updates-from-previous-assessment" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Updates from previous
-assessment</h2>
+</div>
+<div id="updates-from-previous-assessment" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Updates from previous
+assessment</h1>
 <p>2022 - Completely new dataset and layer!</p>
 <hr />
 </div>
-<div id="data-source" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Data Source</h2>
+<div id="data-source" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Data Source</h1>
 <p><strong>Reference</strong>: Murray, N.J., Phinn, S.R., DeWitt, M.,
 Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. &amp;
 Fuller, R.A. (2019) The global distribution and trajectory of tidal
@@ -513,11 +512,10 @@ the interval.</p>
 </ul>
 <hr />
 </div>
-</div>
-<div id="methods" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Methods</h1>
-<div id="overview" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Overview</h2>
+<div id="methods" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Methods</h1>
+<div id="overview" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Overview</h2>
 <p>The goal is to find tidal flat area in each raster</p>
 <ol style="list-style-type: decimal">
 <li><p>Down sample rasters from 30 m<span class="math inline">\(^2\)</span> ground sample distance (GSD) to ~ 1
@@ -555,8 +553,8 @@ shard</p>
 </ul></li>
 </ol>
 </div>
-<div id="setup" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Setup</h2>
+<div id="setup" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Setup</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>, <span class="at">eval =</span> <span class="cn">FALSE</span>, <span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){<span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)}</span>
@@ -589,8 +587,8 @@ shard</p>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="do">### Aurora</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_here &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change&#39;)</span></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># dir_data &lt;- file.path(&#39;/home/shares/food-systems/Global_datasets/global_tidal_wetland_change/d2022&#39;)</span></span></code></pre></div>
-<div id="download-the-data" class="section level3" number="2.2.1">
-<h3><span class="header-section-number">2.2.1</span> Download the
+<div id="download-the-data" class="section level3" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Download the
 data</h3>
 <p>The following bash script will download the raw data for the tidal
 wetland change dataset.</p>
@@ -620,8 +618,8 @@ wetland change dataset.</p>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rm</span> <span class="va">$val</span>.zip </span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
 </div>
-<div id="load-ohi-region-data" class="section level3" number="2.2.2">
-<h3><span class="header-section-number">2.2.2</span> Load OHI region
+<div id="load-ohi-region-data" class="section level3" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Load OHI region
 data</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">### load in regions shapefile</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">regions_shape</span>()</span>
@@ -640,8 +638,8 @@ data</h3>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name) </span></code></pre></div>
 </div>
 </div>
-<div id="find-tidal-flat-area-in-each-raster" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Find tidal flat area
+<div id="find-tidal-flat-area-in-each-raster" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Find tidal flat area
 in each raster</h2>
 <p>Down sample rasters from 30 m<span class="math inline">\(^2\)</span>
 ground sample distance (GSD) to ~ 1 km<span class="math inline">\(^2\)</span> GSD</p>
@@ -751,8 +749,8 @@ of 1 would be equivalent to 0.0009 km<span class="math inline">\(^2\)</span> hab
 <span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>tictoc<span class="sc">::</span><span class="fu">toc</span>()</span></code></pre></div>
 </div>
-<div id="summarise-tidal-flat-inside-each-region" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Summarise tidal flat
+<div id="summarise-tidal-flat-inside-each-region" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Summarise tidal flat
 inside each region</h2>
 <p>Read in the tidal flat files, concatenate files, summarize to OHI
 regions, and output final tidal flat extent summary</p>
@@ -780,8 +778,8 @@ regions, and output final tidal flat extent summary</p>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">213</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;output&#39;</span>, <span class="st">&quot;tidal_flat_extent.csv&quot;</span>))</span></code></pre></div>
 </div>
-<div id="data-check" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Data check</h2>
+<div id="data-check" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Data check</h2>
 <p>Look for large scale changes in single countries.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rgns <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">distinct</span>(dummy_df)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>

@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Fri Aug 19 09:17:51 2022 by molitor" />
+<meta name="author" content="Compiled on Mon Aug 22 11:19:04 2022 by molitor" />
 
 
 <title>OHI 2022 - tidal flat trend</title>
@@ -427,43 +427,41 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - tidal flat trend</h1>
-<h4 class="author"><em>Compiled on Fri Aug 19 09:17:51 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 22 11:19:04 2022 by
 molitor</em></h4>
 
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#summary" id="toc-summary"><span class="toc-section-number">1</span> Summary</a>
-<ul>
-<li><a href="#updates-from-previous-assessment" id="toc-updates-from-previous-assessment"><span class="toc-section-number">1.1</span> Updates from previous
+<li><a href="#summary" id="toc-summary"><span class="toc-section-number">1</span> Summary</a></li>
+<li><a href="#updates-from-previous-assessment" id="toc-updates-from-previous-assessment"><span class="toc-section-number">2</span> Updates from previous
 assessment</a></li>
-<li><a href="#data-source" id="toc-data-source"><span class="toc-section-number">1.2</span> Data Source</a></li>
-</ul></li>
-<li><a href="#methods" id="toc-methods"><span class="toc-section-number">2</span> Methods</a>
+<li><a href="#data-source" id="toc-data-source"><span class="toc-section-number">3</span> Data Source</a></li>
+<li><a href="#methods" id="toc-methods"><span class="toc-section-number">4</span> Methods</a>
 <ul>
-<li><a href="#overview" id="toc-overview"><span class="toc-section-number">2.1</span> Overview</a></li>
-<li><a href="#setup" id="toc-setup"><span class="toc-section-number">2.2</span> Setup</a></li>
-<li><a href="#load-data" id="toc-load-data"><span class="toc-section-number">2.3</span> Load data</a></li>
-<li><a href="#model-the-trend" id="toc-model-the-trend"><span class="toc-section-number">2.4</span> Model the trend</a></li>
-<li><a href="#write-the-results" id="toc-write-the-results"><span class="toc-section-number">2.5</span> Write the results</a></li>
-<li><a href="#data-checks" id="toc-data-checks"><span class="toc-section-number">2.6</span> Data checks</a></li>
+<li><a href="#overview" id="toc-overview"><span class="toc-section-number">4.1</span> Overview</a></li>
+<li><a href="#setup" id="toc-setup"><span class="toc-section-number">4.2</span> Setup</a></li>
+<li><a href="#load-data" id="toc-load-data"><span class="toc-section-number">4.3</span> Load data</a></li>
+<li><a href="#model-the-trend" id="toc-model-the-trend"><span class="toc-section-number">4.4</span> Model the trend</a></li>
+<li><a href="#write-the-results" id="toc-write-the-results"><span class="toc-section-number">4.5</span> Write the results</a></li>
+<li><a href="#data-checks" id="toc-data-checks"><span class="toc-section-number">4.6</span> Data checks</a></li>
 </ul></li>
 </ul>
 </div>
 
 <div id="summary" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Summary</h1>
-<p>This script generates the extent of tidal flat trend for each OHI
-region.</p>
-<div id="updates-from-previous-assessment" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Updates from previous
-assessment</h2>
+<p>This script generates the tidal flat trend for each OHI region.</p>
+</div>
+<div id="updates-from-previous-assessment" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Updates from previous
+assessment</h1>
 <p>2022 - Completely new!</p>
 <hr />
 </div>
-<div id="data-source" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Data Source</h2>
+<div id="data-source" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Data Source</h1>
 <p><strong>Reference</strong>: Murray, N.J., Phinn, S.R., DeWitt, M.,
 Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. &amp;
 Fuller, R.A. (2019) The global distribution and trajectory of tidal
@@ -502,11 +500,10 @@ observable.</p>
 </ul>
 <hr />
 </div>
-</div>
-<div id="methods" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Methods</h1>
-<div id="overview" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Overview</h2>
+<div id="methods" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Methods</h1>
+<div id="overview" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Overview</h2>
 <ol style="list-style-type: decimal">
 <li><p>Load the tidal flat extent data</p></li>
 <li><p>Model the trend</p></li>
@@ -515,8 +512,8 @@ observable.</p>
 <li><p>Check the data for anomalies.</p></li>
 </ol>
 </div>
-<div id="setup" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Setup</h2>
+<div id="setup" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Setup</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>, <span class="at">eval =</span> <span class="cn">FALSE</span>, <span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){<span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)}</span>
@@ -536,8 +533,8 @@ observable.</p>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;hab_tidal_flat&#39;</span>, version_year)</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;workflow&#39;</span>, <span class="st">&#39;R&#39;</span>, <span class="st">&#39;common.R&#39;</span>))</span></code></pre></div>
 </div>
-<div id="load-data" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Load data</h2>
+<div id="load-data" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Load data</h2>
 <p>Load the regions data.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rgns <span class="ot">&lt;-</span> ohicore<span class="sc">::</span>rgn_master <span class="sc">%&gt;%</span> </span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_typ <span class="sc">==</span> <span class="st">&quot;eez&quot;</span>) <span class="sc">%&gt;%</span> </span>
@@ -561,8 +558,8 @@ observable.</p>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::filter(year == 2004) %&gt;% </span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::summarise(km2 = mean(km2))</span></span></code></pre></div>
 </div>
-<div id="model-the-trend" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Model the trend</h2>
+<div id="model-the-trend" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Model the trend</h2>
 <p>Use a nested dataframe and <code>purrr::map</code> to model the trend
 for the most recent 5 time steps. Then we unnest the model and apply it
 to project 5 years past the last time step.</p>
@@ -611,8 +608,8 @@ scale.</p>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(rgn_id, year = year1, habitat, trend) %&gt;% </span></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::distinct()</span></span></code></pre></div>
 </div>
-<div id="write-the-results" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Write the
+<div id="write-the-results" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Write the
 results</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tidal_flat_trend <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  tidal_flat_trend_2013</span>
@@ -622,8 +619,8 @@ results</h2>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(tidal_flat_trend, here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;tidal_flat_trend.csv&quot;</span>))</span></code></pre></div>
 </div>
-<div id="data-checks" class="section level2" number="2.6">
-<h2><span class="header-section-number">2.6</span> Data checks</h2>
+<div id="data-checks" class="section level2" number="4.6">
+<h2><span class="header-section-number">4.6</span> Data checks</h2>
 <p>Check the top growing extents.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>growing_extents <span class="ot">&lt;-</span> tidal_flat_trend <span class="sc">%&gt;%</span> </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> trend)</span></code></pre></div>
