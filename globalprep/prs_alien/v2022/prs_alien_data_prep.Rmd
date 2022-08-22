@@ -17,13 +17,13 @@ output:
 
 This script generates the pressure incurred from invasive species for each OHI region. 
 
-## Updates from previous assessment
+# Updates from previous assessment
 
-2022 - Updating the data with new dataset!
+2022 - Updating with new dataset!
 
 ***
 
-## Data Source 
+# Data Source 
 
 **Reference**: Pagad, S., Genovesi, P., Carnevali, L. et al. Introducing the Global Register of Introduced and Invasive Species. Sci Data 5, 170202 (2018). https://doi.org/10.1038/sdata.2017.202
 

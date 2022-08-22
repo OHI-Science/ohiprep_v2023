@@ -18,12 +18,13 @@ output:
 This script generates the extent of tidal flat for each OHI region. 
 
 
-## Updates from previous assessment
+# Updates from previous assessment
 
 2022 - Completely new dataset and layer!
 
 ***
-## Data Source 
+
+# Data Source 
 
 **Reference**: Murray, N.J., Phinn, S.R., DeWitt, M., Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. & Fuller, R.A. (2019) The global distribution and trajectory of tidal flats. Nature, 565, 222-225.
 
@@ -303,14 +304,14 @@ final <- output %>%
   dplyr::group_by(rgn_id, year, habitat) %>%
   dplyr::summarise(km2 = sum(km2, na.rm = T)) %>% 
   dplyr::filter(rgn_id != 213) %>% 
-  readr::write_csv(here::here(dir_here, 'output', paste0("tidal_flat_extent.csv")))
+  readr::write_csv(here::here(dir_here, 'output', "tidal_flat_extent.csv"))
 ```
 
 ## Data check
 
 Look for large scale changes in single countries.
 
-```{r}
+```{r eval = FALSE}
 rgns <- dplyr::distinct(dummy_df)
 
 final <- dplyr::left_join(final, rgns)

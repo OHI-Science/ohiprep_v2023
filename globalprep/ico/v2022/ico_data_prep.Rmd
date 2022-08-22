@@ -107,7 +107,7 @@ iucn_sid | kingdom | phylum | class | order | family | genus | sciname | populat
 
 Get all pages and bind into total species list, using the IUCN API.
 
-``` {r get_spp_info, eval= F}
+```{r get_spp_info, eval= F}
 ## this is the api key that we need to use to access the files in the api
 api_file <- file.path(dir_data, 'api_key_gc.csv') 
 api_key <- scan(api_file, what = 'character') 
@@ -148,7 +148,7 @@ if(!file.exists(spp_list_from_api_file) | reload) {
 
 The list of Iconic Species is based upon the original ICO list generated in 2011, using species identified as globally iconic (WWF Flagship species and Priority species) or regionally iconic (based upon WWF regional/local priority species and nation-specific lists).
 
-``` {r get_ico_spp_list, eval=FALSE}
+```{r get_ico_spp_list, eval=FALSE}
 
 # ico master species list from Mazu: 'git-annex/globalprep/ico/ico/ico_global_list2016.csv'
 # (if there are any changes to the master list then this needs to be udated)
@@ -184,7 +184,7 @@ DT::datatable(ico_list_raw, caption = 'Iconic Species List')
 
 Filtering the complete IUCN species list to include only the identified Iconic Species, we then use the IUCN API to access the list of countries in which each species occurs, from http://apiv3.iucnredlist.org/api/v3/species/countries/id/<species ID>?token=<token>.  The country list identifies whether the species' presence in that country is "Extant", "Extinct Post-1500", or "Possibly Extinct"; the "Extinct Post-1500" presence will be used later to identify locally extinct populations.
 
-``` {r combine_iucn_spp_info_with_ico_list, eval= F}
+```{r combine_iucn_spp_info_with_ico_list, eval= F}
 
 spp_df_all <- here::here(dir_here, 'raw', 'spp_list_from_api.csv') %>% 
   readr::read_csv()
@@ -210,7 +210,7 @@ readr::write_csv(ico_list, here::here(dir_here, 'int', 'ico_list_prepped.csv')) 
 
 For each of these species, use the IUCN API to gather a list of countries in which it is present.
 
-``` {r get_country_list, eval= F}
+```{r get_country_list, eval= F}
 
 ## saves each species as a temp file in a new tmp folder then binds them together to form the full species list
 
@@ -348,7 +348,7 @@ readr::write_csv(ico_spp_rgn_raw, here::here(dir_here, 'raw', 'ico_spp_rgn_raw.c
 
 Filter for globally iconic species
 
-``` {r attach_country_list_to_spp_info_list, eval=F}
+```{r attach_country_list_to_spp_info_list, eval=F}
 
 ico_spp_rgn_raw <- here::here(dir_here, 'raw', 'ico_spp_rgn_raw.csv') %>% 
   readr::read_csv()
@@ -392,7 +392,7 @@ We accessed the IUCN API to determine past IUCN assessments for each of the iden
 
 Each assessment includes a year and an extinction risk, along with additional information on the assessment.
 
-``` {r get_category_list, eval=F}
+```{r get_category_list, eval=F}
 
 ico_past_assess_url <- 'http://apiv3.iucnredlist.org/api/v3/species/history/id/%s?token=%s'
 ico_list <- here::here(dir_here, 'int', 'ico_list_prepped.csv') %>% 
@@ -530,7 +530,7 @@ NE & & \longleftarrow \text{"Not recognized ($NR$)"}
 iucn_sid | year | code | category | sciname
 
 
-``` {r clean_up_category_list, eval= F}
+```{r clean_up_category_list, eval= F}
 
 ico_assess_raw <- here::here(dir_here, 'raw', 'ico_assessments_raw.csv') %>% 
   readr::read_csv()
@@ -584,7 +584,7 @@ readr::write_csv(ico_assess, here::here(dir_here, 'int', 'ico_assess_clean.csv')
 
 Using `tidyr::complete()` and `tidyr::fill()`, we create a full time series for all species from the earliest assessment to the most recent year.
 
-``` {r fill_out_category_time_series, eval= F}
+```{r fill_out_category_time_series, eval= F}
 
 ico_assess <- here::here(dir_here, 'int', 'ico_assess_clean.csv') %>% readr::read_csv()
 ico_list <- here::here(dir_here, 'int', 'ico_list_prepped.csv') %>% readr::read_csv()
@@ -641,7 +641,7 @@ readr::write_csv(ico_spp_cat, here::here(dir_here, 'int', 'ico_spp_cat.csv'))
 
 Using `dplyr::full_join()` we combine the `ico_spp_rgn` dataframe (iconic species by OHI region) with the `ico_spp_cat` dataframe (iconic species by category and year, with species info, year, and category info).  
 
-``` {r combine_ico_spp_cat_with_countries, eval= F}
+```{r combine_ico_spp_cat_with_countries, eval= F}
 
 ico_cat_ts_abbr <- here::here(dir_here, 'int', 'ico_spp_cat.csv') %>% 
   readr::read_csv() %>%
@@ -679,7 +679,7 @@ The toolbox wants `rgn_id`, species `sciname`, and extinction risk `category` fo
 
 While the official calculations are performed in the toolbox, we perform the same basic calcs here to get a sense of the ICO status and trend ahead of time. Report and summarize estimate of regional iconic species status:
 
-``` {r report_status_and_trend, eval= F}
+```{r report_status_and_trend, eval= F}
 
 ico_spp_rgn_cat <- here::here(dir_here, 'int', 'ico_spp_rgn_cat.csv') %>% 
   readr::read_csv(col_types = "dcdcdddccldc")
@@ -767,7 +767,7 @@ ico_trend %>%
 
 To examine results of the new methods (including API-based data scraping and trend based on time series), we plot the estimated status and trend over time.
 
-``` {r spp_plot_scores_over_time, fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
+```{r fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
 status_ts_plot <- ggplot(
   ico_sum %>% filter(!is.na(rgn_id)),
   aes(x = year, y = ico_status, color = rgn_id, group = rgn_name)) +
@@ -781,7 +781,7 @@ plotly::ggplotly(status_ts_plot)
 ```
 
 
-``` {r spp_plot_scores_over_time, fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
+```{r fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
 trend_ts_plot <- ggplot(
   ico_sum %>% filter(!is.na(rgn_id) &!is.na(ico_trend)),
   aes(x = year, y = ico_trend, color = rgn_id, group = rgn_name)) +
@@ -801,7 +801,7 @@ plotly::ggplotly(trend_ts_plot)
 
 Plot the estimated status and trends for 2016 from assessments v2021 and v2022.
 
-``` {r spp_plot_scores_vs_2016, fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
+```{r fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
 ico_sum <- here::here(dir_here, 'summary', 'ico_summary.csv') %>% 
   readr::read_csv()
 
@@ -831,7 +831,7 @@ plotly::ggplotly(compare_status_plot)
 ```
 
 
-``` {r spp_plot_scores_vs_2016, fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
+```{r fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
 trend_compare_plot <- ggplot(ico_compare) +
   geom_point(
     aes(x = previous_trend, y = ico_trend, 

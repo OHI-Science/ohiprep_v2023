@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Mon Aug 15 16:41:28 2022 by molitor" />
+<meta name="author" content="Compiled on Mon Aug 22 11:22:07 2022 by molitor" />
 
 
 <title>OHI 2022 - saltmarsh trend</title>
@@ -427,37 +427,35 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022 - saltmarsh trend</h1>
-<h4 class="author"><em>Compiled on Mon Aug 15 16:41:28 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 22 11:22:07 2022 by
 molitor</em></h4>
 
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#summary" id="toc-summary"><span class="toc-section-number">1</span> Summary</a>
-<ul>
-<li><a href="#updates-from-previous-assessment" id="toc-updates-from-previous-assessment"><span class="toc-section-number">1.1</span> Updates from previous
+<li><a href="#summary" id="toc-summary"><span class="toc-section-number">1</span> Summary</a></li>
+<li><a href="#updates-from-previous-assessment" id="toc-updates-from-previous-assessment"><span class="toc-section-number">2</span> Updates from previous
 assessment</a></li>
-<li><a href="#data-source" id="toc-data-source"><span class="toc-section-number">1.2</span> Data Source</a></li>
-</ul></li>
-<li><a href="#methods" id="toc-methods"><span class="toc-section-number">2</span> Methods</a>
+<li><a href="#data-source" id="toc-data-source"><span class="toc-section-number">3</span> Data Source</a></li>
+<li><a href="#methods" id="toc-methods"><span class="toc-section-number">4</span> Methods</a>
 <ul>
-<li><a href="#overview" id="toc-overview"><span class="toc-section-number">2.1</span> Overview</a></li>
-<li><a href="#setup" id="toc-setup"><span class="toc-section-number">2.2</span> Setup</a></li>
-<li><a href="#download-the-data" id="toc-download-the-data"><span class="toc-section-number">2.3</span> Download the data</a></li>
-<li><a href="#clean-raw-data" id="toc-clean-raw-data"><span class="toc-section-number">2.4</span> Clean raw data</a></li>
-<li><a href="#match-countries-to-ohi-regions" id="toc-match-countries-to-ohi-regions"><span class="toc-section-number">2.5</span> Match countries to OHI
+<li><a href="#overview" id="toc-overview"><span class="toc-section-number">4.1</span> Overview</a></li>
+<li><a href="#setup" id="toc-setup"><span class="toc-section-number">4.2</span> Setup</a></li>
+<li><a href="#download-the-data" id="toc-download-the-data"><span class="toc-section-number">4.3</span> Download the data</a></li>
+<li><a href="#clean-raw-data" id="toc-clean-raw-data"><span class="toc-section-number">4.4</span> Clean raw data</a></li>
+<li><a href="#match-countries-to-ohi-regions" id="toc-match-countries-to-ohi-regions"><span class="toc-section-number">4.5</span> Match countries to OHI
 regions</a></li>
-<li><a href="#gapfilling" id="toc-gapfilling"><span class="toc-section-number">2.6</span> Gapfilling</a>
+<li><a href="#gapfilling" id="toc-gapfilling"><span class="toc-section-number">4.6</span> Gapfilling</a>
 <ul>
-<li><a href="#step-1" id="toc-step-1"><span class="toc-section-number">2.6.1</span> Step 1</a></li>
-<li><a href="#step-2" id="toc-step-2"><span class="toc-section-number">2.6.2</span> Step 2</a></li>
-<li><a href="#step-3" id="toc-step-3"><span class="toc-section-number">2.6.3</span> Step 3</a></li>
+<li><a href="#step-1" id="toc-step-1"><span class="toc-section-number">4.6.1</span> Step 1</a></li>
+<li><a href="#step-2" id="toc-step-2"><span class="toc-section-number">4.6.2</span> Step 2</a></li>
+<li><a href="#step-3" id="toc-step-3"><span class="toc-section-number">4.6.3</span> Step 3</a></li>
 </ul></li>
-<li><a href="#calculate-the-pressure-score" id="toc-calculate-the-pressure-score"><span class="toc-section-number">2.7</span> Calculate the pressure
+<li><a href="#calculate-the-pressure-score" id="toc-calculate-the-pressure-score"><span class="toc-section-number">4.7</span> Calculate the pressure
 score</a></li>
-<li><a href="#save-the-prepped-data" id="toc-save-the-prepped-data"><span class="toc-section-number">2.8</span> Save the prepped data</a></li>
-<li><a href="#datacheck" id="toc-datacheck"><span class="toc-section-number">2.9</span> Datacheck</a></li>
+<li><a href="#save-the-prepped-data" id="toc-save-the-prepped-data"><span class="toc-section-number">4.8</span> Save the prepped data</a></li>
+<li><a href="#datacheck" id="toc-datacheck"><span class="toc-section-number">4.9</span> Datacheck</a></li>
 </ul></li>
 </ul>
 </div>
@@ -466,14 +464,15 @@ score</a></li>
 <h1><span class="header-section-number">1</span> Summary</h1>
 <p>This script generates the pressure incurred from invasive species for
 each OHI region.</p>
-<div id="updates-from-previous-assessment" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Updates from previous
-assessment</h2>
-<p>2022 - Updating the data with new dataset!</p>
+</div>
+<div id="updates-from-previous-assessment" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Updates from previous
+assessment</h1>
+<p>2022 - Updating with new dataset!</p>
 <hr />
 </div>
-<div id="data-source" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Data Source</h2>
+<div id="data-source" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Data Source</h1>
 <p><strong>Reference</strong>: Pagad, S., Genovesi, P., Carnevali, L. et
 al. Introducing the Global Register of Introduced and Invasive Species.
 Sci Data 5, 170202 (2018). <a href="https://doi.org/10.1038/sdata.2017.202" class="uri">https://doi.org/10.1038/sdata.2017.202</a></p>
@@ -513,11 +512,10 @@ harmful)</p></li>
 </ul>
 <hr />
 </div>
-</div>
-<div id="methods" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Methods</h1>
-<div id="overview" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Overview</h2>
+<div id="methods" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Methods</h1>
+<div id="overview" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Overview</h2>
 <ol style="list-style-type: decimal">
 <li><p>Download the data and clean it up</p></li>
 <li><p>Identify habitat for species with none listed</p></li>
@@ -529,8 +527,8 @@ harmful)</p></li>
 assesments</p></li>
 </ol>
 </div>
-<div id="setup" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Setup</h2>
+<div id="setup" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Setup</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>, <span class="at">eval =</span> <span class="cn">FALSE</span>, <span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){<span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)}</span>
@@ -562,8 +560,8 @@ assesments</p></li>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">&quot;eez&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>type, <span class="at">rgn_name =</span> label)</span></code></pre></div>
 </div>
-<div id="download-the-data" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Download the
+<div id="download-the-data" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Download the
 data</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /home/shares/ohi/git-annex/globalprep/_raw_data/griis/d2022 <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> <span class="va">$_</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -581,8 +579,8 @@ data</h2>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="pp">*</span>.zip</span></code></pre></div>
 </div>
-<div id="clean-raw-data" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Clean raw data</h2>
+<div id="clean-raw-data" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Clean raw data</h2>
 <p>Read in country codes from the <code>countrycode</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>codes <span class="ot">&lt;-</span> countrycode<span class="sc">::</span>codelist <span class="sc">%&gt;%</span> </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> </span>
@@ -724,8 +722,8 @@ final cleanup.</p>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>rgn_id) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country_code <span class="sc">==</span> <span class="st">&quot;IC&quot;</span>, <span class="st">&quot;Canary Islands&quot;</span>, country))</span></code></pre></div>
 </div>
-<div id="match-countries-to-ohi-regions" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Match countries to
+<div id="match-countries-to-ohi-regions" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Match countries to
 OHI regions</h2>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_ohi <span class="ot">&lt;-</span> ohicore<span class="sc">::</span><span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> df)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -768,11 +766,11 @@ fill missing regions with NA values.</p>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">full_join</span>(rgns, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&#39;rgn_name&#39;</span> <span class="ot">=</span> <span class="st">&#39;rgn_label&#39;</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() </span></code></pre></div>
 </div>
-<div id="gapfilling" class="section level2" number="2.6">
-<h2><span class="header-section-number">2.6</span> Gapfilling</h2>
+<div id="gapfilling" class="section level2" number="4.6">
+<h2><span class="header-section-number">4.6</span> Gapfilling</h2>
 <p>Gapfill values from regional averages.</p>
-<div id="step-1" class="section level3" number="2.6.1">
-<h3><span class="header-section-number">2.6.1</span> Step 1</h3>
+<div id="step-1" class="section level3" number="4.6.1">
+<h3><span class="header-section-number">4.6.1</span> Step 1</h3>
 <p>First try “r2 regions” (i.e. Caribbean countries filled with
 Caribbean islands mean).</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>gf_step_1 <span class="ot">&lt;-</span> alien_sp_summary <span class="sc">%&gt;%</span> </span>
@@ -800,8 +798,8 @@ Caribbean islands mean).</p>
 <p>In v2022, everything was filled with step 1. Step 2 and 3 were
 written just in case step 1 stops filling everything.</p>
 </div>
-<div id="step-2" class="section level3" number="2.6.2">
-<h3><span class="header-section-number">2.6.2</span> Step 2</h3>
+<div id="step-2" class="section level3" number="4.6.2">
+<h3><span class="header-section-number">4.6.2</span> Step 2</h3>
 <p>Then try “r1 regions” (i.e. “Oceania” or “Asia”).</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gf_step_2 <span class="ot">&lt;-</span> gf_step_1 <span class="sc">%&gt;%</span> </span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
@@ -810,8 +808,8 @@ written just in case step 1 stops filling everything.</p>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gapfilled      =</span> <span class="fu">ifelse</span>(has_data <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(spp_count) <span class="sc">&amp;</span> <span class="fu">is.na</span>(gapfilled), <span class="st">&quot;yes&quot;</span>, gapfilled),</span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method         =</span> <span class="fu">ifelse</span>(has_data <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(spp_count) <span class="sc">&amp;</span> <span class="fu">is.na</span>(method), <span class="st">&quot;used r1 average&quot;</span>, method))</span></code></pre></div>
 </div>
-<div id="step-3" class="section level3" number="2.6.3">
-<h3><span class="header-section-number">2.6.3</span> Step 3</h3>
+<div id="step-3" class="section level3" number="4.6.3">
+<h3><span class="header-section-number">4.6.3</span> Step 3</h3>
 <p>If there remain any that can’t be gapfilled in one of the regions,
 gapfill with the world score.</p>
 <p><strong>Note:</strong> This is an aggressive strategy but also an
@@ -825,8 +823,8 @@ unlikely scenario that will ensure complete data</p>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="dv">2022</span>)</span></code></pre></div>
 </div>
 </div>
-<div id="calculate-the-pressure-score" class="section level2" number="2.7">
-<h2><span class="header-section-number">2.7</span> Calculate the
+<div id="calculate-the-pressure-score" class="section level2" number="4.7">
+<h2><span class="header-section-number">4.7</span> Calculate the
 pressure score</h2>
 <p>It was decided, somewhat arbitrarily to use a weighted avergae where
 species listed as invasive have a 90% weight, and alien species get a
@@ -850,8 +848,8 @@ improved upon in future iterations.</p>
 <span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>      (((invasive_count<span class="sc">-</span>min_inv_count)<span class="sc">/</span>(max_inv_count<span class="sc">-</span>min_inv_count)) <span class="sc">*</span> inv_weight)) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span></code></pre></div>
 </div>
-<div id="save-the-prepped-data" class="section level2" number="2.8">
-<h2><span class="header-section-number">2.8</span> Save the prepped
+<div id="save-the-prepped-data" class="section level2" number="4.8">
+<h2><span class="header-section-number">4.8</span> Save the prepped
 data</h2>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## save gapfilling flags </span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>gf_step_3 <span class="sc">%&gt;%</span></span>
@@ -863,8 +861,8 @@ data</h2>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, pressure_score) <span class="sc">%&gt;%</span> </span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>))</span></code></pre></div>
 </div>
-<div id="datacheck" class="section level2" number="2.9">
-<h2><span class="header-section-number">2.9</span> Datacheck</h2>
+<div id="datacheck" class="section level2" number="4.9">
+<h2><span class="header-section-number">4.9</span> Datacheck</h2>
 <p>Lets compare to 2013 scores.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>

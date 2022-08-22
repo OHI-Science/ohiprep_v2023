@@ -10,7 +10,7 @@ Information about [condition component](http://ohi-science.github.io/ohiprep_v20
 
 * tidal_flat_extent.csv
 * tidal_flat_trend.csv
-* tidal_flat_condition.csv
+* tidal_flat_health.csv
 
 ### Additional information
 
@@ -18,7 +18,7 @@ A description of files
 
  - tidal_flat_extent.Rmd: This script generates the extent of tidal flat for each OHI region.
  - tidal_flat_trend.Rmd: This script generates the trend of tidal flat for each OHI region.
- - tidal_flat_condition: This script generates the health condition of tidal flat for each OHI region. 
+ - tidal_flat_condition.Rmd: This script generates the health condition of tidal flat for each OHI region. 
 
 If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
 

@@ -22,13 +22,13 @@ editor_options:
 
 This script generates the "need" layer for the artisanal opportunities goal. 
 
-## Updates from previous assessment
+# Updates from previous assessment
 
 One more year of data. 
 
 ***
 
-## Data Source 
+# Data Source 
 
 **Downloaded**: 2022-06-30
 
