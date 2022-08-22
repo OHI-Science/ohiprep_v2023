@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 9 15:40:09 2022 by menzies" />
+<meta name="author" content="Compiled on Mon Aug 22 16:47:09 2022 by menzies" />
 
 
 <title>OHI 2022: Mangrove condition</title>
@@ -1671,7 +1671,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">OHI 2022: Mangrove condition</h1>
-<h4 class="author"><em>Compiled on Tue Aug 9 15:40:09 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 22 16:47:09 2022 by
 menzies</em></h4>
 
 </div>
@@ -1744,6 +1744,17 @@ reference extents. Reference extents are 1980 values from the FAO, and
 dataset.</p>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ohicore)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;workflow/R/common.R&quot;</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="st">&quot;2022&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dir_hab_mangrove <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>dir_fao_mangrove <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/_raw_data/FAO_mangrove&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">region_data</span>()</span></code></pre></div>
 </div>
 <div id="creating-dataset-with-reference-values" class="section level2">
 <h2>Creating dataset with reference values</h2>
@@ -1754,126 +1765,132 @@ question.</p>
 <p>Regions that have extents less than 1 km^2 in 1980 are dropped to
 prevent them receiving condition scores based on highly granular changes
 reported in two different datasets.</p>
+<p>Additionally, Seychelles and Qatar are removed from the 1980 data and
+their 1996 extents from the GMW are used instead. These decisions are
+discussed in the last section of this document.</p>
 <div id="read-in-fao-and-gmw-data-and-join" class="section level3">
 <h3>Read in FAO and GMW data and join</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>fao_mangrove_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_fao_mangrove, <span class="st">&quot;FAO_mangrove_data.csv&quot;</span>))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cleaning up titles and converting ha to km2</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>fao_mangrove <span class="ot">&lt;-</span> fao_mangrove_raw <span class="sc">%&gt;%</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_1980_ha =</span> <span class="fu">str_replace</span>(year_1980_ha, <span class="st">&quot; &quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_1980_ha =</span> <span class="fu">str_replace</span>(year_1980_ha, <span class="st">&quot; &quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">&quot;km2_1980&quot;</span> <span class="ot">=</span> <span class="fu">as.numeric</span>(year_1980_ha) <span class="sc">*</span> <span class="fl">0.01</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># joining with rgn_ids</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fao_mangrove_rgns <span class="ot">&lt;-</span> fao_mangrove <span class="sc">%&gt;%</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;country&quot;</span> <span class="ot">=</span> <span class="st">&quot;rgn_name&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, <span class="st">&quot;km2_1980&quot;</span>, rgn_id) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(km2_1980 <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># read in and wrangle global mangrove watch data and then join with fao data</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>gmw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_extent_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1996</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>habitat) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&quot;year&quot;</span>, <span class="at">values_from =</span> <span class="st">&quot;km2&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">&quot;km2_1996&quot;</span> <span class="ot">=</span> <span class="st">&quot;1996&quot;</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>fao_gmw <span class="ot">&lt;-</span> fao_mangrove_rgns <span class="sc">%&gt;%</span> </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(gmw, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fao_mangrove_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_fao_mangrove, <span class="st">&quot;FAO_mangrove_data.csv&quot;</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cleaning up titles and converting ha to km2</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>fao_mangrove <span class="ot">&lt;-</span> fao_mangrove_raw <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_1980_ha =</span> <span class="fu">str_replace</span>(year_1980_ha, <span class="st">&quot; &quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_1980_ha =</span> <span class="fu">str_replace</span>(year_1980_ha, <span class="st">&quot; &quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">&quot;km2_1980&quot;</span> <span class="ot">=</span> <span class="fu">as.numeric</span>(year_1980_ha) <span class="sc">*</span> <span class="fl">0.01</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># joining with rgn_ids</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>fao_mangrove_rgns <span class="ot">&lt;-</span> fao_mangrove <span class="sc">%&gt;%</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;country&quot;</span> <span class="ot">=</span> <span class="st">&quot;rgn_name&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, <span class="st">&quot;km2_1980&quot;</span>, rgn_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(km2_1980 <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span>country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Seychelles&quot;</span>, <span class="st">&quot;Qatar&quot;</span>))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># read in and wrangle global mangrove watch data and then join with fao data</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>gmw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_extent_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1996</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>habitat) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&quot;year&quot;</span>, <span class="at">values_from =</span> <span class="st">&quot;km2&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">&quot;km2_1996&quot;</span> <span class="ot">=</span> <span class="st">&quot;1996&quot;</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>fao_gmw <span class="ot">&lt;-</span> fao_mangrove_rgns <span class="sc">%&gt;%</span> </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(gmw, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>)</span></code></pre></div>
 </div>
 <div id="deal-with-grouped-and-duplicated-regions-and-gapfill-missing-1980-values-with-1996-gmw-values" class="section level3">
 <h3>Deal with grouped and duplicated regions and gapfill missing 1980
 values with 1996 GMW values</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find 1980 countries that differ from OHI regions</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>rgn_na <span class="ot">&lt;-</span> fao_gmw <span class="sc">%&gt;%</span> </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(rgn_id)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(km2_1996))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>rgn_na_id <span class="ot">&lt;-</span> rgn_na <span class="sc">%&gt;%</span> </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>rgn_id) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">name_2_rgn</span>(<span class="at">fld_name =</span> <span class="st">&quot;country&quot;</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># separate OHI regions that are grouped in the FAO data (e.g. Kiribati) will have their constituent regions gapfilled with 1996 GMW values so we only need to work with the duplicated regions by summing their extents</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>duplicated_rgns <span class="ot">&lt;-</span> rgn_na_id<span class="sc">$</span>rgn_id[<span class="fu">duplicated</span>(rgn_na_id<span class="sc">$</span>rgn_id)]</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>rgn_na_summarized <span class="ot">&lt;-</span> rgn_na_id <span class="sc">%&gt;%</span> </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">%in%</span> duplicated_rgns) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">km2_1980 =</span> <span class="fu">sum</span>(km2_1980))</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>fao_gmw <span class="ot">&lt;-</span> fao_gmw <span class="sc">%&gt;%</span> </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(rgn_na_summarized, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">km2_1980 =</span> <span class="fu">coalesce</span>(km2_1980.x, km2_1980.y)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(km2_1980.x, km2_1980.y)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(rgn_id))</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># use 1996 values from GMW to gapfill missing 1980 values from the FAO</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ref_areas <span class="ot">&lt;-</span> fao_gmw <span class="sc">%&gt;%</span> </span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">km2_ref =</span> <span class="fu">case_when</span>(<span class="sc">!</span><span class="fu">is.na</span>(km2_1980) <span class="sc">~</span> km2_1980,</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">is.na</span>(km2_1980) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(km2_1996) <span class="sc">~</span> km2_1996)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ref_year =</span> <span class="fu">case_when</span>(<span class="sc">!</span><span class="fu">is.na</span>(km2_1980) <span class="sc">~</span> <span class="dv">1980</span>,</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">is.na</span>(km2_1980) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(km2_ref) <span class="sc">~</span> <span class="dv">1996</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, km2_ref, ref_year)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find 1980 countries that differ from OHI regions</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>rgn_na <span class="ot">&lt;-</span> fao_gmw <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(rgn_id)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(km2_1996))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>rgn_na_id <span class="ot">&lt;-</span> rgn_na <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>rgn_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">name_2_rgn</span>(<span class="at">fld_name =</span> <span class="st">&quot;country&quot;</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># separate OHI regions that are grouped in the FAO data (e.g. Kiribati) will have their constituent regions gapfilled with 1996 GMW values so we only need to work with the duplicated regions by summing their extents</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>duplicated_rgns <span class="ot">&lt;-</span> rgn_na_id<span class="sc">$</span>rgn_id[<span class="fu">duplicated</span>(rgn_na_id<span class="sc">$</span>rgn_id)]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>rgn_na_summarized <span class="ot">&lt;-</span> rgn_na_id <span class="sc">%&gt;%</span> </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">%in%</span> duplicated_rgns) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">km2_1980 =</span> <span class="fu">sum</span>(km2_1980))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>fao_gmw <span class="ot">&lt;-</span> fao_gmw <span class="sc">%&gt;%</span> </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(rgn_na_summarized, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">km2_1980 =</span> <span class="fu">coalesce</span>(km2_1980.x, km2_1980.y)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(km2_1980.x, km2_1980.y)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(rgn_id))</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># use 1996 values from GMW to gapfill missing 1980 values from the FAO</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>ref_areas <span class="ot">&lt;-</span> fao_gmw <span class="sc">%&gt;%</span> </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">km2_ref =</span> <span class="fu">case_when</span>(<span class="sc">!</span><span class="fu">is.na</span>(km2_1980) <span class="sc">~</span> km2_1980,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">is.na</span>(km2_1980) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(km2_1996) <span class="sc">~</span> km2_1996)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, km2_ref)</span></code></pre></div>
 </div>
 </div>
 <div id="join-extents-from-all-years-with-reference-extents-and-calculate-health" class="section level2">
 <h2>Join extents from all years with reference extents and calculate
 health</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gmw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_extent_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>habitat) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2015</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>gmw_ref <span class="ot">&lt;-</span> gmw <span class="sc">%&gt;%</span> </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ref_areas, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>mangrove_health <span class="ot">&lt;-</span> gmw_ref <span class="sc">%&gt;%</span> </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">health =</span> km2 <span class="sc">/</span> km2_ref) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.nan</span>(health)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">health =</span> <span class="fu">case_when</span>(health <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                            <span class="cn">TRUE</span> <span class="sc">~</span> health))  <span class="co"># any score over 1 receives a score of 1 - there are a number of these instances due to improved extent data from the GMW compared with the original FAO paper</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>habitat_health_mangrove_updated <span class="ot">&lt;-</span> mangrove_health <span class="sc">%&gt;%</span> </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">&quot;km2&quot;</span>, <span class="st">&quot;km2_ref&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;mangrove&quot;</span>)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(habitat_health_mangrove_updated, <span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_health_mangrove_updated.csv&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gmw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_extent_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>habitat) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2015</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>gmw_ref <span class="ot">&lt;-</span> gmw <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ref_areas, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>mangrove_health <span class="ot">&lt;-</span> gmw_ref <span class="sc">%&gt;%</span> </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">health =</span> km2 <span class="sc">/</span> km2_ref) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.nan</span>(health)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">health =</span> <span class="fu">case_when</span>(health <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                            <span class="cn">TRUE</span> <span class="sc">~</span> health))  <span class="co"># any score over 1 receives a score of 1 - there are a number of these instances due to improved extent data from the GMW compared with the original FAO paper</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>habitat_health_mangrove_updated <span class="ot">&lt;-</span> mangrove_health <span class="sc">%&gt;%</span> </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">&quot;km2&quot;</span>, <span class="st">&quot;km2_ref&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;mangrove&quot;</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(habitat_health_mangrove_updated, <span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_health_mangrove_updated.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="datacheck-compare-to-old-health-data" class="section level2">
 <h2>Datacheck: compare to old health data</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># getting previous version year dir name</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dir_version_years <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;v</span><span class="sc">\\</span><span class="st">d*&quot;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>prev_year <span class="ot">&lt;-</span> dir_version_years[<span class="fu">length</span>(dir_version_years) <span class="sc">-</span> <span class="dv">1</span>]</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>old_health <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove/&quot;</span>, prev_year, <span class="st">&quot;/data/habitat_health_mangrove_updated.csv&quot;</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">health_prev =</span> health)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>compare_health <span class="ot">&lt;-</span> habitat_health_mangrove_updated <span class="sc">%&gt;%</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>,</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>         year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_health, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;habitat&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> health <span class="sc">-</span> health_prev) <span class="sc">%&gt;%</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez[<span class="fu">c</span>(<span class="st">&quot;rgn_name&quot;</span>, <span class="st">&quot;rgn_id&quot;</span>)])</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a> p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(compare_health, <span class="fu">aes</span>(<span class="at">x =</span> health_prev, <span class="at">y =</span> health)) <span class="sc">+</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Mangrove habitat previous (2005 / 1980) vs new (2020 / 1980)&quot;</span>, <span class="at">x =</span> <span class="st">&quot;previous health&quot;</span>, <span class="at">y =</span>  <span class="st">&quot;new health&quot;</span>) <span class="sc">+</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a> <span class="fu">plot</span>(p)</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(p)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># getting previous version year dir name</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dir_version_years <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;v</span><span class="sc">\\</span><span class="st">d*&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>prev_year <span class="ot">&lt;-</span> dir_version_years[<span class="fu">length</span>(dir_version_years) <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>old_health <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove/&quot;</span>, prev_year, <span class="st">&quot;/data/habitat_health_mangrove_updated.csv&quot;</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">health_prev =</span> health)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>compare_health <span class="ot">&lt;-</span> habitat_health_mangrove_updated <span class="sc">%&gt;%</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>         year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_health, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;habitat&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> health <span class="sc">-</span> health_prev) <span class="sc">%&gt;%</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez[<span class="fu">c</span>(<span class="st">&quot;rgn_name&quot;</span>, <span class="st">&quot;rgn_id&quot;</span>)])</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a> p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(compare_health, <span class="fu">aes</span>(<span class="at">x =</span> health_prev, <span class="at">y =</span> health)) <span class="sc">+</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Mangrove habitat previous (2005 / 1980) vs new (2020 / 1980)&quot;</span>, <span class="at">x =</span> <span class="st">&quot;previous health&quot;</span>, <span class="at">y =</span>  <span class="st">&quot;new health&quot;</span>) <span class="sc">+</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a> <span class="fu">plot</span>(p)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(p)</span></code></pre></div>
 <p>Based on this comparison plot, health scores have changed a lot
-across the board. This isn’t entirely unexpected as current extents have
-been updated from 2005 to 2020, and the GMW data are likely much more
-accurate than the FAO data.</p>
-<p>Certain health scores increased dramatically: Liberia, East Timor,
-and Oecussi Ambeno.</p>
+across the board. We expect relatively large changes in many regions
+because current extents have been updated from 2005 to 2020 and were
+derived using more reliable methods, and some reference extents have
+changed from 1980 to 1996 - however, we still need to look at drastic
+changes to see if they reflect real world changes or are primarily
+artifacts of the new dataset.</p>
+<div id="certain-health-scores-increased-dramatically-liberia-east-timor-and-oecussi-ambeno." class="section level4">
+<h4>Certain health scores increased dramatically: Liberia, East Timor,
+and Oecussi Ambeno.</h4>
 <p><strong>Liberia</strong>:</p>
 <p>The FAO data show Liberia’s mangrove extent decreasing by ~65% from
 193 km^2 in 1980 to 67.5 km^2 in 2005. The GMW data report mangrove
@@ -1899,6 +1916,25 @@ such a dramatic jump in the health score.</p>
 <p>Oecussi Ambeno showed no change between 1996 and 2020, giving it a
 health score of 1 and a similarly large jump from the last
 assessment.</p>
+</div>
+<div id="health-scores-that-decreased-dramatically-seychelles-and-qatar" class="section level4">
+<h4>Health scores that decreased dramatically: Seychelles and Qatar</h4>
+<p><strong>Seychelles</strong>:</p>
+<p>Seychelles health score went from 1.00 to 0.035. The FAO reported ~25
+km^2 in 1980 and our spatial calculation yielded ~0.87 km^2 (the GMW
+reported ~3km^2 based on their spatial analysis). This <a href="https://www.sciencedirect.com/science/article/pii/S2351989421001141#bib13">2021
+paper by Constance et al.</a> estimates mangrove extent on Aldabra
+Atoll, which hosts the majority of mangrove coverage in Seychelles.
+Their findings do not reflect the drastic decrease that comparing 1980
+FAO to 2020 GMW extents does. They report far less change. For this
+reason we will only use GMW data for Seychelles, meaning the reference
+area will be that of 1996.</p>
+<p><strong>Qatar</strong>:</p>
+<p>Qatar similarly shows a pronounced decrease in health score. <a href="https://link.springer.com/chapter/10.1007/978-3-319-73016-5_3#Tab2">Milani
+(2018)</a> reports the opposite: a major increase in extent from 0.16
+km^2 in 1977 to 10 km^2 in 2017. For this case we will also use only GMW
+data, with 1996 being the reference year.</p>
+</div>
 </div>
 </div>
 

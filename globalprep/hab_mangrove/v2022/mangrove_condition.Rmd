@@ -61,7 +61,7 @@ Health is calculated for each region by dividing 2020 extents by reference exten
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
+``` {r setup, message = FALSE, warning = FALSE, eval = FALSE}
 library(here)
 library(tidyverse)
 library(ohicore)
@@ -234,7 +234,7 @@ Seychelles health score went from 1.00 to 0.035. The FAO reported ~25 km^2 in 19
 
 **Qatar**:
 
-Qatar similarly shows a pronounced decrease in health score. [Milani 2018](https://link.springer.com/chapter/10.1007/978-3-319-73016-5_3#Tab2) reports the opposite: a major increase in extent from 0.16 km^2 in 1977 to 10 km^2 in 2017. For this case we will also use only GMW data, with 1996 being the reference year. 
+Qatar similarly shows a pronounced decrease in health score. [Milani (2018)](https://link.springer.com/chapter/10.1007/978-3-319-73016-5_3#Tab2) reports the opposite: a major increase in extent from 0.16 km^2 in 1977 to 10 km^2 in 2017. For this case we will also use only GMW data, with 1996 being the reference year. 
 
 
 
