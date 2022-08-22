@@ -76,6 +76,8 @@ dir_raw_data_anx <- file.path(dir_anx, '_raw_data')
 
 source(file.path(dir_setup, 'common_fxns.R'))
 
+sf::sf_use_s2(FALSE)
+
 ```
 
 
@@ -90,65 +92,67 @@ source(file.path(dir_setup, 'common_fxns.R'))
 
 ### Create a 10 km^2 Gall Peters projection cell ID raster
 
+ - Note: Just copy this over from last years 
+ 
 ``` {r rasterize natural earth ocean polygons to Gall-Peters}
 
 ocean_area_file <- file.path(dir_spatial, 'ocean_area_rast.tif')
 cell_id_file    <- file.path(dir_spatial, 'cell_id_rast.tif')
 # ocean_1km_file  <- file.path(dir_goal_anx, 'spatial', 'ocean_1km.tif')
 ocean_500m_file  <- file.path(dir_goal_anx, 'spatial', 'ocean_500m.tif')
-
-if(!file.exists(ocean_area_file)) {
-  
-  ocean_sf_wgs84 <- read_sf(file.path(dir_spatial, 'ne_10m_ocean', 'ne_10m_ocean.shp'))
-  
-  ### Annoyingly, this counts the Caspian Sea as ocean... so make a block,
-  ### cut it out, and go from there.
-  caspian_block <- matrix(c(45, 35, 45, 48, 56, 48, 56, 35, 45, 35), 
-                          ncol = 2, byrow = TRUE)
-  caspian_sf <- st_polygon(list(caspian_block)) %>% 
-    st_sfc(crs = 4326)  %>%
-    st_set_precision(1000000) %>%
-    st_make_valid()
-  
-  
-ocean_sf <- ocean_sf_wgs84 %>%
-    st_difference(caspian_sf) %>%
-    st_transform(gp_proj4)
-
-  bbox_ocean <- st_bbox(ocean_sf)
-  ext_r  <- extent(bbox_ocean$xmin, bbox_ocean$xmax, bbox_ocean$ymin, bbox_ocean$ymax)
-  rast_base_500m <- raster(ext_r, crs = crs(gp_proj4), res = 500)
-  rast_base_10km <- raster(ext_r, crs = crs(gp_proj4), res = 10000)
-  
-  if(!file.exists(ocean_500m_file)) {
-    rast_ocean_500m <- fasterize(ocean_sf, rast_base_500m, 
-                              field = NULL,   ### all polygons given value of 1
-                              background = 0) ### all non-polygons given value of 0
-    writeRaster(rast_ocean_500m, 
-                ocean_500m_file,
-                progress = 'text')
-    #plot(rast_ocean_500m) #check if worked in R 
-  } else {
-    rast_ocean_500m <- raster(ocean_500m_file)
-  }
-  
-  rast_ocean_10km <- raster::aggregate(rast_ocean_500m, 
-                                     fact = 20,   ### factor of 20 aggregation
-                                     fun = mean,  ### mean of 1s (ocean) and 0s (land)
-                                     progress = 'text')
-  
-  rast_ocean_area <- rast_ocean_10km * 100 ### multiply by 100 km^2 per cell
-  values(rast_ocean_area)[values(rast_ocean_area) < 1e-5] <- NA
-  
-  writeRaster(rast_ocean_area, ocean_area_file, overwrite = TRUE)
-}
-
-if(!file.exists(cell_id_file)) {
-  rast_cell_id <- raster(ocean_area_file) %>%
-    setValues(1:ncell(.))
-  
-  writeRaster(rast_cell_id, cell_id_file)
-}
+# 
+# if(!file.exists(ocean_area_file)) {
+#   
+#   ocean_sf_wgs84 <- read_sf(file.path(dir_spatial, 'ne_10m_ocean', 'ne_10m_ocean.shp'))
+#   
+#   ### Annoyingly, this counts the Caspian Sea as ocean... so make a block,
+#   ### cut it out, and go from there.
+#   caspian_block <- matrix(c(45, 35, 45, 48, 56, 48, 56, 35, 45, 35), 
+#                           ncol = 2, byrow = TRUE)
+#   caspian_sf <- st_polygon(list(caspian_block)) %>% 
+#     st_sfc(crs = 4326)  %>%
+#     st_set_precision(1000000) %>%
+#     st_make_valid()
+#   
+#   
+# ocean_sf <- ocean_sf_wgs84 %>%
+#     st_difference(caspian_sf) %>%
+#     st_transform(gp_proj4)
+# 
+#   bbox_ocean <- st_bbox(ocean_sf)
+#   ext_r  <- extent(bbox_ocean$xmin, bbox_ocean$xmax, bbox_ocean$ymin, bbox_ocean$ymax)
+#   rast_base_500m <- raster(ext_r, crs = crs(gp_proj4), res = 500)
+#   rast_base_10km <- raster(ext_r, crs = crs(gp_proj4), res = 10000)
+#   
+#   if(!file.exists(ocean_500m_file)) {
+#     rast_ocean_500m <- fasterize(ocean_sf, rast_base_500m, 
+#                               field = NULL,   ### all polygons given value of 1
+#                               background = 0) ### all non-polygons given value of 0
+#     writeRaster(rast_ocean_500m, 
+#                 ocean_500m_file,
+#                 progress = 'text')
+#     #plot(rast_ocean_500m) #check if worked in R 
+#   } else {
+#     rast_ocean_500m <- raster(ocean_500m_file)
+#   }
+#   
+#   rast_ocean_10km <- raster::aggregate(rast_ocean_500m, 
+#                                      fact = 20,   ### factor of 20 aggregation
+#                                      fun = mean,  ### mean of 1s (ocean) and 0s (land)
+#                                      progress = 'text')
+#   
+#   rast_ocean_area <- rast_ocean_10km * 100 ### multiply by 100 km^2 per cell
+#   values(rast_ocean_area)[values(rast_ocean_area) < 1e-5] <- NA
+#   
+#   writeRaster(rast_ocean_area, ocean_area_file, overwrite = TRUE)
+# }
+# 
+# if(!file.exists(cell_id_file)) {
+#   rast_cell_id <- raster(ocean_area_file) %>%
+#     setValues(1:ncell(.))
+#   
+#   writeRaster(rast_cell_id, cell_id_file)
+# }
 
 ```
 
@@ -164,17 +168,20 @@ Actually, create two maps: one by protection category, another by year for no-ta
 
 ``` {r rasterize_wdpa_to_GP_500m_x_500m}
 
-rast_cell_id    <- raster(cell_id_file)
-rast_ocean_500m  <- raster(ocean_500m_file)
+rast_cell_id    <- rast(cell_id_file)
+rast_ocean_500m  <- rast(ocean_500m_file)
 #plot(rast_ocean_500m) #check to see if loaded properly 
 
-wdpa_marine_file <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/wdpa_mar_by_cat_Feb2021_500m.tif')
-wdpa_poly_file_0   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/WDPA_WDOECM_wdpa_shp0', 
-                              'WDPA_WDOECM_wdpa_shp-polygons.shp')
-wdpa_poly_file_1   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/WDPA_WDOECM_wdpa_shp1', 
-                              'WDPA_WDOECM_wdpa_shp-polygons.shp')
-wdpa_poly_file_2   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/WDPA_WDOECM_wdpa_shp2', 
-                              'WDPA_WDOECM_wdpa_shp-polygons.shp')
+wdpa_marine_file <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/wdpa_mar_by_cat_Jun2022_500m.tif')
+wdpa_marine_file_int <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/wdpa_mar_by_cat_Jun2022_500m_int.tif')
+
+
+wdpa_poly_file_0   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/WDPA_Jun2022_Public_shp_0', 
+                              'WDPA_Jun2022_Public_shp-polygons.shp')
+wdpa_poly_file_1   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/WDPA_Jun2022_Public_shp_1', 
+                              'WDPA_Jun2022_Public_shp-polygons.shp')
+wdpa_poly_file_2   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/WDPA_Jun2022_Public_shp_2', 
+                              'WDPA_Jun2022_Public_shp-polygons.shp')
 
 if(!file.exists(wdpa_marine_file)) {
   
@@ -194,8 +201,8 @@ if(!file.exists(wdpa_marine_file)) {
                  'V'   = 5,
                  'VI'  = 6)
    wdpa_poly$STATUS %>% table()
-     #  Adopted   Designated  Established    Inscribed Not Reported     Proposed 
-    #    34       242940         1148          249           34         1201 
+     # Adopted   Designated  Established    Inscribed Not Reported     Proposed 
+     #      34       254937         2401          250           34         1219 
   # wdpa_poly$NO_TAKE %>% unique()
   # x <- wdpa_poly %>% filter(NO_TAKE %in% c('All', 'Part'))
   # x <- wdpa_poly %>% filter(WDPAID == 309888)
@@ -217,23 +224,37 @@ if(!file.exists(wdpa_marine_file)) {
     st_transform(crs = gp_proj4)
 
   
+  wdpa_marine_vect <- vect(wdpa_marine)
+
+  rm(wdpa_marine)
+  rm(wdpa_poly_0)
+  rm(wdpa_poly_1)
+  rm(wdpa_poly_2)
+  rm(wdpa_poly) ## free up some space
+    
   ### rasterize all protected areas to 500m global raster;
   ### use min value: will prioritize no-take and higher levels of protection
-  wdpa_all_rast_500m <- fasterize::fasterize(sf = wdpa_marine, 
-                                        raster = rast_ocean_500m,
+  terra::rasterize(x = wdpa_marine_vect, 
+                                        y = rast_ocean_500m,
                                         field  = 'cat', 
-                                        fun    = 'min')   
+                                        fun    = 'min', 
+                                        filename = wdpa_marine_file_int)   
 
   #plot(wdpa_all_rast_500m)
   
-  values(rast_ocean_500m)[values(rast_ocean_500m) < .005] <- NA
-  wdpa_marine_rast_500m <- mask(wdpa_all_rast_500m, rast_ocean_500m)
+  wdpa_all_rast_500m <- rast(wdpa_marine_file_int)
   
-  #plot(wdpa_marine_rast_500m)
-  #plot(raster(file.path(dir_raw_data_anx, 'wdpa_mpa/d2020/wdpa_mar_by_cat_Apr2020_500m.tif')))
+  rm(wdpa_marine_vect) ## free up some space
+  
+  rast_ocean_500m <- terra::classify(rast_ocean_500m ,cbind(-Inf, 0.005, NA), right=FALSE)
+  # plot(rast_ocean_500m)
+  
+  wdpa_marine_rast_500m <- terra::mask(wdpa_all_rast_500m, rast_ocean_500m)
+  
+  # plot(wdpa_marine_rast_500m)
+  # plot(rast(file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/wdpa_mar_by_cat_Feb2021_500m.tif')))
   
   writeRaster(wdpa_marine_rast_500m, wdpa_marine_file, 
-              progress = 'text',
               overwrite = TRUE)
   
 }
@@ -242,19 +263,21 @@ if(!file.exists(wdpa_marine_file)) {
 
 ``` {r rasterize_protection_yr_to_GP_500m}
 
-rast_cell_id    <- raster(cell_id_file)
-rast_ocean_500m  <- raster(ocean_500m_file)
+# rast_cell_id    <- rast(cell_id_file)
+rast_ocean_500m  <- rast(ocean_500m_file)
 # plot(rast_ocean_500m)
 
-wdpa_prot_yr_file <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021', 
-                               'wdpa_mar_by_prot_yr_Feb2021_500m.tif')
+wdpa_prot_yr_file <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022', 
+                               'wdpa_mar_by_prot_yr_Jun2022_500m.tif')
 
-wdpa_poly_file_0   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/WDPA_WDOECM_wdpa_shp0', 
-                              'WDPA_WDOECM_wdpa_shp-polygons.shp')
-wdpa_poly_file_1   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/WDPA_WDOECM_wdpa_shp1', 
-                              'WDPA_WDOECM_wdpa_shp-polygons.shp')
-wdpa_poly_file_2   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/WDPA_WDOECM_wdpa_shp2', 
-                              'WDPA_WDOECM_wdpa_shp-polygons.shp')
+wdpa_prot_yr_file_int <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/wdpa_mar_by_prot_yr_Jun2022_500m_int.tif')
+
+wdpa_poly_file_0   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/WDPA_Jun2022_Public_shp_0', 
+                              'WDPA_Jun2022_Public_shp-polygons.shp')
+wdpa_poly_file_1   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/WDPA_Jun2022_Public_shp_1', 
+                              'WDPA_Jun2022_Public_shp-polygons.shp')
+wdpa_poly_file_2   <- file.path(dir_raw_data_anx, 'wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/WDPA_Jun2022_Public_shp_2', 
+                              'WDPA_Jun2022_Public_shp-polygons.shp')
 
 if(!file.exists(wdpa_prot_yr_file)) {
   
@@ -295,24 +318,39 @@ if(!file.exists(wdpa_prot_yr_file)) {
     filter(cat <= 2) %>% ### this limits to categories Ia, Ib, II, and no-take
     st_transform(crs = gp_proj4)
   
+  rm(wdpa_poly_0 , wdpa_poly_1, wdpa_poly_2, wdpa_poly)
+  
+  wdpa_no_take_vect <- vect(wdpa_no_take)
+  
+  rm(wdpa_no_take, wdpa_marine_rast_500m)
+  
   ### rasterize all protected areas to 500 m global raster;
   ### use min value: will prioritize no-take and higher levels of protection
-  wdpa_all_rast_500m <- fasterize::fasterize(sf = wdpa_no_take, 
-                                        raster = rast_ocean_500m,
+           wdpa_all_rast_500m <-   terra::rasterize(x = wdpa_no_take_vect, 
+                                        y = rast_ocean_500m,
                                         field  = 'STATUS_YR', 
                                         fun    = 'min')
+           
+           writeRaster(wdpa_all_rast_500m, wdpa_prot_yr_file_int)
   
-  values(rast_ocean_500m)[values(rast_ocean_500m) < .005] <- NA
+  rm(wdpa_no_take_vect)
+  
+  rast_ocean_500m <- terra::classify(rast_ocean_500m ,cbind(-Inf, 0.005, NA), right=FALSE)
+  
     ### in case of floating point not-quite-zeros...
-  wdpa_yr_rast_500m <- mask(wdpa_all_rast_500m, rast_ocean_500m)
   
+  # wdpa_all_rast_500m <- rast(wdpa_prot_yr_file_int)
+  
+   terra::mask(wdpa_all_rast_500m, rast_ocean_500m, filename = wdpa_prot_yr_file)
+  
+ #    test <- wdpa_all_rast_500m*rast_ocean_500m
+   
     #plot(wdpa_yr_rast_500m)
   #plot(raster(file.path(dir_raw_data_anx, 'wdpa_mpa/d2020/wdpa_mar_by_prot_yr_Apr2020_500m.tif')))
   
-  writeRaster(wdpa_yr_rast_500m, wdpa_prot_yr_file, 
-              progress = 'text',
-              overwrite = TRUE)
-  
+  # writeRaster(wdpa_yr_rast_500m, wdpa_prot_yr_file, 
+  #             overwrite = TRUE)
+  # 
 }
 
 ```
