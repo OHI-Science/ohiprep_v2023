@@ -8,7 +8,7 @@ library(rvest)
 library(tabulizer)
 library(purrr)
 
-# pull the html from the page of interest
+# pull html from the page of interest
 page <- read_html("https://wttc.org/Research/Economic-Impact")
 
 # name and create our download destination folder
@@ -16,7 +16,7 @@ pdf_dir <- here(paste0("globalprep/tr/v", version_year, "/wttc_pdfs/"))
 dir.create(pdf_dir)
 
 raw_list <- page %>% # takes the page above for which we've read the html
-  html_nodes("a") %>%  # find all links in the page
+  html_elements("a") %>%  # find all links in the page
   html_attr("href") %>% # get the url for these links
   str_subset("/QuickDownload") %>% 
   unique() %>% 
