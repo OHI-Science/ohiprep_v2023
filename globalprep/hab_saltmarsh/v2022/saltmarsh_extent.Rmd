@@ -19,7 +19,7 @@ This script generates the extent of saltmarsh for each OHI region.
 
 ## Updates from previous assessment
 
-2022 - Updating with new dataset!
+2022 - Tried updating with new dataset, but calculations did not work out. The lead author for the dataset listed here has plans on releasing saltmarsh extent estimates similar to his tidal flat extent. Look for this data and when released, the summarization process should be very similar to tidal flat. 
 
 ***
 ## Data Source 
