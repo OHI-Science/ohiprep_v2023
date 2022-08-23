@@ -54,24 +54,22 @@ Release date: March 4, 2022
 ***
   
 # Methods
-```{r setup, warning=FALSE, message=FALSE}
+```{r setup, warning=FALSE, message=FALSE, results='hide'}
 knitr::opts_chunk$set(eval=FALSE)
 ## load libraries, set directories
 library(ohicore)  #devtools::install_github('ohi-science/ohicore@dev')
-library(dplyr)
-library(stringr)
-library(tidyr)
 library(zoo)  
-library(ggplot2)
 library(here)
 library(tidyverse)
 library(plotly)
-library(readr)
+
+version_year <- "2022"
+
 ## Load FAO-specific user-defined functions
 source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO files
 source(here('workflow/R/common.R')) # directory locations
-source(here('globalprep/np/v2022/R/np_fxn.R'))
-source(here('globalprep/mar/v2022/mar_fxs.R')) # functions specific to mariculture dealing with compound countries
+source(here(paste0('globalprep/np/v', version_year, '/R/np_fxn.R')))
+source(here(paste0('globalprep/mar/v', version_year, '/mar_fxs.R'))) # functions specific to mariculture dealing with compound countries
 ```
 
 # Import Raw Data: FAO Mariculture data
@@ -79,7 +77,10 @@ source(here('globalprep/mar/v2022/mar_fxs.R')) # functions specific to maricultu
 Mariculture production in tonnes.
 
 ```{r}
-mar <- read.csv(file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_mariculture/d2022/FAO_GlobalAquacultureProduction_Quantity_1950_2020.csv'), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar) 
+mar <- read.csv(paste0(dir_M, '/git-annex/globalprep/_raw_data/FAO_mariculture/d', version_year, '/FAO_GlobalAquacultureProduction_Quantity_1950_2020.csv'),
+                check.names=FALSE, stringsAsFactors=FALSE)
+
+head(mar) 
 ```
 
 # Wrangle: 
@@ -122,7 +123,7 @@ Filter out seaweed species from 'raw/species_list.csv' (from 'globalprep/mar/v20
 
 ```{r}
 ## Read in 'species_list.csv' (originally from 'globalprep/mar/v2021/raw'). Filter for 'Taxon_code = AL' (only seaweed species). Rename 'exclude' columns to 'include' since we're now including seaweed species that were excluded in the MAR dataprep (not primarily used as human food). Therefore, "0" means exclude completely (0%), and "1" means include completely (100%).
-seaweed_sp <- read.csv(file.path('../../mar/v2021/raw/species_list.csv'), stringsAsFactors=FALSE) %>%
+seaweed_sp <- read.csv(here('globalprep/mar/v2021/raw/species_list.csv'), stringsAsFactors=FALSE) %>%
   filter(Taxon_code == 'AL') %>%
   rename(include = exclude)
 
@@ -137,9 +138,8 @@ Update species name in the `raw/species_list_np_seaweeds_edited.csv` file with n
 
 ```{r}
 
-
 ## Read in edited 'species_list_np_seaweeds_edited.csv'.
-seaweeds <- read.csv(here("globalprep/np/v2022/raw/species_list_np_seaweeds.csv"), stringsAsFactors = FALSE)
+seaweeds <- read.csv(here(paste0("globalprep/np/v", version_year, "/raw/species_list_np_seaweeds.csv")), stringsAsFactors = FALSE)
 
 seaweeds_sp <- seaweeds %>%
   select(FAO_name, include, alias, Taxon_code, family)
@@ -198,7 +198,6 @@ mar_rgn <- mar_rgn_all %>%
   group_by(fao, environment, species, year, Taxon_code, family, rgn_id, include) %>% 
   summarize(value = sum(value)) %>%
   ungroup()
-# went from 2979 to 2950 observations - v2020
 # went from 3150 to 3121 obs - v2021 - This is correct; Un. Sov. Soc. Rep. and Russian Federation were combined.
 # went from 3233 to 3173 obs - v2022 - Same as 2021 and Zanzibar / Tanzania were combined
 
@@ -248,7 +247,6 @@ See how may NA values were converted to 0
 
 ```{r}
 table(mar_rgn_gf$gap_0_fill)
-## 382 of these out of 2299+382 cases had NA converted to 0 - v2020
 ## 422 of these out of 2448+442 cases had NA converted to 0 - v2021 - seems reasonable given the added year of production
 ## 460 out of 2500+460 had NA converted to 0 - v2022
 ```
