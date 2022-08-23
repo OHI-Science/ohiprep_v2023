@@ -16,6 +16,7 @@ output:
     toc: true
 ---
 
+**NOTE: This is an incomplete workflow using `terra` in place of `raster`. In the interest of time, this effort was sidelined and the `raster` package was again used for this data prep. At some point this doc can be used as a starting point when the transition to `terra` seems more worthwhile for this particular application.**
 
 # Summary
 
