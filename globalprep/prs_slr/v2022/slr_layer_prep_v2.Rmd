@@ -82,28 +82,19 @@ library(rasterVis)
 library(terra)
 library(tictoc)
 setGDALconfig("GDAL_PAM_ENABLED", "FALSE")
-# pkg <- c( "httr", "R.utils", "raster", "tidyverse", "sf", "RColorBrewer", "ggplot2", "googleVis",
-#           "maps", "parallel", "foreach", "doParallel", "fasterize", "rasterVis")
-# new.pkg <- pkg[!(pkg %in% installed.packages())]
-# if (length(new.pkg)){install.packages(new.pkg)}
-# lapply(pkg, require, character.only = TRUE)
 
 source('../../../workflow/R/common.R')
 library(here)
  
 ## define paths and variables to use throughout data prep
- 
 scen_year <- 2022 # change to reflect assessment year!
-dir_anx_aviso <- file.path(dir_M, "git-annex/globalprep/_raw_data/AVISO_slr") # raw data file path
+dir_anx_aviso <- file.path(dir_M, "git-annex/globalprep/_raw_data/AVISO_slr") 
 dir_prs_slr <-  sprintf("%s/git-annex/globalprep/prs_slr/v%s", dir_M, scen_year)
-
-#p4s_wgs84 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" # proj4string, need 
-# might need to update crs string because switching from raster pkg to terra pkg and an error is resulting with terra::project() downstream
 
 cols <- rev(colorRampPalette(brewer.pal(9, "Spectral"))(255)) # rainbow color scheme for maps
 
 # assign the mollweide projection label, this does not transform the crs (for that we would use the function project(raster_name) after we create the raster) 
-mollCRS <- CRS("+proj=moll") # mollweide projection
+mollCRS <- CRS("+proj=moll") 
 
 ## read in ocean raster with cells at 1km -- template for resampling (held on an NCEAS server)
 ocean <- terra::rast(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.tif"))
@@ -127,7 +118,7 @@ And you will be prompted to either open up a FTP application, like Cyberduck, or
 If you don't want to go through the trouble of running the download process in R, you can do it manually by just click-and-drag between two cyberduck-2 browsers. 
 
 ```{r login_info, eval=FALSE}
-# This layer lags by 2 years unfortunately, since we need a full year of data. 
+# This layer lags by 2 years, since we need a full year of data. 
 
 ## need AVISO username and password, define the following line of code in console (as is), then when prompted, enter the username and password string, don't save the login information here in the script
 ## if either password or username contain the @ symbol, replace with '%40' (percent-encoding for reserved characters)
@@ -136,8 +127,6 @@ userpasswd <- readline("Type AVISO username and password, separated by colon no 
 
 Define file paths for data download:
 ```{r download_data, eval=FALSE}
-## there is a 'download_data.R' script in the Mazu raw data folder but that routine was not working for me...
-
 year <- 2020 # data year to download; lags by 2 years, since 2021 only goes to may as of now... v2022
 months <- str_pad(1:12, 2, pad = "0") #if they upload the rest just change the numbers here to reflect rest of months
 
@@ -210,60 +199,6 @@ The following code is used to:
 2. Rotate each raster so that the Atlantic Ocean is centered in the raster
 
 The output is saved in the folder `int/msla_monthly`
-
-```{r, eval = F}
-# original loop with raster package
-# registerDoParallel(10)
-# 
-#  ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
-#  foreach(file = nc_files) %dopar% {
-# 
-#    m_yr <- substr(file, nchar(file)-10, nchar(file)-3)
-# 
-#    ## read in month raster
-#    r <- raster::raster(file) %>%
-#      rotate()
-# 
-#    ## define projection of the raster before reprojecting
-#    raster::projection(r) <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-# 
-#    ## write raster to int folder in prs_slr
-#    fp <- sprintf("%s/int/msla_monthly/msla_monthly_%s.tif", dir_prs_slr, m_yr)
-#    raster::writeRaster(r, filename = fp, overwrite = TRUE)
-#  }
-# this chunk worked, but now I have to get the next chunk to work since we are transitioning from raster to terra
-# check on the many warnings that result from this chunk (check if they result from the terra approach too)
-
-
-# attempt at converting the parallelized loop from raster to terra
-# registerDoParallel(10)
-# 
-# ## parallel forloop function that rotates each monthly file, sets the long/lat projection, and keeps only coastal cells - saved to GitHub
-# foreach(file = nc_files) %dopar% {
-#   
-#   m_yr <- substr(file, nchar(file)-10, nchar(file)-3) # m_yr value example: "2015_m12"
-# 
-#   ## read in month raster
-#   r <- terra::rast(file) %>%
-#     rotate()
-#   
-#   ## define projection of the raster before reprojecting
-#   terra::project(r, "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0") 
-#   
-#   # new code to solve error in writing the files" Error in x@ptr$nrow() : external pointer is not valid
-#   # wrap() creates a packed obj that enable them to be saved to disk or passed to a connection that serializes (as we do in this loop)
-#   #r_packed <- terra::wrap(r)
-#   #r_packed <- pack(r) # this function on its own returned the error Error in { : task 1 failed - "`x` must be a vector, not a <SpatRaster> object."
-#  # r_unpacked <- unpack(r_packed) 
-#   # set values in place 
-#   #set.values(r)
-#   #values(r) <- values(r)
-#   ## write raster to int folder in prs_slr
-#   fp <- sprintf("%s/int/msla_monthly/msla_monthly_%s.tif", dir_prs_slr, m_yr) 
-#   terra::writeRaster(r, filename = fp, overwrite = TRUE)
-# }
-
-```
 
 ```{r, eval=FALSE}
 tic()
@@ -347,23 +282,7 @@ plot(s, col = "red")
 ## reproject to mollweide
 annual_means <- list.files(file.path(dir_prs_slr, "int/msla_annual_mean"), full = TRUE)
 
-# foreach(file = annual_means) %dopar% {  #file = annual_means[1]
-# 
-#   yr <- str_sub(file, -8, -5)
-#   msla_int <- file.path(dir_prs_slr, "int")
-# 
-# 
-#   rast_data <- terra::rast(file) %>%
-#     #projectRaster(crs = mollCRS, over = TRUE) %>%
-#     terra::project(mollCRS) %>%  # terra::project does not have an argument 'over' that was present in raster::projectRaster() that was set to TRUE to avoid mapping the same area twice, which is desirable for globla data, but I do not think this is an issue
-#     terra::resample(ocean, method = "ngb",
-#              filename = sprintf("%s/msla_annual_mol/mlsa_annual_mol_%s.tif",
-#                                 msla_int, yr), overwrite = TRUE)
-# 
-# 
-# }
-
-# this threw the same error as the first chunk with `terra::project()` i tried to use foreach with terra: Error in x@ptr$nrow() : external pointer is not valid
+# tried to use foreach with terra: Error in x@ptr$nrow() : external pointer is not valid
 ```
 
 ```{r, eval=FALSE}
@@ -409,7 +328,7 @@ coastal_rasts <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol_coastal"
 
 ## get data across all years to 2015
 ## takes a really long times; added foreach dopar to speed...
-## doesn't really need to be recalcuated each year unless theres reason to believe source updated past years data
+## doesn't really need to be recalcuated each year unless there's reason to believe source updated past years data
 ## script was updated in 2022 to convert from raster to terra, so terra functions were added to the following loop but not run because no reason to believe source updated past years data
 registerDoParallel(8)
 
@@ -454,43 +373,8 @@ ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "202
 Each annual raster is rescaled from 0 to 1 using the reference point. If a value is greater than the reference point, it is automatically given a value of 1.
 
 ```{r rescale, eval=FALSE}
-#registerDoParallel(10) # reregister if restarted session between parallel steps above and here
+# foreach() & dopar did not work with terra
 
-# original parallelized loop with raster package from 2021 script
-# foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[26]
-#   yr <- str_sub(file, -8,-5)
-#   
-#   if(file.exists(sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr))){
-#     
-#     message("skipping")
-#   }else{
-#     
-#     raster::raster(file) %>%
-#     calc(fun = function(x){ifelse(x < 0, 0, x)}) %>% # set all negative values to 0
-#     calc(fun = function(x){ifelse(x > ref, 1, x/ref)}, # set equal to one if greater than ref, otherwise scale
-#          filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) 
-#   }
-# }
-
-
-# attempt at converting parallelized loop from raster to terra:
-# foreach(file = coastal_rasts) %dopar% { # file = coastal_rasts[26]
-#   yr <- str_sub(file, -8,-5)
-#   
-#   if(file.exists(sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr))){
-#     
-#     message("skipping")
-#   }else{
-#     
-#     terra::rast(file) %>%
-#     terra::app(fun = function(x){ifelse(x < 0, 0, x)}) %>% # set all negative values to 0
-#     terra::app(fun = function(x){ifelse(x > ref, 1, x/ref)}, # set equal to one if greater than ref, otherwise scale
-#          filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) 
-#   }
-# }
-
-
-# unparallelize because foreach() did not work with terra
 # first define functions outside of app()
 neg_vals <- function(x){ifelse(x < 0, 0, x)}
 greater_vals <- function(x){ifelse(x > ref, 1, x/ref)}
@@ -528,7 +412,6 @@ rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", sce
 ```
 
 ```{r extract regions, eval=FALSE}
-
 ## raster/zonal data, zones tifs created & spatial rgn updated in 2017
 slr_loc <- file.path(dir_prs_slr, "output")
 
