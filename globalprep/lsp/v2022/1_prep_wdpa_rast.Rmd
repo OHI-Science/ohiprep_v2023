@@ -31,20 +31,6 @@ The source data has now been split into 3 different files, so we will need to me
 
 We updated the script to save 3 separate files for the reordering and transforming, for ease of use and reproducibility. 
 
-2020
-Changed data source to 2020
-
-2019:
-Changing all of the readOGR to st_read so as to treat the shapefiles as simple features.
-Changed spTranform to st_transform. 
-Changed writeOGR to st_write. 
-All of the above changes significantly reduce run time. 
-
-Deleted the following code from LSP data prep:
-wdpa_diff <- st_difference(wdpa_sf[1], wdpa_sf_18[1])
-
-The code was included as a data check. It subtracts the old WDPA shapefile from the new WDPA shapefile to visualize the change in polygons between last year and this year. Overall, the resulting shapefile would be relatively sparse because there shouldn't be too many changes.
-However, this was taking forever to run (>24 hours). It is a nice check, but not critical.
 
 ***
 

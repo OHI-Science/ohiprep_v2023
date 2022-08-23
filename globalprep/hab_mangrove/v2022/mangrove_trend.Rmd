@@ -47,7 +47,7 @@ Reported at spatial cell scale.
 
 
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
+``` {r setup, message = FALSE, warning = FALSE, eval = FALSE}
 library(here)
 library(tidyverse)
 library(ohicore)

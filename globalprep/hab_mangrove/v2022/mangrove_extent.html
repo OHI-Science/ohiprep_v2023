@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Wed Aug 3 15:23:33 2022 by menzies" />
+<meta name="author" content="Compiled on Mon Aug 22 16:52:16 2022 by menzies" />
 
 
 <title>OHI 2022: Mangrove extent</title>
@@ -1671,7 +1671,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">OHI 2022: Mangrove extent</h1>
-<h4 class="author"><em>Compiled on Wed Aug 3 15:23:33 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 22 16:52:16 2022 by
 menzies</em></h4>
 
 </div>
@@ -1720,159 +1720,185 @@ onwards.</p>
 <h1>Methods</h1>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<pre><code>## This file makes it easier to process data for the OHI global assessment
-##  by creating the following objects:
-## 
-##  * dir_M = identifies correct file path to Mazu (internal server) based on your operating system
-##  * mollCRS = the crs code for the mollweide coordinate reference system we use in the global assessment
-##  * regions_shape() = function to load global shapefile for land/eez/high seas/antarctica regions
-##  * ohi_rasters() = function to load two rasters: global eez regions and ocean region
-##  * region_data() = function to load 2 dataframes describing global regions 
-##  * rgn_syns() = function to load dataframe of region synonyms (used to convert country names to OHI regions)
-##  * low_pop() = function to load dataframe of regions with low and no human population
-##  * UNgeorgn = function to load dataframe of UN geopolitical designations used to gapfill missing data</code></pre>
-<pre><code>## loads 2 rasters: zones and ocean
-##  zones = raster cells with OHI region ID values, see rgns_all.csv to link IDs with names
-##  ocean = raster with ocean cells identified as 1, otherwise 0</code></pre>
-<pre><code>## returns spatial shape object named &#39;regions&#39;
-##  which includes land, eez, highseas, and antarctica regions
-## 
-## Reading layer `regions_2017_update&#39; from data source `/home/shares/ohi/git-annex/globalprep/spatial/v2017&#39; using driver `ESRI Shapefile&#39;
-## Simple feature collection with 526 features and 7 fields
-## geometry type:  MULTIPOLYGON
-## dimension:      XY
-## bbox:           xmin: -18040060 ymin: -9020048 xmax: 18040080 ymax: 9020048
-## projected CRS:  Mollweide</code></pre>
-<pre><code>## loads 2 dataframes: rgns_all and rgns_eez 
-##  rgns_all = includes eez/high seas/antarctica regions, IDs correspond with region shapefile and raster
-##  rgns_eez = includes only eez regions</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fasterize)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sp)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rgeos)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="st">&quot;2022&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;workflow/R/common.R&quot;</span>))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>dir_hab_mangrove <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>dir_wcmc <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex/globalprep/_raw_data/wcmc_mangrove&#39;</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>dir_shp <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_wcmc, <span class="st">&quot;gmw_v3&quot;</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ohi_rasters</span>() <span class="co"># call the region zones raster</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">regions_shape</span>()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">region_data</span>()</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># load in raster containing OHI regions and their EEZs represented by rgn_id as pixel values</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>land_ocean <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/spatial/v2017/regions_land_ocean.tif&quot;</span>)</span></code></pre></div>
 <p>Read in GMW data and explore</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/_raw_data/wcmc_mangrove/gmw_v3/&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>files_2 <span class="ot">&lt;-</span> files[<span class="fu">grepl</span>(<span class="st">&quot;.shp&quot;</span>, files)]</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;/home/shares/ohi/git-annex/globalprep/_raw_data/wcmc_mangrove/gmw_v3/&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>files_2 <span class="ot">&lt;-</span> files[<span class="fu">grepl</span>(<span class="st">&quot;.shp&quot;</span>, files)]</span></code></pre></div>
 <p>Loop over all years of data and match their regions to OHI
 regions</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dir_annex_int <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/Mangrove/v&quot;</span>, version_year, <span class="st">&quot;/int/&quot;</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># create int directory for current scenario year if it doesn&#39;t already exist </span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">dir.exists</span>(dir_annex_int)) {</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(dir_annex_int, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># create empty list to populate with dfs in loop</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>extent_df_list <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">mode =</span> <span class="st">&quot;list&quot;</span>, <span class="at">length =</span> <span class="fu">length</span>(files_2))</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(files_2)) {</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  gmw_file <span class="ot">&lt;-</span> files_2[i]  </span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  gmw_year <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="fu">c</span>(<span class="st">&quot;_v</span><span class="sc">\\</span><span class="st">d&quot;</span>), <span class="st">&quot;&quot;</span>, gmw_file)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  gmw_year <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;_vec.shp&quot;</span>, <span class="st">&quot;&quot;</span>, gmw_year)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  d_year <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;GMW_&quot;</span>, <span class="st">&quot;&quot;</span>, gmw_year, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  rasterize_file <span class="ot">=</span> <span class="fu">paste0</span>(dir_annex_int, <span class="st">&quot;py_mangrove_rast_&quot;</span>, gmw_year, <span class="st">&quot;.tif&quot;</span>)</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(rasterize_file)) {</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    gmw_shp <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">vect</span>(<span class="fu">file.path</span>(dir_shp, gmw_file))</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="do">## transform 2016 data to our projections</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    gmw_moll <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(gmw_shp, <span class="st">&quot;+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs&quot;</span>)</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># rasterize our polygon dataset</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    raster_poly <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rasterize</span>(gmw_moll, land_ocean, </span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">field =</span> <span class="cn">NULL</span>) <span class="co"># all polygons given value of 1</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    raster_poly</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(terra<span class="sc">::</span><span class="fu">values</span>(raster_poly, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">*</span> <span class="fl">0.934478877011218970</span> <span class="sc">**</span> <span class="dv">2</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">writeRaster</span>(raster_poly, <span class="at">filename =</span> rasterize_file, <span class="at">overwrite =</span> <span class="cn">TRUE</span>) </span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate zonal stats with zones raster and new combined seagrass. Convert to km^2 and save int/output files*</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    zonal_sums_combined <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">zonal</span>(raster_poly, </span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>                                         land_ocean,</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">fun =</span> <span class="st">&quot;sum&quot;</span>,</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># sum all mangrove cells for each ohi zone</span></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    zonal_sums_km2 <span class="ot">&lt;-</span> zonal_sums_combined <span class="sc">%&gt;%</span></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">year =</span> d_year, <span class="at">habitat =</span> <span class="st">&quot;mangrove&quot;</span>,</span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>             <span class="at">km2 =</span> (<span class="fl">0.934478877011218970</span> <span class="sc">**</span> <span class="dv">2</span> <span class="sc">*</span> layer)) <span class="sc">%&gt;%</span> <span class="co"># one cell is equal to ~0.93 km</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="st">&quot;rgn_id&quot;</span> <span class="ot">=</span> <span class="st">&quot;regions_land_ocean&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>layer)</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sum</span>(zonal_sums_km2<span class="sc">$</span>km2))</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># write.csv(zonal_sums_km2, (here(paste0(&quot;globalprep/hab_mangrove/v&quot;, version_year,</span></span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                                          &quot;/int/habitat_extent_mangrove_&quot;, d_year, &quot;.csv&quot;))), row.names = FALSE)</span></span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>    extent_df_list[[i]] <span class="ot">&lt;-</span> zonal_sums_km2</span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(df_list[i]) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;zonal_sums_&quot;</span>, d_year)</span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;completed &quot;</span>, d_year))</span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;file for &quot;</span>, d_year, <span class="st">&quot;exists, skipping&quot;</span>))</span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>zonal_sums_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(extent_df_list)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dir_annex_int <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/Mangrove/v&quot;</span>, version_year, <span class="st">&quot;/int/&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># create int directory for current scenario year if it doesn&#39;t already exist </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">dir.exists</span>(dir_annex_int)) {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(dir_annex_int, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># create empty list to populate with dfs in loop</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>extent_df_list <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">mode =</span> <span class="st">&quot;list&quot;</span>, <span class="at">length =</span> <span class="fu">length</span>(files_2))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(files_2)) {</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  gmw_file <span class="ot">&lt;-</span> files_2[i]  </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  gmw_year <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="fu">c</span>(<span class="st">&quot;_v</span><span class="sc">\\</span><span class="st">d&quot;</span>), <span class="st">&quot;&quot;</span>, gmw_file)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  gmw_year <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;_vec.shp&quot;</span>, <span class="st">&quot;&quot;</span>, gmw_year)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  d_year <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;GMW_&quot;</span>, <span class="st">&quot;&quot;</span>, gmw_year, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  rasterize_file <span class="ot">=</span> <span class="fu">paste0</span>(dir_annex_int, <span class="st">&quot;py_mangrove_rast_&quot;</span>, gmw_year, <span class="st">&quot;.tif&quot;</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(rasterize_file)) {</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    gmw_shp <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">vect</span>(<span class="fu">file.path</span>(dir_shp, gmw_file))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="do">## transform 2016 data to our projections</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    gmw_moll <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(gmw_shp, <span class="st">&quot;+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs&quot;</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># rasterize our polygon dataset</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    raster_poly <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rasterize</span>(gmw_moll, land_ocean, </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">field =</span> <span class="cn">NULL</span>) <span class="co"># all polygons given value of 1</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    raster_poly</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(terra<span class="sc">::</span><span class="fu">values</span>(raster_poly, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">*</span> <span class="fl">0.934478877011218970</span> <span class="sc">**</span> <span class="dv">2</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">writeRaster</span>(raster_poly, <span class="at">filename =</span> rasterize_file, <span class="at">overwrite =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate zonal stats with zones raster and new combined seagrass. Convert to km^2 and save int/output files*</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    zonal_sums_combined <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">zonal</span>(raster_poly, </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>                                         land_ocean,</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">fun =</span> <span class="st">&quot;sum&quot;</span>,</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># sum all mangrove cells for each ohi zone</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    zonal_sums_km2 <span class="ot">&lt;-</span> zonal_sums_combined <span class="sc">%&gt;%</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">year =</span> d_year, <span class="at">habitat =</span> <span class="st">&quot;mangrove&quot;</span>,</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>             <span class="at">km2 =</span> (<span class="fl">0.934478877011218970</span> <span class="sc">**</span> <span class="dv">2</span> <span class="sc">*</span> layer)) <span class="sc">%&gt;%</span> <span class="co"># one cell is equal to ~0.93 km</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="st">&quot;rgn_id&quot;</span> <span class="ot">=</span> <span class="st">&quot;regions_land_ocean&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>layer)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">sum</span>(zonal_sums_km2<span class="sc">$</span>km2))</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># write.csv(zonal_sums_km2, (here(paste0(&quot;globalprep/hab_mangrove/v&quot;, version_year,</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                                          &quot;/int/habitat_extent_mangrove_&quot;, d_year, &quot;.csv&quot;))), row.names = FALSE)</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    extent_df_list[[i]] <span class="ot">&lt;-</span> zonal_sums_km2</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(df_list[i]) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;zonal_sums_&quot;</span>, d_year)</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;completed &quot;</span>, d_year))</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;file for &quot;</span>, d_year, <span class="st">&quot;exists, skipping&quot;</span>))</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>zonal_sums_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(extent_df_list)</span></code></pre></div>
 <p>Save the new dataset for use in global</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>habitat_extent_mangrove_updated <span class="ot">&lt;-</span> zonal_sums_all <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(habitat_extent_mangrove_updated, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year, </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;/data/habitat_extent_mangrove_updated.csv&quot;</span>)), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>habitat_extent_mangrove_updated <span class="ot">&lt;-</span> zonal_sums_all <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(habitat_extent_mangrove_updated, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;/data/habitat_extent_mangrove_updated.csv&quot;</span>)), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>Compare total areas with paper</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>habitat_extent_mangrove_updated <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year, </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;/data/habitat_extent_mangrove_updated.csv&quot;</span>)))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># paste in data table from paper with datapasta</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>paper_extents <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>year, <span class="sc">~</span>km2_paper,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1996</span>, <span class="dv">152604</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2007</span>, <span class="dv">149973</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2008</span>, <span class="dv">148645</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2009</span>, <span class="dv">148453</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2010</span>, <span class="dv">148020</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2015</span>, <span class="dv">147345</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2016</span>, <span class="dv">147070</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2017</span>, <span class="dv">147260</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2018</span>, <span class="dv">147554</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2019</span>, <span class="dv">147605</span>,</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2020</span>, <span class="dv">147359</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>compare_extents <span class="ot">&lt;-</span> habitat_extent_mangrove_updated <span class="sc">%&gt;%</span> </span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">km2 =</span> <span class="fu">sum</span>(km2)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(paper_extents) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> km2 <span class="sc">-</span> km2_paper) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_diff =</span> <span class="fu">abs</span>(diff) <span class="sc">/</span> km2 <span class="sc">*</span> <span class="dv">100</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>habitat_extent_mangrove_updated <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;/data/habitat_extent_mangrove_updated.csv&quot;</span>)))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># paste in data table from paper with datapasta</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>paper_extents <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>year, <span class="sc">~</span>km2_paper,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1996</span>, <span class="dv">152604</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2007</span>, <span class="dv">149973</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2008</span>, <span class="dv">148645</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2009</span>, <span class="dv">148453</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2010</span>, <span class="dv">148020</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2015</span>, <span class="dv">147345</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2016</span>, <span class="dv">147070</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2017</span>, <span class="dv">147260</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2018</span>, <span class="dv">147554</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2019</span>, <span class="dv">147605</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2020</span>, <span class="dv">147359</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>compare_extents <span class="ot">&lt;-</span> habitat_extent_mangrove_updated <span class="sc">%&gt;%</span> </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">km2 =</span> <span class="fu">sum</span>(km2)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(paper_extents) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> km2 <span class="sc">-</span> km2_paper) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_diff =</span> <span class="fu">abs</span>(diff) <span class="sc">/</span> km2 <span class="sc">*</span> <span class="dv">100</span>)</span></code></pre></div>
 <p><strong>These differences look reasonable</strong></p>
 <p>Compare a few country values with those in the paper</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>indonesia <span class="ot">&lt;-</span> habitat_extent_mangrove_updated <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">216</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>brazil <span class="ot">&lt;-</span> habitat_extent_mangrove_updated <span class="sc">%&gt;%</span> </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">171</span>)</span></code></pre></div>
-<p>Indonesia 1996 (workflow): 31,545.31 Indonesia 1996 (paper):
-31,273.02</p>
-<p>Indonesia 2020 (workflow): 29,263.51 Indonesia 2020 (paper):
-29,533.98</p>
-<p>Brazil 1996 (workflow): 11,580.18 Brazil 1996 (paper): 11,474.56</p>
-<p>Brazil 2020 (workflow): 11,497.22 Brazil 2020 (paper): 11,414.71</p>
-<p><strong>Everything looks good</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>indonesia <span class="ot">&lt;-</span> habitat_extent_mangrove_updated <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">216</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>brazil <span class="ot">&lt;-</span> habitat_extent_mangrove_updated <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">171</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Country</th>
+<th align="center">Year</th>
+<th align="center">Workflow</th>
+<th align="center">Paper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Indonesia</td>
+<td align="center">1996</td>
+<td align="center">31,545.31 km<sup>2</sup></td>
+<td align="center">31,273.02 km<sup>2</sup></td>
+</tr>
+<tr class="even">
+<td align="center">Indonesia</td>
+<td align="center">2020</td>
+<td align="center">29,263.51 km<sup>2</sup></td>
+<td align="center">29,263.51 km<sup>2</sup></td>
+</tr>
+<tr class="odd">
+<td align="center">Brazil</td>
+<td align="center">1996</td>
+<td align="center">11,580.18 km<sup>2</sup></td>
+<td align="center">11,474.56 km<sup>2</sup></td>
+</tr>
+<tr class="even">
+<td align="center">Brazil</td>
+<td align="center">2020</td>
+<td align="center">11,497.22 km<sup>2</sup></td>
+<td align="center">11,414.71 km<sup>2</sup></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Everything looks good here</strong></p>
 </div>
 </div>
 

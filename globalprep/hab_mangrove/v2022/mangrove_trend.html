@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 16 12:00:45 2022 by menzies" />
+<meta name="author" content="Compiled on Mon Aug 22 16:46:37 2022 by menzies" />
 
 
 <title>OHI 2022: Mangrove condition</title>
@@ -1671,7 +1671,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">OHI 2022: Mangrove condition</h1>
-<h4 class="author"><em>Compiled on Tue Aug 16 12:00:45 2022 by
+<h4 class="author"><em>Compiled on Mon Aug 22 16:46:37 2022 by
 menzies</em></h4>
 
 </div>
@@ -1679,16 +1679,18 @@ menzies</em></h4>
 
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>We used Global Mangrove Watch mangrove cover data to estimate the
+<p>We used Global Mangrove Watch mangrove extent data to estimate the
 proportional yearly change in mangrove area using a linear regression
-model of the most recent 12 years of data (2005, 2006, 2007, 2010, 2015,
-2016) (i.e., slope divided by data from the earliest year included in
-the regression model). This length of data is longer than we usually do,
-but we feel we get a better estimate using this period of time. The
-slope was then multiplied by five to get the predicted change in 5
-years. The original mangrove data are provided yearly (1996, 2005, 2006,
-2007, 2010, 2015, 2016) within polygons (subsequently rasterized to
-match our regions and extract the area).</p>
+model of years from 2007 up to the year in question. This length of data
+is longer than we usually do (typically 5 years), but we feel we get a
+better estimate using this period of time. Proportional yearly change is
+determined by first dividing yearly extents by the extent from the
+earliest year in the model. Year is then regressed on those proportions,
+and the resulting slope is multiplied by 5 to get the predicted change
+in five years. The original mangrove extent data are provided yearly
+(2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020) in the form
+of polygons - these are subsequently rasterized to match our regions and
+extract the area.</p>
 <div id="updates-from-previous-assessment" class="section level2">
 <h2>Updates from previous assessment</h2>
 <p>2022: Using updated dataset from Global Mangrove Watch.</p>
@@ -1725,86 +1727,96 @@ Annual maps are planned from 2018 and onwards”</p>
 <h1>Methods</h1>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>mangrove_extent <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_extent_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>, year <span class="sc">&gt;=</span> <span class="dv">2007</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ohicore)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;workflow/R/common.R&quot;</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="st">&quot;2022&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dir_hab_mangrove <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/hab_mangrove/v&quot;</span>, version_year))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dir_fao_mangrove <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/_raw_data/FAO_mangrove&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">region_data</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mangrove_extent <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_extent_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>, year <span class="sc">&gt;=</span> <span class="dv">2007</span>)</span></code></pre></div>
 </div>
 <div id="take-an-initial-look-at-trend-data-and-compare-to-old-data" class="section level2">
 <h2>Take an initial look at trend data and compare to old data</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## look at Benin since it had a large increase mangrove cover between 2010 and 2015 and is an outlier </span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>benin <span class="ot">&lt;-</span> mangrove_extent <span class="sc">%&gt;%</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">99</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## ↓ comments from v2021 ↓</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># This accounts for 0.02 km2 of reforestation in Benin: https://www.globalnature.org/en/manatees-mangroves-benin</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># This accounts for 0.3 km2 of reforestation in Benin: https://initiative-mangroves-ffem.com/en/costa-rica-benin-project/</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This indicates that mangrove cover in Benin has been steadily decreasing: https://link.springer.com/article/10.1007%2Fs10668-017-0075-x</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># I dont trust the benin estimates... it seems that there is a lack of information there. And looking at our FAO mangrove health data, the numbers don&#39;t match up either. I will just assign Benin a 0 trend. </span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="do">## --</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># v2022: the extents for Benin from the latest update (2017 - 2020) appear more reasonable - this assessment we will calculate trend for Benin based on 2016 through 2020</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># our datasets formerly reported Dominica having 0 extent, but the analysis of the polygons from the latest update now show a small extent. The paper associated with the GMW data (https://zenodo.org/record/6894273) shows Dominica having a consistent small extent (0.01 km2) for all years. Dominica&#39;s trend will be based on years after it&#39;s extent became non-zero.</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Bonaire has a suspicious jump in extent in 2018 that will be removed - this issue was identified later in the workflow after initially calculating trends and finding Bonaire had a relatively large positive trend</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>mangrove_extent_rgns <span class="ot">&lt;-</span>  mangrove_extent <span class="sc">%&gt;%</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez) <span class="sc">%&gt;%</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, year, habitat, km2) <span class="sc">%&gt;%</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">99</span> <span class="sc">|</span> (rgn_id <span class="sc">==</span> <span class="dv">99</span> <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">2017</span>)) <span class="sc">%&gt;%</span> <span class="co"># crop Benin year range</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">123</span> <span class="sc">|</span> (rgn_id <span class="sc">==</span> <span class="dv">123</span> <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">2019</span>)) <span class="sc">%&gt;%</span>  <span class="co"># crop Dominica year range</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">245</span> <span class="sc">|</span> (rgn_id <span class="sc">==</span> <span class="dv">245</span> <span class="sc">&amp;</span> year <span class="sc">!=</span> <span class="dv">2018</span>)) <span class="sc">%&gt;%</span>  <span class="co"># remove 2018 for Bonaire</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_area =</span> <span class="fu">sum</span>(km2),</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">km2_rel =</span> km2 <span class="sc">/</span> km2[year <span class="sc">==</span> <span class="fu">min</span>(year)]) <span class="sc">%&gt;%</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">km2_rel =</span> <span class="fu">ifelse</span>(total_area <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">0</span>, km2_rel))</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># function to create linear regression and tidy the output - to be used in pipe sequence below</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>trend_function <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(km2_rel <span class="sc">~</span> year, <span class="at">data =</span> df) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>mangrove_extent_trends <span class="ot">&lt;-</span> mangrove_extent_rgns <span class="sc">%&gt;%</span> </span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span> <span class="co"># create nested df based on groupings</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model =</span> purrr<span class="sc">::</span><span class="fu">map</span>(data, trend_function)) <span class="sc">%&gt;%</span> <span class="co"># perform linear regression on each region</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(model)) <span class="sc">%&gt;%</span> <span class="co"># unnest contents of model column</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">&quot;year&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trend =</span> estimate <span class="sc">*</span> <span class="dv">5</span> <span class="sc">%&gt;%</span> </span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>           <span class="fu">round</span>(<span class="dv">6</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, trend) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## look at Benin since it had a large increase mangrove cover between 2010 and 2015 and is an outlier </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>benin <span class="ot">&lt;-</span> mangrove_extent <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">99</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">## ↓ comments from v2021 ↓</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># This accounts for 0.02 km2 of reforestation in Benin: https://www.globalnature.org/en/manatees-mangroves-benin</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># This accounts for 0.3 km2 of reforestation in Benin: https://initiative-mangroves-ffem.com/en/costa-rica-benin-project/</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This indicates that mangrove cover in Benin has been steadily decreasing: https://link.springer.com/article/10.1007%2Fs10668-017-0075-x</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># I dont trust the benin estimates... it seems that there is a lack of information there. And looking at our FAO mangrove health data, the numbers don&#39;t match up either. I will just assign Benin a 0 trend. </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="do">## --</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># v2022: the extents for Benin from the latest update (2017 - 2020) appear more reasonable - this assessment we will calculate trend for Benin based on 2016 through 2020</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># our datasets formerly reported Dominica having 0 extent, but the analysis of the polygons from the latest update now show a small extent. The paper associated with the GMW data (https://zenodo.org/record/6894273) shows Dominica having a consistent small extent (0.01 km2) for all years. Dominica&#39;s trend will be based on years after it&#39;s extent became non-zero.</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Bonaire has a suspicious jump in extent in 2018 that will be removed - this issue was identified later in the workflow after initially calculating trends and finding Bonaire had a relatively large positive trend</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>mangrove_extent_rgns <span class="ot">&lt;-</span>  mangrove_extent <span class="sc">%&gt;%</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez) <span class="sc">%&gt;%</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, year, habitat, km2) <span class="sc">%&gt;%</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">99</span> <span class="sc">|</span> (rgn_id <span class="sc">==</span> <span class="dv">99</span> <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">2017</span>)) <span class="sc">%&gt;%</span> <span class="co"># crop Benin year range</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">123</span> <span class="sc">|</span> (rgn_id <span class="sc">==</span> <span class="dv">123</span> <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">2019</span>)) <span class="sc">%&gt;%</span>  <span class="co"># crop Dominica year range</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">245</span> <span class="sc">|</span> (rgn_id <span class="sc">==</span> <span class="dv">245</span> <span class="sc">&amp;</span> year <span class="sc">!=</span> <span class="dv">2018</span>)) <span class="sc">%&gt;%</span>  <span class="co"># remove 2018 for Bonaire</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_area =</span> <span class="fu">sum</span>(km2),</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">km2_rel =</span> km2 <span class="sc">/</span> km2[year <span class="sc">==</span> <span class="fu">min</span>(year)]) <span class="sc">%&gt;%</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">km2_rel =</span> <span class="fu">ifelse</span>(total_area <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">0</span>, km2_rel))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># function to create linear regression and tidy the output - to be used in pipe sequence below</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>trend_function <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(km2_rel <span class="sc">~</span> year, <span class="at">data =</span> df) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>mangrove_extent_trends <span class="ot">&lt;-</span> mangrove_extent_rgns <span class="sc">%&gt;%</span> </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span> <span class="co"># create nested df based on groupings</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model =</span> purrr<span class="sc">::</span><span class="fu">map</span>(data, trend_function)) <span class="sc">%&gt;%</span> <span class="co"># perform linear regression on each region</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(model)) <span class="sc">%&gt;%</span> <span class="co"># unnest contents of model column</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">&quot;year&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trend =</span> estimate <span class="sc">*</span> <span class="dv">5</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>           <span class="fu">round</span>(<span class="dv">6</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, trend) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
 </div>
 <div id="look-at-regions-with-most-positive-trends-and-make-sure-they-make-sense" class="section level2">
 <h2>Look at regions with most positive trends and make sure they make
 sense</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>growing_extents <span class="ot">&lt;-</span> mangrove_extent_trends <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> trend)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># investigate Bonaire</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>bonaire <span class="ot">&lt;-</span> mangrove_extent <span class="sc">%&gt;%</span> </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">245</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2018 looks suspicious - this increase isn&#39;t reflected in the GMW paper, and I can&#39;t find anything to support it elsewhere - this year is now removed above </span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>growing_extents <span class="ot">&lt;-</span> mangrove_extent_trends <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> trend)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># investigate Bonaire</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>bonaire <span class="ot">&lt;-</span> mangrove_extent <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">245</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2018 looks suspicious - this increase isn&#39;t reflected in the GMW paper, and I can&#39;t find anything to support it elsewhere - this year is now removed above </span></span></code></pre></div>
 </div>
 <div id="compare-with-trends-from-the-last-update" class="section level2">
 <h2>Compare with trends from the last update</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>version_year_dirs <span class="ot">&lt;-</span> <span class="fu">list.dirs</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove&quot;</span>), <span class="at">recursive =</span> <span class="cn">FALSE</span>, <span class="at">full.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prev_version_year <span class="ot">&lt;-</span> version_year_dirs[<span class="fu">length</span>(version_year_dirs) <span class="sc">-</span> <span class="dv">1</span>]</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>old_trends <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove&quot;</span>, prev_version_year, <span class="st">&quot;data/habitat_trend_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">old_trend =</span> trend)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>compare_trends <span class="ot">&lt;-</span> mangrove_extent_trends <span class="sc">%&gt;%</span> </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_trends, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare_trends<span class="sc">$</span>old_trend, compare_trends<span class="sc">$</span>trend)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># things look quite different, but this isn&#39;t surprising as GMW updated their methods and back-calculated extents / redefined polygons for past years</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>version_year_dirs <span class="ot">&lt;-</span> <span class="fu">list.dirs</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove&quot;</span>), <span class="at">recursive =</span> <span class="cn">FALSE</span>, <span class="at">full.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>prev_version_year <span class="ot">&lt;-</span> version_year_dirs[<span class="fu">length</span>(version_year_dirs) <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>old_trends <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_mangrove&quot;</span>, prev_version_year, <span class="st">&quot;data/habitat_trend_mangrove_updated.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">old_trend =</span> trend)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>compare_trends <span class="ot">&lt;-</span> mangrove_extent_trends <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_trends, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compare_trends<span class="sc">$</span>old_trend, compare_trends<span class="sc">$</span>trend)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># things look quite different, but this isn&#39;t surprising as GMW updated their methods and back-calculated extents / redefined polygons for past years</span></span></code></pre></div>
 </div>
 <div id="calculate-trends-for-all-scenario-years-and-write-final-layer" class="section level2">
 <h2>Calculate trends for all scenario years and write final layer</h2>
@@ -1862,43 +1874,43 @@ sense</h2>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create vector of assessment years we need trends for</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>assessment_years <span class="ot">&lt;-</span> <span class="fu">unique</span>(mangrove_extent<span class="sc">$</span>year[mangrove_extent<span class="sc">$</span>year <span class="sc">&gt;=</span> <span class="dv">2015</span>])</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># list to be populated with dfs created in loop below</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>extent_df_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># loop to filter extent df to just years that will be used in regression to find trend for the year in question, calculate trend, and add new df with trends to list</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(assessment_years)) {</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> mangrove_extent_rgns <span class="sc">%&gt;%</span> </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">&lt;=</span> assessment_years[i]) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nest</span>() <span class="sc">%&gt;%</span> <span class="co"># create nested df based on groupings</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> purrr<span class="sc">::</span><span class="fu">map</span>(data, trend_function)) <span class="sc">%&gt;%</span> <span class="co"># perform linear regression on each region</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(model)) <span class="sc">%&gt;%</span> <span class="co"># unnest contents of model column</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">&quot;year&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trend =</span> estimate <span class="sc">*</span> <span class="dv">5</span> <span class="sc">%&gt;%</span> </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>             <span class="fu">round</span>(<span class="dv">6</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, trend) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year =</span> assessment_years[i])</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  df_name <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;extent_trends_&quot;</span>, assessment_years[i])</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">assign</span>(df_name, df)</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  extent_df_list[[df_name]] <span class="ot">&lt;-</span> <span class="fu">get</span>(df_name)</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># bind dfs created in loop</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>habitat_trend_mangrove_updated <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(extent_df_list) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>rgn_name) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;mangrove&quot;</span>)</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(habitat_trend_mangrove_updated, <span class="fu">here</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_trend_mangrove_updated.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create vector of assessment years we need trends for</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>assessment_years <span class="ot">&lt;-</span> <span class="fu">unique</span>(mangrove_extent<span class="sc">$</span>year[mangrove_extent<span class="sc">$</span>year <span class="sc">&gt;=</span> <span class="dv">2015</span>])</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># list to be populated with dfs created in loop below</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>extent_df_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># loop to filter extent df to just years that will be used in regression to find trend for the year in question, calculate trend, and add new df with trends to list</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(assessment_years)) {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> mangrove_extent_rgns <span class="sc">%&gt;%</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">&lt;=</span> assessment_years[i]) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id, rgn_name) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nest</span>() <span class="sc">%&gt;%</span> <span class="co"># create nested df based on groupings</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> purrr<span class="sc">::</span><span class="fu">map</span>(data, trend_function)) <span class="sc">%&gt;%</span> <span class="co"># perform linear regression on each region</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(model)) <span class="sc">%&gt;%</span> <span class="co"># unnest contents of model column</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">&quot;year&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trend =</span> estimate <span class="sc">*</span> <span class="dv">5</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>             <span class="fu">round</span>(<span class="dv">6</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, trend) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year =</span> assessment_years[i])</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  df_name <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;extent_trends_&quot;</span>, assessment_years[i])</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">assign</span>(df_name, df)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  extent_df_list[[df_name]] <span class="ot">&lt;-</span> <span class="fu">get</span>(df_name)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co"># bind dfs created in loop</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>habitat_trend_mangrove_updated <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(extent_df_list) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>rgn_name) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;mangrove&quot;</span>)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(habitat_trend_mangrove_updated, <span class="fu">here</span>(dir_hab_mangrove, <span class="st">&quot;data/habitat_trend_mangrove_updated.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 </div>
 

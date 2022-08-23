@@ -31,7 +31,7 @@ Replaced deprecated functions (`replace_at()`, `spread()`, `gather()`)
     App release date: July 2021 
 FAO raw commodities quantity 1976_2019
 FAO raw commodities value 1976_2019
-FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commodities-production/en)
+[FAO metadata](http://www.fao.org/fishery/statistics/global-commodities-production/en)
 
 **Downloaded**: June, 23, 2022
 

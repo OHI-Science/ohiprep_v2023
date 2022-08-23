@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Mon Aug 22 11:19:54 2022 by molitor" />
+<meta name="author" content="Compiled on Tue Aug 23 09:36:08 2022 by molitor" />
 
 
 <title>OHI 2022 - Pressure: Ultraviolet Radiation</title>
@@ -1672,14 +1672,14 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2022 - Pressure: Ultraviolet
 Radiation</h1>
-<h4 class="author"><em>Compiled on Mon Aug 22 11:19:54 2022 by
+<h4 class="author"><em>Compiled on Tue Aug 23 09:36:08 2022 by
 molitor</em></h4>
 
 </div>
 
 
-<div id="summary" class="section level1">
-<h1>Summary</h1>
+<div id="summary" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Summary</h1>
 <p>The Ultraviolet Radiation pressure layer is generated from daily data
 on Local Noon Erythemal UV Irradiance (mW/m2) derived from satellite
 observations.</p>
@@ -1708,28 +1708,30 @@ reference anomalies (total over the reference period 2005-2009)<br />
 the reference point</li>
 </ol>
 </div>
-<div id="updates-from-previous-assessment" class="section level1">
-<h1>Updates from previous assessment</h1>
+<div id="updates-from-previous-assessment" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Updates from previous
+assessment</h1>
 <p>One additional year of data was added to mazu.</p>
 <hr />
 </div>
-<div id="data-source" class="section level1">
-<h1>Data Source</h1>
-<p><a href="https://disc.gsfc.nasa.gov/datasets/OMUVBd_V003/summary" class="uri">https://disc.gsfc.nasa.gov/datasets/OMUVBd_V003/summary</a>
-<a href="https://acdisc.gesdisc.eosdis.nasa.gov/data/Aura_OMI_Level3/OMUVBd.003/" class="uri">https://acdisc.gesdisc.eosdis.nasa.gov/data/Aura_OMI_Level3/OMUVBd.003/</a>
-<strong>Reference</strong>: The Ultraviolet Radiation pressures layer
-uses the <a href="http://disc.sci.gsfc.nasa.gov/Aura/data-holdings/OMI/omuvbd_v003.shtml">Aura
-OMI Global Surface UVB Data Product</a>.<br />
-<strong>Native Data Resolution</strong>: 1 degree<br />
-<strong>Values</strong>: Level-3 OMI Surface UV Irradiance and Erythemal
-Dose- OMUVBd<br />
-<strong>Time Range</strong>: Daily data from 2005 - 2021 (10/1/2004
-through 06/21/2022, but only full years of data are used)
-<strong>Format</strong>: NetCDF HDF5 (.he5.nc)
-<strong>Downloaded</strong>: June 21, 2022</p>
+<div id="data-source" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Data Source</h1>
+<p><strong>Data Summary</strong>: <a href="https://disc.gsfc.nasa.gov/datasets/OMUVBd_V003/summary" class="uri">https://disc.gsfc.nasa.gov/datasets/OMUVBd_V003/summary</a></p>
+<p><strong>Download Link</strong>: <a href="https://acdisc.gesdisc.eosdis.nasa.gov/data/Aura_OMI_Level3/OMUVBd.003/" class="uri">https://acdisc.gesdisc.eosdis.nasa.gov/data/Aura_OMI_Level3/OMUVBd.003/</a></p>
+<p><strong>Reference</strong>: The Ultraviolet Radiation pressures layer
+uses the <a href="https://disc.gsfc.nasa.gov/datasets?page=1&amp;source=AURA%20OMI">Aura
+OMI Global Surface UVB Data Product</a>.</p>
+<p><strong>Native Data Resolution</strong>: 1 degree</p>
+<p><strong>Values</strong>: Level-3 OMI Surface UV Irradiance and
+Erythemal Dose- OMUVBd</p>
+<p><strong>Time Range</strong>: Daily data from 2005 - 2021 (10/1/2004
+through 06/21/2022, but only full years of data are used)</p>
+<p><strong>Format</strong>: NetCDF HDF5 (.he5.nc)</p>
+<p><strong>Downloaded</strong>: June 21, 2022</p>
 </div>
-<div id="data-citation-information" class="section level1">
-<h1>Data citation information</h1>
+<div id="data-citation-information" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Data citation
+information</h1>
 <p>Jari Hovila, Antii Arola, and Johanna Tamminen (2013), OMI/Aura
 Surface UVB Irradiance and Erythemal Dose Daily L3 Global Gridded 1.0
 degree x 1.0 degree V3, NASA Goddard Space Flight Center, Goddard Earth
@@ -1737,10 +1739,10 @@ Sciences Data and Information Services Center (GES DISC), Accessed: June
 21, 2022, 10.5067/Aura/OMI/DATA3009</p>
 <hr />
 </div>
-<div id="methods" class="section level1">
-<h1>Methods</h1>
-<div id="setup" class="section level2">
-<h2>Setup</h2>
+<div id="methods" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Methods</h1>
+<div id="setup" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Setup</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>current_yr <span class="ot">&lt;-</span> <span class="dv">2022</span>  <span class="do">############## UPDATE ME</span></span>
@@ -1806,8 +1808,9 @@ Sciences Data and Information Services Center (GES DISC), Accessed: June
 <span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="do">## define colors in spectral format for plotting rasters -- rainbow color scheme  </span></span>
 <span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">colorRampPalette</span>(<span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Spectral&quot;</span>))(<span class="dv">255</span>))</span></code></pre></div>
 </div>
-<div id="downloading-the-netcdf-.he5.nc-files" class="section level2">
-<h2>Downloading the NetCDF (.he5.nc) Files</h2>
+<div id="downloading-the-netcdf-.he5.nc-files" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Downloading the
+NetCDF (.he5.nc) Files</h2>
 <p>Data files can be found in the <a href="https://disc.gsfc.nasa.gov/datasets/OMUVBd_003/summary">GES DISC
 EARTHDATA Data Archive</a>.</p>
 <p><strong>Steps:</strong></p>
@@ -1928,8 +1931,9 @@ files</p>
 <span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="co"># v2021: all look good </span></span>
 <span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 </div>
-<div id="create-rasters-from-netcdf-files" class="section level2">
-<h2>Create rasters from NetCDF files</h2>
+<div id="create-rasters-from-netcdf-files" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Create rasters from
+NetCDF files</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## list and check missing dates in NetCDF data files</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## list all files from raw data folder</span></span>
@@ -1956,8 +1960,9 @@ files</p>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">#filter(ndays &lt; 28)</span></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="do">## For some reason June 2016 is missing 14 days (June 1-14, 2016).. I checked the website and those files don&#39;t exist. It is just a gap in the data. The rest seem ok. - v2021</span></span></code></pre></div>
-<div id="caluculate-weekly-means-and-standard-deviations" class="section level3">
-<h3>Caluculate Weekly Means and Standard Deviations</h3>
+<div id="caluculate-weekly-means-and-standard-deviations" class="section level3" number="5.3.1">
+<h3><span class="header-section-number">5.3.1</span> Caluculate Weekly
+Means and Standard Deviations</h3>
 <p>Calculate weekly means and standard deviations across all years:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">## for every week in each year of the time series, calculate weekly mean and standard deviation</span></span>
@@ -2054,8 +2059,9 @@ files</p>
 <span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 </div>
 </div>
-<div id="compare-to-climatology" class="section level2">
-<h2>Compare to Climatology</h2>
+<div id="compare-to-climatology" class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Compare to
+Climatology</h2>
 <p>Compare each week in each year to the climatology for that week. The
 climatology is equal to the mean plus one standard deviation.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## loop to calculate annual positive anomalies</span></span>
@@ -2076,8 +2082,9 @@ climatology is equal to the mean plus one standard deviation.</p>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">overwrite =</span> <span class="cn">TRUE</span>) <span class="do">## each assessment get new year of data, another layer in this calculation...</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
-<div id="calculate-differences" class="section level2">
-<h2>Calculate Differences</h2>
+<div id="calculate-differences" class="section level2" number="5.5">
+<h2><span class="header-section-number">5.5</span> Calculate
+Differences</h2>
 <p>Calculate the difference in total number of anomalies over a 5 year
 period compared to the first 5 years (2005-2009)</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;annual_anomalies_diff&quot;</span>), </span>
@@ -2107,8 +2114,8 @@ period compared to the first 5 years (2005-2009)</p>
 <span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
-<div id="rescale" class="section level2">
-<h2>Rescale</h2>
+<div id="rescale" class="section level2" number="5.6">
+<h2><span class="header-section-number">5.6</span> Rescale</h2>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ref_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(int_sp_data, <span class="st">&quot;annual_anomalies_diff&quot;</span>), </span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;diff&quot;</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2175,13 +2182,14 @@ period compared to the first 5 years (2005-2009)</p>
 <hr />
 </div>
 </div>
-<div id="results" class="section level1">
-<h1>Results</h1>
+<div id="results" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Results</h1>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mol1km_masked <span class="ot">&lt;-</span> <span class="fu">list.files</span>(out_dir, <span class="at">pattern =</span> <span class="st">&quot;uv_.*_mol_1km.tif&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">raster</span>(mol1km_masked[<span class="fu">length</span>(mol1km_masked)])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> cols, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">&quot;UV Pressure Layer</span><span class="sc">\n</span><span class="st">OHI&quot;</span>, current_yr))</span></code></pre></div>
-<div id="extract-data-for-each-region" class="section level2">
-<h2>Extract Data for Each Region</h2>
+<div id="extract-data-for-each-region" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Extract Data for Each
+Region</h2>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## load raster/zonal data</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>zones <span class="ot">&lt;-</span> <span class="fu">raster</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/v2017/regions_eez_with_fao_ant.tif&quot;</span>))</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>rgn_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;~/ohi-global/eez/spatial/regions_list.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -2237,8 +2245,8 @@ period compared to the first 5 years (2005-2009)</p>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, pressure_score)</span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(uv_data, <span class="st">&quot;output/uv.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
-<div id="data-check" class="section level2">
-<h2>Data Check</h2>
+<div id="data-check" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Data Check</h2>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## This top part was added in 2022 to help with data checks to be able to keep track of the </span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="do">## data year and which version year the plot is being generated from See conversation in </span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="do">## https://github.com/OHI-Science/globalfellows-issues/issues/210 to understand why... maybe.</span></span>

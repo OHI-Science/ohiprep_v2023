@@ -29,7 +29,7 @@ No changes to methods from previous assessment. We now download the data from a 
 # Data Source 
 
 **Reference**:      
-Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. 1996, updated yearly. Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1. [Indicate subset used]. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. doi: https://doi.org/10.5067/8GQ8LZQVL0VL. 
+Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally. (1996). Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data, Version 1 [Data Set]. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. https://doi.org/10.5067/8GQ8LZQVL0VL. Date Accessed 08-22-2022.
 
 **Downloaded**: 2022 June 6
 
@@ -126,6 +126,7 @@ The final folder structure looks like this, where you have created new "north", 
 ![](https://user-images.githubusercontent.com/33332753/62662807-1c88c080-b92a-11e9-9f4f-08944efba63d.png)
 
 ![](https://user-images.githubusercontent.com/33332753/62719994-f4e33800-b9bd-11e9-9ae0-f5db00cbc54d.png)
+
 __Option 3 - Download through R (new and incomplete)__
 
 This option is not complete and will need some work but amy be the best option moving forward. See [the NOAA tutorial](https://coastwatch.pfeg.noaa.gov/projects/r/Projected.html#download-the-sea-ice-concentration-data) for downloading directly with R through the PolarWatch ERDDAP server. 

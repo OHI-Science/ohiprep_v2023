@@ -39,17 +39,12 @@ where:
 
 # Updates from previous assessment
 
-2022
+v2022
 Using updated June 2022 data
 Switched `raster` functions over to their `terra` equivalents.
 
-2021
+v2021
 Using updated February 2021 data 
-
-2020
-Using updated April 2020 data
-Made a slight change to the calc_area function by moving the `ungroup()` step one step earlier, to avoid error
-Got rid of ggplotly funtion, simply called the comparison graph
 
 
 ***

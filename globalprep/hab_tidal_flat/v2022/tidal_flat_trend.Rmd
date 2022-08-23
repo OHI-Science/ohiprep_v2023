@@ -4,6 +4,8 @@ author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
     toc: true
+    toc_depth: 1
+    toc_float: yes
     number_sections: true
     theme: cerulean
     highlight: haddock
@@ -17,12 +19,16 @@ output:
 
 This script generates the tidal flat trend for each OHI region. 
 
-
 # Updates from previous assessment
 
 2022 - Completely new!
 
+## Future improvements
+
+This layer was troublesome due to the large differences in the first time step and the last, as well as large variation in extent values within certain countries. We opted to go with a regional average from 2001 to 2013 to calculate trend, and applied these values to all regions. This helped smooth out the large variation in the data, but it may be best to rethink this calculation.  
+
 ***
+
 # Data Source 
 
 **Reference**: Murray, N.J., Phinn, S.R., DeWitt, M., Ferrari, R., Johnston, R., Lyons, M.B., Clinton, N., Thau, D. & Fuller, R.A. (2019) The global distribution and trajectory of tidal flats. Nature, 565, 222-225.
@@ -121,16 +127,6 @@ tf_ext_2001 <- tidal_flat_extent %>%
 
 Use a nested dataframe and `purrr::map` to model the trend for the most recent 5 time steps. Then we unnest the model and apply it to project 5 years past the last time step. 
 
-
-try filtering out small areas 
-
-try cutting highly variable
-
-try increasing time steps
-
-try regional data
-
-
 First do the trend for 2013.
 
 ```{r eval = FALSE}
@@ -148,7 +144,6 @@ tidal_flat_trend_2013 <- tidal_flat_extent %>%
   dplyr::filter(term == "year") %>% 
   dplyr::left_join(tf_ext_2001) %>% 
   dplyr::mutate(trend = (estimate / km2) * 5, year = 2013) %>% 
-  # tidyr::replace_na(list(trend = 0)) %>% 
   dplyr::select(r2_label, data, year, habitat, trend) %>% 
   tidyr::unnest() %>% 
   dplyr::ungroup() %>% 
