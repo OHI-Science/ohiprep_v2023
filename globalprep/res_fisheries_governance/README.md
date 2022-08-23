@@ -1,8 +1,6 @@
-## Ocean Health Index: Softbottom habitat data for the habitat subgoal
+## Ocean Health Index: Fisheries Governance Resilience Layer
 
-This folder includes the extent, health, and trend data for soft-bottom habitat.
-
-More information about the habitat subgoal (biodiversity goal) is available [here](https://oceanhealthindex.org/goals/biodiversity/habitats/).
+This folder includes the resilience layer for AO, FIS, HAB, ICO, NP, & SPP.
 
 The folders in this file include the metadata, R scripts, and data for each assessement year (i.e., the year the assessment was conducted).  The most current year represents the best available data and methods, and previous years are maintained for archival purposes.
 
