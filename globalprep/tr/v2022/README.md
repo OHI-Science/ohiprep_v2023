@@ -1,7 +1,7 @@
 ## Ocean Health Index: Tourism and Recreation
 
 
-Model details on dataprep [here](http://ohi-science.github.io/ohiprep_v2020/globalprep/tr/v2020/tr_data_prep.html).
+Model details on dataprep [here](http://ohi-science.github.io/ohiprep_v2022/globalprep/tr/v2022/tr_data_prep.html).
 
 More information about the Tourism and Recreation Goal [here](http://ohi-science.org/goals/#tourism-and-recreation)
 
