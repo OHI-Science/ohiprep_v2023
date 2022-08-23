@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Aug 18 14:48:18 2022 by jcohen" />
+<meta name="author" content="Compiled on Tue Aug 23 14:48:41 2022 by jcohen" />
 
 
 <title>OHI 2022 - Soft bottom pressure data prep</title>
@@ -1672,7 +1672,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2022 - Soft bottom pressure data
 prep</h1>
-<h4 class="author"><em>Compiled on Thu Aug 18 14:48:18 2022 by
+<h4 class="author"><em>Compiled on Tue Aug 23 14:48:41 2022 by
 jcohen</em></h4>
 
 </div>
@@ -1693,11 +1693,14 @@ standardized by area (km^2) soft-bottom habitat in each region.</p>
 <div id="updates-from-previous-assessment" class="section level1">
 <h1>Updates from previous assessment</h1>
 <p>New data source: <a href="https://github.com/GlobalFishingWatch/gfwr">Global Fishing Watch
-API</a> Processing this new data requires a completely different data
-prep. Some methods were based on the
-<code>OHI-Science/food_systems</code> approach <a href="https://github.com/OHI-Science/food_systems/tree/master/fisheries/marine/disturbance">here.</a>.
-Methods were upscaled appropriately and switched from
-<code>raster</code> to <code>terra</code>.</p>
+API</a><br />
+Processing this new data requires a completely different data prep. Some
+methods were based on the <code>OHI-Science/food_systems</code> approach
+<a href="https://github.com/OHI-Science/food_systems/tree/master/fisheries/marine/disturbance">here</a>.
+Methods were scaled up appropriately to apply to each OHI region and all
+years for which we have apparent fishing effort data. Additionally, we
+switched spatial analysis from <code>raster</code> to
+<code>terra</code>.</p>
 <hr />
 </div>
 <div id="data-sources" class="section level1">
@@ -1705,7 +1708,8 @@ Methods were upscaled appropriately and switched from
 <div id="global-fishing-watch-apparent-fishing-effort" class="section level2">
 <h2>Global Fishing Watch Apparent Fishing Effort</h2>
 <p><strong>Reference</strong>: 1. Global Fishing Watch. [2022].
-www.globalfishingwatch.org 2. <a href="https://github.com/GlobalFishingWatch/gfwr"><code>gfwr</code>
+www.globalfishingwatch.org<br />
+2. <a href="https://github.com/GlobalFishingWatch/gfwr"><code>gfwr</code>
 API</a></p>
 <p><strong>Downloaded</strong>: July 21, 2022</p>
 <p><strong>Description</strong>: API to extract apparent fishing effort
@@ -1740,14 +1744,14 @@ and dredging geartypes</li>
 <li>Correct trawling data by subsetting for only bottom trawling using
 catch data from Watson &amp; Tidd (2018) and combine with dreding
 data</li>
-<li>Layer the fishing effort data with OHI regional polygons and
-standardize by soft-bottom habitat of each region calculate fishing
-effort for each OHI region <strong>(insert transformation approach here,
-like ln(x + 1) transformation if density data are extremely
-skewed)</strong></li>
-<li>Rescale the transformed data y dividing the maximum value across all
-years. <strong>also consider using a second rescaling using the median
-values across years</strong></li>
+<li>Layer the fishing effort data with OHI regional polygons for land
+and EEZ to extract only fishing effort within regions of interest</li>
+<li>Standardize by soft-bottom habitat of each region calculate fishing
+effort for each OHI region</li>
+<li>Transform data with log(x + 1) because density data are extremely
+skewed, then divide by the 95th quantile and cap values at 1</li>
+<li>Assign health and pressure labels to values</li>
+<li>Calculate trend</li>
 </ol>
 <p>This script provides pressure scores, health indicators, and trend
 values for soft-bottom habitats.</p>
@@ -2475,7 +2479,7 @@ data processing.</p>
 <div id="calculate-health-and-pressure-scores" class="section level2">
 <h2>Calculate health and pressure scores</h2>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check that all regions are present</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(health_pressure<span class="sc">$</span>rgn_id)) <span class="co"># 220</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(health_pressure<span class="sc">$</span>rgn_id))</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>health_pressure <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;soft_bottom&quot;</span>) <span class="sc">%&gt;%</span></span>

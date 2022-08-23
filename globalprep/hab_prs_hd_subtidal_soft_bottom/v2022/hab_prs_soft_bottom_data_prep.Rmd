@@ -24,8 +24,8 @@ This habitat pressure layer is created from apparent fishing effort data from Gl
 
 # Updates from previous assessment
 
-New data source: [Global Fishing Watch API](https://github.com/GlobalFishingWatch/gfwr)
-Processing this new data requires a completely different data prep. Some methods were based on the `OHI-Science/food_systems` approach [here.](https://github.com/OHI-Science/food_systems/tree/master/fisheries/marine/disturbance). Methods were upscaled appropriately and switched from `raster` to `terra`.
+New data source: [Global Fishing Watch API](https://github.com/GlobalFishingWatch/gfwr)\
+Processing this new data requires a completely different data prep. Some methods were based on the `OHI-Science/food_systems` approach [here](https://github.com/OHI-Science/food_systems/tree/master/fisheries/marine/disturbance). Methods were scaled up appropriately to apply to each OHI region and all years for which we have apparent fishing effort data. Additionally, we switched spatial analysis from `raster` to `terra`.
 
 ***
 
@@ -34,7 +34,7 @@ Processing this new data requires a completely different data prep. Some methods
 ## Global Fishing Watch Apparent Fishing Effort
 
 **Reference**:
-1. Global Fishing Watch. [2022]. www.globalfishingwatch.org
+1. Global Fishing Watch. [2022]. www.globalfishingwatch.org\
 2. [`gfwr` API](https://github.com/GlobalFishingWatch/gfwr)
 
 **Downloaded**: July 21, 2022
@@ -64,10 +64,14 @@ Processing this new data requires a completely different data prep. Some methods
 ***
   
 # Methods 
+
 1. Pull apparent fishing effort data for all EEZ regions for 2012-2020 from the GFW API, combine into one dataframe, and filter for trawling and dredging geartypes
 2. Correct trawling data by subsetting for only bottom trawling using catch data from Watson & Tidd (2018) and combine with dreding data
-3. Layer the fishing effort data with OHI regional polygons and standardize by soft-bottom habitat of each region calculate fishing effort for each OHI region **(insert transformation approach here, like ln(x + 1) transformation if density data are extremely skewed)**
-4. Rescale the transformed data y dividing the maximum value across all years. **also consider using a second rescaling using the median values across years**
+3. Layer the fishing effort data with OHI regional polygons for land and EEZ to extract only fishing effort within regions of interest
+4. Standardize by soft-bottom habitat of each region calculate fishing effort for each OHI region
+5. Transform data with log(x + 1) because density data are extremely skewed, then divide by the 95th quantile and cap values at 1
+6. Assign health and pressure labels to values
+7. Calculate trend
 
 This script provides pressure scores, health indicators, and trend values for soft-bottom habitats.  
 
@@ -796,7 +800,7 @@ length(unique(data_rescale_na$rgn_id)) # 0
 
 ```{r, eval=FALSE}
 # check that all regions are present
-length(unique(health_pressure$rgn_id)) # 220
+length(unique(health_pressure$rgn_id))
 
 health_pressure <- data_density %>%
   mutate(habitat = "soft_bottom") %>%

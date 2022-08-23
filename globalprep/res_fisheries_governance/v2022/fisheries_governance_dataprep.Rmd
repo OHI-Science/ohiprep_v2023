@@ -91,7 +91,7 @@ The data source used for this resilience layer was updated in 2022, which was th
 # Initial set-up code
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 
 ```{r, message=FALSE, warning=FALSE, results="hide"}

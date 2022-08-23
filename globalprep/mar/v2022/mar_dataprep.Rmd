@@ -221,12 +221,9 @@ mar_rgn <- mar_rgn %>%
 **Take a look at the tidied data for a single year and region**
 
 ```{r see-tidy-data, eval = FALSE}
-
 data.frame(filter(mar_rgn, rgn_id==130) %>%
   filter(year==2013) %>%
   arrange(species))
-
-
 ```
 
 # Gapfilling
@@ -299,7 +296,7 @@ maric <- mar_rgn_gf
 
 ```
 
-# Save file:
+# Save mariculture file
 
 Used to estimate total mariculture yield per country.
 
@@ -693,18 +690,10 @@ mar_sw_sus_final = mar_sw_sus %>%
   mutate(Sust = round(Sust/10, 2),
          esc_score = 1 - round(esc_score/10, 2))
 
-
 summary(mar_sw_sus_final)
 filter(mar_sw_sus_final, gapfill_sus == "georegion_family_avg")
 filter(mar_sw_sus_final, gapfill_sus == "family_avg")
 filter(mar_sw_sus_final, gapfill_sus == "taxon_group_avg")
-
-# 
-# test1 <- mar_sw_sus_final %>%
-#   filter(is.na(Sust)) %>%
-#   dplyr::select(rgn_id, species, year, taxa_group, family, Sust, avg_rgn_fam_sust, avg_gr_fam_sust, avg_fam_sust, avg_taxon_code_sust)
-
-# filter(mar_sw_sus_final, family == "Mollusca")
 
 ```
 
@@ -722,7 +711,6 @@ genEscapes <- tonnes_esc %>%
   group_by(rgn_id, year) %>%
   summarize(genEscapes = weighted.mean(esc_score, tonnes, na.rm=TRUE))
 ```
-
 
 Obtain gapfill information from `genEscapes`
 
@@ -1041,8 +1029,6 @@ mean_diff_sus <- ggplot(test, aes(x = rgn_id, y = mean_rgn_sus_diff)) +
 
 ggplotly(mean_diff_sus)
 ```
-
-
 
 ## Data check genetic escapes
 

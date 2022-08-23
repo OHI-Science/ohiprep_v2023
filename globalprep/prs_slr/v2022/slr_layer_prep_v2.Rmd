@@ -55,23 +55,19 @@ The source data are monthly mean sea level anomalies, in meters. These anomalies
 
 # Methods
 
-## Setup
+# Setup
 
-```{r setup, message = FALSE, warning = FALSE, eval=FALSE}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message = FALSE, warning = FALSE)
+```
 
-knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/',message = FALSE, warning = FALSE)
-
-# stack overflow that mentioned the first line works if install the dev version of terra package:
-# https://gis.stackexchange.com/questions/427923/preventing-terra-from-writing-auxiliary-files-when-writing-to-disc
-
-## load packages
+```{r, message = FALSE, warning = FALSE, eval=FALSE}
 library(httr)
 library(R.utils)
 library(raster)
 library(tidyverse)
 library(sf)
 library(RColorBrewer)
-library(ggplot2)
 library(googleVis)
 library(maps)
 library(parallel)
@@ -104,8 +100,7 @@ ocean <- terra::rast(file.path(dir_M, "git-annex/globalprep/spatial/v2017/ocean.
 plot(ocean)
 ```
 
-
-## Download the New Data
+# Download the New Data
 
 These chunks can be used to download the data from AVISO. You will need an AVISO account to do this, it might take a few days for the account to be active, or use the account of a prior fellow.
 
@@ -163,9 +158,9 @@ Unzip the files you've just downloaded, if the data is prior to 2020:
 ```
 2020 data is stored in the source as unzipped .nc files, so the above code chunk was not necessary. This is likely the case for all years (past and future) since the url data source was updated.
 
-## Data Prep
+# Data Prep
 
-### Clip data to coastal cells
+## Clip data to coastal cells
 
 All NetCDF files for each month are rasterized.
 
@@ -258,7 +253,8 @@ foreach(yr = c(1993:maxyr)) %dopar% {
 ```
 
 ## Changing the projection and masking
-Since we are only interested in the increase in sea level near the coasts, we apply a mask to the raster layers that removes all cells farther than 3nm offshore. This mask was created previously for the OHI global 2016 assessment.
+
+Since we are only interested in the increase in sea level near the coasts, we apply a mask to the raster layers that removes all cells farther than 3nm offshore. This mask was created previously for a former OHI global assessment.
 
 ```{r plot_mask, eval = FALSE}
 ## 3nm offshore raster to select only nearshore cells
@@ -279,7 +275,6 @@ if(file.exists(ocean_mask_prev)){
 s <- terra::rast(sprintf("%s/int/ocean_mask.tif", dir_prs_slr, scen_year))
 plot(s, col = "red")
 
-## reproject to mollweide
 annual_means <- list.files(file.path(dir_prs_slr, "int/msla_annual_mean"), full = TRUE)
 
 # tried to use foreach with terra: Error in x@ptr$nrow() : external pointer is not valid
@@ -367,13 +362,12 @@ ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "202
 
 ```     
 
-
 ## Rescale 
 
 Each annual raster is rescaled from 0 to 1 using the reference point. If a value is greater than the reference point, it is automatically given a value of 1.
 
 ```{r rescale, eval=FALSE}
-# foreach() & dopar did not work with terra
+# foreach() & dopar did not work well with terra in this context
 
 # first define functions outside of app()
 neg_vals <- function(x){ifelse(x < 0, 0, x)}
@@ -394,7 +388,6 @@ for(i in seq_along(coastal_rasts)) { # i = coastal_rasts[26]
   }
 }
 ```
-
 
 # Results
 
@@ -458,7 +451,6 @@ print(Motion, file = "slr.html")
 ```
 
 ```{r compare, eval=FALSE}
-
 new_data <- read.csv("output/slr.csv") %>%
   dplyr::select(rgn_id, year, new_pressure_score = pressure_score)
 
