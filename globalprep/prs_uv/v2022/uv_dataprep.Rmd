@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 1
     toc_float: yes
-    number_sections: false
+    number_sections: true
     theme: cerulean
     highlight: haddock
     includes: 
@@ -35,16 +35,23 @@ One additional year of data was added to mazu.
 
 ***
 
-# Data Source
-https://disc.gsfc.nasa.gov/datasets/OMUVBd_V003/summary
-https://acdisc.gesdisc.eosdis.nasa.gov/data/Aura_OMI_Level3/OMUVBd.003/
-**Reference**: The Ultraviolet Radiation pressures layer uses the [Aura OMI Global Surface UVB Data Product](http://disc.sci.gsfc.nasa.gov/Aura/data-holdings/OMI/omuvbd_v003.shtml).  
-**Native Data Resolution**: 1 degree  
-**Values**: Level-3 OMI Surface UV Irradiance and Erythemal Dose- OMUVBd  
-**Time Range**: Daily data from 2005 - 2021 (10/1/2004 through 06/21/2022, but only full years of data are used)
-**Format**: NetCDF HDF5 (.he5.nc)
-**Downloaded**: June 21, 2022
+# Data Source  
 
+**Data Summary**: https://disc.gsfc.nasa.gov/datasets/OMUVBd_V003/summary  
+
+**Download Link**: https://acdisc.gesdisc.eosdis.nasa.gov/data/Aura_OMI_Level3/OMUVBd.003/  
+
+**Reference**: The Ultraviolet Radiation pressures layer uses the [Aura OMI Global Surface UVB Data Product](https://disc.gsfc.nasa.gov/datasets?page=1&source=AURA%20OMI). 
+
+**Native Data Resolution**: 1 degree  
+
+**Values**: Level-3 OMI Surface UV Irradiance and Erythemal Dose- OMUVBd  
+
+**Time Range**: Daily data from 2005 - 2021 (10/1/2004 through 06/21/2022, but only full years of data are used)  
+
+**Format**: NetCDF HDF5 (.he5.nc)  
+
+**Downloaded**: June 21, 2022  
 
 # Data citation information  
 
