@@ -1,5 +1,5 @@
 ---
-title: 'OHI `r format(Sys.date(), "%Y")`: Sea Surface Temperature Pressure Layer'
+title: 'OHI `r format(Sys.Date(), "%Y")`: Sea Surface Temperature Pressure Layer'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -26,13 +26,13 @@ This script creates the Sea Surface Temperature (SST) layer for the 2022 global 
 
 # Updates from previous assessment
 
- For the 2022 assessment, data year will match 2021, so data year 2021 represents year 2020, and so on. 
+Used updated 2021 data from NOAA
 
 ***
 
 # Data Source
 
-Data comes from [CoRTAD version 6](https://www.ncei.noaa.gov/products/coral-reef-temperature-anomaly-database)
+Data come from NOAA's NCEI: [CoRTAD version 6](https://www.ncei.noaa.gov/products/coral-reef-temperature-anomaly-database)
 
 See `prs_sst/v2015/dataprep.R` for preparation of the "annual_pos_anomalies" data. 
 
@@ -71,7 +71,6 @@ library(ncdf4)
 library(httr)
 library(lubridate)
 library(animation)
-library(ggplot2)
 library(plotly)
 library(here)
 
