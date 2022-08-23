@@ -27,7 +27,7 @@ This script downloads WGI data and prepares it for a pressures (1 - WGI) and res
 
 No methods updates; additional year of data added.  
 
-Consider this improvement for future assessments: Explore a better way to gapfill... based on a linear model (~line 166)
+Potential improvement for future assessments: Explore a better way to gapfill... based on a linear model (~line 166)
 
 ***
 
