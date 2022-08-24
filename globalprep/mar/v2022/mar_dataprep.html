@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 23 14:23:01 2022 by jcohen" />
+<meta name="author" content="Compiled on Wed Aug 24 09:41:53 2022 by jcohen" />
 
 
 <title>OHI 2022: Mariculture</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2022: Mariculture</h1>
-<h4 class="author"><em>Compiled on Tue Aug 23 14:23:01 2022 by
+<h4 class="author"><em>Compiled on Wed Aug 24 09:41:53 2022 by
 jcohen</em></h4>
 
 </div>
@@ -1104,16 +1104,21 @@ currently out there, and should be given a score of 100.</p>
 <p>Obtain a sustainability and escapes score for each record, and a
 book-keeping column of whether it’s actual or gapfilled</p>
 <p>For missing sustainability and escapes scores:</p>
-<p>Steps: 1. Group by country and family and summarise to get mean
-sustainability and escapes values (gapfilled by country/family) 2. Group
-by georegion and family and summarise to get mean sustainability and
-escapes values (gapfilled by georegion/family) 3. Group by family to get
-mean sustainability and escapes values (global family gapfilled) 4.
-Gapfill by average of the taxon_code to get mean sustainability and
-escapes values (taxon_group gapfilled) 5. Assign any Algae with the
-seaweeds score from SFW data (6.72 for sustainability, 4 for escapes) 6.
-Apply the global average to any remaining sustainability and escapes
-score NAs</p>
+<p>Steps:</p>
+<ol style="list-style-type: decimal">
+<li>Group by country and family and summarise to get mean sustainability
+and escapes values (gapfilled by country/family)</li>
+<li>Group by georegion and family and summarise to get mean
+sustainability and escapes values (gapfilled by georegion/family)</li>
+<li>Group by family to get mean sustainability and escapes values
+(global family gapfilled)</li>
+<li>Gapfill by average of the taxon_code to get mean sustainability and
+escapes values (taxon_group gapfilled)</li>
+<li>Assign any Algae with the seaweeds score from SFW data (6.72 for
+sustainability, 4 for escapes)</li>
+<li>Apply the global average to any remaining sustainability and escapes
+score NAs</li>
+</ol>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define gapfilling scores for global seaweed and escapes (a subcomponent of the global seaweed score) found in pdf here (updated occasionally): https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>seaweed_gf_score <span class="ot">&lt;-</span> <span class="fl">6.72</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>escapes_gf_score <span class="ot">&lt;-</span> <span class="dv">4</span> </span>
