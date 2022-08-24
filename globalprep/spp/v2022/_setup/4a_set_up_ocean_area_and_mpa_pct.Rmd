@@ -92,7 +92,7 @@ sf::sf_use_s2(FALSE)
 
 ### Create a 10 km^2 Gall Peters projection cell ID raster
 
- - Note: Just copy this over from last years 
+ - Note: Just copy this over from last years, it doesn't change. 
  
 ``` {r rasterize natural earth ocean polygons to Gall-Peters}
 
@@ -331,7 +331,7 @@ if(!file.exists(wdpa_prot_yr_file)) {
                                         field  = 'STATUS_YR', 
                                         fun    = 'min')
            
-           writeRaster(wdpa_all_rast_500m, wdpa_prot_yr_file_int)
+       #    writeRaster(wdpa_all_rast_500m, wdpa_prot_yr_file_int)
   
   rm(wdpa_no_take_vect)
   
@@ -339,12 +339,12 @@ if(!file.exists(wdpa_prot_yr_file)) {
   
     ### in case of floating point not-quite-zeros...
   
-  # wdpa_all_rast_500m <- rast(wdpa_prot_yr_file_int)
+  wdpa_all_rast_500m <- rast(wdpa_prot_yr_file_int)
   
    terra::mask(wdpa_all_rast_500m, rast_ocean_500m, filename = wdpa_prot_yr_file)
-  
- #    test <- wdpa_all_rast_500m*rast_ocean_500m
    
+   
+   # wdpa_yr_rast_500m <- rast(wdpa_prot_yr_file)
     #plot(wdpa_yr_rast_500m)
   #plot(raster(file.path(dir_raw_data_anx, 'wdpa_mpa/d2020/wdpa_mar_by_prot_yr_Apr2020_500m.tif')))
   
@@ -363,22 +363,21 @@ We can't simply aggregate upwards here, since we need to keep track of different
 
 ``` {r crosstab mpa areas}
 
-wdpa_marine_rast_500m <- raster(wdpa_marine_file)
-rast_cell_id    <- raster(cell_id_file)    ### cell IDs at 10 km^2
-rast_ocean_500m <- raster(ocean_500m_file)  ### ocean presence at 1 km^2
-rast_ocean_area <- raster(ocean_area_file) ### ocean proportional area at 10 km^2
+wdpa_marine_rast_500m <- rast(wdpa_marine_file)
+rast_cell_id    <- rast(cell_id_file)    ### cell IDs at 10 km^2
+rast_ocean_500m <- rast(ocean_500m_file)  ### ocean presence at 1 km^2
+rast_ocean_area <- rast(ocean_area_file) ### ocean proportional area at 10 km^2
 
 cell_id_500m_file <- file.path(dir_goal_anx, 'spatial/cell_id_500m.tif')
 
 ### Need a 500 m raster of cell IDs for crosstabbing...
 if(!file.exists(cell_id_500m_file)) {
-  rast_cell_id_500m <- resample(rast_cell_id, rast_ocean_500m,
-                             progress = 'text',
+  rast_cell_id_500m <- terra::resample(x = rast_cell_id, y = rast_ocean_500m,
                              filename = cell_id_500m_file,
-                             method = 'ngb',
+                             method = 'near',
                              overwrite = TRUE)
 } else {
-  rast_cell_id_500m <- raster(cell_id_500m_file)
+  rast_cell_id_500m <- rast(cell_id_500m_file)
 }
 #plot(rast_cell_id_500m)
 #plot(raster(file.path("/home/shares/ohi/git-annex/globalprep/spp/v2020/spp_risk_dists/spatial/cell_id_500m.tif")))
@@ -391,21 +390,26 @@ if(!file.exists(wdpa_cell_area_file)) {
   n_chunks <- 60
   
   crosstab_chunk <- function(rast1, rast2, chunk, n_chunks) {
-    ### chunk <- 1
-    ### rast1 = wdpa_marine_rast_500m
-    ### rast2 = rast_cell_id_500m
+    ## chunk <- 2
+    # rast1 = wdpa_marine_rast_500m
+    # rast2 = rast_cell_id_500m
+    
+    rast1 <- raster(rast1)
+    rast2 <- raster(rast2)
     
     chunk_size <- ceiling(ncol(rast1) / n_chunks)
     left_bound <- (chunk - 1) * chunk_size + 1
     right_bound <- min(left_bound + chunk_size - 1, ncol(rast1))
     
-    chunk_ext <- extent(rast1, 1, nrow(rast1), left_bound, right_bound)
+   # chunk_ext <- terra::ext(xFromCol(rast1, left_bound), xFromCol(rast1, right_bound), yFromRow(rast1, nrow(rast1)), yFromRow(rast1, 1))
+      
+  chunk_ext <- extent(rast1, 1, nrow(rast1), left_bound, right_bound)
+  
     message('Processing ', chunk, ': ', paste0(as.character(round(chunk_ext)), collapse = ', '))
-    wdpa_chunk    <- crop(rast1, chunk_ext)
-    cell_id_chunk <- crop(rast2, chunk_ext)
+    wdpa_chunk    <- raster::crop(rast1, chunk_ext)
+    cell_id_chunk <- raster::crop(rast2, chunk_ext)
     
-    wdpa_cells <- crosstab(wdpa_chunk, cell_id_chunk, 
-                           progress = 'text',
+    wdpa_cells <- raster::crosstab(wdpa_chunk, cell_id_chunk, 
                            long = TRUE) %>%
       setNames(c('wdpa_category', 'cell_id', 'n_prot')) %>%
       mutate(wdpa_category = as.integer(as.character(wdpa_category)),
@@ -425,23 +429,15 @@ if(!file.exists(wdpa_cell_area_file)) {
                                        chunk = x, n_chunks))
 #     user   system  elapsed 
 # 5335.773  588.892  550.586  - about ten minutes! 
+    
   })
   
-  # ## splitting it by 10s... see if this will work if doing all the chunks at once wont... 
-  # wdpa_cells_list_1_10 <- wdpa_cells_list
-  # wdpa_cells_list_11_20 <- wdpa_cells_list
-  # wdpa_cells_list_21_30 <- wdpa_cells_list
-  # wdpa_cells_list_31_40 <- wdpa_cells_list
-  # wdpa_cells_list_41_50 <- wdpa_cells_list
-  # wdpa_cells_list_51_60 <- wdpa_cells_list
-  # 
-  # 
-  # wdpa_cells_df <- bind_rows(wdpa_cells_list_1_10, wdpa_cells_list_11_20, wdpa_cells_list_21_30, wdpa_cells_list_31_40, wdpa_cells_list_41_50, wdpa_cells_list_51_60)
   
   wdpa_cells_df <- bind_rows(wdpa_cells_list)
   
   area_df <- data.frame(cell_id  = values(rast_cell_id),
-                        area_km2 = values(rast_ocean_area))
+                        area_km2 = values(rast_ocean_area)) %>%
+    rename(cell_id = 1, area_km2 = 2)
   
   wdpa_area_df <- wdpa_cells_df %>%
     full_join(area_df, by = 'cell_id') %>%
@@ -455,6 +451,9 @@ if(!file.exists(wdpa_cell_area_file)) {
     ungroup()
   
   # old <- read_csv(file.path(here(), "globalprep/spp/v2021/_spatial/wdpa_mpa_area.csv"))
+  
+  sum(old$prot_area_km2) # 26841457
+  sum(wdpa_area_df$prot_area_km2) # 24690672 
   
   write_csv(wdpa_area_df, wdpa_cell_area_file)
   
@@ -515,20 +514,11 @@ if(!file.exists(wdpa_cell_year_file)) {
 # 5401.628  619.072  562.306 - about 10 mins
   })
   
-## split it into 10s if the full chunk doesnt work... 
-  # wdpa_cells_list_1_10 <- wdpa_cells_list
-  # wdpa_cells_list_11_20 <- wdpa_cells_list
-  # wdpa_cells_list_21_30 <- wdpa_cells_list
-  # wdpa_cells_list_31_40 <- wdpa_cells_list
-  # wdpa_cells_list_41_50 <- wdpa_cells_list
-  # wdpa_cells_list_51_60 <- wdpa_cells_list
-  # 
-  # wdpa_cells_df <- bind_rows(wdpa_cells_list_1_10, wdpa_cells_list_11_20, wdpa_cells_list_21_30, wdpa_cells_list_31_40, wdpa_cells_list_41_50, wdpa_cells_list_51_60)
   
   wdpa_cells_df <- bind_rows(wdpa_cells_list)
   
-  area_df <- data.frame(cell_id  = values(rast_cell_id),
-                        area_km2 = values(rast_ocean_area))
+  area_df <- data.frame(cell_id  = raster::values(rast_cell_id),
+                        area_km2 = raster::values(rast_ocean_area))
   
   wdpa_year_df <- wdpa_cells_df %>%
     full_join(area_df, by = 'cell_id') %>%
@@ -568,27 +558,32 @@ Note: these are not saved as separate rasters at this point... they are easily c
 
 wdpa_area_df <- read_csv(wdpa_cell_area_file)
 
+# wdpa_area_df <- read_csv("/home/sgclawson/github/ohiprep_v2022/globalprep/spp/v2021/_spatial/wdpa_mpa_area.csv")
+
 notake_df <- wdpa_area_df %>%
   filter(wdpa_category <= 2) %>%
   group_by(cell_id) %>%
-  summarize(mpa_pct = sum(mpa_pct))
+  summarize(mpa_pct = sum(mpa_pct)) %>%
+  rename(from = cell_id, to = mpa_pct)
 
 conservation_df <- wdpa_area_df %>%
   filter(wdpa_category <= 4) %>%
   group_by(cell_id) %>%
-  summarize(mpa_pct = sum(mpa_pct))
+  summarize(mpa_pct = sum(mpa_pct)) %>%
+  rename(from = cell_id, to = mpa_pct)
 
 all_prot_df <- wdpa_area_df %>%
   group_by(cell_id) %>%
-  summarize(mpa_pct = sum(mpa_pct))
+  summarize(mpa_pct = sum(mpa_pct)) %>%
+  rename(from = cell_id, to = mpa_pct)
 
-notake_raster <- subs(rast_cell_id, notake_df, by = 'cell_id', which = 'mpa_pct')
+notake_raster <- classify(x = rast(rast_cell_id), notake_df, othersNA = TRUE)
 plot(notake_raster, main = 'No take protection (Ia, Ib, II + no take)')
 
-conservation_raster <- subs(rast_cell_id, conservation_df, by = 'cell_id', which = 'mpa_pct')
+conservation_raster <- classify(rast(rast_cell_id), conservation_df, othersNA = TRUE)
 plot(conservation_raster, main = 'Conservation protection (Ia - IV + no take)')
 
-all_prot_raster <- subs(rast_cell_id, all_prot_df, by = 'cell_id', which = 'mpa_pct')
+all_prot_raster <- classify(rast(rast_cell_id), all_prot_df, othersNA = TRUE)
 plot(all_prot_raster, main = 'All protection (any category)')
 ```
 

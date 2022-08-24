@@ -54,6 +54,8 @@ source(file.path(dir_setup, 'common_fxns.R'))
 
 # Summary
 
+**NOTE: This does not need to be rerun, unless the OHI regions or the MEOW regions have changed (which they have not in v2022).**
+
 Set up analysis rasters for EEZs, MEOWs, and bathymetry at Gall-Peters 10 km^2 resolution.
 
 * EEZs will include all EEZs as well as FAO regions and CCAMLR regions, based on the global OHI EEZ map.
