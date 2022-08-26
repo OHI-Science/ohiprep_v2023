@@ -4,6 +4,8 @@ author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
     toc: true
+    toc_depth: 2
+    toc_float: yes
     number_sections: true
     theme: cerulean
     highlight: haddock
@@ -57,9 +59,9 @@ Additional year of IUCN Red List data added.
 
 **Species native country information:**
 
-* __Reference__: 
-* IUCN 2020. IUCN Red List of Threatened Species. Version 2020-3 <www.iucnredlist.org>
-* __Accessed__: Feb 1, 2020
+* __Reference__: IUCN 2022. IUCN Red List of Threatened Species. Version 2022-1 <www.iucnredlist.org>
+* __Accessed__: Aug 1, 2022
+* __Download__: Download is done through iucnredlist API
 * __Native data resolution__: Country level (by country name)
 * __Time range__: 1965-2020 (discrete past assessments by species) 
 * __Format__:  JSON
