@@ -120,9 +120,10 @@ tidal_flat_condition <- tidal_flat_extent %>%
                 recent = mean(c(`2013`, `2010`)),
                 health = recent / reference,
                 health = case_when(health > 1 ~ 1, T ~ health),
+                health = ifelse(is.nan(health), NA, health),
                 year = 2013) %>% 
   dplyr::ungroup() %>% 
-  dplyr::select(rgn_id, year, habitat, health) 
+  dplyr::select(rgn_id, year, habitat, health)
 ```
 
 ## Write the results

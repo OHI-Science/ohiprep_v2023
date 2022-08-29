@@ -115,7 +115,7 @@ tidal_flat_extent <- here::here(dir_here, "output", "tidal_flat_extent.csv") %>%
 tf_ext_2001 <- tidal_flat_extent %>% 
   dplyr::group_by(r2_label) %>% 
   dplyr::filter(year == 2001) %>% 
-  dplyr::summarise(km2 = mean(km2))
+  dplyr::summarise(km2 = mean(km2, na.rm = T))
 
 # tf_ext_2004 <- tidal_flat_extent %>% 
 #   dplyr::group_by(r2_label) %>% 
@@ -131,7 +131,7 @@ First do the trend for 2013.
 
 ```{r eval = FALSE}
 trend_function <- function(df) {
-  lm(km2 ~ year, data = df) %>% 
+  lm(km2 ~ year, data = df, na.action = na.omit) %>% 
     broom::tidy()
 }
 
@@ -143,11 +143,12 @@ tidal_flat_trend_2013 <- tidal_flat_extent %>%
   tidyr::unnest(cols = c(model)) %>% 
   dplyr::filter(term == "year") %>% 
   dplyr::left_join(tf_ext_2001) %>% 
-  dplyr::mutate(trend = (estimate / km2) * 5, year = 2013) %>% 
-  dplyr::select(r2_label, data, year, habitat, trend) %>% 
-  tidyr::unnest() %>% 
+  dplyr::mutate(trend = (estimate / km2) * 5) %>% 
+  dplyr::select(r2_label, data, habitat, trend) %>% 
+  tidyr::unnest(cols = c(data)) %>% 
   dplyr::ungroup() %>% 
-  dplyr::select(rgn_id, year = year1, habitat, trend) %>% 
+  dplyr::mutate(year = 2013, trend = ifelse(is.nan(trend), NA, trend)) %>% 
+  dplyr::select(rgn_id, year, habitat, trend) %>% 
   dplyr::distinct()
 ```
 
