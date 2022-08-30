@@ -35,11 +35,12 @@ library(rgdal)
 library(here)
 library(ggplot2)
 library(rgeos)
+library(janitor)
 
 source(here('workflow/R/common.R'))
 
 goal     <- 'spp'
-scenario <- 'v2021'
+scenario <- 'v2022'
 dir_goal <- here('globalprep', goal, scenario)
 
 ### goal specific folders and info
@@ -53,9 +54,9 @@ dir_spatial <- file.path(dir_goal, '_spatial')
 source(file.path(dir_setup, 'common_fxns.R'))
 
 dir_bli <- file.path(dir_M, 'git-annex/globalprep/_raw_data/birdlife_intl/d2021')
-dir_shp <- file.path(dir_M, 'git-annex/globalprep/_raw_data/iucn_spp/d2020-3')
+dir_shp <- file.path(dir_M, 'git-annex/globalprep/_raw_data/iucn_spp/d2022-1')
   ### in this folder are shapefiles at a taxonomic level, both from
-  ### IUCN spatial data download (version 2020-3)
+  ### IUCN spatial data download (version 2022-1)
 
 
 ```
@@ -110,8 +111,8 @@ if(reload == FALSE) {
 }
 
 ### for selectively rerunning taxonomic groups
-maps_to_rasterize <- maps_to_rasterize %>%
-  filter(str_detect(dbf_file, 'birdlife'))
+# maps_to_rasterize <- maps_to_rasterize %>%
+#   filter(str_detect(dbf_file, 'birdlife'))
 
 
 
@@ -135,13 +136,14 @@ if(nrow(maps_to_rasterize) == 0) { ### all maps accounted for as .csvs
   ### Loop over each distinct shapefile with species range maps
   ################################################################.
 
-  bli_already_done <- read_csv(file.path(dir_setup, "int/bli_already_done.csv"))  
-  bli_done_vec <- bli_already_done$iucn_sid
+  #bli_already_done <- read_csv(file.path(dir_setup, "int/bli_already_done.csv"))  
+  #bli_done_vec <- bli_already_done$iucn_sid
   
-  maps_to_rasterize <- maps_to_rasterize %>%
-    filter(!(iucn_sid %in% bli_done_vec))
+  # maps_to_rasterize <- maps_to_rasterize %>%
+  #   filter(!(iucn_sid %in% bli_done_vec))
   
   shps <- maps_to_rasterize$shp_file %>% unique()
+  
   for(i in seq_along(shps)) {
      #i <- 1
     
@@ -156,8 +158,9 @@ if(nrow(maps_to_rasterize) == 0) { ### all maps accounted for as .csvs
     
     cat_msg(i, ' of ', length(shps), ': reading ', basename(shp), ' from: \n  ', shp)
 
-    polys_all <- read_sf(shp, type = 6) %>%
-      clean_df_names()
+    polys_all <- st_read(shp, type = 6) %>%
+      st_sf() %>%
+      dplyr::rename("sciname" = 2)
       ### we will check geoms and fix them inside the mclapply, 
       ### and then reproject, one species at a time
 
@@ -266,6 +269,7 @@ if(nrow(maps_to_rasterize) == 0) { ### all maps accounted for as .csvs
 
 ## Note: v2020: This got to the end and didn't indicate it was finished. I only knew because I periodically stopped the loop and checked after it got to the last couple of sfs and then looked at maps_to_rasterize that it was finished. 
 ## v2021: I had to add some extra if statements to fix column name issues with the new bli data.
+## v2022: column name in IUCN shapes changed to "binomial", I renamed it to "sciname" when reading in. 
 
 ```
 

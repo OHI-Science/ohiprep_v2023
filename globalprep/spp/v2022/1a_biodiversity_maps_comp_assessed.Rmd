@@ -31,12 +31,13 @@ library(here)
 library(data.table)
 library(raster)
 library(sf)
+library(terra)
 
 
 source(here('workflow/R/common.R'))
 
 goal     <- 'spp'
-scenario <- 'v2021'
+scenario <- 'v2022'
 dir_goal <- here('globalprep', goal, scenario)
 
 ### goal specific folders and info
@@ -120,13 +121,13 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
   message('going into the first mclapply...')
   
   ptm <- system.time({
-    cell_values_all <- parallel::mclapply(comp_files, mc.cores = 32,
+    cell_values_all <- parallel::mclapply(comp_files, mc.cores = 12,
                                           FUN = function(x) {
                                             read_csv(x, col_types = 'dddiidi')
                                             }) %>%
       bind_rows()
   }) ### end of system.time
-  message('... processing time ', ptm[3], ' sec') # ... processing time 11.6840000000001 sec
+  message('... processing time ', ptm[3], ' sec') # ... processing time 11.7670000000071  sec
     
   ### chunk into smaller bits for mclapply usage in the summarizing step.  Use mclapply to chunk,
   ### then pass result to mclapply to calculate weighted average values
@@ -136,7 +137,7 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
   
   message('going into the second mclapply...')
   # system.time({ 
-    ### mclapply: 32 secs
+    ### mclapply: 59.2379999999976 secs
   ptm <- system.time({
     cell_vals_list <- parallel::mclapply(1:n_chunks, mc.cores = 12,
         FUN = function(x) { ### x <- 1
@@ -152,8 +153,8 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
   
   message('going into the third mclapply...')
   
-  ptm <- system.time({ #processing time 39.706 sec
-    cell_summary_list <- parallel::mclapply(cell_vals_list, mc.cores = 24,
+  ptm <- system.time({ #processing time 19.4599999999919 sec
+    cell_summary_list <- parallel::mclapply(cell_vals_list, mc.cores = 12,
                                        FUN = function(x) {
       ### x <- cell_vals_list[[250]]
       y <- x %>%
@@ -164,7 +165,8 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
                   pct_threatened   = n_spp_threatened / n_spp_risk,
                   mean_trend  = sum(mean_trend * n_spp_trend, na.rm = TRUE) / 
                                   sum(n_spp_trend, na.rm = TRUE),
-                  n_spp_trend = sum(n_spp_trend, na.rm = TRUE))
+                  n_spp_trend = sum(n_spp_trend, na.rm = TRUE)) %>%
+        ungroup()
       
       z <- x %>%
         mutate(mean_risk_g = mean_risk,   ### protect it
@@ -184,7 +186,8 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
                                       is.infinite(var_risk), 
                                     NA, var_risk)) %>%
                     ### get rid of negative (tiny) variances and infinite variances
-        dplyr::select(cell_id, var_risk)
+        dplyr::select(cell_id, var_risk) %>%
+        ungroup()
       
         yz <- left_join(y, z, by = 'cell_id')
         return(yz)
@@ -215,7 +218,7 @@ reload <- FALSE
 
 rast_base <- raster(file.path(dir_spatial, 'cell_id_rast.tif'))
 
-land_poly <- sf::read_sf(file.path(dir_spatial, 'ne_10m_land/ne_10m_land.shp')) %>%
+land_poly <- st_read(file.path(dir_spatial, 'ne_10m_land/ne_10m_land.shp')) %>%
   st_transform(gp_proj4)
 
 
@@ -225,6 +228,7 @@ if(!file.exists(map_rast_file) | reload == TRUE) {
     
   
   mean_rast <- subs(rast_base, cell_summary, by = 'cell_id', which = 'mean_risk')
+
   writeRaster(mean_rast, map_rast_file,
               overwrite = TRUE)
   
@@ -278,12 +282,10 @@ if(!file.exists(map_rast_file) | reload == TRUE) {
   n_threat_rast <- subs(rast_base, cell_summary, by = 'cell_id', which = 'n_spp_threatened')
   writeRaster(n_threat_rast, map_rast_file,
               overwrite = TRUE)
-  ### n_threat_rast <- raster(file.path(dir_output, 'n_threat_raster_comp.tif'))
 
   pct_threat_rast <- subs(rast_base, cell_summary, by = 'cell_id', which = 'pct_threatened')
   writeRaster(pct_threat_rast, file.path(dir_output, 'pct_threat_raster_comp.tif'),
               overwrite = TRUE)
-  ### n_threat_rast <- raster(file.path(dir_output, 'n_threat_raster_comp.tif'))
 
 } else {
   message('Map exists: ', map_rast_file)

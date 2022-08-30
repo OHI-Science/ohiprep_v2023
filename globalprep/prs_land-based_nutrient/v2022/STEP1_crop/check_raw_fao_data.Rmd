@@ -1,0 +1,156 @@
+---
+title: "OHI 2021: Extract and wrangle FAO stat nutrient data"
+author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_depth: 1
+    toc_float: yes
+    number_sections: false
+    theme: cerulean
+    highlight: haddock
+    includes: 
+      in_header: '../../../workflow/templates/ohi_hdr.html'
+pdf_document:
+  toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Summary
+Wrangle FAOSTAT data; allocate data nationally based on crop production at each location.
+https://github.com/OHI-Science/food_systems/blob/master/STEP1_crop/nutrient/step3_fao_production_wrangling.Rmd
+
+2/3 of fertilizer use allocated to irrigated systems and 1/3 to high input systems.
+
+***
+
+# Data Source
+
+**Reference**: FAOSTAT; http://www.fao.org/faostat/en/#data/RFN 
+
+**Downloaded**: 09/14/2021
+
+**Description**: 
+The Fertilizers by Nutrient dataset contains information on the totals in nutrients for Production, Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers, over the time series 1961-present. The data are provided for the three primary plant nutrients: nitrogen (N), phosphorus (expressed as P2O5) and potassium (expressed as K2O). Both straight and compound fertilizers are included.
+
+**Native data resolution**: Country 
+
+**Time range**: 2005-2019
+
+**Format**: CSV
+
+**Notes**: Go here: http://www.fao.org/faostat/en/#data/RFN  and click "Bulk Downloads" ---> "All Data", and save on Mazu.
+
+
+***
+
+# Setup
+```{r setup, include = FALSE}
+# getting packages we want
+library(here)
+library(janitor)
+library(vroom)
+library(cowplot)
+library(tidyverse)
+library(countrycode)
+
+source(here('workflow/R/common.R'))
+
+crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2022/STEP1_crop")
+
+region_data()
+
+food_rgns <- read_csv(here("globalprep/spatial/v2022/food_rgns.csv"), col_types = "cdc")
+
+nutrient_d2022_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2022")
+
+``` 
+
+# Methods 
+
+## Integrate iso3c codes
+```{r}
+# Import country-level fertilizer data
+
+fao_nutrient <-   vroom::vroom(file.path(nutrient_d2022_anx, "Inputs_FertilizersNutrient_E_All_Data_NOFLAG.csv"), 
+               .name_repair = make_clean_names) %>%
+  pivot_longer(cols = c(9:68), names_to = "year") %>%
+  mutate(year = as.numeric(gsub("y", "", year))) %>%
+  rename(nutrient = item, country_application = value) %>%
+    mutate(nutrient = recode(nutrient,
+                           "Nutrient nitrogen N (total)"     = "N",
+                           "Nutrient phosphate P2O5 (total)" = "P2O5",
+                           "Nutrient potash K2O (total)"     = "K2O")) %>%
+    filter(element == "Agricultural Use") %>%
+  filter(year >= 2005) %>%
+  filter(area_code < 5000) %>%
+    dplyr::select(area, nutrient, year, country_application) %>%
+  filter(year != 2020)
+
+# Global tonnes of each fertilizer
+sum_before_wrangling <- 
+  fao_nutrient %>% 
+  group_by(nutrient, year) %>% 
+  summarize(global_tonnes = sum(country_application, na.rm = TRUE))
+sum_before_wrangling
+
+
+nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2021")
+fao_nutrient_old <-   vroom::vroom(file.path(nutrient_d2021_anx, "Inputs_FertilizersNutrient_E_All_Data_NOFLAG.csv"), 
+               .name_repair = make_clean_names) %>%
+  pivot_longer(cols = c(8:66), names_to = "year") %>%
+  mutate(year = as.numeric(gsub("y", "", year))) %>%
+  rename(nutrient = item, country_application = value) %>%
+    mutate(nutrient = recode(nutrient,
+                           "Nutrient nitrogen N (total)"     = "N",
+                           "Nutrient phosphate P2O5 (total)" = "P2O5",
+                           "Nutrient potash K2O (total)"     = "K2O")) %>%
+    filter(element == "Agricultural Use") %>%
+  filter(year >= 2005) %>%
+  filter(area_code < 5000) %>%
+  dplyr::select(area, nutrient, year, country_application)
+
+# Global tonnes of each fertilizer
+sum_before_wrangling_old <- 
+  fao_nutrient_old %>% 
+  group_by(nutrient, year) %>% 
+  summarize(global_tonnes = sum(country_application, na.rm = TRUE))
+sum_before_wrangling
+
+library(compareDF)
+
+test <- compare_df(fao_nutrient, fao_nutrient_old)
+test2 <- test[[1]]
+
+
+# exclude = c("area", "nutrient", "year")
+```
+
+# Match FAOSTAT regions with food_rgns list
+```{r}
+
+fix_sudan <- fao_nutrient %>%
+  filter(str_detect(area, "Sudan")) %>%
+  filter(!is.na(country_application)) %>%
+  mutate(area = "Sudan",
+         area_code = 276) %>%
+  arrange(nutrient, year)
+
+# Remove China and re-allocate Serbia data to Kosovo and Serbia and filter out serbia and montenegro from 2005 (when they split)
+fao_nutrient <- fao_nutrient %>%
+  mutate(area_code = if_else(area_code %in% 272, 275, area_code)) %>%  # XKO
+  bind_rows(fao_nutrient) %>%
+  mutate(area_code = if_else(area_code %in% 272, 286, area_code)) %>%
+  unique() %>% 
+  filter(area_code != 351) %>% # Code 351 values are for all of China, including MAC, HKG, TWN.
+  filter(area_code != 186) %>%
+  filter(!str_detect(area, "Sudan")) %>%
+  rbind(fix_sudan) %>%
+  filter(!(area %in% c("USSR", "Yugoslav SFR", "Ethiopia PDR", "Czechoslovakia", "Belgium-Luxembourg")))
+
+
+```
+  
+
