@@ -62,6 +62,14 @@ Processing this new data requires a completely different data prep. Some methods
 **Format**:  csv format
 
 ***
+
+## Softbottom Habitat Extent
+
+The extent data for soft bottom habitat for was originally developed for the Cumulative Human Impacts project, and are available from [KNB](https://knb.ecoinformatics.org/#view/doi:10.5063/F19Z92TW).
+
+**Reference**: Halpern, Benjamin S et al. “Spatial and Temporal Changes in Cumulative Human Impacts on the World’s Ocean.” Nature Communications 6.1 (2015): 7615–7615. Web.
+
+**Description**: Number of square kilometers of soft bottom habitat that is associated with each of the 220 OHI regions. 
   
 # Methods 
 
