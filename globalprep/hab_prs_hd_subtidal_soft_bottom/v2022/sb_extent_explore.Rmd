@@ -1,0 +1,90 @@
+---
+title: "sb_extent_explore"
+output: html_document
+date: '2022-08-31'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(terra)
+library(tidyverse)
+#library(raster)
+```
+
+```{r}
+sb_hab_raw <- rast("/home/jcohen/s_t_s_bottom_lzw.tif")
+sb_hab_raw
+# 934 x 934 meters, Mollweide
+```
+
+```{r}
+fish_effort <- rast("/home/shares/ohi/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_2020.tif")
+fish_effort
+# 0.01 degree, 4326
+```
+
+Project the soft bottom habitat (in meters, Mollweide) to coarser resolution of fishing effort raster (degrees, 4326).
+
+```{r}
+sb_hab_coarse <- terra::aggregate(x = sb_hab_raw, fact = 4, fun = "sum")
+sb_hab_coarse
+# 3737 x 3737 meters
+```
+```{r}
+rasters <- c(sb_hab_coarse, fish_effort)
+# error: extents do not match
+
+# check extents:
+ext(sb_hab_coarse) # -18040095.1961317, 18042003.2030255, -9022850.78470102, 9020067.3726316 (xmin, xmax, ymin, ymax)
+ext(fish_effort) # -180.005, 180.005, -67.315, 81.985 (xmin, xmax, ymin, ymax)
+# sb_hab_coarse is larger raster, fish_effort is smaller raster
+
+# extend fish_effort to extent of sb_hab_coarse
+fish_effort_extended <- terra::extend(fish_effort, sb_hab_coarse)
+# Warning: Attempt to create -686757456x1804291816 dataset is illegal,sizes must be larger than zero. (GDAL error 1)Error: [extend] failed writing GTiff file
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Change crs to mollewide 
+
+```{r}
+#mollCRS <- CRS("+proj=moll")
+#fish_effort_mol <- terra::project(fish_effort, mollCRS)
+```
+
+Make extents match
+
+```{r}
+#compareGeom(sb_hab_raw, fish_effort)
+
+#ext(sb_hab_raw)
+#ext(fish_effort)
+
+```
+
+```{r}
+#fish_effort_extended <- terra::extend(fish_effort, sb_hab_raw)
+#ext(fish_effort_extended)
+
+#sb_raw_extended
+```
+
