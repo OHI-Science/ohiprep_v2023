@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: Prep surface water and river rasters"
+title: "OHI 2022: Prep surface water and river rasters"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -19,6 +19,8 @@ editor_options:
 ---
 
 ## Summary
+
+**NOTE:** This doesn't need to be repeated for future years. These rasters do not change. 
 
 Create rasters which describe: 
  - Areas within 1km of surface waters (rivers and lakes) and within 1km of the coast. This will be used to multiply by our leaching estimates. Taken from the [Tuholske et al 2021; Wastewater project](https://github.com/OHI-Science/wastewater)
