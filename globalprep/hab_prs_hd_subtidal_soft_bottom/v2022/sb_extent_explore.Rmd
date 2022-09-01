@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(terra)
 library(tidyverse)
-#library(raster)
+library(raster)
 ```
 
 ```{r}
@@ -24,30 +24,61 @@ sb_hab_raw
 fish_effort <- rast("/home/shares/ohi/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_2020.tif")
 fish_effort
 # 0.01 degree, 4326
+
+# fish_effort[is.na(fish_effort)] <- 0
+
+plot(cellSize(fish_effort, unit = "km"))
 ```
 
 Project the soft bottom habitat (in meters, Mollweide) to coarser resolution of fishing effort raster (degrees, 4326).
 
 ```{r}
-sb_hab_coarse <- terra::aggregate(x = sb_hab_raw, fact = 4, fun = "sum")
+
+
+sb_hab_coarse <- terra::aggregate(x = sb_hab_raw, fact = 5, fun = "sum", na.rm = TRUE) 
 sb_hab_coarse
-# 3737 x 3737 meters
+# 4672.394 x 4672.394 meters
+
+
+sb_hab_prop <- sb_hab_coarse/25
+
+fish_effort_coarse <- terra::aggregate(x = fish_effort, fact = 5, fun = "sum", na.rm = TRUE)
+global(fish_effort, "sum", na.rm = TRUE)
+global(fish_effort_coarse, "sum", na.rm = TRUE) # 18379444
+
+fish_effort_hr_km <- fish_effort_coarse/cellSize(fish_effort_coarse, unit = "km")
+
+fish_effort_reproj <- project(fish_effort_hr_km, sb_hab_prop)
+
+fish_effort_reproj_fix <- fish_effort_reproj*21.83127
+
+global(fish_effort_reproj_fix, "sum", na.rm = TRUE) # 18541882
+
+
+multiply <- fish_effort_reproj_fix*sb_hab_prop
+multiply[is.na(multiply)] = 0 
+
+sb_hab_coarse_fix <- sb_hab_coarse
+sb_hab_coarse_fix[sb_hab_coarse >= 1] <- 1
+
+multiply_mask <- mask(multiply, mask = sb_hab_coarse_fix)
+
+# multiply_mask[multiply_mask == 0] <- 10000000000 # test
+
+
+plot(log(multiply_mask+1))
+plot(multiply_mask)
+zoom(multiply_mask)
+click(multiply_mask)
+
+## convert sb_hab_coarse to >=1 = 1 
+## mask by converted sb_hab_coarse to keep healthy SB habitats 
+## rescale these rasters by 99.9 or something (0-1); THIS IS THE PRESSURE
+## then extract by OHI region 
+##TO GET HEALTH: 1 - PRESSURE from above step
+
 ```
-```{r}
-rasters <- c(sb_hab_coarse, fish_effort)
-# error: extents do not match
 
-# check extents:
-ext(sb_hab_coarse) # -18040095.1961317, 18042003.2030255, -9022850.78470102, 9020067.3726316 (xmin, xmax, ymin, ymax)
-ext(fish_effort) # -180.005, 180.005, -67.315, 81.985 (xmin, xmax, ymin, ymax)
-# sb_hab_coarse is larger raster, fish_effort is smaller raster
-
-# extend fish_effort to extent of sb_hab_coarse
-fish_effort_extended <- terra::extend(fish_effort, sb_hab_coarse)
-# Warning: Attempt to create -686757456x1804291816 dataset is illegal,sizes must be larger than zero. (GDAL error 1)Error: [extend] failed writing GTiff file
-
-
-```
 
 
 
