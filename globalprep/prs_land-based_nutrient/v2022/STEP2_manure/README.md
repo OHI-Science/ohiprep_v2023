@@ -1,6 +1,8 @@
 # Animal Nutrient
 
-This folder contains all the scripts and data produced from creating rasters of P leaching, N leaching, and N volatization from livestock animal systems for years 2005-2019 of FAOSTAT data. 
+**NOTE: For v2022, the FAOSTAT manure data was not updated. Instead of rerunning everything for this, we ran STEP00_copy_2020.Rmd first. This copies the final output from STEP7 for all years to the v2022 git-annex folder, and also copies and saves data year 2019 as 2020. 
+
+This folder contains all the scripts and data produced from creating rasters of P leaching, N leaching, and N volatization from livestock animal systems for years 2005-2020 of FAOSTAT data. 
 
 
 ## Scripts

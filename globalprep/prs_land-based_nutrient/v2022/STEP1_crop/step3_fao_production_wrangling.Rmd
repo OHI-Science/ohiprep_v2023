@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: Extract and wrangle FAO stat nutrient data"
+title: "OHI 2022: Extract and wrangle FAO stat nutrient data"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -30,14 +30,14 @@ https://github.com/OHI-Science/food_systems/blob/master/STEP1_crop/nutrient/step
 
 **Reference**: FAOSTAT; http://www.fao.org/faostat/en/#data/RFN 
 
-**Downloaded**: 09/14/2021
+**Downloaded**: 08/26/2022
 
 **Description**: 
 The Fertilizers by Nutrient dataset contains information on the totals in nutrients for Production, Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers, over the time series 1961-present. The data are provided for the three primary plant nutrients: nitrogen (N), phosphorus (expressed as P2O5) and potassium (expressed as K2O). Both straight and compound fertilizers are included.
 
 **Native data resolution**: Country 
 
-**Time range**: 2005-2019
+**Time range**: 1961-2020
 
 **Format**: CSV
 
@@ -58,13 +58,13 @@ library(countrycode)
 
 source(here('workflow/R/common.R'))
 
-crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP1_crop")
+crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2022/STEP1_crop")
 
 region_data()
 
 food_rgns <- read_csv(here("globalprep/spatial/v2021/food_rgns.csv"), col_types = "cdc")
 
-nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2021")
+nutrient_d2022_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2022")
 
 ``` 
 
@@ -74,9 +74,9 @@ nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data
 ```{r}
 # Import country-level fertilizer data
 
-fao_nutrient <-   vroom::vroom(file.path(nutrient_d2021_anx, "Inputs_FertilizersNutrient_E_All_Data_NOFLAG.csv"), 
+fao_nutrient <-   vroom::vroom(file.path(nutrient_d2022_anx, "Inputs_FertilizersNutrient_E_All_Data_NOFLAG.csv"), 
                .name_repair = make_clean_names) %>%
-  pivot_longer(cols = c(8:66), names_to = "year") %>%
+  pivot_longer(cols = c(9:68), names_to = "year") %>%
   mutate(year = as.numeric(gsub("y", "", year))) %>%
   rename(nutrient = item, country_application = value) %>%
     mutate(nutrient = recode(nutrient,
@@ -165,7 +165,7 @@ fao_nutrient$country_application[fao_nutrient$iso3c %in% "XKO"] <-
 # Extract iso3c codes not included in fao_nutrient dataset
 missing_rgns <- setdiff(unique(food_rgns$iso3c), unique(fao_nutrient$iso3c))
 duplicated(fao_rgn_codes$area_code)
-length(missing_rgns) # 76 missing rgns
+length(missing_rgns) # 74 missing rgns
 
 # I gave these autonomous regions the same area_codes as POR and GBR respectively.
 fao_nutrient$country_application[fao_nutrient$iso3c %in% c("XMI", "GGY")] <- 0
@@ -182,7 +182,7 @@ fao_nutrient <-
               nutrient = c("N", "P2O5", "K2O"),
               country_application = NA,
               reported_by_fao = "No", 
-              year = c(2005:2019)) %>% 
+              year = c(2005:2020)) %>% 
   bind_rows(fao_nutrient) %>% 
   mutate(reported_by_fao = if_else(is.na(reported_by_fao),
                                    "Yes",

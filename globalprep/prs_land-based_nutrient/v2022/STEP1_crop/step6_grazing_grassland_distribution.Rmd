@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021 - Distribute grassland fertilizers"
+title: "OHI 2022 - Distribute grassland fertilizers"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -33,6 +33,7 @@ library(readxl)
 library(tidyverse)
 library(vroom)
 library(doParallel)
+library(terra)
 
 # Import food_rgns xy df
 food_rgns_xy <-
@@ -44,19 +45,19 @@ food_crs <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 
 source(here('workflow/R/common.R'))
 
-source(here('globalprep/prs_land-based_nutrient/v2021/STEP1_crop/R/common_spatial.R'))
+source(here('globalprep/prs_land-based_nutrient/v2022/STEP1_crop/R/common_spatial.R'))
 
-crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021")
+crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2022")
 
 region_data()
 
 food_rgns <- read_csv(here("globalprep/spatial/v2021/food_rgns.csv"), col_types = "cdc")
 
-nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2021")
+nutrient_d2022_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2022")
 
-halpern_raw <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/halpern_food_systems/d2021")
+halpern_raw <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/halpern_food_systems/d2021") # data is static.. doesn't change
 
-prep <- file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/")
+prep <- file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/")
 
  
 ```
@@ -103,17 +104,17 @@ df_all <-
 fao_nutrient_grassland_N <- 
   vroom(here(crop_nutrient, "STEP1_crop/int/fubc_2017_grassland_2.csv")) %>% 
     filter(nutrient %in% "N") %>% 
-    select(-nutrient)
+    dplyr::select(-nutrient)
 
 fao_nutrient_grassland_P2O5 <- 
   vroom(here(crop_nutrient, "STEP1_crop/int/fubc_2017_grassland_2.csv")) %>% 
     filter(nutrient %in% "P2O5") %>% 
-    select(-nutrient)
+    dplyr::select(-nutrient)
 
 fao_nutrient_grassland_K2O <- 
   vroom(here(crop_nutrient, "STEP1_crop/int/fubc_2017_grassland_2.csv")) %>% 
     filter(nutrient %in% "K2O") %>% 
-    select(-nutrient)
+    dplyr::select(-nutrient)
 
 df_all_2 <-
   df_all %>% 
@@ -146,13 +147,11 @@ df_all_3_K2O <-
   ungroup() %>% 
   mutate(cell_application = iso3c_prop_sum_lsu * country_application)
 
-sum(df_all_3_K2O$cell_application, na.rm = TRUE) # 19183624
-sum(fao_nutrient_grassland_K2O$country_application, na.rm = TRUE) # 19183899
+sum(df_all_3_K2O$cell_application, na.rm = TRUE) # 20573816
+sum(fao_nutrient_grassland_K2O$country_application, na.rm = TRUE) # 20574113
 
 # slightly off, but nothing of concern
 
-test <- df_all_3_N %>%
-  filter(year == 2005) 
 ```
 
 
@@ -166,7 +165,9 @@ test <- df_all_3_N %>%
 #  rasterFromXYZ(crs = food_crs)
 # # 
 # # correct_proj
-food_raster
+
+## ok.. delete what we don't need to clear up memory space
+rm(df_all, df_all_2, fao_nutrient_grassland_K2O, fao_nutrient_grassland_N, fao_nutrient_grassland_P2O5, food_rgns, food_rgns_xy, food_rgns_tif, rgns_eez, rgns_all, stack1, stack2, stack_all)
 
 
 grassland_fertilizer_application <- function(i, nutrient, this_year) {
@@ -180,7 +181,7 @@ grassland_fertilizer_application <- function(i, nutrient, this_year) {
 
  grassland_df %>%
  mutate(cell_grazer_application = .[i] * cell_application) %>%
- select(x, y, cell_grazer_application) %>%
+ dplyr::select(x, y, cell_grazer_application) %>%
  rasterFromXYZ(crs = food_crs) %>%
  projectRaster(., food_raster, method = 'ngb') %>% ## ngb ensures the sum stays the same... no interpolation
  writeRaster(.,
@@ -203,7 +204,7 @@ grassland_fertilizer_application <- function(i, nutrient, this_year) {
 
 
 # write for loop to loop through the scenarios; for next year, maybe try dopar for parallel processing to speed up. Takes around 1.5 hours as it is.
-for(j in 2005:2019){
+for(j in 2005:2020){
   
  # j = 2010
   for(k in c("N", "P2O5", "K2O")){
@@ -222,13 +223,13 @@ for(j in 2005:2019){
 # Data check
 ```{r}
 # takes way too long to run this
-# list.files(file.path(prep, 
-#                      "animal_farm_int/grassland_fertilizer_application",
-#                      fsep = ""),
-#            full.names = TRUE) %>% 
-#   stack() %>% 
-#   stackApply(., 1, fun = "sum") %>% 
-#   raster::cellStats(., stat = "sum")
+list.files(file.path(prep,
+                     "animal_farm_int/grassland_fertilizer_application",
+                     fsep = ""),
+           full.names = TRUE) %>%
+  stack() %>%
+  stackApply(., 1, fun = "sum") %>%
+  raster::cellStats(., stat = "sum")
 
 sum(
 sum(fao_nutrient_grassland_N$country_application, na.rm = TRUE),

@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: merge FUBC rates with nutrient application dfs"
+title: "OHI 2022: merge FUBC rates with nutrient application dfs"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -31,13 +31,13 @@ library(tidyverse)
 
 source(here('workflow/R/common.R'))
 
-crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021/STEP1_crop")
+crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2022/STEP1_crop")
 
 region_data()
 
 food_rgns <- read_csv(here("globalprep/spatial/v2021/food_rgns.csv"), col_types = "cdc")
 
-nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2021")
+nutrient_d2022_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2022")
 ``` 
 
 # Import
@@ -81,11 +81,11 @@ fubc <-
 ```{r}
 fao_application <- vroom(here(crop_nutrient, "int/fao_nutrient_application_gf.csv"))
 
-nrow(fao_application) == 244 * 3 * 15
+nrow(fao_application) == 244 * 3 * 16
 nutrient_df <- left_join(fubc, fao_application)
 
 ## should have somewhere around
-244*45*15*3  # rows
+244*45*16*3  # rows
 ```
 
 -------------------------------------------------------------------------------
@@ -172,7 +172,7 @@ nutrient_df_full %>%
   summarise(total = sum(prop_nutrient)) %>%
   view()
 
-nrow(nutrient_df_full) == 244 * 2 * 3 * 45*15 
+nrow(nutrient_df_full) == 244 * 2 * 3 * 45*16
 
 sum(nutrient_df_full$total_nutrient)
 sum(unique(nutrient_df_full$country_application), na.rm = TRUE)

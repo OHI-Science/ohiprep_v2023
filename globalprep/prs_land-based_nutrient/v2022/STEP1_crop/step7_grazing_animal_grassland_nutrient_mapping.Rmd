@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021 - Map nutrient leaching fro grassland fertilizer application"
+title: "OHI 2022 - Map nutrient leaching fro grassland fertilizer application"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -34,6 +34,7 @@ library(tidyverse)
 library(vroom)
 library(doParallel)
 library("future")
+library(terra)
 
 # Import food_rgns xy df
 food_rgns_xy <-
@@ -45,19 +46,19 @@ food_crs <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 
 source(here('workflow/R/common.R'))
 
-source(here('globalprep/prs_land-based_nutrient/v2021/STEP1_crop/R/common_spatial.R'))
+source(here('globalprep/prs_land-based_nutrient/v2022/STEP1_crop/R/common_spatial.R'))
 
-crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2021")
+crop_nutrient <- file.path(here(), "globalprep/prs_land-based_nutrient/v2022")
 
 region_data()
 
-food_rgns <- read_csv(here("globalprep/spatial/v2021/food_rgns.csv"), col_types = "cdc")
+food_rgns <- read_csv(here("globalprep/spatial/v2021/food_rgns.csv"), col_types = "cdc") # this won't be updated ever
 
-nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2021")
+nutrient_d2021_anx <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/FAOSTAT/crop_nutrient/d2022")
 
 halpern_raw <- file.path("/home/shares/ohi/git-annex/globalprep/_raw_data/halpern_food_systems/d2021")
 
-prep <- file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/")
+prep <- file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/")
 ``` 
 
 # Withdrawal of N
@@ -254,7 +255,7 @@ grazer_list <-
 distinct_vars <- 
   expand_grid(grazer_list = grazer_list,
             nutrient = c("N", "P2O5"),
-            year = 2005:2019)
+            year = 2005:2020)
 
 
 future_pmap(list(distinct_vars$grazer_list,
@@ -270,15 +271,16 @@ future_pmap(list(distinct_vars$grazer_list,
 ```{r}
 ## check 2017
 
+
 total_N <- 
   list.files(file.path(prep,
                      "animal_farm_int/grassland_fertilizer_application/",
                      fsep = ""),
              pattern = "_N_2017",
              full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., "sum", na.rm = TRUE)
 
 withdrawn_N <- 
   list.files(file.path(prep,
@@ -286,11 +288,12 @@ withdrawn_N <-
                      fsep = ""),
              pattern = "withdrawal_N_2017",
              full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., "sum", na.rm = TRUE)
 
-withdrawn_N / total_N # should be approx 50% of total N; 0.5775261
+withdrawn_N / total_N #  0.5775261
+total_N/withdrawn_N # 0.4474883
 
 # NH3 volatilization
 volatilized_N <- 
@@ -299,11 +302,11 @@ volatilized_N <-
                      fsep = ""),
              pattern = "volatilized_N_2017",
              full.names = TRUE) %>%  
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., "sum")
 
-volatilized_N / total_N # should be approx 14% of total N
+volatilized_N / total_N # 0.1686965 should be approx 14% of total N
 
 # Denitrification, N2 and N20 emissions
 denitrification_N <- 
@@ -312,9 +315,9 @@ denitrification_N <-
                      fsep = ""),
              pattern = "denitrification_N_2017",
              full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., "sum", na.rm = TRUE)
 
 denitrification_N / total_N # should be approx 10% of total N; 0.102
 
@@ -324,9 +327,9 @@ leached_N <-
                        fsep = ""),
              pattern = "leached_N_2017",
              full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., fun = "sum", na.rm = TRUE)
 
 (leached_N + P_leached + volatilized_N) / total_N
 leached_N 
@@ -338,9 +341,9 @@ P_leached <-
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
              pattern = "_leached_P_2017",
              full.names = TRUE) %>% 
-  stack()  %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., stat = "sum")
+  rast()  %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., fun = "sum", na.rm = TRUE)
            
 total_P <- 
   list.files(file.path(prep,
@@ -348,9 +351,9 @@ total_P <-
                      fsep = ""),
              pattern = "P2O5_2017",
              full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., fun = "sum", na.rm = TRUE)
 
 (total_P / 2.29) * 0.065
 P_leached / total_P
@@ -366,24 +369,24 @@ leached_N <-
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
            pattern = paste(val, ".*_leached_N_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  raster() %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  global(., fun = "sum", na.rm = TRUE)
 leached_N  
 
 P_leached <- 
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
            pattern = paste(val, ".*_leached_P_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  raster() %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  global(., fun = "sum", na.rm = TRUE)
 P_leached
 
 volatilized_N <- 
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
            pattern = paste(val, ".*volatilized_N_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  raster() %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  global(., fun = "sum", na.rm = TRUE)
 volatilized_N
 
 total_applied <- 
@@ -391,9 +394,9 @@ total_applied <-
                        fsep = ""),
              pattern = paste(val, ".*_(N|P2O5)_", this_year, ".tif", sep = ""),
            full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., "sum", na.rm = TRUE)
 total_applied
 
 leached_N + P_leached + volatilized_N
@@ -402,9 +405,9 @@ leached_N + P_leached + volatilized_N
 
 distinct_vars <- 
   expand_grid(grazer_list = grazer_list,
-            year = 2005:2019)
+            year = 2005:2020)
 
-map2(distinct_vars$grazer_list, distinct_vars$year, run_fun)
+map2(distinct_vars$grazer_list, distinct_vars$year, run_fun) # looks pretty consistent increase year over year
 ```
 
 # Nutrient pollution per animal per year
@@ -416,24 +419,24 @@ withdrawn_N <-
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
            pattern = paste(val, ".*withdrawal_N_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  raster() %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  global(., fun = "sum", na.rm = TRUE)
 withdrawn_N  
 
 denitrification_N <- 
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
            pattern = paste(val, ".*denitrification_N_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  raster() %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  global(., fun = "sum", na.rm = TRUE)
 denitrification_N
 
 volatilized_N <- 
   list.files(file.path(prep, "animal_farm_int/grassland_nutrient_pollution"),
            pattern = paste(val, ".*volatilized_N_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  raster() %>% 
-  cellStats(., stat = "sum")
+  rast() %>% 
+  global(., fun = "sum", na.rm = TRUE)
 volatilized_N
 
 total_N <- 
@@ -441,9 +444,9 @@ total_N <-
                        fsep = ""),
              pattern = paste(val, ".*_N_", this_year, sep = ""),
            full.names = TRUE) %>% 
-  stack() %>% 
-  stackApply(., 1, fun = "sum") %>% 
-  cellStats(., "sum")
+  rast() %>% 
+  tapp(., 1, fun = "sum") %>% 
+  global(., "sum", na.rm = TRUE)
 
 
 1- ((withdrawn_N + volatilized_N + denitrification_N) / total_N)
@@ -454,8 +457,8 @@ total_N <-
 
 distinct_vars <- 
   expand_grid(grazer_list = grazer_list,
-            year = 2010:2019)
+            year = 2005:2020)
 
-map2(distinct_vars$grazer_list, distinct_vars$year, run_fun2) # ~30-40% each time 
+map2(distinct_vars$grazer_list, distinct_vars$year, run_fun2) # ~20-40% each time 
 ```
 

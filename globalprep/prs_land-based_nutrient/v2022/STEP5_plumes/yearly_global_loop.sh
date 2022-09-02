@@ -2,18 +2,18 @@
 # this executes all steps for creating a final, mosaiced plume raster over a series of pourpoint shapefiles 
 
 
-cd /home/sgclawson/plumes
+cd /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes
 
 # Load ocean mask null into grass session 
-r.in.gdal /home/sgclawson/grassdata/location/PERMANENT/ocean_mask_10km.tif output='ocean'
+r.in.gdal /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/grassdata/location/PERMANENT/ocean_mask.tif output='ocean'
 
-outdir=/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/output/N_plume
+outdir=/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume
 
 j=0
 
-for file in /home/sgclawson/plumes/shp/*.shp ; do
+for file in /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes/shp/*.shp ; do
 
-# file=/home/sgclawson/plumes/shp/*.shp
+# file=/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes/shp/*.shp
 
     fileout=${file%.shp}_joined.tif #define output filename  
     j=$(( j + 1 ))
@@ -88,7 +88,7 @@ do
    # mosaic subset 
    cd subsets/subset$i/
 
-    python2 /home/sgclawson/plumes/gdal_add.py -o effluent_sub$i.tif -ot Float32 plume_effluent*.tif # ALWAYS UPDATE first tif NAME to whatever you are running.. 
+    python2 /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes/gdal_add.py -o effluent_sub$i.tif -ot Float32 plume_effluent*.tif # ALWAYS UPDATE first tif NAME to whatever you are running.. 
 
    printf "subset $i tif done \n"
   
@@ -103,17 +103,15 @@ printf "Done Subsets \n"
 # final mosaic
 cd subsets
 
-python2 /home/sgclawson/plumes/gdal_add.py -o $fileout -ot Float32 effluent_sub*.tif # ALWAYS UPDATE tif NAME
+python2 /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes/gdal_add.py -o $fileout -ot Float32 effluent_sub*.tif # ALWAYS UPDATE tif NAME
 
 echo "finished mosaic"
 
 	mv $fileout $outdir #move the mosaic tif file to the output directory defined above
 
-    cd /home/sgclawson/plumes
-
-	#rm -rf /home/sgclawson/plumes/output #delete output directory and everything in it 
-	
-	mv /home/sgclawson/plumes/output /home/sgclawson/plumes/output$j # rename output so that we can see which plumes it breaks on, if it breaks
+    cd /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes
+    
+	mv /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes/output /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/plumes/output$j # rename output so that we can see which plumes it breaks on, if it breaks
 
 done #end loop
 
