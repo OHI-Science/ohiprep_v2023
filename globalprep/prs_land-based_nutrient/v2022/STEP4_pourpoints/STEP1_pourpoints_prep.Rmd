@@ -15,7 +15,7 @@ output:
   pdf_document:
     toc: true
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 
@@ -419,6 +419,16 @@ st_write(ws_pp_zonal_all_fix, file.path(prs_int_dir, "pourpoints", final_name), 
 # mapview(ws_pp_zonal_all_fix)
 }
 
+
+```
+
+Now we need to copy over the appropriate ocean mask file from the wastewater project.. this won't change. So for next year, you can just copy over from the v2022 folder. 
+
+``` {bash }
+
+mkdir /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/int/ocean_masks
+
+cp /home/sgclawson/grassdata/ocean_mask.tif /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/int/ocean_masks
 
 ```
 
