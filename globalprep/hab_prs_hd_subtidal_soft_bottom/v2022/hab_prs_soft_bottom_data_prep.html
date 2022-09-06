@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Sep 6 14:33:39 2022 by jcohen" />
+<meta name="author" content="Compiled on Tue Sep 6 15:21:48 2022 by jcohen" />
 
 
 <title>OHI 2022 - Soft bottom pressure data prep</title>
@@ -1672,7 +1672,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2022 - Soft bottom pressure data
 prep</h1>
-<h4 class="author"><em>Compiled on Tue Sep 6 14:33:39 2022 by
+<h4 class="author"><em>Compiled on Tue Sep 6 15:21:48 2022 by
 jcohen</em></h4>
 
 </div>
@@ -2648,8 +2648,8 @@ to 2012-2019 data and save the output tif’s to the same directory.</p>
 <span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() </span></code></pre></div>
 </div>
-<div id="standarize-catches-per-soft-bottom-area-1" class="section level2">
-<h2>Standarize catches per soft-bottom area</h2>
+<div id="rescale-data-for-ohi-regions" class="section level2">
+<h2>Rescale data for OHI regions</h2>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#area &lt;-  read.csv(paste0(here(), &quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2016/output/habitat_extent_softbottom.csv&quot;))</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in csv for each year and combine them in one data frame</span></span>
@@ -2660,54 +2660,49 @@ to 2012-2019 data and save the output tif’s to the same directory.</p>
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(annual_list)</span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">raw_density =</span> effort_sum)</span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co">#data_density &lt;- fishing_all %&gt;%</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">#  left_join(area, by = &quot;rgn_id&quot;) %&gt;%</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#  filter(rgn_id &lt;= 250) %&gt;%</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">#  mutate(raw_density = effort_sum/km2)</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># get summary stats for the data density before rescaling using the quantile</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data_density<span class="sc">$</span>raw_density)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">#    0       0       0   55153    4769 7540105</span></span>
 <span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co"># get summary stats for the data density before rescaling using the quantile</span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data_density<span class="sc">$</span>raw_density)</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co">#    0       0       0   55153    4769 7540105</span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="co"># old summary stats:</span></span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Min.   1st Qu.    Median      Mean   3rd Qu.      Max.      NA&#39;s </span></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co">#    0.0000    0.0000    0.0005    4.4239    0.2861 2503.8848       135 </span></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the data distribution because in the past density data happens to be very skewed</span></span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(data_density<span class="sc">$</span>raw_density) <span class="co"># very skewed (right)</span></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="co"># tested many approaches to normalize data, none do it extremely enough to look normal (square root, cube root, lower quantiles, annual quantiles, inverse, etc.), taking the log is the most logical method for this data even though it is still skewed after transformation</span></span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_density =</span> <span class="fu">log</span>(raw_density <span class="sc">+</span> <span class="dv">1</span>))</span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>ref_point_95_all_years <span class="ot">&lt;-</span> <span class="fu">quantile</span>(data_density<span class="sc">$</span>log_density, <span class="fu">c</span>(<span class="fl">0.95</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Rescale the density:</span></span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled =</span> log_density<span class="sc">/</span>ref_point_95_all_years) <span class="sc">%&gt;%</span></span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled_capped =</span> <span class="fu">ifelse</span>(density_rescaled <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>                                                 <span class="dv">1</span>,</span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>                                                 density_rescaled))</span>
-<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 2022 assessment scratch code:</span></span>
-<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a><span class="do">## Correct regions with no soft bottom habitat area</span></span>
-<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a><span class="co"># check which regions have NA values</span></span>
-<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a><span class="co"># data_rescale_na &lt;- data_density %&gt;% </span></span>
-<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(density_rescaled_capped)) </span></span>
-<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a><span class="co"># length(unique(data_rescale_na$rgn_id)) </span></span>
-<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a><span class="co"># # replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ&#39;s because it is not there to begin with</span></span>
-<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a><span class="co"># data_density &lt;- data_density %&gt;% </span></span>
-<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(density_rescaled_capped = ifelse(is.na(density_rescaled_capped), 0, density_rescaled_capped))</span></span>
-<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a><span class="co"># # check it worked:</span></span>
-<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a><span class="co"># data_rescale_na &lt;- data_density %&gt;% </span></span>
-<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(density_rescaled_capped)) </span></span>
-<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a><span class="co"># length(unique(data_rescale_na$rgn_id)) # 0</span></span></code></pre></div>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co"># old summary stats:</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Min.   1st Qu.    Median      Mean   3rd Qu.      Max.      NA&#39;s </span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co">#    0.0000    0.0000    0.0005    4.4239    0.2861 2503.8848       135 </span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the data distribution because in the past density data happens to be very skewed</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(data_density<span class="sc">$</span>raw_density) <span class="co"># very skewed (right)</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co"># tested many approaches to normalize data, none do it extremely enough to look normal (square root, cube root, lower quantiles, annual quantiles, inverse, etc.), taking the log is the most logical method for this data even though it is still skewed after transformation</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_density =</span> <span class="fu">log</span>(raw_density <span class="sc">+</span> <span class="dv">1</span>))</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>ref_point_95_all_years <span class="ot">&lt;-</span> <span class="fu">quantile</span>(data_density<span class="sc">$</span>log_density, <span class="fu">c</span>(<span class="fl">0.95</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Rescale the density:</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled =</span> log_density<span class="sc">/</span>ref_point_95_all_years) <span class="sc">%&gt;%</span></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled_capped =</span> <span class="fu">ifelse</span>(density_rescaled <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>                                                 <span class="dv">1</span>,</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>                                                 density_rescaled))</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 2022 assessment scratch code:</span></span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a><span class="do">## Correct regions with no soft bottom habitat area</span></span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a><span class="co"># check which regions have NA values</span></span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a><span class="co"># data_rescale_na &lt;- data_density %&gt;% </span></span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(density_rescaled_capped)) </span></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a><span class="co"># length(unique(data_rescale_na$rgn_id)) </span></span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a><span class="co"># # replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ&#39;s because it is not there to begin with</span></span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a><span class="co"># data_density &lt;- data_density %&gt;% </span></span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(density_rescaled_capped = ifelse(is.na(density_rescaled_capped), 0, density_rescaled_capped))</span></span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a><span class="co"># # check it worked:</span></span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a><span class="co"># data_rescale_na &lt;- data_density %&gt;% </span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(density_rescaled_capped)) </span></span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a><span class="co"># length(unique(data_rescale_na$rgn_id)) # 0</span></span></code></pre></div>
 </div>
 <div id="calculate-health-and-pressure-scores" class="section level2">
 <h2>Calculate health and pressure scores</h2>

@@ -934,7 +934,7 @@ for (i in years_all) {
 toc() 
 ```
 
-## Standarize catches per soft-bottom area
+## Rescale data for OHI regions
 
 ```{r, eval=FALSE}
 #area <-  read.csv(paste0(here(), "/globalprep/hab_prs_hd_subtidal_soft_bottom/v2016/output/habitat_extent_softbottom.csv"))
@@ -946,11 +946,6 @@ annual_list <- lapply(files, function(x){read.csv(file = x)})
 # combine all annual dataframes into one with a year variable present
 data_density <- bind_rows(annual_list)
 data_density <- data_density %>% rename(raw_density = effort_sum)
-
-#data_density <- fishing_all %>%
-#  left_join(area, by = "rgn_id") %>%
-#  filter(rgn_id <= 250) %>%
-#  mutate(raw_density = effort_sum/km2)
 
 # get summary stats for the data density before rescaling using the quantile
 summary(data_density$raw_density)
