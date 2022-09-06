@@ -108,7 +108,7 @@ hist(tmp$w_fis)
 Compare to previous year data (a big jump in fish data, so not super compatible, but should be correlated at least)
 ```{r}
 
-compare <- read.csv("../../fp/v2020/output/wildcaught_weight.csv") %>%
+compare <- read.csv("../../fp/v2021/output/wildcaught_weight.csv") %>%
   rename(w_fis_old = w_fis) %>%
   left_join(tmp, by=c('rgn_id', 'year'))
 plot(compare$w_fis_old, compare$w_fis)
