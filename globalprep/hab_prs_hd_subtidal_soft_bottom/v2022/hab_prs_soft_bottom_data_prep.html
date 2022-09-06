@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 30 14:49:34 2022 by jcohen" />
+<meta name="author" content="Compiled on Tue Sep 6 14:33:39 2022 by jcohen" />
 
 
 <title>OHI 2022 - Soft bottom pressure data prep</title>
@@ -1672,7 +1672,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2022 - Soft bottom pressure data
 prep</h1>
-<h4 class="author"><em>Compiled on Tue Aug 30 14:49:34 2022 by
+<h4 class="author"><em>Compiled on Tue Sep 6 14:33:39 2022 by
 jcohen</em></h4>
 
 </div>
@@ -1741,8 +1741,17 @@ for the Cumulative Human Impacts project, and are available from <a href="https:
 <p><strong>Reference</strong>: Halpern, Benjamin S et al. “Spatial and
 Temporal Changes in Cumulative Human Impacts on the World’s Ocean.”
 Nature Communications 6.1 (2015): 7615–7615. Web.</p>
-<p><strong>Description</strong>: Number of square kilometers of soft
-bottom habitat that is associated with each of the 220 OHI regions.</p>
+<p><strong>Description</strong>: Rasters that portray soft bottom
+habitat across the world. Rasters are as follows:</p>
+<ol style="list-style-type: decimal">
+<li>habitat_d_s_benthic</li>
+<li>habitat_s_t_s_bottom</li>
+<li>habitat_soft_shelf</li>
+<li>habitat_soft_slope</li>
+<li>habitat_inttidalmud</li>
+</ol>
+<p><strong>Native data resolution</strong>: ~934 x 934 meters</p>
+<p><strong>Format</strong>: tif format</p>
 </div>
 </div>
 <div id="methods" class="section level1">
@@ -1754,10 +1763,10 @@ and dredging geartypes</li>
 <li>Correct trawling data by subsetting for only bottom trawling using
 catch data from Watson &amp; Tidd (2018) and combine with dreding
 data</li>
+<li>Standardize by soft-bottom habitat using soft bottom habitat extent
+rasters from Haplern et al. 2015</li>
 <li>Layer the fishing effort data with OHI regional polygons for land
 and EEZ to extract only fishing effort within regions of interest</li>
-<li>Standardize by soft-bottom habitat of each region calculate fishing
-effort for each OHI region</li>
 <li>Transform data with log(x + 1) because density data are extremely
 skewed, then divide by the 95th quantile and cap values at 1</li>
 <li>Assign health and pressure labels to values</li>
@@ -2369,238 +2378,453 @@ data processing.</p>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(nigeria<span class="sc">$</span>geometry, <span class="at">col =</span> <span class="st">&quot;grey96&quot;</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">&quot;Nigeria Trawling &amp; Dredging Fishing Effort 2020&quot;</span>, <span class="at">legend =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fishing_effort_2020, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
-<div id="calculate-fishing-effort-for-each-ohi-region" class="section level2">
-<h2>Calculate fishing effort for each OHI region</h2>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>() <span class="co"># 21 min</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in OHI regions polygons - several polygons (rows) for each region because one polygon exists for each region &amp; land type combo (eez, land, etc.)</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ohi_regions <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/v2017&quot;</span>), <span class="at">layer =</span> <span class="st">&quot;regions_2017_update&quot;</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Make the region coordinate reference system the same as the trawling &amp; dredging raster</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>ohi_regions_wgs <span class="ot">&lt;-</span>  <span class="fu">st_transform</span>(<span class="at">x =</span> ohi_regions, <span class="at">crs =</span> <span class="st">&quot;EPSG:4326&quot;</span>) </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># filter out antarctica and disputed and all land types besides eez and land </span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>ohi_regions_filtered <span class="ot">&lt;-</span> ohi_regions_wgs <span class="sc">%&gt;%</span> </span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;eez&quot;</span>, <span class="st">&quot;land&quot;</span>),</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span>rgn_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Antarctica&quot;</span>, <span class="st">&quot;DISPUTED&quot;</span>))</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>years_all <span class="ot">&lt;-</span>  <span class="fu">as.factor</span>(<span class="dv">2012</span><span class="sc">:</span><span class="dv">2020</span>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> years_all) {</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Processing &quot;</span>, i, <span class="st">&quot; fishing effort.&quot;</span>))</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read in the annual fishing raster for all regions that represents corrected trawling plus dredging data </span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  fishing_raster <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_&quot;</span>, i, <span class="st">&quot;.tif&quot;</span>))</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># extract the fishing effort that falls within the polygons of OHI regions</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  extracted <span class="ot">&lt;-</span> exactextractr<span class="sc">::</span><span class="fu">exact_extract</span>(fishing_raster, ohi_regions_filtered)</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># sum effort by polygon and append polygon dataframes into 1</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  all_polygon_effort <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(extracted)) {</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> extracted[[j]]</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    weighted_effort_polygon <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>      <span class="co"># weight the fishing effort within each cell by the coverage of the cell within the polygon </span></span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">effort =</span> value<span class="sc">*</span>coverage_fraction,</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>             <span class="at">polygon_id =</span> j) <span class="sc">%&gt;%</span></span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(polygon_id, effort) <span class="sc">%&gt;%</span></span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(polygon_id) <span class="sc">%&gt;%</span></span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarize</span>(<span class="at">effort_sum =</span> <span class="fu">sum</span>(effort, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># bind the polygon-specific sum to the master dataframe of polygon sums</span></span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>    all_polygon_effort <span class="ot">&lt;-</span> <span class="fu">rbind</span>(all_polygon_effort, weighted_effort_polygon)</span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bind regional id&#39;s to the polygon id&#39;s</span></span>
-<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>  rgn_id <span class="ot">&lt;-</span> ohi_regions_filtered<span class="sc">$</span>rgn_id</span>
-<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>  regional_polygon_effort <span class="ot">&lt;-</span> <span class="fu">cbind</span>(all_polygon_effort, rgn_id)</span>
-<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>  regional_polygon_effort <span class="ot">&lt;-</span> regional_polygon_effort <span class="sc">%&gt;%</span></span>
-<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
-<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># combine each land and eez polygon for the same region, because some of the fishing points landed just on the border of these polygons and are associated with land when they should be eez</span></span>
-<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">effort_sum =</span> <span class="fu">sum</span>(effort_sum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year =</span> i)</span>
-<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>  <span class="co"># convert this raster info into a csv that represents the trawling and dredging fishing effort for each OHI region for year i </span></span>
-<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(regional_polygon_effort, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="fu">here</span>(), <span class="st">&quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv/fishing_effort_&quot;</span>, i, <span class="st">&quot;.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;Saved &quot;</span>, i, <span class="st">&quot; fishing effort csv to &quot;</span>, <span class="fu">here</span>(), <span class="st">&quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv/fishing_effort_&quot;</span>, i, <span class="st">&quot;.csv&quot;</span>))</span>
-<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() </span></code></pre></div>
-</div>
 <div id="standarize-catches-per-soft-bottom-area" class="section level2">
 <h2>Standarize catches per soft-bottom area</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>area <span class="ot">&lt;-</span>  <span class="fu">read.csv</span>(<span class="fu">paste0</span>(<span class="fu">here</span>(), <span class="st">&quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2016/output/habitat_extent_softbottom.csv&quot;</span>))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in csv for each year and combine them in one data frame</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;.csv&quot;</span>, <span class="at">full =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>annual_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(files, <span class="cf">function</span>(x){<span class="fu">read.csv</span>(<span class="at">file =</span> x)})</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># combine all annual dataframes into one with a year variable present</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>fishing_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(annual_list) </span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> fishing_all <span class="sc">%&gt;%</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(area, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">raw_density =</span> effort_sum<span class="sc">/</span>km2)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># get summary stats for the data density before rescaling using the quantile</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data_density<span class="sc">$</span>raw_density)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Min.   1st Qu.    Median      Mean   3rd Qu.      Max.      NA&#39;s </span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">#    0.0000    0.0000    0.0005    4.4239    0.2861 2503.8848       135 </span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the data distribution because in the past density data happens to be very skewed</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(data_density<span class="sc">$</span>raw_density) <span class="co"># very skewed (right)</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co"># tested many approaches to normalize data, none do it extremely enough to look normal (square root, cube root, lower quantiles, annual quantiles, inverse, etc.), taking the log is the most logical method for this data even though it is still skewed after transformation</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_density =</span> <span class="fu">log</span>(raw_density <span class="sc">+</span> <span class="dv">1</span>))</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>ref_point_95_all_years <span class="ot">&lt;-</span> <span class="fu">quantile</span>(data_density<span class="sc">$</span>log_density, <span class="fu">c</span>(<span class="fl">0.95</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Rescale the density:</span></span>
-<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled =</span> log_density<span class="sc">/</span>ref_point_95_all_years) <span class="sc">%&gt;%</span></span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled_capped =</span> <span class="fu">ifelse</span>(density_rescaled <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>                                                 <span class="dv">1</span>,</span>
-<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>                                                 density_rescaled))</span></code></pre></div>
+<p>Read in all files that represent soft bottom habitat extent (Halpern
+et al. 2015).</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create raster stack of all 5 tif files that represent different types of soft bottom habitat</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sb_hab_raw_stack <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/soft_bottom_extent/tifs/&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;.tif&quot;</span>, <span class="at">full =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># check metadata</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>sb_hab_raw_stack</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># get an idea what one layer looks like to make sure summation works</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sb_hab_raw_stack[[<span class="dv">5</span>]], <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>sb_hab_raw_stack[[<span class="dv">5</span>]]</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co"># sum all rasters to create composite raster for all soft bottom habitat</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>sb_hab_composite <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">app</span>(sb_hab_raw_stack, <span class="at">fun =</span> <span class="st">&quot;sum&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co"># convert all values greater than 1 to 1, so we have a presence/absence raster for all soft bottom habitat. Values greater than one represent cells that have been assigned to 2 different soft bottom habitat types, but this is not helpful for our purposes.</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>sb_hab_composite[sb_hab_composite <span class="sc">&gt;=</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sb_hab_composite, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p>Convert the soft bottom habitat raster (resolution units = meters,
+CRS = <code>WGS_1984_Mollweide</code>) to a coarser resolution because
+we know that there is error associated with our soft bottom habitat
+measurements. Aggregating allows us to make a buffer around each cell,
+which helps account for this uncertainty.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sb_hab_coarse <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">aggregate</span>(<span class="at">x =</span> sb_hab_composite, <span class="at">fact =</span> <span class="dv">5</span>, <span class="at">fun =</span> <span class="st">&quot;sum&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sb_hab_coarse</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 4672.394 x 4672.394 meters resolution</span></span></code></pre></div>
+<p>The purpose of this raster is to multiply it by the annual fishing
+effort rasters to identify the proportion of the fishing effort per cell
+that affected soft bottom habitat, so we need each aggregated cell of
+the soft bottom habitat raster to represent the
+<strong>proportion</strong> of that area that is soft bottom. To convert
+the cell value to a proportion, we divide by the number of original
+cells that were aggregated into each derived cell.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># min value of raster: 1, max value of raster: 25</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># since we aggregated by a factor of 5 and used the sum function, each cell now represents the sum of the cells within a square of 25 cells. If all those cells represented soft bottom habitat, meaning they all had a value of 1, then the value of those cells is now 25</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>sb_hab_prop <span class="ot">&lt;-</span> sb_hab_coarse<span class="sc">/</span><span class="dv">25</span></span></code></pre></div>
+<p>Pull in fishing effort rasters for each year, so we can process each
+by multiplying them by the soft bottom habitat extent.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fish_effort <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;.tif&quot;</span>, <span class="at">full =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2020 file path</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>fish_effort[<span class="dv">9</span>]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># rasterize file</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>fish_effort_2020 <span class="ot">&lt;-</span> <span class="fu">rast</span>(fish_effort[<span class="dv">9</span>])</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>fish_effort_2020</span></code></pre></div>
+<p>Aggregate the fishing effort raster, too, because we know there is
+also similar error associated with the fishing effort data and because
+we want the resolutions of the two rasters to be similar.</p>
+<ul>
+<li>The resolution of the <strong>fishing effort</strong> raster is
+<strong>0.01 x 0.01 degrees</strong>, CRS =
+<code>lon/lat WGS 84 (EPSG:4326)</code>.</li>
+<li>The resolution of the <strong>soft bottom habitat</strong> raster is
+<strong>~934 x 934 meters</strong>, CRS =
+<code>WGS_1984_Mollweide</code>.</li>
+</ul>
+<p>We know that the soft bottom habitat raster has a very similar
+resolution because ~934 x ~934 meters translates to ~0.934 square
+kilometers, and 0.01 x 0.01 degrees translates to ~1.11 square
+kilometers at the equator (the exact size of the degree cells differs
+slightly based on the latitude of the raster cell). So since the
+resolutions are similar to start, we want to aggregate them similarly as
+well.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fish_effort_2020_coarse <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">aggregate</span>(<span class="at">x =</span> fish_effort_2020, <span class="at">fact =</span> <span class="dv">5</span>, <span class="at">fun =</span> <span class="st">&quot;sum&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># unequal area, but equal angle</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 0.05 x 0.05 resolution </span></span></code></pre></div>
+<p>The fishing effort raster is in units of pure fishing hours, so it is
+not already standardized over the area of each cell. This raster is
+<strong>equal angle</strong> and not <strong>equal area</strong>, as the
+soft bottom habitat raster is, meaning that the cell values differ based
+on latitude. As such, we should divide the fishing hours for each cell
+by the area of the cell, which we calculate with
+<code>terra::cellSize(unit = &quot;km&quot;)</code> so that the division is based
+on the actual size of each individual cell in kilometers. This
+standardization is necessary because we need to reproject the fishing
+effort raster into the same CRS as the soft bottom habitat raster
+(<code>WGS_1984_Mollweide</code>), which changes the projection of the
+fishing hours over space, and we do not want to change the total value
+of fishing hours for each year. Overall, the steps are as follows:</p>
+<ol style="list-style-type: decimal">
+<li>Convert the units of fishing hours to fishing hours per
+kilometer</li>
+<li>Reproject the CRS of the fishing effort raster to match that of the
+soft bottom habitat raster</li>
+<li>To get units of pure fishing hours again, multiply the fishing hours
+raster cells by the size of the <strong>newly aggregated equal area
+raster</strong></li>
+</ol>
+<p>This approach is not perfect because there will still be a slight
+discrepancy between the sum of the fishing hours before and after
+reprojecting, but this does a relatively clean job of retaining the
+apparent fishing hours per area.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check the total number of fishing hours before reprojecting</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">global</span>(fish_effort_2020_coarse, <span class="st">&quot;sum&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># 18379444 </span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>fish_effort_2020_hr_km <span class="ot">&lt;-</span> fish_effort_2020_coarse<span class="sc">/</span><span class="fu">cellSize</span>(fish_effort_2020_coarse, <span class="at">unit =</span> <span class="st">&quot;km&quot;</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># change CRS to `WGS_1984_Mollweide`</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>fish_effort_2020_reproj <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(fish_effort_2020_hr_km, sb_hab_prop)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>fish_effort_2020_reproj <span class="co"># WGS_1984_Mollweide!!</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># now that the raster is equal angle, we can multiply each cell by the same value, and we don&#39;t have to use cellSize()</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>fish_effort_2020_reproj_fix <span class="ot">&lt;-</span> fish_effort_2020_reproj<span class="sc">*</span><span class="fl">21.83127</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="fu">global</span>(fish_effort_2020_reproj_fix, <span class="st">&quot;sum&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># 18541882, very close to what it was before reprojecting! great</span></span></code></pre></div>
+<p>Lastly, we multiply the raster of soft bottom habitat proportion by
+the fishing effort raster to subset the fishing hours to those that only
+affect soft bottom habitat.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create stack of both rasters</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>effort_sb_stack <span class="ot">&lt;-</span> <span class="fu">c</span>(fish_effort_2020_reproj_fix, sb_hab_prop)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># check NA values in fishing raster</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">global</span>(fish_effort_2020_reproj_fix, <span class="st">&quot;isNA&quot;</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># fish effort values range 0 - 10706, and 29459600 NA values</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># check NA values in sb habitat raster</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">global</span>(sb_hab_prop, <span class="st">&quot;isNA&quot;</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sb habitat values range 0.4-1, and 14215686 NA values</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>multiply <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">lapp</span>(effort_sb_stack, <span class="at">fun =</span> <span class="cf">function</span>(x,y){<span class="fu">return</span>(x<span class="sc">*</span>y)})</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>multiply <span class="co"># units of hours * proportion of that cell which is sb hab, resulting units are hrs of fishing effort </span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">global</span>(multiply, <span class="st">&quot;isNA&quot;</span>) <span class="co"># 29473052 NA values</span></span></code></pre></div>
+<p>Now that we multiplied the rasters, we should consider the difference
+between <code>NA</code> values and 0 values. The <code>NA</code> values
+in this raster represent cells that either did not have fishing effort,
+do not contain soft bottom habitat, or both, so they should be converted
+to 0 to represent no soft bottom habitat destruction.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>multiply[<span class="fu">is.na</span>(multiply)] <span class="ot">=</span> <span class="dv">0</span> </span></code></pre></div>
+<p>Switching gears a bit, we now want to correct the aggregated soft
+bottom habitat raster to cap the values of each cell at 1. This yields a
+raster that represents whether or not soft bottom habitat is present in
+a cell at all, rather than the amount of soft bottom habitat
+standardized over the area of the cells, which is represented in the
+raster we made earlier, <code>sb_hab_prop</code>.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first check if there are values in the aggregated raster that are between 0 and 1</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">unique</span>(sb_hab_coarse) <span class="co"># whole numbers ranging from 1-25, and NA</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># duplicate object with another name</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>sb_hab_coarse_fix <span class="ot">&lt;-</span> sb_hab_coarse  </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># cap values at 1 to convert this raster into a presence(1) or absence(0) raster</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>sb_hab_coarse_fix[sb_hab_coarse_fix <span class="sc">&gt;=</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<p>Apply a mask to the raster that represents just the trawling and
+dredging fishing effort standardized over the amount of soft bottom
+habitat, so we can retain the soft bottom habitat that is undisturbed in
+addition to the soft bottom habitat that is disturbed (which is already
+present in <code>multiply</code>). Before we use the <code>mask()</code>
+function on these two rasters, the <code>multiply</code> raster contains
+0 where there is no fishing effort, no soft bottom habitat, or both.
+There are no <code>NA</code> values. On the other hand, the raster
+<code>sb_hab_coarse_fix</code> contains <code>NA</code> where no soft
+bottom habitat is present, and 1 where any type of soft bottom habitat
+is present. <code>mask()</code> converts all the cells in
+<code>multiply</code> to <code>NA</code> where they fall on
+<code>NA</code> in the soft bottom habitat raster. This step allows us
+to distinguish between 0’s and <code>NA</code>s. 0’s will represent soft
+bottom habitat that has not been disturbed, and <code>NA</code>s will
+now represent lack of soft bottom habitat.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the raster `multiply` has no NA values</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># the raster `sb_hab_coarse_fix` has values either 1 or NA</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>multiply_mask <span class="ot">&lt;-</span> <span class="fu">mask</span>(<span class="at">x =</span> multiply, <span class="at">mask =</span> sb_hab_coarse_fix, <span class="at">filename =</span> <span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_2020.tif&quot;</span>))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># now the raster `multiply_mask` does contain NA values where there is no soft bottom habitat at all</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co"># we want to identify the soft bottom habitat that is undisturbed because we need to be able to assign regions that are not disturbing available soft bottom habitat with a good score</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(multiply_mask)</span></code></pre></div>
 </div>
-<div id="correct-regions-with-no-soft-bottom-habitat-area" class="section level2">
-<h2>Correct regions with no soft bottom habitat area</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check which regions have NA values</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>data_rescale_na <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(density_rescaled_capped)) </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(data_rescale_na<span class="sc">$</span>rgn_id)) <span class="co"># 15 regions have NA values for fishing effort, this is just because those regions do not have soft bottom habitat in the spatial file</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ&#39;s because it is not there to beign with</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span> </span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled_capped =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(density_rescaled_capped), <span class="dv">0</span>, density_rescaled_capped))</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check it worked:</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>data_rescale_na <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span> </span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(density_rescaled_capped)) </span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(data_rescale_na<span class="sc">$</span>rgn_id)) <span class="co"># 0</span></span></code></pre></div>
+<div id="iterate-the-soft-bottom-habitat-standardization-across-all-other-years" class="section level2">
+<h2>Iterate the soft bottom habitat standardization across all other
+years</h2>
+<p>We just ran through 2020 step by step, now we apply the same process
+to 2012-2019 data and save the output tif’s to the same directory.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fish_effort_12_19 <span class="ot">&lt;-</span> fish_effort[<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(fish_effort_12_19)) {</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># define the year we are processing so we can keep track of loop and name files clearly</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  year <span class="ot">&lt;-</span> <span class="fu">substring</span>(fish_effort_12_19[i], <span class="dv">118</span>, <span class="dv">121</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  fish_effort_annual <span class="ot">&lt;-</span> <span class="fu">rast</span>(fish_effort_12_19[i])</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;Aggregating year &quot;</span>, year))</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  fish_effort_coarse <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">aggregate</span>(<span class="at">x =</span> fish_effort_annual, <span class="at">fact =</span> <span class="dv">5</span>, <span class="at">fun =</span> <span class="st">&quot;sum&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Dividing by cell size&quot;</span>)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  fish_effort_hr_km <span class="ot">&lt;-</span> fish_effort_coarse<span class="sc">/</span><span class="fu">cellSize</span>(fish_effort_coarse, <span class="at">unit =</span> <span class="st">&quot;km&quot;</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Reprojecting&quot;</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  fish_effort_reproj <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">project</span>(fish_effort_hr_km, sb_hab_prop)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  fish_effort_reproj_fix <span class="ot">&lt;-</span> fish_effort_reproj<span class="sc">*</span><span class="fl">21.83127</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Stacking&quot;</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  effort_sb_stack <span class="ot">&lt;-</span> <span class="fu">c</span>(fish_effort_reproj_fix, sb_hab_prop)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Standardizing by soft bottom habitat&quot;</span>)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  multiply <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">lapp</span>(effort_sb_stack, <span class="at">fun =</span> <span class="cf">function</span>(x,y){<span class="fu">return</span>(x<span class="sc">*</span>y)})</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  multiply[<span class="fu">is.na</span>(multiply)] <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  sb_hab_coarse_fix <span class="ot">&lt;-</span> sb_hab_coarse</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  sb_hab_coarse_fix[sb_hab_coarse_fix <span class="sc">&gt;=</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;Masking and saving year &quot;</span>, year))</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>  multiply_mask <span class="ot">&lt;-</span> <span class="fu">mask</span>(<span class="at">x =</span> multiply, <span class="at">mask =</span> sb_hab_coarse_fix, <span class="at">filename =</span> <span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_&quot;</span>, year, <span class="st">&quot;.tif&quot;</span>))</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="co"># check out some plots</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a><span class="co">#plot(rast(paste0(dir_M, &quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_2012.tif&quot;)))</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a><span class="co">#plot(rast(paste0(dir_M, &quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_2015.tif&quot;)))</span></span></code></pre></div>
+</div>
+<div id="calculate-fishing-effort-for-each-ohi-region" class="section level2">
+<h2>Calculate fishing effort for each OHI region</h2>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>() <span class="co"># 15-20 min</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in OHI regions polygons - several polygons (rows) for each region because one polygon exists for each region &amp; land type combo (eez, land, etc.)</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ohi_regions <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/spatial/v2017&quot;</span>), <span class="at">layer =</span> <span class="st">&quot;regions_2017_update&quot;</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co"># filter out antarctica and disputed and all land types besides eez and land </span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>ohi_regions_filtered <span class="ot">&lt;-</span> ohi_regions <span class="sc">%&gt;%</span> </span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;eez&quot;</span>, <span class="st">&quot;land&quot;</span>),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span>rgn_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Antarctica&quot;</span>, <span class="st">&quot;DISPUTED&quot;</span>))</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>years_all <span class="ot">&lt;-</span>  <span class="fu">as.factor</span>(<span class="dv">2012</span><span class="sc">:</span><span class="dv">2020</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> years_all) {</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Processing &quot;</span>, i, <span class="st">&quot; fishing effort.&quot;</span>))</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read in the annual fishing raster for all regions that represents corrected trawling plus dredging data </span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  fishing_raster <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_&quot;</span>, i, <span class="st">&quot;.tif&quot;</span>))</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># extract the fishing effort that falls within the polygons of OHI regions</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  extracted <span class="ot">&lt;-</span> exactextractr<span class="sc">::</span><span class="fu">exact_extract</span>(fishing_raster, ohi_regions_filtered)</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># sum effort by polygon and append polygon dataframes into 1</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  all_polygon_effort <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(extracted)) {</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> extracted[[j]]</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    weighted_effort_polygon <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>      <span class="co"># weight the fishing effort within each cell by the coverage of the cell within the polygon </span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">effort =</span> value<span class="sc">*</span>coverage_fraction,</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>             <span class="at">polygon_id =</span> j) <span class="sc">%&gt;%</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">select</span>(polygon_id, effort) <span class="sc">%&gt;%</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">group_by</span>(polygon_id) <span class="sc">%&gt;%</span></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">effort_sum =</span> <span class="fu">sum</span>(effort, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># bind the polygon-specific sum to the master dataframe of polygon sums</span></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>    all_polygon_effort <span class="ot">&lt;-</span> <span class="fu">rbind</span>(all_polygon_effort, weighted_effort_polygon)</span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bind regional id&#39;s to the polygon id&#39;s</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>  rgn_id <span class="ot">&lt;-</span> ohi_regions_filtered<span class="sc">$</span>rgn_id</span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>  regional_polygon_effort <span class="ot">&lt;-</span> <span class="fu">cbind</span>(all_polygon_effort, rgn_id)</span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>  regional_polygon_effort <span class="ot">&lt;-</span> regional_polygon_effort <span class="sc">%&gt;%</span></span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># combine each land and eez polygon for the same region, because some of the fishing points landed just on the border of these polygons and are associated with land when they should be eez</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">effort_sum =</span> <span class="fu">sum</span>(effort_sum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year =</span> i)</span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>  <span class="co"># convert this raster info into a csv that represents the trawling and dredging fishing effort for each OHI region for year i </span></span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(regional_polygon_effort, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="fu">here</span>(), <span class="st">&quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv/fishing_effort_&quot;</span>, i, <span class="st">&quot;.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;Saved &quot;</span>, i, <span class="st">&quot; fishing effort csv to &quot;</span>, <span class="fu">here</span>(), <span class="st">&quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv/fishing_effort_&quot;</span>, i, <span class="st">&quot;.csv&quot;</span>))</span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() </span></code></pre></div>
+</div>
+<div id="standarize-catches-per-soft-bottom-area-1" class="section level2">
+<h2>Standarize catches per soft-bottom area</h2>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#area &lt;-  read.csv(paste0(here(), &quot;/globalprep/hab_prs_hd_subtidal_soft_bottom/v2016/output/habitat_extent_softbottom.csv&quot;))</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in csv for each year and combine them in one data frame</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv&quot;</span>), <span class="at">pattern =</span> <span class="st">&quot;.csv&quot;</span>, <span class="at">full =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>annual_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(files, <span class="cf">function</span>(x){<span class="fu">read.csv</span>(<span class="at">file =</span> x)})</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># combine all annual dataframes into one with a year variable present</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(annual_list)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">raw_density =</span> effort_sum)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co">#data_density &lt;- fishing_all %&gt;%</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">#  left_join(area, by = &quot;rgn_id&quot;) %&gt;%</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#  filter(rgn_id &lt;= 250) %&gt;%</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">#  mutate(raw_density = effort_sum/km2)</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co"># get summary stats for the data density before rescaling using the quantile</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data_density<span class="sc">$</span>raw_density)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co">#    0       0       0   55153    4769 7540105</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="co"># old summary stats:</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Min.   1st Qu.    Median      Mean   3rd Qu.      Max.      NA&#39;s </span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co">#    0.0000    0.0000    0.0005    4.4239    0.2861 2503.8848       135 </span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the data distribution because in the past density data happens to be very skewed</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(data_density<span class="sc">$</span>raw_density) <span class="co"># very skewed (right)</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="co"># tested many approaches to normalize data, none do it extremely enough to look normal (square root, cube root, lower quantiles, annual quantiles, inverse, etc.), taking the log is the most logical method for this data even though it is still skewed after transformation</span></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_density =</span> <span class="fu">log</span>(raw_density <span class="sc">+</span> <span class="dv">1</span>))</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>ref_point_95_all_years <span class="ot">&lt;-</span> <span class="fu">quantile</span>(data_density<span class="sc">$</span>log_density, <span class="fu">c</span>(<span class="fl">0.95</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Rescale the density:</span></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>data_density <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled =</span> log_density<span class="sc">/</span>ref_point_95_all_years) <span class="sc">%&gt;%</span></span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density_rescaled_capped =</span> <span class="fu">ifelse</span>(density_rescaled <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>                                                 <span class="dv">1</span>,</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>                                                 density_rescaled))</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 2022 assessment scratch code:</span></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a><span class="do">## Correct regions with no soft bottom habitat area</span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a><span class="co"># check which regions have NA values</span></span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a><span class="co"># data_rescale_na &lt;- data_density %&gt;% </span></span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(density_rescaled_capped)) </span></span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a><span class="co"># length(unique(data_rescale_na$rgn_id)) </span></span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a><span class="co"># # replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ&#39;s because it is not there to begin with</span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a><span class="co"># data_density &lt;- data_density %&gt;% </span></span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(density_rescaled_capped = ifelse(is.na(density_rescaled_capped), 0, density_rescaled_capped))</span></span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a><span class="co"># # check it worked:</span></span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a><span class="co"># data_rescale_na &lt;- data_density %&gt;% </span></span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(density_rescaled_capped)) </span></span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a><span class="co"># length(unique(data_rescale_na$rgn_id)) # 0</span></span></code></pre></div>
 </div>
 <div id="calculate-health-and-pressure-scores" class="section level2">
 <h2>Calculate health and pressure scores</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check that all regions are present</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(health_pressure<span class="sc">$</span>rgn_id))</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>health_pressure <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;soft_bottom&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pressure =</span> density_rescaled_capped) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">health =</span> (<span class="dv">1</span> <span class="sc">-</span> density_rescaled_capped)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, health, pressure, habitat)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(health_pressure<span class="sc">$</span>pressure)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(health_pressure<span class="sc">$</span>health)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>health_pressure <span class="ot">&lt;-</span> data_density <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;soft_bottom&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pressure =</span> density_rescaled_capped) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">health =</span> (<span class="dv">1</span> <span class="sc">-</span> density_rescaled_capped)) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, health, pressure, habitat)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># check that all regions are present</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(health_pressure<span class="sc">$</span>rgn_id))</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(health_pressure<span class="sc">$</span>pressure)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(health_pressure<span class="sc">$</span>health)</span></code></pre></div>
 </div>
 <div id="calculate-and-save-trend" class="section level2">
 <h2>Calculate and save trend</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Get habitat trends</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>stop_year <span class="ot">&lt;-</span> <span class="fu">max</span>(health_pressure<span class="sc">$</span>year)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>trend <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># run trend calculation on last 5 years of data</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (status_year <span class="cf">in</span> (stop_year<span class="dv">-4</span>)<span class="sc">:</span>stop_year){ </span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  trend_years <span class="ot">&lt;-</span> status_year<span class="sc">:</span>(status_year <span class="sc">-</span> <span class="dv">4</span>)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  first_trend_year <span class="ot">&lt;-</span> <span class="fu">min</span>(trend_years)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  trend_new <span class="ot">&lt;-</span> health_pressure <span class="sc">%&gt;%</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># subset health &amp; pressure scores to just trend years</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">%in%</span> trend_years) <span class="sc">%&gt;%</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># create linear model of habitat health over 5 years </span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">do</span>(<span class="at">mdl =</span> <span class="fu">lm</span>(health <span class="sc">~</span> year, <span class="at">data =</span> .),</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>       <span class="co"># starting point for the health trend is derived from the health values within the first year of the trend, this serves as a kind of reference point</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">adjust_trend =</span> .<span class="sc">$</span>health[.<span class="sc">$</span>year <span class="sc">==</span> first_trend_year]) <span class="sc">%&gt;%</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">rgn_id =</span> rgn_id,</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>              <span class="co"># create trend by dividing the year coefficient by the health in the first year of the trend, then multiplying that slope by the number of years in the trend</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">trend =</span> <span class="fu">round</span>(<span class="fu">coef</span>(mdl)[<span class="st">&#39;year&#39;</span>]<span class="sc">/</span>adjust_trend <span class="sc">*</span> <span class="dv">5</span>, <span class="dv">4</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># cap the trend at 1 and -1</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trend =</span> <span class="fu">ifelse</span>(trend <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, trend)) <span class="sc">%&gt;%</span></span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trend =</span> <span class="fu">ifelse</span>(trend <span class="sc">&lt;</span> (<span class="sc">-</span><span class="dv">1</span>), (<span class="sc">-</span><span class="dv">1</span>), trend))</span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  trend_new <span class="ot">&lt;-</span> trend_new <span class="sc">%&gt;%</span></span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;soft_bottom&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> status_year) <span class="sc">%&gt;%</span></span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, habitat, trend)</span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>  trend <span class="ot">&lt;-</span> <span class="fu">rbind</span>(trend, trend_new)</span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(trend, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Get habitat trends</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>stop_year <span class="ot">&lt;-</span> <span class="fu">max</span>(health_pressure<span class="sc">$</span>year)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>trend <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co"># run trend calculation on last 5 years of data</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (status_year <span class="cf">in</span> (stop_year<span class="dv">-4</span>)<span class="sc">:</span>stop_year){ </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  trend_years <span class="ot">&lt;-</span> status_year<span class="sc">:</span>(status_year <span class="sc">-</span> <span class="dv">4</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  first_trend_year <span class="ot">&lt;-</span> <span class="fu">min</span>(trend_years)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  trend_new <span class="ot">&lt;-</span> health_pressure <span class="sc">%&gt;%</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># subset health &amp; pressure scores to just trend years</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">%in%</span> trend_years) <span class="sc">%&gt;%</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># create linear model of habitat health over 5 years </span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">do</span>(<span class="at">mdl =</span> <span class="fu">lm</span>(health <span class="sc">~</span> year, <span class="at">data =</span> .),</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>       <span class="co"># starting point for the health trend is derived from the health values within the first year of the trend, this serves as a kind of reference point</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">adjust_trend =</span> .<span class="sc">$</span>health[.<span class="sc">$</span>year <span class="sc">==</span> first_trend_year]) <span class="sc">%&gt;%</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">rgn_id =</span> rgn_id,</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>              <span class="co"># create trend by dividing the year coefficient by the health in the first year of the trend, then multiplying that slope by the number of years in the trend</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">trend =</span> <span class="fu">round</span>(<span class="fu">coef</span>(mdl)[<span class="st">&#39;year&#39;</span>]<span class="sc">/</span>adjust_trend <span class="sc">*</span> <span class="dv">5</span>, <span class="dv">4</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># cap the trend at 1 and -1</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trend =</span> <span class="fu">ifelse</span>(trend <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, trend)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trend =</span> <span class="fu">ifelse</span>(trend <span class="sc">&lt;</span> (<span class="sc">-</span><span class="dv">1</span>), (<span class="sc">-</span><span class="dv">1</span>), trend))</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  trend_new <span class="ot">&lt;-</span> trend_new <span class="sc">%&gt;%</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">habitat =</span> <span class="st">&quot;soft_bottom&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> status_year) <span class="sc">%&gt;%</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, habitat, trend)</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  trend <span class="ot">&lt;-</span> <span class="fu">rbind</span>(trend, trend_new)</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(trend, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="save-health-scores-for-softbottom-habitat-and-pressure-scores-for-subtidal-habitat" class="section level2">
 <h2>Save health scores for softbottom habitat and pressure scores for
 subtidal habitat</h2>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate soft bottom habitat health</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>health <span class="ot">&lt;-</span> health_pressure <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, habitat, health)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(health, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>pressure <span class="ot">&lt;-</span> health_pressure <span class="sc">%&gt;%</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, <span class="at">pressure_score =</span> pressure) </span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(pressure, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate soft bottom habitat health</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>health <span class="ot">&lt;-</span> health_pressure <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, habitat, health)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(health, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate soft bottom habitat pressure</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>pressure <span class="ot">&lt;-</span> health_pressure <span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, <span class="at">pressure_score =</span> pressure) </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(pressure, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv&quot;</span>))</span></code></pre></div>
 </div>
 <div id="compare-trend-pressure-pressure-output-to-last-years-values" class="section level2">
 <h2>Compare trend, pressure, pressure output to last year’s values</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># health</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>old_health_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/habitat_health_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span> <span class="co"># plot the first year that 2020 and 2022 assessment years have in common: 2017 </span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">old_health =</span> health) <span class="co"># only 205 regions</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>compare_health <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">new_health =</span> health) <span class="sc">%&gt;%</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_health_data)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check range of health scores:</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(new_health <span class="sc">~</span> old_health, <span class="at">data =</span> compare_health, </span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Soft Bottom Habitat Health:</span><span class="sc">\n</span><span class="st">Comparison between 2020 Assessment and 2022 Assessment&quot;</span>,</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;2020 Assessment&quot;</span>,</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;2022 Assessment&quot;</span>)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col =</span> <span class="st">&#39;red&#39;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pressure</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>old_pressure_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/hd_sb_subtidal.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span> <span class="co"># plot the first year that 2020 and 2022 assessment years have in common: 2017 </span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">old_pressure =</span> pressure_score) <span class="co"># only 205 regions</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>compare_pressure <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">new_pressure =</span> pressure_score) <span class="sc">%&gt;%</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_pressure_data)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check range of health scores:</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(new_pressure <span class="sc">~</span> old_pressure, <span class="at">data =</span> compare_pressure, </span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Soft Bottom Habitat Destruction Pressure:</span><span class="sc">\n</span><span class="st">Comparison between 2020 Assessment and 2022 Assessment&quot;</span>,</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;2020 Assessment&quot;</span>,</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;2022 Assessment&quot;</span>)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col =</span> <span class="st">&#39;red&#39;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trend</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>old_trend_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/habitat_trend_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span> <span class="co"># plot the first year that 2020 and 2022 assessment years have in common: 2017 </span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">old_trend =</span> trend) <span class="co"># only 205 regions</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>compare_trend <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">new_trend =</span> trend) <span class="sc">%&gt;%</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_trend_data)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check range of health scores:</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(new_trend <span class="sc">~</span> old_trend, <span class="at">data =</span> compare_trend, </span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Soft Bottom Habitat Trend:</span><span class="sc">\n</span><span class="st">Comparison between 2020 Assessment and 2022 Assessment&quot;</span>,</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;2020 Assessment&quot;</span>,</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;2022 Assessment&quot;</span>)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col =</span> <span class="st">&#39;red&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># health</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>old_health_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/habitat_health_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span> <span class="co"># plot the first year that 2020 and 2022 assessment years have in common: 2017 </span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">old_health =</span> health) <span class="co"># only 205 regions</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>compare_health <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">new_health =</span> health) <span class="sc">%&gt;%</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_health_data)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check range of health scores:</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(new_health <span class="sc">~</span> old_health, <span class="at">data =</span> compare_health, </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Soft Bottom Habitat Health:</span><span class="sc">\n</span><span class="st">Comparison between 2020 Assessment and 2022 Assessment&quot;</span>,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;2020 Assessment&quot;</span>,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;2022 Assessment&quot;</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col =</span> <span class="st">&#39;red&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pressure</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>old_pressure_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/hd_sb_subtidal.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span> <span class="co"># plot the first year that 2020 and 2022 assessment years have in common: 2017 </span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">old_pressure =</span> pressure_score) <span class="co"># only 205 regions</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>compare_pressure <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">new_pressure =</span> pressure_score) <span class="sc">%&gt;%</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_pressure_data)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check range of health scores:</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(new_pressure <span class="sc">~</span> old_pressure, <span class="at">data =</span> compare_pressure, </span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Soft Bottom Habitat Destruction Pressure:</span><span class="sc">\n</span><span class="st">Comparison between 2020 Assessment and 2022 Assessment&quot;</span>,</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;2020 Assessment&quot;</span>,</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;2022 Assessment&quot;</span>)</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col =</span> <span class="st">&#39;red&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trend</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>old_trend_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2020/output/habitat_trend_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span> <span class="co"># plot the first year that 2020 and 2022 assessment years have in common: 2017 </span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">old_trend =</span> trend) <span class="co"># only 205 regions</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>compare_trend <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2017</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, <span class="at">new_trend =</span> trend) <span class="sc">%&gt;%</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(old_trend_data)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co"># check range of health scores:</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(new_trend <span class="sc">~</span> old_trend, <span class="at">data =</span> compare_trend, </span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Soft Bottom Habitat Trend:</span><span class="sc">\n</span><span class="st">Comparison between 2020 Assessment and 2022 Assessment&quot;</span>,</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;2020 Assessment&quot;</span>,</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;2022 Assessment&quot;</span>)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col =</span> <span class="st">&#39;red&#39;</span>)</span></code></pre></div>
 </div>
 <div id="gapfill-record-keeping" class="section level2">
 <h2>Gapfill record keeping</h2>
@@ -2608,26 +2832,26 @@ subtidal habitat</h2>
 with values of 0. Every data layer has to have a corresponding gapfill
 file. If there is no gapfilling the gapfill column is filled in with 0
 as done below.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># health</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>hab_health_sb_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(hab_health_sb_gf, <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom_gf.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># trend</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>hab_trend_sb_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv&quot;</span>))<span class="sc">%&gt;%</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(hab_trend_sb_gf, <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom_gf.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># pressure</span></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>hd_sb_subtidal_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled)</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(hd_sb_subtidal_gf, <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal_gf.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># health</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>hab_health_sb_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(hab_health_sb_gf, <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom_gf.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co"># trend</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>hab_trend_sb_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom.csv&quot;</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(hab_trend_sb_gf, <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_trend_softbottom_gf.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="co"># pressure</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>hd_sb_subtidal_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled)</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(hd_sb_subtidal_gf, <span class="fu">here</span>(<span class="st">&quot;globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/hd_sb_subtidal_gf.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 </div>
 
