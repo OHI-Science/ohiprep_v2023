@@ -30,7 +30,6 @@ Replaced deprecated functions (`replace_at()`, `spread()`, `gather()`)
 
 **Reference**:      
 http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-Release date: March 2021
 FAO Global Aquaculture Production Quantity 1950_2020
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
