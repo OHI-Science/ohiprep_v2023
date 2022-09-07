@@ -937,9 +937,7 @@ toc()
 ## Rescale data for OHI regions
 
 ```{r, eval=FALSE}
-#area <-  read.csv(paste0(here(), "/globalprep/hab_prs_hd_subtidal_soft_bottom/v2016/output/habitat_extent_softbottom.csv"))
-
-# Read in csv for each year and combine them in one data frame
+# Read in csv of fishing effort for each year and combine them in one data frame
 files <- list.files(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv"), pattern = ".csv", full = TRUE)
 
 annual_list <- lapply(files, function(x){read.csv(file = x)})
