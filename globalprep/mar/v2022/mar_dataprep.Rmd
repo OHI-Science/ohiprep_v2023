@@ -647,7 +647,14 @@ Obtain a sustainability and escapes score for each record, and a book-keeping co
 
 For missing sustainability and escapes scores:
 
-Steps: 1. Group by country and family and summarise to get mean sustainability and escapes values (gapfilled by country/family) 2. Group by georegion and family and summarise to get mean sustainability and escapes values (gapfilled by georegion/family) 3. Group by family to get mean sustainability and escapes values (global family gapfilled) 4. Gapfill by average of the taxon_code to get mean sustainability and escapes values (taxon_group gapfilled) 5. Assign any Algae with the seaweeds score from SFW data (6.72 for sustainability, 4 for escapes) 6. Apply the global average to any remaining sustainability and escapes score NAs
+Steps:
+
+1. Group by country and family and summarise to get mean sustainability and escapes values (gapfilled by country/family)
+2. Group by georegion and family and summarise to get mean sustainability and escapes values (gapfilled by georegion/family)
+3. Group by family to get mean sustainability and escapes values (global family gapfilled)
+4. Gapfill by average of the taxon_code to get mean sustainability and escapes values (taxon_group gapfilled)
+5. Assign any Algae with the seaweeds score from SFW data (6.72 for sustainability, 4 for escapes)
+6. Apply the global average to any remaining sustainability and escapes score NAs
 
 ```{r sw-sus-gapfill-missing, eval = FALSE}
 # define gapfilling scores for global seaweed and escapes (a subcomponent of the global seaweed score) found in pdf here (updated occasionally): https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568

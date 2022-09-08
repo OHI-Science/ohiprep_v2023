@@ -1,5 +1,5 @@
 ---
-title: 'OHI 2021: Natural Products: weighting data prep'
+title: 'OHI 2022: Natural Products: weighting data prep'
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -25,16 +25,16 @@ This analysis converts FAO commodities tonnes data for ornamental fish trade, SA
 
 **Reference**:      
     http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-    App release date: July 2019 
-FAO raw commodities quantity 1976_2018
-FAO raw commodities value 1976_2018
-FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commodities-production/en)
+    App release date: July 2021 
+FAO raw commodities quantity 1976_2019
+FAO raw commodities value 1976_2019
+[FAO metadata](http://www.fao.org/fishery/statistics/global-commodities-production/en)
 
-**Downloaded**: April 29, 2021
+**Downloaded**: June, 23, 2022
 
-**Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: shells, corals, ornamental fish, fish oil, seaweed and plants, sponges (see: raw/commodities2products.csv for details).
+**Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: ornamental fish, fish oil, seaweed and plants (see: raw/commodities2products_weighting.csv for details).
 
-**Time range**: 1976-2018
+**Time range**: 1976-2019
 
 
 **Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
@@ -78,16 +78,17 @@ FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commoditi
 * DOI: 10.5281/zenodo.2542919
 
 
-**Reference**: [FAO Mariculture data](http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp)
-Release date: March 2021
-FAO Global Aquaculture Production Quantity 1950_2018
+**Reference**:      
+http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
+FAO Global Aquaculture Production Quantity 1950_2020
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
-**Downloaded**: April 29, 2021
+**Downloaded**:  April 25, 2022
 
 **Description**:  Quantity (tonnes) of mariculture for each country, species, year.
 
-**Time range**: 1950-2019 
+**Time range**: 1950-2020
+
 ***
 
 ## Setup
@@ -99,7 +100,11 @@ knitr::opts_chunk$set(eval=FALSE)
 library(here)
 library(tidyverse)
 source(here('workflow/R/common.R'))
-source(here('globalprep/np/v2021/R/np_fxn.R'))
+source(here('globalprep/np/v2022/R/np_fxn.R'))
+
+prep <- file.path("globalprep/np/v2022/")
+
+prep_year <- 2022
 
 ```
   
@@ -108,7 +113,7 @@ source(here('globalprep/np/v2021/R/np_fxn.R'))
 Import prepped FAO commodities data set and find 5 year average $USD / Tonne average value per product per region. Gapfill these based on the UN geopolitical region/global values. 
 ```{r}
 ## read in the prepped FAO commodities data set 
-harvest_tonnes_usd <- read_csv("int/np_harvest_tonnes_usd.csv") %>%
+harvest_tonnes_usd <- read_csv(file.path(prep, "int/np_harvest_tonnes_usd.csv")) %>%
   filter(rgn_id != 213)
 
 max_year = max(harvest_tonnes_usd$year)
@@ -164,7 +169,7 @@ harvest_tonnes_usd_values_gf <- harvest_tonnes_usd_geo_rgn %>%
                                ifelse(is.na(values) & georgn_values == "NaN", 1, 0))) ## now we have a dataset with gapfilled average values and calculated yearly values... now we will save this, and then calculate the 5 year averages
 
 ## save this data frame to int
-write.csv(harvest_tonnes_usd_values_gf, "int/harvest_tonnes_usd_weighting_gf.csv", row.names = FALSE)
+write.csv(harvest_tonnes_usd_values_gf, file.path(prep, "int/harvest_tonnes_usd_weighting_gf.csv"), row.names = FALSE)
 
 ## now calculate 5 year averages and assign year = 2020
 weighting_usd_values_final <- harvest_tonnes_usd_values_gf %>%
@@ -174,14 +179,14 @@ weighting_usd_values_final <- harvest_tonnes_usd_values_gf %>%
   ungroup() 
 
 #save this df
-write.csv(weighting_usd_values_final, "int/harvest_weighting_values.csv", row.names = FALSE)
+write.csv(weighting_usd_values_final, file.path(prep, "int/harvest_weighting_values.csv"), row.names = FALSE)
 
 ```
 
 Now prep the tonnes data from each product to be per each region for the 6 year average (2013-2018). 
 ```{r}
 ## Read in FOFM tonnes data
-fofm_tonnes <- read_csv("int/mean_catch_FOFM.csv") %>%
+fofm_tonnes <- read_csv(file.path(prep, "int/mean_catch_FOFM.csv")) %>%
   dplyr::filter(year %in% years) %>%
   mutate(product = "fish_oil") %>%
   group_by(rgn_id, year, product) %>%
@@ -197,7 +202,7 @@ fofm_tonnes <- read_csv("int/mean_catch_FOFM.csv") %>%
 
 
 ## Read in ornamentals tonnes data
-np_tonnes <- read_csv("int/np_harvest_tonnes_usd.csv") %>% 
+np_tonnes <- read_csv(file.path(prep, "int/np_harvest_tonnes_usd.csv")) %>% 
   filter(rgn_id != 213)
 
 orn_fill_df <- region_product %>%
@@ -217,7 +222,7 @@ orn_tonnes <- np_tonnes %>%
 sw_fill_df <- region_product %>%
   filter(product == "seaweeds")
 
-sw_tonnes <- read_csv("int/np_seaweeds_tonnes_weighting.csv") %>%
+sw_tonnes <- read_csv(file.path(prep, "int/np_seaweeds_tonnes_weighting.csv")) %>%
   mutate(product = "seaweeds") %>%
   group_by(rgn_id, year, product) %>%
   summarise(tonnes = sum(tonnes, na.rm = TRUE)) %>%
@@ -233,10 +238,10 @@ sw_tonnes <- read_csv("int/np_seaweeds_tonnes_weighting.csv") %>%
 
 ```
 
-Now we will calculate the weights per each product. To do this we need to multiply our average $ value for each product * tonnes of each product, and then divide by the total per each region. We will also assign year = 2021 so that this can be read into OHI-global (2021 corresponds to the year that these weights were calculated).
+Now we will calculate the weights per each product. To do this we need to multiply our average $ value for each product * tonnes of each product, and then divide by the total per each region. We will also assign year = 2022 so that this can be read into OHI-global (2022 corresponds to the year that these weights were calculated).
 
 ```{r}
-harvest_weighting_values <- read_csv("int/harvest_weighting_values.csv") %>%
+harvest_weighting_values <- read_csv(file.path(prep, "int/harvest_weighting_values.csv")) %>%
   dplyr::select(rgn_id, product, value_per_tonne)
 
 prod_weights <- orn_tonnes %>%
@@ -250,18 +255,18 @@ prod_weights <- orn_tonnes %>%
   ungroup() %>%
   mutate(weight = usd_product/total_usd) %>%
   dplyr::select(-3, -4, -5, -6) %>%
-  mutate(year = 2021) %>%
+  mutate(year = prep_year) %>%
   dplyr::select(rgn_id, year, product, weight) %>%
   filter(rgn_id != 213)
 
-write.csv(prod_weights, "output/np_product_weights.csv", row.names = FALSE)
+write.csv(prod_weights, file.path(prep, "output/np_product_weights.csv"), row.names = FALSE)
 ```
 
 ```{r}
 ##datacheck
-old_prod_weights <- read_csv("../v2020/output/np_product_weights.csv")
+old_prod_weights <- read_csv(file.path(prep, "../v2021/output/np_product_weights.csv"))
 
-prod_weights <- read_csv("output/np_product_weights.csv")
+prod_weights <- read_csv(file.path(prep, "output/np_product_weights.csv"))
 
 check <- prod_weights %>%
   rename("new_weight" = "weight") %>%
@@ -291,14 +296,14 @@ abline(0,1, col="red")
 test <- harvest_tonnes_usd %>%
   filter(rgn_id == 46)
 
-harvest_tonnes_usd_old <- read_csv("../v2020/int/np_harvest_tonnes_usd.csv") %>%
+harvest_tonnes_usd_old <- read_csv(file.path(prep, "../v2021/int/np_harvest_tonnes_usd.csv")) %>%
   filter(rgn_id != 213)
 
 test2 <- harvest_tonnes_usd_old %>%
   filter(rgn_id == 46)
 
 
-gf_orn <- read_csv("output/np_ornamentals_harvest_tonnes_gf.csv")
+gf_orn <- read_csv(file.path( prep, "output/np_ornamentals_harvest_tonnes_gf.csv"))
 
 check_fofm <- check %>%
   filter(product == "fish_oil")

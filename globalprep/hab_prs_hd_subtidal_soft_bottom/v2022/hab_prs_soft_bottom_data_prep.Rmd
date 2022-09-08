@@ -62,13 +62,31 @@ Processing this new data requires a completely different data prep. Some methods
 **Format**:  csv format
 
 ***
+
+## Softbottom Habitat Extent
+
+The extent data for soft bottom habitat for was originally developed for the Cumulative Human Impacts project, and are available from [KNB](https://knb.ecoinformatics.org/#view/doi:10.5063/F19Z92TW).
+
+**Reference**: Halpern, Benjamin S et al. “Spatial and Temporal Changes in Cumulative Human Impacts on the World’s Ocean.” Nature Communications 6.1 (2015): 7615–7615. Web.
+
+**Description**: Rasters that portray soft bottom habitat across the world. Rasters are as follows:
+
+1. habitat_d_s_benthic
+2. habitat_s_t_s_bottom
+3. habitat_soft_shelf
+4. habitat_soft_slope
+5. habitat_inttidalmud
+
+**Native data resolution**: ~934 x 934 meters
+
+**Format**: tif format
   
 # Methods 
 
 1. Pull apparent fishing effort data for all EEZ regions for 2012-2020 from the GFW API, combine into one dataframe, and filter for trawling and dredging geartypes
 2. Correct trawling data by subsetting for only bottom trawling using catch data from Watson & Tidd (2018) and combine with dreding data
-3. Layer the fishing effort data with OHI regional polygons for land and EEZ to extract only fishing effort within regions of interest
-4. Standardize by soft-bottom habitat of each region calculate fishing effort for each OHI region
+3. Standardize by soft-bottom habitat using soft bottom habitat extent rasters from Haplern et al. 2015
+4. Layer the fishing effort data with OHI regional polygons for land and EEZ to extract only fishing effort within regions of interest
 5. Transform data with log(x + 1) because density data are extremely skewed, then divide by the 95th quantile and cap values at 1
 6. Assign health and pressure labels to values
 7. Calculate trend
@@ -673,18 +691,197 @@ plot(nigeria$geometry, col = "grey96", axes = FALSE, main = "Nigeria Trawling & 
 plot(fishing_effort_2020, axes = FALSE, add = TRUE)
 ```
 
+## Standarize catches per soft-bottom area
+
+Read in all files that represent soft bottom habitat extent (Halpern et al. 2015).
+
+```{r, eval=FALSE}
+# create raster stack of all 5 tif files that represent different types of soft bottom habitat
+sb_hab_raw_stack <- rast(list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/soft_bottom_extent/tifs/"), pattern = ".tif", full = TRUE))
+
+# check metadata
+sb_hab_raw_stack
+
+# get an idea what one layer looks like to make sure summation works
+plot(sb_hab_raw_stack[[5]], col = "red")
+sb_hab_raw_stack[[5]]
+
+# sum all rasters to create composite raster for all soft bottom habitat
+sb_hab_composite <- terra::app(sb_hab_raw_stack, fun = "sum", na.rm = TRUE)
+
+# convert all values greater than 1 to 1, so we have a presence/absence raster for all soft bottom habitat. Values greater than one represent cells that have been assigned to 2 different soft bottom habitat types, but this is not helpful for our purposes.
+sb_hab_composite[sb_hab_composite >= 1] <- 1
+
+plot(sb_hab_composite, col = "red")
+```
+
+Convert the soft bottom habitat raster (resolution units = meters, CRS = `WGS_1984_Mollweide`) to a coarser resolution because we know that there is error associated with our soft bottom habitat measurements. Aggregating allows us to make a buffer around each cell, which helps account for this uncertainty.
+
+```{r, eval=FALSE}
+sb_hab_coarse <- terra::aggregate(x = sb_hab_composite, fact = 5, fun = "sum", na.rm = TRUE) 
+sb_hab_coarse
+# 4672.394 x 4672.394 meters resolution
+```
+
+The purpose of this raster is to multiply it by the annual fishing effort rasters to identify the proportion of the fishing effort per cell that affected soft bottom habitat, so we need each aggregated cell of the soft bottom habitat raster to represent the **proportion** of that area that is soft bottom. To convert the cell value to a proportion, we divide by the number of original cells that were aggregated into each derived cell.
+
+```{r, eval=FALSE}
+# min value of raster: 1, max value of raster: 25
+# since we aggregated by a factor of 5 and used the sum function, each cell now represents the sum of the cells within a square of 25 cells. If all those cells represented soft bottom habitat, meaning they all had a value of 1, then the value of those cells is now 25
+sb_hab_prop <- sb_hab_coarse/25
+```
+
+Pull in fishing effort rasters for each year, so we can process each by multiplying them by the soft bottom habitat extent.
+
+```{r, eval=FALSE}
+fish_effort <- list.files(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters"), pattern = ".tif", full = TRUE)
+
+# 2020 file path
+fish_effort[9]
+
+# rasterize file
+fish_effort_2020 <- rast(fish_effort[9])
+fish_effort_2020
+```
+
+Aggregate the fishing effort raster, too, because we know there is also similar error associated with the fishing effort data and because we want the resolutions of the two rasters to be similar.
+
+- The resolution of the **fishing effort** raster is **0.01 x 0.01 degrees**, CRS = `lon/lat WGS 84 (EPSG:4326)`. 
+- The resolution of the **soft bottom habitat** raster is **~934 x 934 meters**, CRS = `WGS_1984_Mollweide`.
+
+We know that the soft bottom habitat raster has a very similar resolution because ~934 x ~934 meters translates to ~0.934 square kilometers, and 0.01 x 0.01 degrees translates to ~1.11 square kilometers at the equator (the exact size of the degree cells differs slightly based on the latitude of the raster cell). So since the resolutions are similar to start, we want to aggregate them similarly as well. 
+
+```{r, eval=FALSE}
+fish_effort_2020_coarse <- terra::aggregate(x = fish_effort_2020, fact = 5, fun = "sum", na.rm = TRUE) # unequal area, but equal angle
+# 0.05 x 0.05 resolution 
+```
+
+The fishing effort raster is in units of pure fishing hours, so it is not already standardized over the area of each cell. This raster is **equal angle** and not **equal area**, as the soft bottom habitat raster is, meaning that the cell values differ based on latitude. As such, we should divide the fishing hours for each cell by the area of the cell, which we calculate with `terra::cellSize(unit = "km")` so that the division is based on the actual size of each individual cell in kilometers. This standardization is necessary because we need to reproject the fishing effort raster into the same CRS as the soft bottom habitat raster (`WGS_1984_Mollweide`), which changes the projection of the fishing hours over space, and we do not want to change the total value of fishing hours for each year. Overall, the steps are as follows:
+
+1. Convert the units of fishing hours to fishing hours per kilometer
+2. Reproject the CRS of the fishing effort raster to match that of the soft bottom habitat raster
+3. To get units of pure fishing hours again, multiply the fishing hours raster cells by the size of the **newly aggregated equal area raster**
+
+This approach is not perfect because there will still be a slight discrepancy between the sum of the fishing hours before and after reprojecting, but this does a relatively clean job of retaining the apparent fishing hours per area.
+
+```{r, eval=FALSE}
+# check the total number of fishing hours before reprojecting
+global(fish_effort_2020_coarse, "sum", na.rm = TRUE) # 18379444	
+
+fish_effort_2020_hr_km <- fish_effort_2020_coarse/cellSize(fish_effort_2020_coarse, unit = "km")
+
+# change CRS to `WGS_1984_Mollweide`
+fish_effort_2020_reproj <- terra::project(fish_effort_2020_hr_km, sb_hab_prop)
+fish_effort_2020_reproj # WGS_1984_Mollweide!!
+
+# now that the raster is equal angle, we can multiply each cell by the same value, and we don't have to use cellSize()
+fish_effort_2020_reproj_fix <- fish_effort_2020_reproj*21.83127
+
+global(fish_effort_2020_reproj_fix, "sum", na.rm = TRUE) # 18541882, very close to what it was before reprojecting! great
+```
+
+Lastly, we multiply the raster of soft bottom habitat proportion by the fishing effort raster to subset the fishing hours to those that only affect soft bottom habitat.
+
+```{r, eval=FALSE}
+# create stack of both rasters
+effort_sb_stack <- c(fish_effort_2020_reproj_fix, sb_hab_prop)
+
+# check NA values in fishing raster
+terra::global(fish_effort_2020_reproj_fix, "isNA")
+# fish effort values range 0 - 10706, and 29459600 NA values
+
+# check NA values in sb habitat raster
+terra::global(sb_hab_prop, "isNA")
+# sb habitat values range 0.4-1, and 14215686 NA values
+
+multiply <- terra::lapp(effort_sb_stack, fun = function(x,y){return(x*y)})
+multiply # units of hours * proportion of that cell which is sb hab, resulting units are hrs of fishing effort 
+terra::global(multiply, "isNA") # 29473052 NA values
+```
+
+Now that we multiplied the rasters, we should consider the difference between `NA` values and 0 values. The `NA` values in this raster represent cells that either did not have fishing effort, do not contain soft bottom habitat, or both, so they should be converted to 0 to represent no soft bottom habitat destruction.
+
+```{r, eval=FALSE}
+multiply[is.na(multiply)] = 0 
+```
+
+Switching gears a bit, we now want to correct the aggregated soft bottom habitat raster to cap the values of each cell at 1. This yields a raster that represents whether or not soft bottom habitat is present in a cell at all, rather than the amount of soft bottom habitat standardized over the area of the cells, which is represented in the raster we made earlier, `sb_hab_prop`.
+
+```{r, eval=FALSE}
+# first check if there are values in the aggregated raster that are between 0 and 1
+terra::unique(sb_hab_coarse) # whole numbers ranging from 1-25, and NA
+
+# duplicate object with another name
+sb_hab_coarse_fix <- sb_hab_coarse  
+
+# cap values at 1 to convert this raster into a presence(1) or absence(0) raster
+sb_hab_coarse_fix[sb_hab_coarse_fix >= 1] <- 1
+```
+
+Apply a mask to the raster that represents just the trawling and dredging fishing effort standardized over the amount of soft bottom habitat, so we can retain the soft bottom habitat that is undisturbed in addition to the soft bottom habitat that is disturbed (which is already present in `multiply`). Before we use the `mask()` function on these two rasters, the `multiply` raster contains 0 where there is no fishing effort, no soft bottom habitat, or both. There are no `NA` values. On the other hand, the raster `sb_hab_coarse_fix` contains `NA` where no soft bottom habitat is present, and 1 where any type of soft bottom habitat is present. `mask()` converts all the cells in `multiply` to `NA` where they fall on `NA` in the soft bottom habitat raster. This step allows us to distinguish between 0's and `NA`s. 0's will represent soft bottom habitat that has not been disturbed, and `NA`s will now represent lack of soft bottom habitat.
+
+```{r, eval=FALSE}
+# the raster `multiply` has no NA values
+# the raster `sb_hab_coarse_fix` has values either 1 or NA
+multiply_mask <- mask(x = multiply, mask = sb_hab_coarse_fix, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_2020.tif"))
+# now the raster `multiply_mask` does contain NA values where there is no soft bottom habitat at all
+# we want to identify the soft bottom habitat that is undisturbed because we need to be able to assign regions that are not disturbing available soft bottom habitat with a good score
+
+plot(multiply_mask)
+```
+
+## Iterate the soft bottom habitat standardization across all other years
+
+We just ran through 2020 step by step, now we apply the same process to 2012-2019 data and save the output tif's to the same directory.
+
+```{r, eval=FALSE}
+fish_effort_12_19 <- fish_effort[1:8]
+
+for (i in seq_along(fish_effort_12_19)) {
+
+  # define the year we are processing so we can keep track of loop and name files clearly
+  year <- substring(fish_effort_12_19[i], 118, 121)
+  
+  fish_effort_annual <- rast(fish_effort_12_19[i])
+  
+  print(paste0("Aggregating year ", year))
+  fish_effort_coarse <- terra::aggregate(x = fish_effort_annual, fact = 5, fun = "sum", na.rm = TRUE)
+  
+  print("Dividing by cell size")
+  fish_effort_hr_km <- fish_effort_coarse/cellSize(fish_effort_coarse, unit = "km")
+  
+  print("Reprojecting")
+  fish_effort_reproj <- terra::project(fish_effort_hr_km, sb_hab_prop)
+  fish_effort_reproj_fix <- fish_effort_reproj*21.83127
+  
+  print("Stacking")
+  effort_sb_stack <- c(fish_effort_reproj_fix, sb_hab_prop)
+  
+  print("Standardizing by soft bottom habitat")
+  multiply <- terra::lapp(effort_sb_stack, fun = function(x,y){return(x*y)})
+  multiply[is.na(multiply)] = 0
+  sb_hab_coarse_fix <- sb_hab_coarse
+  sb_hab_coarse_fix[sb_hab_coarse_fix >= 1] <- 1
+  
+  print(paste0("Masking and saving year ", year))
+  multiply_mask <- mask(x = multiply, mask = sb_hab_coarse_fix, filename = paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_", year, ".tif"))
+}
+
+# check out some plots
+#plot(rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_2012.tif")))
+#plot(rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_2015.tif")))
+```
+
 ## Calculate fishing effort for each OHI region
 
 ```{r, eval=FALSE}
-tic() # 21 min
+tic() # 15-20 min
 
 # Read in OHI regions polygons - several polygons (rows) for each region because one polygon exists for each region & land type combo (eez, land, etc.)
 ohi_regions <- st_read(dsn = file.path(dir_M, "git-annex/globalprep/spatial/v2017"), layer = "regions_2017_update")
-# Make the region coordinate reference system the same as the trawling & dredging raster
-ohi_regions_wgs <-  st_transform(x = ohi_regions, crs = "EPSG:4326") 
 
 # filter out antarctica and disputed and all land types besides eez and land 
-ohi_regions_filtered <- ohi_regions_wgs %>% 
+ohi_regions_filtered <- ohi_regions %>% 
   filter(rgn_type %in% c("eez", "land"),
          !rgn_name %in% c("Antarctica", "DISPUTED"))
 
@@ -695,7 +892,7 @@ for (i in years_all) {
   print(paste("Processing ", i, " fishing effort."))
   
   # read in the annual fishing raster for all regions that represents corrected trawling plus dredging data 
-  fishing_raster <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/dredging_trawling_combined_", i, ".tif"))
+  fishing_raster <- terra::rast(paste0(dir_M, "/git-annex/globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/final_rasters/standardized_soft_bottom/standardized_", i, ".tif"))
   
   # extract the fishing effort that falls within the polygons of OHI regions
   extracted <- exactextractr::exact_extract(fishing_raster, ohi_regions_filtered)
@@ -711,9 +908,9 @@ for (i in years_all) {
       # weight the fishing effort within each cell by the coverage of the cell within the polygon 
       mutate(effort = value*coverage_fraction,
              polygon_id = j) %>%
-      select(polygon_id, effort) %>%
-      group_by(polygon_id) %>%
-      summarize(effort_sum = sum(effort, na.rm = TRUE))
+      dplyr::select(polygon_id, effort) %>%
+      dplyr::group_by(polygon_id) %>%
+      dplyr::summarize(effort_sum = sum(effort, na.rm = TRUE))
     # bind the polygon-specific sum to the master dataframe of polygon sums
     all_polygon_effort <- rbind(all_polygon_effort, weighted_effort_polygon)
     
@@ -737,25 +934,23 @@ for (i in years_all) {
 toc() 
 ```
 
-## Standarize catches per soft-bottom area
+## Rescale data for OHI regions
 
 ```{r, eval=FALSE}
-area <-  read.csv(paste0(here(), "/globalprep/hab_prs_hd_subtidal_soft_bottom/v2016/output/habitat_extent_softbottom.csv"))
-
-# Read in csv for each year and combine them in one data frame
+# Read in csv of fishing effort for each year and combine them in one data frame
 files <- list.files(here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/int/fishing_annual_csv"), pattern = ".csv", full = TRUE)
 
 annual_list <- lapply(files, function(x){read.csv(file = x)})
 # combine all annual dataframes into one with a year variable present
-fishing_all <- bind_rows(annual_list) 
-
-data_density <- fishing_all %>%
-  left_join(area, by = "rgn_id") %>%
-  filter(rgn_id <= 250) %>%
-  mutate(raw_density = effort_sum/km2)
+data_density <- bind_rows(annual_list)
+data_density <- data_density %>% rename(raw_density = effort_sum)
 
 # get summary stats for the data density before rescaling using the quantile
 summary(data_density$raw_density)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#    0       0       0   55153    4769 7540105
+
+# old summary stats:
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.      NA's 
 #    0.0000    0.0000    0.0005    4.4239    0.2861 2503.8848       135 
 
@@ -774,39 +969,38 @@ data_density <- data_density %>%
   mutate(density_rescaled_capped = ifelse(density_rescaled > 1,
                                                  1,
                                                  density_rescaled))
-```
 
+# 2022 assessment scratch code:
 ## Correct regions with no soft bottom habitat area
 
-```{r, eval=FALSE}
 # check which regions have NA values
-data_rescale_na <- data_density %>% 
-  filter(is.na(density_rescaled_capped)) 
-
-length(unique(data_rescale_na$rgn_id)) # 15 regions have NA values for fishing effort, this is just because those regions do not have soft bottom habitat in the spatial file
-
-# replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ's because it is not there to beign with
-data_density <- data_density %>% 
-  mutate(density_rescaled_capped = ifelse(is.na(density_rescaled_capped), 0, density_rescaled_capped))
-
-# check it worked:
-data_rescale_na <- data_density %>% 
-  filter(is.na(density_rescaled_capped)) 
-
-length(unique(data_rescale_na$rgn_id)) # 0
+# data_rescale_na <- data_density %>% 
+#   filter(is.na(density_rescaled_capped)) 
+# 
+# length(unique(data_rescale_na$rgn_id)) 
+# 
+# # replace those na values with 0, since there is no potential for those regions to destroy soft bottom habitat within their EEZ's because it is not there to begin with
+# data_density <- data_density %>% 
+#   mutate(density_rescaled_capped = ifelse(is.na(density_rescaled_capped), 0, density_rescaled_capped))
+# 
+# # check it worked:
+# data_rescale_na <- data_density %>% 
+#   filter(is.na(density_rescaled_capped)) 
+# 
+# length(unique(data_rescale_na$rgn_id)) # 0
 ```
 
 ## Calculate health and pressure scores 
 
 ```{r, eval=FALSE}
-# check that all regions are present
-length(unique(health_pressure$rgn_id))
-
 health_pressure <- data_density %>%
   mutate(habitat = "soft_bottom") %>%
   mutate(pressure = density_rescaled_capped) %>% 
   mutate(health = (1 - density_rescaled_capped)) %>% 
   dplyr::select(rgn_id, year, health, pressure, habitat)
+
+# check that all regions are present
+length(unique(health_pressure$rgn_id))
 
 hist(health_pressure$pressure)
 hist(health_pressure$health)
@@ -860,6 +1054,7 @@ health <- health_pressure %>%
   
 write.csv(health, file = here("globalprep/hab_prs_hd_subtidal_soft_bottom/v2022/output/habitat_health_softbottom.csv"), row.names = FALSE)
   
+# calculate soft bottom habitat pressure
 pressure <- health_pressure %>%
   dplyr::select(rgn_id, year, pressure_score = pressure) 
   

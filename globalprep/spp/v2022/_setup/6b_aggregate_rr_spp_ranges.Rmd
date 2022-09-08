@@ -34,11 +34,12 @@ library(rgdal)
 library(here)
 library(ggplot2)
 library(rgeos)
+library(terra)
 
 source(here('workflow/R/common.R'))
 
 goal     <- 'spp'
-scenario <- 'v2021'
+scenario <- 'v2022'
 dir_goal <- here('globalprep', goal, scenario)
 
 ### goal specific folders and info
@@ -52,15 +53,15 @@ dir_spatial <- file.path(dir_goal, '_spatial')
 source(file.path(dir_setup, 'common_fxns.R'))
 
 dir_bli <- file.path(dir_M, 'git-annex/globalprep/_raw_data/birdlife_intl/d2021')
-dir_shp <- file.path(dir_M, 'git-annex/globalprep/_raw_data/iucn_spp/d2020-3')
+dir_shp <- file.path(dir_M, 'git-annex/globalprep/_raw_data/iucn_spp/d2022-1')
   ### in this folder are shapefiles at a taxonomic level, both from
-  ### IUCN spatial data download (version 2020-3)
+  ### IUCN spatial data download (version 2022-1)
 
 ```
 
 # Summary
 
-Using individual species range data (csv outputs from `5_rasterize_spp_shps.Rmd`), collect into species groups.  In each species group, process range and risk information to get mean risk, variance of risk, species richness, and threatened species count per cell.  These are all weighted by species range rarity as a metric of endemism.
+Using individual species range data (csv outputs from `5c_rasterize_spp_shps.Rmd`), collect into species groups.  In each species group, process range and risk information to get mean risk, variance of risk, species richness, and threatened species count per cell.  These are all weighted by species range rarity as a metric of endemism.
 
 # Methods
 
@@ -87,10 +88,11 @@ spp_range_file <- file.path(dir_data,
 reload <- FALSE
 
 ### load area raster, convert to data frame
-area_rast <- raster(file.path(dir_spatial, 'ocean_area_rast.tif'))
-area_df <- data.frame(cell_id = 1:length(area_rast),
-                      area_km2 = values(area_rast))
-  
+area_rast <- rast(file.path(dir_spatial, 'ocean_area_rast.tif'))
+area_df <- data.frame(cell_id = 1:(nrow(area_rast)*ncol(area_rast)),
+                      area_km2 = terra::values(area_rast)) %>%
+  rename(area_km2 = ocean_area_rast)
+
 ### load csvs of marine species range maps
 spp_maps <- read_csv(file.path(dir_data, 
                                sprintf('spp_marine_maps_%s.csv', api_version)),
@@ -151,8 +153,7 @@ write_csv(spp_range_df, spp_range_file)
 ### calculate range from polygons
 
 This may *over*predict range for many species whose range is limited by depth,
-due to polyon buffering.  This can be used to sanity-check the 
-raster-calculated ranges.
+due to polygon buffering.  This can be used to sanity-check the raster-calculated ranges.
 
 ``` {r calculate range from polygons, eval = FALSE}
 
@@ -168,34 +169,6 @@ polygon_areas_file <- file.path(dir_setup, 'int/polygon_areas.csv')
 
 reload <- FALSE
 if(!file.exists(polygon_areas_file) | reload) {
-  
-  # poly_range_list <- parallel::mclapply(seq_along(spp_shps), mc.cores = 12,
-  #                         FUN = function(i) { ### i <- 17
-  #                           x <- spp_shps[i]
-  #                           cat_msg(i, ': Processing ', x)
-  #                           shp <- st_read(x)
-  #                           
-  #                           if('id_no' %in% names(shp)) {
-  #                             shp <- shp %>%
-  #                               rename(iucn_sid = id_no)
-  #                           }
-  #                           
-  #                           if('sisid' %in% names(shp)){
-  #                             shp <- shp %>%
-  #                               rename(iucn_sid = sisid)
-  #                           }
-  #                           
-  #                           shp <- shp %>%
-  #                             filter(iucn_sid %in% spp_maps$iucn_sid)
-  #                               ### NOTE: this will miss subpops
-  # 
-  #                           range_df <- data.frame(iucn_sid = shp$iucn_sid,
-  #                                                  poly_range_km2 = st_area(shp)) %>%
-  #                             mutate(poly_range_km2 = as.numeric(poly_range_km2 / 1e6))
-  #                           cat_msg(i, ': Finished ', x)
-  #                           
-  #                           return(range_df)
-  #                         })
   
   #### Use a for loop instead.... mclapply is too intensive for mazu with lots of cores... it fails most of the time. 
   
@@ -297,14 +270,16 @@ spp_risk_trend <- spp_risk %>%
   left_join(spp_range, by = 'iucn_sid')
 
 ### raster for cell IDs
-rast_cell_ids <- raster(file.path(dir_spatial, 'cell_id_rast.tif'))
+rast_cell_ids <- rast(file.path(dir_spatial, 'cell_id_rast.tif'))
 
 ### Make a dataframe of cell ID to MEOW for regional assessments... also 
 ### make a lookup of MEOW to region
-meow_rgns_rast <- raster::raster(file.path(dir_spatial, 'meow_rast.tif'))
-meow_cells_all <- data.frame(cell_id = values(rast_cell_ids),
-                             meow_id = values(meow_rgns_rast)) %>%
+meow_rgns_rast <- terra::rast(file.path(dir_spatial, 'meow_rast.tif'))
+meow_cells_all <- data.frame(cell_id = terra::values(rast_cell_ids),
+                             meow_id = terra::values(meow_rgns_rast)) %>%
+  rename(cell_id = 1, meow_id = 2) %>%
   filter(!is.na(meow_id))
+
 meow_to_rgn <- read_csv(file.path(dir_spatial, 'iucn_rgn_to_meow.csv'))
 
 
@@ -356,7 +331,7 @@ for(taxon in taxa) {
     ### Collect all species ranges for this taxon into a single data.frame.
     ### Use mclapply since we're reading many large-ish files.  For MARINE_MAMMALS (85 assessed spp)
     ### this takes about 30-40 seconds
-    taxon_cells_list <- parallel::mclapply(taxon_ids, mc.cores = 24,
+    taxon_cells_list <- parallel::mclapply(taxon_ids, mc.cores = 12,
                                         FUN = function(x) {
        x <- taxon_ids[1]
         ### x <- 4131                            

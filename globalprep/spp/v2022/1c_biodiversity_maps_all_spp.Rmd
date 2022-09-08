@@ -36,7 +36,7 @@ library(sf)
 source(here('workflow/R/common.R'))
 
 goal     <- 'spp'
-scenario <- 'v2021'
+scenario <- 'v2022'
 dir_goal <- here('globalprep', goal, scenario)
 
 ### goal specific folders and info
@@ -121,8 +121,8 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
   
   message('going into the first mclapply...')
   
-  ptm <- system.time({ # processing time 13.0130000000001 sec
-    cell_values_all <- parallel::mclapply(sum_files, mc.cores = 32,
+  ptm <- system.time({ # processing time 8.29499999999996 sec
+    cell_values_all <- parallel::mclapply(sum_files, mc.cores = 12,
       FUN = function(x) {
         read_csv(x, col_types = 'dddiidi')
         }) %>%
@@ -157,7 +157,7 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
   message('going into the third mclapply...')
   
   ptm <- system.time({ # processing time  sec
-    cell_summary_list <- parallel::mclapply(cell_vals_list, mc.cores = 24,
+    cell_summary_list <- parallel::mclapply(cell_vals_list, mc.cores = 12,
                                        FUN = function(x) {
       ### x <- cell_vals_list[[250]]
       y <- x %>%
@@ -168,7 +168,8 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
                   pct_threatened   = n_spp_threatened / n_spp_risk,
                   mean_trend  = sum(mean_trend * n_spp_trend, na.rm = TRUE) / 
                                   sum(n_spp_trend, na.rm = TRUE),
-                  n_spp_trend = sum(n_spp_trend, na.rm = TRUE))
+                  n_spp_trend = sum(n_spp_trend, na.rm = TRUE)) %>%
+        ungroup()
       
       z <- x %>%
         mutate(mean_risk_g = mean_risk,   ### protect it
@@ -186,7 +187,8 @@ if(!file.exists(cell_summary_file) | reload == TRUE) {
                   var_risk = ifelse(var_risk < 0, 0, var_risk),
                   var_risk = ifelse(is.nan(var_risk) | is.infinite(var_risk), NA, var_risk)) %>%
                     ### get rid of negative (tiny) variances and infinite variances
-        dplyr::select(cell_id, var_risk)
+        dplyr::select(cell_id, var_risk) %>%
+        ungroup()
       
         yz <- left_join(y, z, by = 'cell_id')
         return(yz)

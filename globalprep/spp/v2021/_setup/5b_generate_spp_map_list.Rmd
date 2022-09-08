@@ -39,7 +39,7 @@ library(rgeos)
 source(here('workflow/R/common.R'))
 
 goal     <- 'spp'
-scenario <- 'v2021'
+scenario <- 'v2022'
 dir_goal <- here('globalprep', goal, scenario)
 
 ### goal specific folders and info
@@ -52,9 +52,9 @@ dir_raw_data_anx <- file.path(dir_anx, '_raw_data')
 source(file.path(dir_setup, 'common_fxns.R'))
 
 dir_bli <- file.path(dir_M, 'git-annex/globalprep/_raw_data/birdlife_intl/d2021')
-dir_shp <- file.path(dir_M, 'git-annex/globalprep/_raw_data/iucn_spp/d2020-3')
+dir_shp <- file.path(dir_M, 'git-annex/globalprep/_raw_data/iucn_spp/d2022-1')
   ### in this folder are shapefiles at a taxonomic level, both from
-  ### IUCN spatial data download (version 2020-3)
+  ### IUCN spatial data download (version 2022-1)
 
 ```
 
@@ -315,10 +315,10 @@ bli_dbfs   <- list.files(dir_bli, pattern = '\\.dbf$', full.names = TRUE)
 map_files  <- c(iucn_dbfs, bli_dbfs)
 
 
-# spp_group_names <- map_files %>%
-#   basename() %>%
-#   str_replace_all('\\.dbf$|_PART_.+', '') %>%
-#   unique()
+spp_group_names <- map_files %>%
+  basename() %>%
+  str_replace_all('\\.dbf$|_PART_.+', '') %>%
+  unique()
 
 
 ####### just map iucn files
@@ -457,11 +457,11 @@ marine_map_info <- read_csv(file.path(dir_data,
   distinct()
 
 taxa_info <- read_csv(file.path(dir_goal_anx, 'iucn', 
-                                'spp_info_from_api_2020-3.csv')) %>%
+                                'spp_info_from_api_2022-1.csv')) %>%
   dplyr::select(iucn_sid, kingdom:family)
 
 cat_info <- read_csv(file.path(dir_data, 
-                               'iucn_risk_current_2020-3.csv')) %>%
+                               'iucn_risk_current_2022-1.csv')) %>%
   dplyr::select(iucn_sid, cat_score) %>%
   filter(!is.na(cat_score))
 
