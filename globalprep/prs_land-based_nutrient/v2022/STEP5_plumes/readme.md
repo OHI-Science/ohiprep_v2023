@@ -29,7 +29,7 @@ cp /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/int/ocean
 
 rm -r /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/grassdata/location # replace filepath with your filepath
 
-grass -c /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/grassdata/ocean_mask.tif /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/grassdata/location ## start a grass session and create a location folder where grass will run 
+grass -c /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/grassdata_testing/ocean_mask.tif /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/grassdata/location ## start a grass session and create a location folder where grass will run 
 
 exit ## exit grass, and copy ocean_mask.tif to PERMANENT folder, located in location folder
 

@@ -332,6 +332,11 @@ high_seas_prod <- read.csv(file.path("/home/shares/ohi/git-annex/globalprep/_raw
 
 sum(high_seas_prod$tonnes)
 
+test <- high_seas_prod %>% 
+  distinct(scientific_name, common_name, functional_group)
+
+write.csv(test, "tmp/saup_high_seas_species.csv", row.names = FALSE)
+
 
 ######## Join SAUP high seas production data to get the FAO id ########
 

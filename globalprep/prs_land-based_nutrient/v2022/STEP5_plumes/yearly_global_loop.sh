@@ -23,13 +23,13 @@ for file in /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/
 
 
     # # clean up any previous pour points (maybe expand these out):
-    #clean_pour_point_files.sh: removes pour_point rasters and vectors from current grass session
+    # removes pour_point rasters and vectors from current grass session
 
     g.remove -f type=raster pattern=pours_*
     g.remove -f type=vector pattern=pours_*
     g.remove -f type=raster pattern=plume_effluent_*_*
    
-    # code from clean_plumes.sh: removes plume rasters from current grass session (note this pattern is from OHI not MAR)
+    # removes plume rasters from current grass session (note this pattern is from OHI not MAR)
 
     g.list type=rast pattern=plume_pest* > plume_raster.list
     g.list type=rast pattern=plume_fert* >> plume_raster.list
@@ -48,9 +48,6 @@ for file in /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/
     echo "ran plumes model"
 
     # Export the rasters to tif files
-    # sh export_plumes.sh
-
-    ## Code below is from export_plumes.sh
 
     # Make output directory to export rasters in the grass cloud to
     mkdir output 
@@ -65,7 +62,7 @@ for file in /home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/
         g.region rast=$i
         r.mapcalc "plume_temp = if(isnull(${i}),0,${i})"
         r.out.gdal --overwrite input=plume_temp output=$i.tif type=Float32
-        g.remove -f type=raster name=plume_temp
+        g.remove -f type=raster name=plume_temp 
     done
 
 
@@ -82,7 +79,7 @@ do
    printf "Starting $i \n"
    mkdir subsets/subset$i
   
-   # move the tif files in batches of 10000 - NOTE CHANGE TO 10000 before running again gage
+   # move the tif files in batches of 10000 
    mv `ls | head -10000` subsets/subset$i/
   
    # mosaic subset 
