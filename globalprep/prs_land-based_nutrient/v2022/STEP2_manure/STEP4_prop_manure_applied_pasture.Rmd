@@ -1,5 +1,5 @@
 ---
-title: "OHI2021: STEP4: create rasters for prop N going to soils"
+title: "OHI2022: STEP4: create rasters for prop N going to soils"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:

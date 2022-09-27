@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: STEP6: Prop for manure left on pastures, and prop leaching and volatized"
+title: "OHI 2022: STEP6: Prop for manure left on pastures, and prop leaching and volatized"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:

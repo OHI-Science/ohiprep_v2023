@@ -59,14 +59,14 @@ cat("loads 2 rasters: zones and ocean\n",
   ## the fasterize package (which corrected some small errors in the previous raster that was created 
   ## using the rasterize package)
 
-zones <<- raster::raster(file.path(dir_M, "git-annex/globalprep/spatial/v2017/regions_eez_with_fao_ant.tif"))
+zones <<- terra::rast(file.path(dir_M, "git-annex/globalprep/spatial/v2017/regions_eez_with_fao_ant.tif"))
 
 ### ocean
   ## load ocean raster for masking spatial raster data
   ## this was the ocean layer created for the original cumulative human impacts
   ## This should be used when layers are going to be used for cumulative human impacts
 
-ocean <<- raster::raster(file.path(dir_M, 'model/GL-NCEAS-Halpern2008/tmp/ocean.tif'))
+ocean <<- terra::rast(file.path(dir_M, 'model/GL-NCEAS-Halpern2008/tmp/ocean.tif'))
 }
 
 ### Dataframes
