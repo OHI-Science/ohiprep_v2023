@@ -1,5 +1,5 @@
 ---
-title: "OHI 2021: Natural Products, Preparing catch and B/Bmsy data for forage fish species"
+title: "OHI 2022: Natural Products, Preparing catch and B/Bmsy data for forage fish species"
 author: "*Compiled on `r date()` by `r Sys.info()['user']`*"
 output: 
   html_document:
@@ -22,11 +22,9 @@ editor_options:
 
 # Summary
 
-This script takes the SAUP 2021 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
+This script takes the SAUP 2022 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
 
 ## Updates from previous assessment
-
-Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO bbmsy). Updated fisheries and RAM data.
 
 ***
 
@@ -34,11 +32,11 @@ Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO b
 
 **Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
 
-**Downloaded**: August 24, 2021
+**Downloaded**: September 27, 2022
 
 **Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
 
-**Time range**: 1950 - 2018
+**Time range**: 1950 - 2019
 
 **Format**: CSV
 
@@ -64,7 +62,7 @@ Deleted the underharvest penalty for the FOFM bbmsy scores (and for FIS and AO b
 
 **Native data resolution**: stock (fish stock, species and region specific)
 
-**Time range**: 1950 - 2018
+**Time range**: 1950 - 2024
 
 **Format**: CSV format 
 
@@ -113,10 +111,10 @@ Get the list of forage fish used for FOFM:
 ```{r, eval=FALSE}
 
 ## Read in Froehlich list of forage fish species
-forage <- read_csv(file.path(here(), "globalprep/np/v2021/raw/msleckman.61.1-CatchMSY_Nis_FAOAreas.csv"))
+forage <- read_csv(file.path(here(), "globalprep/np/v2022/raw/msleckman.61.1-CatchMSY_Nis_FAOAreas.csv"))
 sort(unique(forage$Species)) #238 forage fish groups listed
 
-saup_taxonkey <- read.csv(file.path(here(), "globalprep/fis/v2021/int/taxon_key_v2021.csv"))
+saup_taxonkey <- read.csv(file.path(here(), "globalprep/fis/v2022/int/taxon_key_v2022.csv"))
   
 ## Combined list:
 foragefish_list <- data.frame(forage_fish = sort(unique(c(unique(forage$Species), saup_taxonkey$TaxonName[saup_taxonkey$forage_fish %in% 1]))))
@@ -143,13 +141,13 @@ foragefish_list <- foragefish_list %>%
   left_join(saup_taxonkey, by = c("forage_fish" = "TaxonName")) %>% 
    mutate(inSAUP = ifelse(is.na(TaxonKey), NA, "yes")) ## Now only 9 missing spp.. this is good enough! Note: some of the species that are listed as in the SAUP data, are actually not in the SAUP data. This is because this forage fish list was originally derived from the Watson data, and there are some Watson species which are not in the SAUP data. This is not a problem.
 
-write.csv(foragefish_list, here("globalprep/np/v2021/int/master_taxa_list_SAUP.csv"), row.names=FALSE)
+write.csv(foragefish_list, here("globalprep/np/v2022/int/master_taxa_list_SAUP.csv"), row.names=FALSE)
 
 ```
 
 ## Read in v2021 catch data 
 ```{r}
-file <- file.path(dir_M,'git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn_taxa.csv')
+file <- file.path(dir_M,'git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn_taxa.csv')
 
 catch <- read.csv(file) %>%
   rename(common = CommonName, fao_id = fao_rgn, species=TaxonName)
@@ -166,12 +164,12 @@ catch <- catch %>%
 
 ```
 
-## Subset the v2021 catch data for our forage fish species 
+## Subset the v2022 catch data for our forage fish species 
 
 ```{r}
 ## need to get TaxonKey's for each species to join with catch
 
-foragefish_list <- read.csv(here("globalprep/np/v2021/int/master_taxa_list_SAUP.csv"))
+foragefish_list <- read.csv(here("globalprep/np/v2022/int/master_taxa_list_SAUP.csv"))
 
 missing_spp <- foragefish_list %>%
   filter(is.na(TaxonKey))
@@ -192,7 +190,7 @@ forage_fish_taxa_list <- foragefish_list %>%
 forage_fish_no_saup <- forage_fish_taxa_list %>%
   filter(is.na(TaxonKey)) 
 
-write.csv(forage_fish_no_saup, file.path(here(), "globalprep/np/v2021/int/forage_fish_not_in_SAUP.csv"), row.names = FALSE)
+write.csv(forage_fish_no_saup, file.path(here(), "globalprep/np/v2022/int/forage_fish_not_in_SAUP.csv"), row.names = FALSE)
 
 
 ## now join with catch data set 
@@ -200,7 +198,7 @@ catch_fishfeed <- catch %>%
   left_join(forage_fish_taxa_list, by = c("TaxonKey")) %>%
   dplyr::filter(!is.na(forage_fish))
 
-write.csv(catch_fishfeed, file.path(here(), "globalprep/np/v2021/int/saup_catch_forage_fish.csv"), row.names = FALSE)
+write.csv(catch_fishfeed, file.path(here(), "globalprep/np/v2022/int/saup_catch_forage_fish.csv"), row.names = FALSE)
 
 test <- catch_fishfeed %>%
   group_by(year) %>%
@@ -214,7 +212,7 @@ test <- catch_fishfeed %>%
 Justification from the [Froelich et al. 2018](https://www.nature.com/articles/s41893-018-0077-1#Sec11): "Currently, it is estimated about 10% of forage fish enter the human diet directly, but the notoriously tiny-boned fish are labour intensive (thus expensive) to process for human consumption, are the foundation of several industries and thus jobs (creating inertia to change) and are not the preferred fish type for most people."
 
 ```{r}
-catch_fishfeed <- read_csv(file.path(here(),"globalprep/np/v2021/int/saup_catch_forage_fish.csv"))
+catch_fishfeed <- read_csv(file.path(here(),"globalprep/np/v2022/int/saup_catch_forage_fish.csv"))
 
 catch_non_human <- catch_fishfeed %>% 
   mutate(tons_non_human = tons*0.9)
@@ -263,7 +261,7 @@ mean_catch_FOFM <- mean_catch %>%
   data.frame() %>%
   rename(catch = catch_non_human)
 
-write.csv(mean_catch_FOFM,  file.path(here(), "globalprep/np/v2021/int/mean_catch_FOFM.csv"), row.names = FALSE)
+write.csv(mean_catch_FOFM,  file.path(here(), "globalprep/np/v2022/int/mean_catch_FOFM.csv"), row.names = FALSE)
 ```
 
 # Steps 3/4/5/6
@@ -271,11 +269,11 @@ write.csv(mean_catch_FOFM,  file.path(here(), "globalprep/np/v2021/int/mean_catc
 ## Join with the final B/Bmsy layer from the fis model, convert the B/Bmsy values to scores (this is done in functions.R for FIS subgoal, but we do it in the dataprep for NP), apply the underharvest penalty, and take a catch weighted average of B/Bmsy scores for each region/year.
 
 ```{r}
-fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2021/output/fis_bbmsy.csv"))
+fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2022/output/fis_bbmsy.csv"))
 
-fis_bbmsy_gf <- read.csv(file.path(here(), "globalprep/fis/v2021/output/fis_bbmsy_gf.csv"))
+fis_bbmsy_gf <- read.csv(file.path(here(), "globalprep/fis/v2022/output/fis_bbmsy_gf.csv"))
 
-catch_FOFM <- read_csv(file.path(here(), "globalprep/np/v2021/int/mean_catch_FOFM.csv")) 
+catch_FOFM <- read_csv(file.path(here(), "globalprep/np/v2022/int/mean_catch_FOFM.csv")) 
 
 
 b <- fis_bbmsy %>%
@@ -385,7 +383,7 @@ b <- b %>%
            gapfilled,
            method) 
   
-  write.csv(gap_fill_data, here('globalprep/np/v2021/output/NP_bbmsy_summary_gf.csv'), row.names = FALSE)
+  write.csv(gap_fill_data, here('globalprep/np/v2022/output/NP_bbmsy_summary_gf.csv'), row.names = FALSE)
   
   score_data <- data_fis_gf %>%
     dplyr::select(rgn_id, stock_id, year, catch, score)
@@ -408,13 +406,13 @@ b <- b %>%
 
 summary(score_data)
 
-write.csv(score_data, here('globalprep/np/v2021/output/np_fofm_scores.csv'), row.names = FALSE)
+write.csv(score_data, here('globalprep/np/v2022/output/np_fofm_scores.csv'), row.names = FALSE)
 
 
-old <- read_csv(here('globalprep/np/v2021/archive/np_fofm_scores.csv')) 
+old <- read_csv(here('globalprep/np/v2021/output/np_fofm_scores.csv')) 
 summary(old)
 
-new <- read_csv(here('globalprep/np/v2021/output/np_fofm_scores.csv'))
+new <- read_csv(here('globalprep/np/v2022/output/np_fofm_scores.csv'))
 
 
 # old_prod_weights <- read_csv("../v2020/output/np_product_weights.csv")

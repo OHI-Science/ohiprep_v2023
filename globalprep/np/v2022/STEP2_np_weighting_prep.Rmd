@@ -39,11 +39,11 @@ FAO raw commodities value 1976_2019
 
 **Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
 
-**Downloaded**: August 24, 2021
+**Downloaded**: September 27, 2022
 
 **Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
 
-**Time range**: 1950 - 2018
+**Time range**: 1950 - 2019
 
 **Format**: CSV
 
