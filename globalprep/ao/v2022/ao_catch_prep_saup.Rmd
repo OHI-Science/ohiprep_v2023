@@ -20,7 +20,7 @@ editor_options:
 
 # Summary
 
-This script takes the SAUP 2021 catch data and creates 1 data layer:
+This script takes the SAUP 2022 catch data and creates 1 data layer:
 
 1. An average non-industrial catch dataset used to weight B/Bmsy values in the fisheries model. For this dataset, the catch is assigned to FAO and OHI regions.
 
@@ -28,7 +28,7 @@ This script takes the SAUP 2021 catch data and creates 1 data layer:
 
 ## Updates from previous assessment
 
-v2021 - This is a new layer for the artisanal opportunities goal stock status, and a new fisheries catch dataset.
+v2022 - Added new year of data (2019)
 
 ***
 
@@ -36,11 +36,11 @@ v2021 - This is a new layer for the artisanal opportunities goal stock status, a
 
 **Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
 
-**Downloaded**: August 24, 2021
+**Downloaded**: September 27, 2022
 
 **Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
 
-**Time range**: 1950 - 2018
+**Time range**: 1950 - 2019
 
 **Format**: CSV
 
@@ -61,7 +61,6 @@ knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/',message 
 ## Libraries
 library(readr)
 library(dplyr)
-library(raster)
 library(parallel)
 library(purrr)
 library(stringr)
@@ -70,14 +69,13 @@ library(foreach)
 library(here)
 library(sf)
 library(tidyverse)
-library(maps)
 library(readxl)
 
-setwd(here::here("globalprep/ao/v2021"))
+setwd(here::here("globalprep/ao/v2022"))
 source('../../../workflow/R/common.R')
 
 ## Paths for data
-fis_path = file.path(dir_M,"git-annex/globalprep/fis/v2021/int") # filepath to fisheries path
+fis_path = file.path(dir_M,"git-annex/globalprep/fis/v2022/int") # filepath to fisheries path
 ```
 
 ***
@@ -126,7 +124,7 @@ output_df <- catch %>%
     dplyr::summarise(tons = sum(tons)) %>% 
     dplyr::ungroup()
 
-write.csv(output_df, file = file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn_taxa.csv'), row.names=FALSE)
+write.csv(output_df, file = file.path(dir_M,'git-annex/globalprep/ao/v2022/int/ao_stock_catch_by_rgn_taxa.csv'), row.names=FALSE)
 
 test <- output_df %>%
   group_by(year) %>%
@@ -140,10 +138,13 @@ Take a look at catch data with missing ohi and fao regions in **stock_catch_by_r
 ```{r, eval=FALSE}
 region_data()
 
-df <- read_csv(file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn_taxa.csv')) %>%
+df <- read_csv(file.path(dir_M,'git-annex/globalprep/ao/v2022/int/ao_stock_catch_by_rgn_taxa.csv')) %>%
   left_join(rgns_eez)
 
 # they all have ohi or fao regions; however there are only 197 regions with artisanal or subsistence catch in the SAUP data.
+
+length(unique(df$rgn_id))
+unique(df$year)
 ```
 
 ***
@@ -158,7 +159,7 @@ Mean catch data is used to weight the B/Bmsy values in the fishery subgoal.
 
 ```{r mean catch, eval=F}
 
-file <- file.path(dir_M,'git-annex/globalprep/ao/v2021/int/ao_stock_catch_by_rgn_taxa.csv')
+file <- file.path(dir_M,'git-annex/globalprep/ao/v2022/int/ao_stock_catch_by_rgn_taxa.csv')
 
 catch <- read_csv(file) %>%
   rename(common = CommonName, fao_id = fao_rgn, species=TaxonName)
@@ -261,9 +262,9 @@ write.csv(mean_catch_toolbox, "intermediate/mean_catch.csv", row.names=FALSE) ##
 
 length(unique(mean_catch_toolbox$rgn_id)) # only 196 regions... We will gapfill the missing regions...
 
-old <- read.csv("intermediate/mean_catch_watson.csv")
+old <- read.csv("../v2021/intermediate/mean_catch.csv")
 
-length(unique(old$rgn_id)) # only 210 regions
+length(unique(old$rgn_id)) # only 196 regions
 
 ```
 
