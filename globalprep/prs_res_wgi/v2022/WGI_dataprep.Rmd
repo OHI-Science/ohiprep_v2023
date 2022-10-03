@@ -36,10 +36,10 @@ Potential improvement for future assessments: Explore a better way to gapfill...
 
 **Downloaded**: 
 
-June 29, 2022 (source data updated Sep 2021)
+October 3, 2022 (source data updated Sep 2022)
 
 **Description**:  
-The Worldwide Governance Indicators (WGI) project reports aggregate and individual governance indicators for 215 economies over the period 1996–2020, for six dimensions of governance:
+The Worldwide Governance Indicators (WGI) project reports aggregate and individual governance indicators for 215 economies over the period 1996–2021, for six dimensions of governance:
 
 * Voice and Accountability
 * Political Stability and Absence of Violence
@@ -48,7 +48,7 @@ The Worldwide Governance Indicators (WGI) project reports aggregate and individu
 * Rule of Law
 * Control of Corruption
 
-**Time range**: 1996-2020
+**Time range**: 1996-2021
 
 ***
 
@@ -68,7 +68,7 @@ library(readr)
 
 # check website to see what years are available: http://info.worldbank.org/governance/wgi/index.aspx#home
 yr_start = 1996
-yr_end   = 2020
+yr_end   = 2021
 
 scen_year <- "2022"
 
@@ -152,7 +152,7 @@ The first gapfilling occurs when we use the average of previous years data withi
 **Read in WGI data - change appended date in file name to reflect the most recent version of the saved WGI data:**
 ```{r, eval=FALSE}
 
-d <- read.csv(here(paste0('globalprep/prs_res_wgi/v', scen_year, '/raw/worldbank_wgi_from_wdi_api_2022-06-29.csv'))) # change appended date to most recent version
+d <- read.csv(here(paste0('globalprep/prs_res_wgi/v', scen_year, '/raw/worldbank_wgi_from_wdi_api_2022-10-03.csv'))) # change appended date to most recent version
 
 ```
 
@@ -286,6 +286,8 @@ d_calcs <- d_calcs %>%
   mutate(country = as.character(country))
 
 d_calcs$country[grep("Korea, Dem.", d_calcs$country)] <- "North Korea"
+
+d_calcs$country[grep("Turkiye", d_calcs$country)] <- "Turkey"
 # Maybe in future update package with country synonym list
 
 
@@ -389,7 +391,7 @@ d_gf2 <- regions %>%
 head(d_sovs)
 summary(d_sovs) 
   ## v2021: score has 1029 NAs
-  ## v2022: 1078 NAs
+  ## v2022: 1127 NAs
 
 ```
 
@@ -509,7 +511,7 @@ Checking on outliers in 2022 assessment:
 
 ## Do this after updating in global
 
-worldbank_wgi_from_wdi_api <- read_csv(paste0("globalprep/prs_res_wgi/v", scen_year, "/raw/worldbank_wgi_from_wdi_api_2022-06-29.csv"))
+worldbank_wgi_from_wdi_api <- read_csv(paste0("globalprep/prs_res_wgi/v", scen_year, "/raw/worldbank_wgi_from_wdi_api_2022-10-03.csv"))
 
 worldbank_2018 <- worldbank_wgi_from_wdi_api %>% 
   filter(year == 2018) %>% 
