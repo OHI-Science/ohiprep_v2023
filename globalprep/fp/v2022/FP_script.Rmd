@@ -44,7 +44,7 @@ mar <- read.csv('../../mar/v2022/output/MAR_FP_data.csv')
 Fisheries data.
 ```{r}
 
-fis <- read.csv("../../fis/v2021/output/FP_fis_catch.csv") %>%
+fis <- read.csv("../../fis/v2022/output/FP_fis_catch.csv") %>%
   dplyr::select(rgn_id, year, fis_t = fis_catch)
 
 ```

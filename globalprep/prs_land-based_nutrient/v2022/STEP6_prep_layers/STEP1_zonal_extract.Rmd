@@ -61,7 +61,7 @@ rast_loc <- file.path(dir_M,
 
 
 
-## Reproject and mask ocean raster to make consistent with standard OHI global region file
+## Mask ocean raster to make consistent with standard OHI global region file
 
 ```{r, eval = FALSE}
 files <- list.files(rast_loc, pattern = "pourpoints", full=TRUE)
@@ -72,8 +72,9 @@ files <- list.files(file.path(dir_M, "git-annex/globalprep/prs_land-based_nutrie
          pattern = "pourpoints", full=TRUE)
 
 
+
 registerDoParallel(5)
-foreach(file = files) %dopar% { #file = files[1]
+foreach(file = files) %dopar% { #file = files[16]
   name <- basename(file)
   name <- sub('\\.tif$', '', name)
 
@@ -91,8 +92,9 @@ foreach(file = files) %dopar% { #file = files[1]
 }
 
 # check to see if we lost data
-test <- rast("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_masked/pourpoints_crop_manure_leached_volt_N_2005_joined.tif")
-plot(test)
+test <- rast(list.files("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_masked", full.names = TRUE))
+tmp <- rast(files[1])
+
 global(tmp, "sum") # 16083871
 global(test, "sum", na.rm = TRUE) # 16082433
 ```
@@ -107,16 +109,17 @@ files <- list.files(file.path(dir_M, "git-annex/globalprep/prs_land-based_nutrie
          pattern = "pourpoints", full=TRUE)
 
 
-registerDoParallel(8)
+registerDoParallel(4)
 foreach(file = files) %dopar% { #file = files[1]
   name <- basename(file)
   name <- sub('\\.tif$', '', name)
 
   tmp <- rast(file)
   
-classify(tmp, cbind(-Inf, 0, NA), right=TRUE, filename = file.path(dir_M, 
+classify(tmp, cbind(-Inf, 0, NA), right=NA, filename = file.path(dir_M, 
                               sprintf("git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_no_zero/%s", basename(file))), 
          overwrite = TRUE)
+
   
 }
 
@@ -124,12 +127,15 @@ test <- rast(file)
 plot(test)
 global(test, "sum", na.rm = TRUE) # 16082433
 
+global(rast("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_no_zero/pourpoints_crop_manure_leached_volt_N_2005_joined.tif"), "sum", na.rm = TRUE) # 16082433
+
+plot(rast("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_no_zero/pourpoints_crop_manure_leached_volt_N_2005_joined.tif")) 
+
 ```
 
 ## Calculate the 99th quantile to use as the reference level. 
- - v2021: I also took a look at the 99.9th and 99.99th quantiles
-```{r, eval = FALSE}
 
+```{r, eval = FALSE}
 ### Collect quantile data for regulars for the 99th quantile 
 
 files_unlog <- list.files(file.path(dir_M, 'git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_no_zero'), full.names = TRUE)
@@ -144,12 +150,12 @@ for(file in files_unlog) { #file = files_unlog[1]
 }
 
 write.csv(quantiles, 
-          "globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/int/quantiles_99.csv",
+          "globalprep/prs_land-based_nutrient/v2022/STEP6_prep_layers/int/quantiles_99.csv",
           row.names = FALSE)
 
 ## reference point
-## 16.58593
-## This was derived using all 99th quantile from all years of data for 2021 OHI assessment (fao data from 2005 to 2019)
+## 15.66116
+## This was derived using all 99th quantile from all years of data for 2022 OHI assessment (fao data from 2005 to 2020)
 
 quantiles <- read.csv(file.path(here(), "globalprep/prs_land-based_nutrient/v2022/STEP6_prep_layers/int/quantiles_99.csv"))
 
@@ -157,7 +163,10 @@ quant_ref <- mean(quantiles$quantile_99)
 
 
 ref_point <- read.csv(here("globalprep/supplementary_information/v2022/reference_points_pressures.csv")) %>% 
-  mutate(ref_point = ifelse(pressure == "Fertilizer plume data", quant_ref, ref_point))
+  mutate(ref_point = ifelse(pressure == "Fertilizer plume data", quant_ref, ref_point)) %>%
+  mutate(data_years = ifelse(pressure == "Fertilizer plume data", "2005-2020", data_years),
+         method = ifelse(pressure == "Fertilizer plume data", "99 quantile across full time range", method), 
+         ref_year = ifelse(pressure == "Fertilizer plume data", "N/A", ref_year))
 
 
 write.csv(ref_point, here("globalprep/supplementary_information/v2022/reference_points_pressures.csv"))
@@ -176,14 +185,14 @@ ref_point_fert <- as.numeric(as.character(ref_point$ref_point))
 files <- list.files(file.path(dir_M, 'git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_plume_no_zero'), 
                     full.names = TRUE)
 
-registerDoParallel(cores = 5)
+registerDoParallel(cores = 2)
 foreach(file = files) %dopar% { #file = files[1]
 
   year <- str_sub(file,-15,-12)
   
   tmp <- rast(file)
   
-  calc(tmp, fun=function(x){ifelse(x>ref_point_fert, 1, x/ref_point_fert)},
+  app(tmp, fun=function(x){ifelse(x>ref_point_fert, 1, x/ref_point_fert)},
        filename = file.path(dir_M, 
   sprintf("git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_rescaled_99/nutrient_%s_N_rescaled_mol.tif", year)), 
        overwrite=TRUE)
@@ -193,7 +202,7 @@ foreach(file = files) %dopar% { #file = files[1]
 #### Data check 
 ## take a look at one year of data and zoom in on some areas
 
-test <- rast(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2021/output/N_rescaled_999/nutrient_2005_N_rescaled_mol.tif"))
+test <- rast(file.path("/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_rescaled_99/nutrient_2005_N_rescaled_mol.tif"))
 plot(test)
 
 
@@ -272,22 +281,14 @@ tmp <- raster(files[1])
 eez_land_raster <- fasterize::fasterize(regions, tmp, field="rgn_ant_id")
 plot(eez_land_raster) ## this is what I want to use to extract
 
-eez_land_raster <- rast(eez_land_raster)
 
-# beginCluster(n = 8)
-# eez_land_rast_reclass <- reclassify(eez_land_raster, cbind(251, Inf, NA), progress = "text")
-# endCluster()
-# plot(eez_land_rast_reclass) ## just checking to make sure this is correct
-
-files <- files[2:15]
-
-registerDoParallel(cores = 7)
+registerDoParallel(cores = 4)
 foreach(file = files) %dopar% {
  # file = files[1]
   
   yr <- str_sub(file,-23,-20)
   
-  tmp <- rast(file)
+  tmp <- raster(file)
   
 
 regions_stats <- zonal(tmp,  eez_land_raster, fun="mean", na.rm=TRUE)
@@ -334,20 +335,19 @@ write.csv(myMergedData, file.path(here(), save_loc_data, "output/cw_fertilizers_
 # 
 # writeRaster(combine_inland_3nm, file.path("/home/shares/ohi/git-annex/globalprep/spatial/v2021/inland_3nm_rast.tif"))
 
-combine_inland_3nm <- rast(file.path("/home/shares/ohi/git-annex/globalprep/spatial/v2021/inland_3nm_rast.tif"))
+combine_inland_3nm <- raster(file.path("/home/shares/ohi/git-annex/globalprep/spatial/v2021/inland_3nm_rast.tif"))
 
 ## now do zonal stats to extract the scores 
 files <- list.files(file.path(dir_M, "git-annex/globalprep/prs_land-based_nutrient/v2022/output/N_rescaled_99"), pattern = "rescaled", full=TRUE)
 
-# files <- files[2:15]
 
-registerDoParallel(cores = 7)
+registerDoParallel(cores = 4)
 foreach(file = files) %dopar% {
   # file = files[1]
   
    yr <- str_sub(file,-23,-20)
    
-  tmp <- rast(file)
+  tmp <- raster(file)
   
 
 regions_stats_3nm <- zonal(tmp,  combine_inland_3nm, fun="mean", na.rm=TRUE, progress="text")
@@ -382,7 +382,7 @@ test <- myMergedData %>%
 ```{r, eval = FALSE}
 ## trend should be calculated on 3nm (not eez)
 
-trend_data <- read.csv(file.path(here(), save_loc_data, "STEP6_prep_layers/output/cw_fertilizers_score_3nm_updated.csv"))
+trend_data <- read.csv(file.path(here(), save_loc_data, "output/cw_fertilizers_score_3nm_updated.csv"))
 
 for(scenario_year in 2009:2020){ #scenario_year=2009
 
@@ -403,14 +403,14 @@ adj_trend_year <- as.numeric(min(trend_years))
     mutate(trend = round(trend, 4)) %>%
     dplyr::select(rgn_id, trend) 
   
-  write.csv(trends, file.path(here(), save_loc_data, "STEP6_prep_layers", sprintf('int/cw_fertilizers_trend_%s_new.csv', scenario_year)), row.names=FALSE)
+  write.csv(trends, file.path(here(), save_loc_data, sprintf('int/cw_fertilizers_trend_%s_new.csv', scenario_year)), row.names=FALSE)
 }
 
 
 data <- data.frame()
 
 for (year in 2009:2020){ # year = 2012
-  trend <- read.csv(file.path(here(), sprintf("globalprep/prs_land-based_nutrient/v2021/STEP6_prep_layers/int/cw_fertilizers_trend_%s_new.csv", year)))
+  trend <- read.csv(file.path(here(), sprintf("globalprep/prs_land-based_nutrient/v2022/int/cw_fertilizers_trend_%s_new.csv", year)))
   
   trend <- trend %>%
     mutate(year = year) %>%
@@ -422,17 +422,16 @@ for (year in 2009:2020){ # year = 2012
 }
 
 
-write.csv(data, file.path(here(), "globalprep/prs_land-based_nutrient/v2021/output/cw_fertilizers_trend_updated.csv"),
+write.csv(data, file.path(here(), "globalprep/prs_land-based_nutrient/v2022/output/cw_fertilizers_trend_updated.csv"),
           row.names=FALSE)
 ```
 
-Need to update below (9/26/2022)
 ## compare new and old trend values:
 
 ```{r, eval = FALSE}
-  old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_trend_2016_new.csv')) %>%
+  old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2021/output/cw_fertilizers_trend_updated.csv')) %>%
     dplyr::select(rgn_id, old_trend = trend)
-new <- read.csv(file.path(save_loc_data, 'STEP6_prep_layers/int/cw_fertilizers_trend_2016_new.csv')) %>%
+new <- read.csv(file.path(save_loc_data, 'output/cw_fertilizers_trend_updated.csv')) %>%
   left_join(old, by="rgn_id") 
 new
 plot(new$old_trend, new$trend)
@@ -440,10 +439,10 @@ abline(0, 1, col="red")
 
 
 
-  old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2016/output/cw_fertilizers_score_3nm_updated.csv')) %>%
+  old <- read.csv(file.path(here(), 'globalprep/prs_land-based_nutrient/v2021/output/cw_fertilizers_score_3nm_updated.csv')) %>%
     filter(year == 2016) %>%
     dplyr::select(rgn_id, old_pressure = pressure_score)
-new <- read.csv(file.path(save_loc_data, 'STEP6_prep_layers/output/cw_fertilizers_score_3nm_updated.csv')) %>%
+new <- read.csv(file.path(save_loc_data, 'output/cw_fertilizers_score_3nm_updated.csv')) %>%
   filter(year == 2016) %>%
   left_join(old, by="rgn_id") 
  # mutate(pressure_score = ifelse(is.na(pressure_score), 0, pressure_score))
