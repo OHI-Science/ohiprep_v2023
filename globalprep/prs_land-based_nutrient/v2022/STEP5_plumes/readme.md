@@ -1,8 +1,8 @@
-## MAR Wastewater Project: Plume model 
+## Wastewater Project: Plume model 
 
-Here I will document how to run the plume model. Much of this was written by Gage Clawson, and updated by Maddie Berger for the MAR wastewater project.
+How to run the plume model! 
  
- - Download this "STEP5_plumes" folder into whatever directory you want to run it. For OHI this will be `/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v20XX/`, and name it "plumes". YOU WILL NEED TO UPDATE ALL THE FILEPATHS IN `readme.md` and `yearly_global_loop.sh` IF YOU WANT ANY OF THIS TO WORK. 
+ - Download this "STEP5_plumes" folder into whatever directory you want to run it. For OHI this will be `/home/shares/ohi/git-annex/globalprep/prs_land-based_nutrient/v20XX/`, and name it "plumes". **YOU WILL NEED TO UPDATE ALL THE FILEPATHS IN `readme.md` and `yearly_global_loop.sh` IF YOU WANT ANY OF THIS TO WORK.** 
  - Go ahead and install the anaconda installer for 64-bit (x86) linux from https://www.anaconda.com/products/individual and throw the file into your home directory on mazu (or Aurora if that is what you use). You will end up with a folder akin to /home/username/anaconda3
  - In your terminal, ssh into mazu.. i.e. `ssh username@mazu.nceas.ucsb.edu` and enter your password
  - Create a folder in your "anaconda3/envs" folder named "py2", this will be your python environment. This can be done with this line `conda create --name py2 python=2`
