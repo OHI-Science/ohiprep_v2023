@@ -109,7 +109,7 @@ Or, should you try to estimate the missing values?  If so, how might you go abou
 ### Goal status and trend
 <br>
 
-7. Read the methods section for the Lasting Special Places subgoal: https://ohi-science.org/ohiprep_v2021/Reference/methods_and_results/Supplement.html#692_Lasting_special_places_(subgoal_of_sense_of_place)
+7. Read the methods section for the Lasting Special Places subgoal: hhttps://oceanhealthindex.org/images/htmls/Supplement.html#692_Lasting_special_places_(subgoal_of_sense_of_place))
 
 The information in this section describes how status and trend are calculated for this goal, it also includes the data used to calculate the pressure and resilience dimensions.
 
@@ -179,7 +179,7 @@ QUESTION: Can you think of any scenarios when we would not use 5 years of data t
 
 The final pressure dimension is calculated for each region and goal using a function from the ohicore package.  The function requires several pieces of information:
 
-a. A data layer for each pressure layer describing the magnitude of the pressure on a scale of 0-1.  For example, here is the sea surface temperature pressure layer (low pressures are good and high pressures are bad): https://github.com/OHI-Science/ohiprep_v2022/blob/gh-pages/globalprep/prs_sst/v2021/output/sst_updated.csv
+a. A data layer for each pressure layer describing the magnitude of the pressure on a scale of 0-1.  For example, here is the sea surface temperature pressure layer (low pressures are good and high pressures are bad): https://github.com/OHI-Science/ohiprep_v2023/blob/gh-pages/globalprep/prs_sst/v2022/output/sst_updated.csv
 
 b. Classifying the pressure category for each data layer. The pressure dimension is based on two types of pressures: Ecological and Social (Figure 4.2).  The ecological pressures are broken into 5 categories (pollution, alien species, habitat destruction, fishing, and climate change).  Each pressure data layer is assigned to a category in this file: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/pressure_categories.csv
 
@@ -205,7 +205,7 @@ NOTE: It is convention to add a superscript to the pressure name that describes 
 
 The final pressure dimension is calculated for each region and goal using a function from the ohicore package.  The function requires several pieces of information:
 
-a. A data layer for each pressure layer describing the magnitude of the pressure on a scale of 0-1. For example, here is the Social Progress Index layer (low resilience is bad and high resilience is good): https://github.com/OHI-Science/ohiprep_v2022/blob/gh-pages/globalprep/prs_res_spi/v2021/output/spi_res.csv
+a. A data layer for each pressure layer describing the magnitude of the pressure on a scale of 0-1. For example, here is the Social Progress Index layer (low resilience is bad and high resilience is good): https://github.com/OHI-Science/ohiprep_v2023/blob/gh-pages/globalprep/prs_res_spi/v2022/output/spi_res.csv
 
 b. The resilience dimension includes two major categories: Ecological and Social (Figure 4.3). Ecological resilience has two subcategories: Ecosystem and Regulatory.  Regulatory is comprised of the same 5 subcomponents as the Ecological *pressures*: pollution, alien species, habitat destruction, fishing, and climate change.  There is also a “goal” specific subcomponent.   Each resilience data layer is assigned to a category in this file: https://github.com/OHI-Science/ohi-global/blob/draft/eez/conf/resilience_categories.csv
 

@@ -39,7 +39,7 @@ Good luck!
 *Hint* Here is a link to the data: 
 https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv
 
-*Note* There are scores for 2022, you can ignore these. These are just here as a placeholder until we calculate new ones for 2022 (they are the 2021 scores). 
+*Note* There are scores for 2023, you can ignore these. These are just here as a placeholder until we calculate new ones for 2023 (they are the 2022 scores). 
 
 ```{r, include=FALSE}
 ## Working space
@@ -106,7 +106,7 @@ https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv
 
 *Question* Figure out which goals/subgoals have the most NA values for scores in 2021.  Which ones have the least? Can you discern any reason why some goals have lots of missing values and others do not?
 
-*Hint* Include only dimension = score, and year = 2021, and cut region_id = 0.
+*Hint* Include only dimension = score, and year = 2022, and cut region_id = 0.
 
 *Answer* Write your answer here!
 
@@ -155,7 +155,7 @@ year       |  Scenario year               | 2012 to 2022
 
 ### Plot
 
-*Project* Create a scatterplot that compares 2012 and 2021 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
+*Project* Create a scatterplot that compares 2012 and 2022 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time? 
 
 *Answer* Write your answer here!
 
