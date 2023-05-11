@@ -1,4 +1,4 @@
-## Welcome the global Ocean Health Index data prep repository!
+## Welcome the global Ocean Health Index data prep repository
 
 This repository includes all the scripts used to prepare data for the global Ocean Health Assessment
 for the 2022 assessment. The tenth assessment of OHI! 
