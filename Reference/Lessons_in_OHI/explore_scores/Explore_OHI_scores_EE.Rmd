@@ -1,5 +1,6 @@
 ---
 title: "Learning about OHI scores"
+author: Erika Egg
 output: html_document
 ---
 
