@@ -1,16 +1,19 @@
 ---
 title: "Learning about OHI scores"
-output: html_document
+output:
+  html_document:
 editor_options: 
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ## loading packages.. you might need to install them first
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(tidyverse)
+library(plotly)
 ```
 
 ## OH NO!
@@ -66,13 +69,7 @@ goal_names <- read_csv("https://raw.githubusercontent.com/OHI-Science/ohi-global
 
 *Answer*
 
-**Antarctica (region 213) has all NA values for scores which explains one of the extra regions. Region 0 does not have a name, this is global.**
-
-**Additional Concerns:**
-
--   **one region is missing from the region list (region_id 0)**
-
--   **there are only 10 goals listed in the data set with goal names, but there appear to be 19 in the scores data set.**
+**Antarctica (region 213) has all NA values for scores which explains one of the extra regions. Region 0 does not have a name, this represents the entire globe.**
 
 ```{r, include=FALSE}
 #check out the scores data
@@ -118,7 +115,7 @@ na_region$rgn_name
 
 Which region id corresponds to the United States?
 
-**There appears to be both a region id and an admin region id. The admin region id is 163. However within that admin_region id, there are other region ids, presumably areas that are not geographically within the US but are territories of the us. These region ids are printed below. We don't ever really use the admin region id.**
+**The region_id for the United states is 163. There appears to be both a region id and an admin region id, which is also 163 for the US. However within the US admin_region id, there are other region ids, presumably areas that are not geographically within the US but are territories of the us. These additional region ids are printed below. Note: Discussed that admin region ids are rarely used.**
 
 ```{r}
 #filter to the us
@@ -131,6 +128,12 @@ unique(united_states$admin_rgn_id)
 all_us_regions <- c(unique(united_states$region_id))
 #look at all of the US region ids 
 cat("Additional region_ids associated with the United states admin region include", all_us_regions)
+
+#looking for us only in main region id
+#filter to the us
+united_states_main <- scores_expanded %>% filter(rgn_name == "United States")
+
+unique(united_states_main$region_id)
 
 ```
 
@@ -162,18 +165,13 @@ length(unique(goal_names$Goal))
 **It looks like only scores are calculated for index and not any of the other dimensions. This makes sense because the dimensions are already incorporated into the scores (score is made up of the other 5 dimenstions) for each goal before they are averaged into the index score. See Figure 2.1 in the methods.**
 
 ```{r, include=FALSE}
-## Working space
+
 
  unique(scores$dimension)
  table(scores$dimension)
  
  table(scores$goal)
  table(scores$goal, scores$dimension)
-
- #look at the index goal
- 
- 
-
 ```
 
 ### Missing data
@@ -186,13 +184,13 @@ length(unique(goal_names$Goal))
 
 **CS: The methods state that carbon storage goals are NAs in regions that don't have the coastal ecosystems that are evaluated for carbon storage.**
 
-**NP, MAR, AO, ECO, LE, LIV:** **all relate to economies/livelihoods extracted from the area. These could be NAs in areas that are totally protected/ not inhabited by people. The methods mention food production goals often do not apply in uninhabited areas.** **However this is a little confusing because FP (which relates to seafood harvest) only has one NA. Fishing relates to where the fishing happens, so can still apply to uninhabitated places.**
+**NP, MAR, AO, ECO, LE, LIV:** **all relate to economies/livelihoods extracted from the area. These could be NAs in areas that are totally protected/ not inhabited by people. The methods mention food production goals often do not apply in uninhabited areas.** **However this is a little confusing because FP (which relates to seafood harvest) only has one NA. Fishing relates to where the fishing happens, so that explains why goals related to this rarely have NAs even if other food production goals are NA.**
 
 **TR: relates to people experiencing/enjoying. I could see how this could be NA in areas that aren't inhabited as well.**
 
 **CP:** **"The amount of protection provided by marine and coastal habitats serving as natural buffers against incoming waves" The methods state that this can include mangroves, coral reefs, sea grasses, kelp forest sea ice, and salt marshes.** **I assume this goal has high NAs for the same reason as the CS variable, in that not all places have these types of habitats.**
 
-**Ones with fewest have decent data.**
+**Ones with fewest NAs generally apply to all areas.**
 
 ```{r, include=FALSE}
 scores_expanded %>% 
@@ -233,38 +231,62 @@ scores_expanded %>%
 
 Write it in the following table. NOTE: Knit the document to see if the table is formatting correctly (but don't bother if you do not know how to knit a document or if you are running into errors!).
 
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
-| Variable   | Description                                                                                                                                     | Values                                                              |
-+============+=================================================================================================================================================+=====================================================================+
-| goal       | Abbreviation for goal. Represent goals for ocean ecosystems which represent the full suite of benefits that people want and need from the ocean | character                                                           |
-|            |                                                                                                                                                 |                                                                     |
-|            | Includes main goals, sub-goals and overall index score.                                                                                         | 2 letter codes-10 goals of OHI                                      |
-|            |                                                                                                                                                 |                                                                     |
-|            |                                                                                                                                                 | 3 letter codes-subgoals used to calculate 4 of the goals            |
-|            |                                                                                                                                                 |                                                                     |
-|            |                                                                                                                                                 | Index-overall index score                                           |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
-| dimension  | variable used to calculate goals                                                                                                                | current status,                                                     |
-|            |                                                                                                                                                 |                                                                     |
-|            |                                                                                                                                                 | predicted future status: sub dimensions-resilience, pressure, trend |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
-| region_id  | For the global OHI, each region is defined as the offshore EEZ area for all coastal countries and territories.                                  | 2020 total +(Anartica not calculated) Gloabl Region 0               |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
-| score      | Scores are calculated at the level of region and goal. Goal score represents an average of current and future status score.                     | 0-100                                                               |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
-| year       | Scenario year                                                                                                                                   | 2012 to 2023                                                        |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| Variable   | Description                                                                                                                                     | Values                                                     |
++============+=================================================================================================================================================+============================================================+
+| goal       | Abbreviation for goal. Represent goals for ocean ecosystems which represent the full suite of benefits that people want and need from the ocean | character                                                  |
+|            |                                                                                                                                                 |                                                            |
+|            | Includes main goals, sub-goals and overall index score.                                                                                         | 2 letter codes-10 goals of OHI                             |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | 3 letter codes-subgoals used to calculate 4 of the goals   |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | Index-overall index score                                  |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| dimension  | variable used to calculate goals                                                                                                                | current status                                             |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | predicted future status:                                   |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | -   resilience                                             |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | -   pressure                                               |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | -   trend                                                  |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| region_id  | For the global OHI, each region is defined as the offshore EEZ area for all coastal countries and territories.                                  | 2020 total +(Antarctica not calculated) + Global Region 0  |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| score      | Scores are calculated at the level of region and goal. Goal score represents an average of current and future status score.                     | -1 to 1 for trend                                          |
+|            |                                                                                                                                                 |                                                            |
+|            |                                                                                                                                                 | 0-100 all other dimensions                                 |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| year       | Scenario year                                                                                                                                   | 2012 to 2023                                               |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+
+```{r}
+#looking at the range of scores for all dimensions except trend
+score_dimension <- scores %>% filter(dimension != "trend")
+
+max(score_dimension$score, na.rm = TRUE)
+min(score_dimension$score, na.rm = TRUE)
+
+#looking at the range of scores for trend
+score_dimension <- scores %>%
+  filter(dimension == "trend")
+
+max(score_dimension$score, na.rm = TRUE)
+min(score_dimension$score, na.rm = TRUE)
+```
 
 ### Plot
 
 *Project* Create a scatterplot that compares 2012 and 2022 *scores* for each region for the artisanal opportunities goal. Based on this, do scores for the artisanal opportunities goal appear to have increased or decreased over time?
 
-*Answer* Write your answer here!
+**It appears that the scores have increased by a small amount between 2012 and 2022.**
 
 ```{r}
-## Working space
+#scatterplot
 artisinal <- scores_expanded %>% 
-  filter(goal_name == "Artisanal Fishing Opportunity" & dimension == "score") %>% filter(year %in% c(2012,2022) & region_id != 0)
+  filter(goal_name == "Artisanal Fishing Opportunity" & dimension == "score") %>%
+  filter(year %in% c(2012,2022) & region_id != 0)
 
 mean_scores <- artisinal %>%
   group_by(year) %>%
@@ -273,14 +295,13 @@ mean_scores <- artisinal %>%
 ggplot(artisinal, aes(x = region_id, y = score, col = score)) +
   geom_point() +
   geom_hline(data = mean_scores, aes(yintercept = mean_score), linetype = "dashed", color = "red") +
-  facet_grid(~ year) + labs(title = "Artisinal Fishing Opportunity Scores for All Regions")
+  facet_grid(~ year) + labs(title = "Artisinal Fishing Opportunity Scores for All Regions", subtitle = )
 
+# Create interactive scatterplot using plotly
 
-ggplot(artisinal, aes(x = region_id, y = score, col = score)) +
-  geom_point() +
-  facet_grid(~year) +
-  geom_boxplot(alpha = 0) + labs(title = "Artisinal Fishing Opportunity Scores for All Regions")
-
+artisinal %>% group_by(year) %>%  do(p=plot_ly(., x = ~region_id, y = ~score, type = "scatter", mode = "markers", hoverinfo = "text", text = ~rgn_name, name = toString(unique(.$year)))) %>%
+  subplot(nrows = 1, shareX = TRUE, shareY = TRUE) %>% 
+  layout(title = "Artisinal Fishing Opportunity Scores for All Regions")
 ```
 
 Create a plot that shows the distribution (e.g., histogram or barplot or ??) of *Index* scores of all countries.
@@ -291,11 +312,14 @@ Create a plot that shows the distribution (e.g., histogram or barplot or ??) of 
 ## Code to create a plot showing distribution of country Index scores
 scores_expanded %>% filter(goal_name == "Artisanal Fishing Opportunity" & dimension == "score") %>% 
   filter(year!= "2023") %>% #remove 2023 since this is a placeholder
-  ggplot() + geom_histogram(aes(x = score), fill = "skyblue") + labs(title = "Distribution of OHI Scores", subtitle = " Artisinal Fishing Opportunity 2012-2023")
+  ggplot() + geom_histogram(aes(x = score), fill = "skyblue") + 
+  labs(title = "Distribution of OHI Scores", subtitle = " Artisinal Fishing Opportunity 2012-2023")
 ```
 
 ```{r}
 scores_expanded %>% filter(goal_name == "Artisanal Fishing Opportunity" & dimension == "score") %>% 
   filter(year!= "2023") %>% #remove 2023 since this is a placeholder
-  ggplot() + geom_density(aes(x = score), fill = "skyblue") + labs(title = "Density of OHI Scores", subtitle = " Artisinal Fishing Opportunity 2012-2023")
+  ggplot() + 
+  geom_density(aes(x = score), fill = "skyblue") +
+  labs(title = "Density of OHI Scores", subtitle = " Artisinal Fishing Opportunity 2012-2023")
 ```
