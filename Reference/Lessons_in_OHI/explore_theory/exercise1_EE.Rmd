@@ -17,7 +17,7 @@ I will be around to answer any questions...so don't hesitate to get clarificatio
 1. What is the difference between a goal's "status" and "score"?
 
 <br>
-"status" is the current state of the goal relative to the desired “reference point." Values range from 0-100. "score" is the average of the goal's present status and the goal's likely near-term future status.
+"status" is the current state of the goal relative to the desired “reference point." Values range from 0-100. "future status" incorporates trend in present status, pressure, and resilience. "score" is the average of the goal's present status and the goal's likely near-term future status.
 <br>
 
 2. If a region's food provision goal has the following values, what would its food provision score be?
@@ -88,7 +88,7 @@ Resilience | 50 | 50
 QUESTION: How did a pressure change from 100 to 50 affect the final score?  Was this a larger or smaller effect than you would have expected?
 
 <br>
-Pressure changing from 100 to 50 caused a decrease of `r score1-score2`. This is somewhat the effect I was expecting or perhaps larger than I was expecting, since pressure isn't as big of a factor as trend, for example.
+Pressure changing from 100 to 50 caused a change of `r score1-score2`. This is somewhat the effect I was expecting or perhaps larger than I was expecting, since pressure isn't as big of a factor as trend, for example.
 <br>
 
 
@@ -107,7 +107,7 @@ c. Take some sort of average of the stock status scores within each region (for 
 QUESTION: B/Bmsy scores greater than 1 indicate the stock is doing well, but is underharvested!  Given this, do you think we should penalize underharvesting? Why? Do you have any ideas for how we could account for underharvesting without unduly penalizing regions that are trying to let stocks recover? 
 
 <br>
-I think underharvesting should be penalized because this means fisheries could be benefiting more than they currently are, which is an nonoptimal use of resources. Perhaps we could leave regions trying to let stocks recover out of the calculation of the score. This way regions doing well get benefited, regions not doing well get penalized, and regions working on improving are not benefited nor penalized.
+I think underharvesting should be penalized because this means fisheries could be benefiting more than they currently are, which is an nonoptimal use of resources. Perhaps we could leave regions trying to let stocks recover out of the calculation of the score. This way regions doing well get benefited, regions not doing well get penalized, and regions working on improving are not benefited nor penalized. You would really need to understand why they are underharvesting in order to penalize it.
 <br>
 
 ### Gapfilling
@@ -264,7 +264,7 @@ relevant_pressures
 
 QUESTION: Some goals, like Coastal Protection, have multiple “elements”.  Why? 
 <br>
-Elements are different factors that go into certain goals, ie. habitats for Coastal Protection: the status is calculated as relative health of the habitats within a region that provide shoreline protection, weighted by their area and protectiveness rank. These are necessary to account for the differences between different elements within a goal.
+Elements are different factors that go into certain goals, ie. habitats for Coastal Protection: the status is calculated as relative health of the habitats within a region that provide shoreline protection, weighted by their area and protectiveness rank. These are necessary to account for the differences between different elements within a goal. With elements, we are able to apply pressures to specific habitats.
 <br>
 
 NOTE: It is convention to add a superscript to the pressure name that describes its category:

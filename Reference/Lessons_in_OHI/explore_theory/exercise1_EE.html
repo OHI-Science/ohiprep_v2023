@@ -383,9 +383,10 @@ clarification, extra guidance, or request hints!</p>
 <li>What is the difference between a goal’s “status” and “score”?</li>
 </ol>
 <p><br> “status” is the current state of the goal relative to the
-desired “reference point.” Values range from 0-100. “score” is the
-average of the goal’s present status and the goal’s likely near-term
-future status. <br></p>
+desired “reference point.” Values range from 0-100. “future status”
+incorporates trend in present status, pressure, and resilience. “score”
+is the average of the goal’s present status and the goal’s likely
+near-term future status. <br></p>
 <ol start="2" style="list-style-type: decimal">
 <li>If a region’s food provision goal has the following values, what
 would its food provision score be?</li>
@@ -532,7 +533,7 @@ score2 &lt;- (xC2 + xF2) / 2</code></pre>
 <p>QUESTION: How did a pressure change from 100 to 50 affect the final
 score? Was this a larger or smaller effect than you would have
 expected?</p>
-<p><br> Pressure changing from 100 to 50 caused a decrease of -6.1875.
+<p><br> Pressure changing from 100 to 50 caused a change of -6.1875.
 This is somewhat the effect I was expecting or perhaps larger than I was
 expecting, since pressure isn’t as big of a factor as trend, for
 example. <br></p>
@@ -566,7 +567,9 @@ fisheries could be benefiting more than they currently are, which is an
 nonoptimal use of resources. Perhaps we could leave regions trying to
 let stocks recover out of the calculation of the score. This way regions
 doing well get benefited, regions not doing well get penalized, and
-regions working on improving are not benefited nor penalized. <br></p>
+regions working on improving are not benefited nor penalized. You would
+really need to understand why they are underharvesting in order to
+penalize it. <br></p>
 </div>
 <div id="gapfilling" class="section level3">
 <h3>Gapfilling</h3>
@@ -877,7 +880,8 @@ certain goals, ie. habitats for Coastal Protection: the status is
 calculated as relative health of the habitats within a region that
 provide shoreline protection, weighted by their area and protectiveness
 rank. These are necessary to account for the differences between
-different elements within a goal. <br></p>
+different elements within a goal. With elements, we are able to apply
+pressures to specific habitats. <br></p>
 <p>NOTE: It is convention to add a superscript to the pressure name that
 describes its category: * po=pollution * hd=habitat destruction *
 sp=alien species * fp=fishing pressure * cc=climate change</p>
