@@ -48,7 +48,10 @@ fao_clean_data_new <- function(m, sub_N = 0.1) {
       ###   sometimes comes at start (commodities), sometimes at end (mariculture)...?
       value = ifelse(value == '...', NA, value),
       ### FAO's code for NA
-      value = str_replace(value, fixed(' N'), sub_N),  
+      #value = str_replace(value, fixed(' N'), sub_N),
+      value = case_when(str_detect(value,"0  N") ~ as.character(sub_N),
+                        str_detect(value, " N") ~ str_remove(value, " N"),
+                        TRUE ~value),
       ### FAO denotes something as 'N' when it is > 0 but < 1/2 of a unit. 
       ### Replace with lowdata_value.
       value = str_replace(value, fixed(  '-'), '0'),  
