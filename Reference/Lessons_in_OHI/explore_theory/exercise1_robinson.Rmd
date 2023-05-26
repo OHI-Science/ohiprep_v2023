@@ -24,10 +24,10 @@ clarification, extra guidance, or request hints!
 
 1.  What is the difference between a goal's "status" and "score"?
 
-<br> The status represents the current status of the goal, the score is
-an average of both the current status and the predicted future status.
-Predicted future status incorporates resilience, pressures and trend.
-<br>
+<br> **The status represents the current status of the goal, the score
+is an average of both the current status and the predicted future
+status. Predicted future status incorporates resilience, pressures and
+trend.** <br>
 
 2.  If a region's food provision goal has the following values, what
     would its food provision score be?
@@ -105,8 +105,7 @@ scores %>%
 #find the mean for each year 
 scores %>% 
   filter(region_id == 1 & str_length(goal) < 3 &
-      dimension %in% c("score")) %>% group_by(year) %>% 
-  summarize(mean(score))
+      dimension %in% c("score")) %>% group_by(year) %>% summarize(mean(score))
 
 
 #filter to the index scores
@@ -125,7 +124,7 @@ status are not modified.
 |-------------------------|------------|------------|
 | Score                   | 71         | 78         |
 | Current status          | 75         | 75         |
-| Predicted future status | 67         | 80         |
+| Predicted future status | 68         | 80         |
 | Trend                   | 0.10       | 0.10       |
 | Pressure                | 100        | 50         |
 | Resilience              | 50         | 50         |
@@ -147,7 +146,6 @@ $B = 0.67$
 ```{r}
 #calculate the score
 (1+ (.67 * .1) + (1 -.67) + ((50 *.01) - (100*.01))) * 75
-
 
 #check in the data 
 #this does not match up as expected
@@ -250,7 +248,8 @@ the pressure and resilience dimensions.
 QUESTION: What is the reference point for this subgoal?
 
 **The reference point is that 30% of the coastline qualifies as a
-special place.**
+special place. This assumes that a country is unlikely to preserve their
+entire EEZ.**
 
 Explore the links to the pressures and resilience data layers.
 
@@ -278,9 +277,13 @@ is -.15. The value is scaled by dividing by the initial status value
 used.**
 
 8.  
+
 9.  
+
 10. 
+
 11. 
+
 12. 
 
 <br> <br>
@@ -338,9 +341,8 @@ of data to estimate trend?
 
 <br> **When limited data do not allow for this. For example for the salt
 marsh data in the habitat sub-goal, all regions are assigned trend for
-this layer due to 2% historical global loss. I assume because the
-resolution of available data does allow this to be calculate at the
-regional level.** <br>
+this layer due to 2% historical global loss. This relates to the fact
+that most loss is less recent.**<br>
 
 ### Goal pressure and resilience
 
@@ -391,7 +393,7 @@ QUESTION: Some goals, like Coastal Protection, have multiple "elements".
 Why?
 
 **Different data layers that are incorporated have different pressures
-impacting them.**
+impacting them. Allows for different elements in different habitats.**
 
 NOTE: It is convention to add a superscript to the pressure name that
 describes its category: \* po=pollution \* hd=habitat destruction \*
