@@ -105,10 +105,10 @@ pred_future_1 <- ((1 + beta * trend) + ((1 - beta) * (resilience - pressure))) *
 
 score_1 <- (current_1 + pred_future_1)/2
 
-diff <- score_2 - score_1
-
 # average current and predicted future
 score_2 <- (current_2 + pred_future_2)/2
+
+d <- score_2 - score_1
 ```
 
 <br> <br>
