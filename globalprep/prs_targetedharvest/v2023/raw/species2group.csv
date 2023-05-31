@@ -94,9 +94,16 @@ pinniped,South American fur seal,exclude
 pinniped,Steller sea lion,exclude
 turtle,Chinese softshell turtle,exclude
 turtle,Diamond back terrapins,exclude
+turtle,Eastern Pacific green turtle,include
+turtle,River and lake turtles nei,exclude
+turtle,Chinese softshell turtle,exclude
 turtle,River and lake turtles nei,exclude
 cetacean,Indian Ocean humpback dolphin,include
 cetacean,Pygmy right whale,include
 fish,Common dolphinfish,exclude
-fish,Pompano dolphinfish,excule
+fish,Pompano dolphinfish,exclude
 fish,Velvet whalefish,exclude
+whale,Creek whaler,exclude
+whale,Velvet whalefish,exclude
+cetacean,Common dolphinfish,exclude
+cetacean,Pompano dolphinfish,exclude
