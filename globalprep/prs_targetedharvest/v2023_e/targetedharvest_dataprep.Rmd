@@ -255,6 +255,7 @@ target_harvest <- m_sum_rgn %>%
   
 # v2021 quant_95 = 3409.4
 # v2022 quant_95 = 3450.05
+# v2023 quant_95 = 3572
 
 # any regions that did not have a catch should have score = 0 
 rgns <-  rgn_master %>%
