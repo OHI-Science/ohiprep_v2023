@@ -75,7 +75,7 @@ This includes the FAO capture production data and a list of the "target" species
 
 ```{r, eval=FALSE}
 
-## FAO capture production data - all columns being parsed as characters and producing error in one column, but not sure which? (read.csv might help avoid this error?) # ERIKA: can i delete this?
+## FAO capture production data - all columns being parsed as characters and producing error in one column, but not sure which? (read.csv might help avoid this error?)
 fis_fao_raw <- read_csv(
   file.path(dir_M, 'git-annex/globalprep/_raw_data/FAO_capture',
             paste0('d', version_year),
