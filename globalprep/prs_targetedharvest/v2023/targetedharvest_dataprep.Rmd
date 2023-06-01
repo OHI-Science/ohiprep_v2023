@@ -26,7 +26,9 @@ This analysis converts FAO capture production data into the OHI 2022 targeted ha
 
 # Updates from previous assessment
 
-2023 - One more year of data
+2023 - One more year of data, 2021
+Small fixes to how N data is handled in fao_fxn.R
+Delete unused/not relevant code
 
 ***
 
