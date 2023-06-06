@@ -13,9 +13,9 @@ for (p in poles){
   ## extents from NSIDC (http://nsidc.org/data/polar_stereo/ps_grids.html)
   
   if (p == "n"){
-    xMin = -3850000; yMin = -5350000; nr = 448; nc = 304; prj = prj.n; fp = fp.n
+    xMin = -3850000; yMin = -5350000; nr = 448; nc = 304; prj = prj.n; fp = fp.n; cor = "N" #added
   } else if (p == "s"){
-    xMin = -3950000; yMin = -3950000; nr = 332; nc = 316; prj = prj.s; fp = fp.s
+    xMin = -3950000; yMin = -3950000; nr = 332; nc = 316; prj = prj.s; fp = fp.s; cor = "S" #added
   } 
   
   xMax = xMin + (pixel*nc); yMax = yMin + (pixel*nr)
@@ -59,12 +59,25 @@ for (p in poles){
       print(sprintf("Retrieving %s (%d of %d). Minutes done=%0.1f, to go=%0.1f",
                     p.y.m,i.pym,n.pym,min.done,min.togo)) # time remaining for data download
       
-      u <- sprintf("%s/nt_%d_%s_v1.1_%s.bin", fp, ym, ss, p)
-      con <- file(u, "rb")  # "rb" = "open for reading in binary mode"
-      x <- readBin(con, "raw", 300)
-      x <- readBin(con,"int", size = 1, signed = FALSE, 150000)
-      close(con)    
+      #nt_YYYYMM_SSS_vVV_R.bin
       
+      
+     # u <- sprintf("%s/nt_%d_%s_v1.1_%s.bin", fp, ym, ss, p)
+      #new file format NSIDC0051_SEAICE_PS_S25km_202212_v2.0.nc
+      u <- sprintf("%s/NSIDC0051_SEAICE_PS_%s25km_%d_v2.0.nc", fp, cor, ym)
+      #con <- file(u, "rb")  # "rb" = "open for reading in binary mode"
+      nc <- nc_open(u)
+      
+      variable_name <- "N07_ICECON"
+      
+      #x <- readBin(con, "raw", 300)
+      #x <- readBin(con,"int", size = 1, signed = FALSE, 150000)
+      #close(con)    
+      x <- nvarcharget <- ncvar_get(nc, variable_name)
+      
+      nc_close(nc)
+      
+    
       ## place result in raster framework
       r <- setValues(r, x)
       

@@ -176,8 +176,8 @@ if (!("ohicore" %in% installed.packages())){devtools::install_github("ohi-scienc
 lapply(c(pkg, "ohicore"), require, character.only = TRUE)
 
 ## UPDATE THESE!
-current_year <- 2022
-last_year <- 2021 # final year of data (all months)
+current_year <- 2023
+last_year <- 2022 # final year of data (all months)
 
 assess_year <- paste0("v", current_year) # assessment year for file paths
 previous_year <- paste0("v", last_year)  # previous assessment year
