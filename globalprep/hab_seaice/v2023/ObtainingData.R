@@ -61,29 +61,35 @@ for (p in poles){
       
       #nt_YYYYMM_SSS_vVV_R.bin
       
-      
      # u <- sprintf("%s/nt_%d_%s_v1.1_%s.bin", fp, ym, ss, p)
       #new file format NSIDC0051_SEAICE_PS_S25km_202212_v2.0.nc
-      u <- sprintf("%s/NSIDC0051_SEAICE_PS_%s25km_%d_v2.0.nc", fp, cor, ym)
-      #con <- file(u, "rb")  # "rb" = "open for reading in binary mode"
-      nc <- nc_open(u)
       
-      variable_name <- "N07_ICECON"
+
+      u <- sprintf("%s/NSIDC0051_SEAICE_PS_%s25km_%d_v2.0.nc", fp, cor, ym)
+      
+      
+      #con <- file(u, "rb")  # "rb" = "open for reading in binary mode"
+      
+      
+      r <- brick(u)
       
       #x <- readBin(con, "raw", 300)
       #x <- readBin(con,"int", size = 1, signed = FALSE, 150000)
-      #close(con)    
-      x <- nvarcharget <- ncvar_get(nc, variable_name)
+      #close(con)
       
-      nc_close(nc)
+     # nc_close(r) # do i need this?
       
     
       ## place result in raster framework
-      r <- setValues(r, x)
+      #currently getting an error here 
+      # r <- setValues(r, x)
       
       ## raster values: 254=land, 253=coast, 251=north pole assumed ice not seen by satellite
       ## 0 to 250 / 250 = % ice concentration (see raster::calc documentation)
       
+      #2023 update-the data read in already appears to be scaled from 0 to 1
+      #scaling it back to run the rest of the function
+      r <- r * 250
       
       ##################################################################################################################
       ## Creates pts shp file if does not exist (n_type_rgns_pts.shp or s_type_rgns_pts.shp)
@@ -117,10 +123,13 @@ for (p in poles){
         
         ## These take the raster cells that are identified as something other than ice (i.e., land, water, etc.)
         ## and creates new raster layers with just those cells
+        
+        
         r_coast = r == 253
         r_land = r == 254
         r_hole = r == 251
         r_water = r <= 250
+        
         
         r_coast_na <- calc(r_coast, fun = function(x) { x[x == 0] = NA; return(x) }) # replaces 0 values with NA in r_coast file
         r_coast_distance <- distance(r_coast_na) # calculates distance from coast (units are in meters)
@@ -135,11 +144,11 @@ for (p in poles){
         r_type[r_hole == 1] = 4
         
         writeRaster(r_type, 
-                    file.path(dir_M, sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_year, "tmp/%s_type.tif", p)),
+                    file.path(dir_M, sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce/%s/tmp/%s_type.tif", assess_year, p)),
                     overwrite=T) # r_type in memory, read r.typ from file for increased speed
         
         
-        r.typ <- raster(file.path(dir_M, sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_year, "tmp/%s_type.tif",p)))
+        r.typ <- raster(file.path(dir_M, sprintf("git-annex/globalprep/_raw_data/NSIDC_SeaIce/%s/tmp/%s_type.tif", assess_year, p)))
         OHIregion <- read_sf(dsn = file.path(dir_M, "git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2015/raw"), 
                              layer = sprintf("New_%s_rgn_fao", p)) # projected ohi regions, read as simple features object
         OHIregion <- OHIregion %>%
