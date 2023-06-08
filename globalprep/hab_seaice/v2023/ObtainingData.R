@@ -77,8 +77,6 @@ for (p in poles){
       #x <- readBin(con,"int", size = 1, signed = FALSE, 150000)
       #close(con)
       
-     # nc_close(r) # do i need this?
-      
     
       ## place result in raster framework
       #currently getting an error here 
