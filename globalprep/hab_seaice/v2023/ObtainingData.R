@@ -16,10 +16,10 @@ for (p in poles){
     xMin = -3850000; yMin = -5350000; nr = 448; nc = 304; prj = prj.n; fp = fp.n; cor = "N" #added
   } else if (p == "s"){
     xMin = -3950000; yMin = -3950000; nr = 332; nc = 316; prj = prj.s; fp = fp.s; cor = "S" #added
-  } 
-  
+  }
+
   xMax = xMin + (pixel*nc); yMax = yMin + (pixel*nr)
-  
+
   r <- raster(nrow = nr, ncol = nc, xmn = xMin, xmx = xMax, ymn = yMin, ymx = yMax)
   projection(r) <- prj
   s <- stack(r)
@@ -59,29 +59,15 @@ for (p in poles){
       print(sprintf("Retrieving %s (%d of %d). Minutes done=%0.1f, to go=%0.1f",
                     p.y.m,i.pym,n.pym,min.done,min.togo)) # time remaining for data download
       
-      #nt_YYYYMM_SSS_vVV_R.bin
       
-     # u <- sprintf("%s/nt_%d_%s_v1.1_%s.bin", fp, ym, ss, p)
-      #new file format NSIDC0051_SEAICE_PS_S25km_202212_v2.0.nc
-      
-
+      #locate the file
       u <- sprintf("%s/NSIDC0051_SEAICE_PS_%s25km_%d_v2.0.nc", fp, cor, ym)
       
       
-      #con <- file(u, "rb")  # "rb" = "open for reading in binary mode"
-      
-      
-      r <- brick(u)
-      
-      #x <- readBin(con, "raw", 300)
-      #x <- readBin(con,"int", size = 1, signed = FALSE, 150000)
-      #close(con)
+      #save as a raster 
+      r <- raster(u)
       
     
-      ## place result in raster framework
-      #currently getting an error here 
-      # r <- setValues(r, x)
-      
       ## raster values: 254=land, 253=coast, 251=north pole assumed ice not seen by satellite
       ## 0 to 250 / 250 = % ice concentration (see raster::calc documentation)
       
@@ -166,7 +152,7 @@ for (p in poles){
         library(dplyr)
         OHIregion_points <- OHIregion_points %>% dplyr::mutate(type_nsidc = raster::extract(r.typ, OHIregion_points))
         st_write(OHIregion_points, dsn = file.path(maps, "tmp"), 
-                 driver = "ESRI Shapefile", layer = sprintf("%s_type_rgns_pts",p), update = TRUE)
+                 driver = "ESRI Shapefile", layer = sprintf("%s_type_rgns_pts",p), append = FALSE)
       }
       
       ##################################################################################################################
