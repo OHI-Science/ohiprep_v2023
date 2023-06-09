@@ -230,7 +230,7 @@ assessment year (v) in setup code chunk.
 
 ```{r setup, eval=FALSE}
 ## Install R packages where necessary
-pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc", "dplyr") # "fields" for colors in Status_Trend.R
+pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc", "dplyr", "ggplot2") # "fields" for colors in Status_Trend.R
 new.pkg <- pkg[!(pkg %in% installed.packages())]
 if (length(new.pkg)){install.packages(new.pkg)}
 if (!("ohicore" %in% installed.packages())){devtools::install_github("ohi-science/ohicore")}
@@ -408,37 +408,46 @@ write.csv(extent, "output/hab_ice_extent_eez.csv", row.names = FALSE) # save sea
 
 ```{r data checks, eval=FALSE}
 ## Health comparison
+
+#compare same years with different version year 
 health <- read.csv("output/hab_ice_health_eez.csv")
 ice_health_eez <- read.csv(sprintf("../%s/output/hab_ice_health_eez.csv", previous_year)) %>% # compare to last year's data
   dplyr::rename(health_prev_assess = health) %>%
   dplyr::left_join(health, by = c("rgn_id", "habitat", "year")) %>% 
   na.omit("health")
-plot(ice_health_eez$health_prev_assess, ice_health_eez$health)
-abline(0, 1, col="red")
+
+comp_plot <-ggplot() + geom_point(data = ice_health_eez, aes(x = health_prev_assess, y = health)) + labs(x = "previous health (2012-2021)", y = "health (2012-2021)") + geom_abline(slope = 1, intercept = 0, col = "red")
+ggplotly(comp_plot)
+
 
 ### let's compare the data year 2022 to data year 2021 (current data year vs the year before)
 
-health_2020 <- health %>%
+health_2022 <- health %>%
   dplyr::filter(year == current_year-1)
 
-health_2019 <- ice_health_eez %>%
+health_2021 <- ice_health_eez %>%
   dplyr::filter(year == last_year-1) %>%
   dplyr::select(-year, -health)
 
-health_old_new <-  dplyr::left_join(health_2020, health_2019)
+health_old_new <-  dplyr::left_join(health_2022, health_2021)
 
-year_change_plot <- plot(health_old_new$health_prev_assess, health_old_new$health)
-abline(0, 1, col="red")
+year_change_plot <-ggplot() +
+  geom_point(data = health_old_new,
+             aes(x = health_prev_assess,
+                 y = health, text = paste("Region ID:", rgn_id, "<br>Habitat:", habitat))) + labs(x = "previous assessment health", y = "current health") + geom_abline(slope = 1, intercept = 0, col = "red")
 
-
+ggplotly(year_change_plot, tooltip = "text")
 ## Trend comparison
 trend <- read.csv("output/hab_ice_trend_eez.csv")
 ice_trend_eez <- read.csv(sprintf("../%s/output/hab_ice_trend_eez.csv", previous_year)) %>% # compare to last year's data
   dplyr::rename(trend_prev_assess = trend) %>%
   dplyr::left_join(trend, by = c("rgn_id", "habitat", "year")) %>% 
   na.omit("trend")
-plot(ice_trend_eez$trend_prev_assess, ice_trend_eez$trend)
-abline(0, 1, col="red")
+
+#update label years 
+trend_comp <- ggplot() + geom_point(data = ice_trend_eez, aes(x = trend_prev_assess, y = trend)) + labs(x = "previous assessment trend (2016-2021)", y= "current assessment trend (2016-2021)") + geom_abline(slope = 1, intercept = 0, col = "red")
+
+ggplotly(trend_comp)
 
 ### let's compare the data year 2022 to data year 2021 (current data year vs the year before)
 
@@ -451,16 +460,17 @@ trend_2021 <- ice_trend_eez %>%
 
 trend_old_new <- dplyr::left_join(trend_2022, trend_2021)
 
-plot(trend_old_new$trend_prev_assess, trend_old_new$trend)
-abline(0, 1, col="red") 
+year_trend_change_plot <-ggplot() + geom_point(data = trend_old_new, aes(x = trend_prev_assess, y = trend, text = rgn_id)) + labs(x = "previous year trend", y = "current trend") + geom_abline(slope = 1, intercept = 0, col = "red")
 
+ggplotly(year_trend_change_plot, tooltip = "text")
 
 ## Extent comparison
 extent <- read.csv("output/hab_ice_extent_eez.csv", stringsAsFactors = FALSE)
 ice_extent_eez <- read.csv(sprintf("../%s/output/hab_ice_extent_eez.csv", previous_year), stringsAsFactors = FALSE) %>% # compare to last year's data
-  dplyr::rename(km2_prev_assess = km2)
-plot(ice_extent_eez$km2_prev_assess, extent$km2)
-abline(0, 1, col="red")
+  dplyr::rename(km2_prev_assess = km2) %>% left_join(extent)
+
+ggplot(data = ice_extent_eez) +geom_point(aes(x =km2_prev_assess, y = km2)) + geom_abline(slope = 1, intercept = 0, col = "red")
+
 
 ### let's compare the data year 2022 to data year 2021
 
@@ -470,8 +480,8 @@ extent_2021 <- ice_extent_eez
 
 extent_old_new <- dplyr::left_join(extent_2022, extent_2021)
 
-plot(extent_old_new$km2_prev_assess, extent_old_new$km2)
-abline(0, 1, col="red") # extent doesn't change at all, because we use the same year for extent every year
+ # extent doesn't change at all, because we use the same year for extent every year
+ggplot(data = extent_old_new) + geom_point(aes(x = km2_prev_assess, y = km2)) + geom_abline(slope = 1, intercept = 0, col = "red")
 
 
 
