@@ -310,12 +310,15 @@ In this case, all of the regions looked very similar.
 common_year <- 2020
 
 new <- readr::read_csv(here("globalprep", "prs_targetedharvest", paste0('v', version_year, "_a"), "output", "fao_targeted.csv")) %>% 
-  dplyr::filter(year == common_year)
+  dplyr::filter(year == 2021)
 
 old <- readr::read_csv(here("globalprep", "prs_targetedharvest", paste0('v', version_year - 1), "output", "fao_targeted.csv")) %>%
   dplyr::filter(year == common_year) %>%
-  dplyr::select(rgn_id, year, pressure_score_old = pressure_score) %>%
-  dplyr::left_join(new, by = c("rgn_id", "year"))
+  dplyr::select(-year) %>%
+  dplyr::select(rgn_id, pressure_score_2020 = pressure_score) %>%
+  dplyr::left_join(new, by = c("rgn_id")) %>%
+  dplyr::rename(pressure_score_2021 = pressure_score) %>%
+  left_join(rgns_eez)
 
 # Compare pressure_score between last year and this year's assessments
 compare_plot <- ggplot(data = old, aes(x = pressure_score_old, y = pressure_score, label = rgn_id)) +
