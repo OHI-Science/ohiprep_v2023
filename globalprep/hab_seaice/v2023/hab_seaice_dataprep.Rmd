@@ -422,6 +422,12 @@ ggplotly(comp_plot)
 
 ### let's compare the data year 2022 to data year 2021 (current data year vs the year before)
 
+## Pair with region names
+regions <- rgn_master %>%
+  dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>%
+  unique()
+
+
 health_2022 <- health %>%
   dplyr::filter(year == current_year-1)
 
@@ -429,7 +435,8 @@ health_2021 <- ice_health_eez %>%
   dplyr::filter(year == last_year-1) %>%
   dplyr::select(-year, -health)
 
-health_old_new <-  dplyr::left_join(health_2022, health_2021)
+health_old_new <-  dplyr::left_join(health_2022, health_2021) %>% mutate(difference = (health - health_prev_assess)) %>% left_join(regions)
+
 
 year_change_plot <-ggplot() +
   geom_point(data = health_old_new,
@@ -458,9 +465,9 @@ trend_2021 <- ice_trend_eez %>%
   dplyr::filter(year == last_year -1) %>%
   dplyr::select(-year, -trend)
 
-trend_old_new <- dplyr::left_join(trend_2022, trend_2021)
+trend_old_new <- dplyr::left_join(trend_2022, trend_2021) %>% mutate(difference = (trend - trend_prev_assess)) %>% left_join(regions)
 
-year_trend_change_plot <-ggplot() + geom_point(data = trend_old_new, aes(x = trend_prev_assess, y = trend, text = rgn_id)) + labs(x = "previous year trend", y = "current trend") + geom_abline(slope = 1, intercept = 0, col = "red")
+year_trend_change_plot <-ggplot() + geom_point(data = trend_old_new, aes(x = trend_prev_assess, y = trend, text = paste("Region ID:", rgn_id, "<br>Habitat:", habitat))) + labs(x = "previous year trend", y = "current trend") + geom_abline(slope = 1, intercept = 0, col = "red")
 
 ggplotly(year_trend_change_plot, tooltip = "text")
 
@@ -482,7 +489,6 @@ extent_old_new <- dplyr::left_join(extent_2022, extent_2021)
 
  # extent doesn't change at all, because we use the same year for extent every year
 ggplot(data = extent_old_new) + geom_point(aes(x = km2_prev_assess, y = km2)) + geom_abline(slope = 1, intercept = 0, col = "red")
-
 
 
 ## Pair with region names
