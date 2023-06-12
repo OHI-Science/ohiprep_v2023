@@ -33,13 +33,13 @@ This process is completed entirely within this script. The raw data is downloade
 - One additional year of data, 2021, was added. 
 - Add in code to automatically create folders when applicable
 - Add in some more tic/tocs
-- Had to change `terra` code back to `raster` for one chunk to get it to work (check if fine)
+- Had to change `terra` code back to `raster` for one chunk (making the histograms) to get it to work
 
 ***
 
 # Data
 
-The source data are monthly mean sea level anomalies, in meters. These anomalies are calculated by subtracting the current absolute sea level for each month from the average sea level for that month calculated from 1993 - 2012.
+The source data are monthly mean sea level anomalies, in meters. These anomalies are calculated by subtracting the current absolute sea level for each month from the average sea level for that month calculated from 1993 - 2015.
 
 **Reference**: The altimeter products were produced and distributed by Aviso (http://www.aviso.altimetry.fr/), as part of the Ssalto ground processing segment. [AVISO MSLA heights, monthly means](https://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/gridded-sea-level-anomalies-mean-and-climatology.html#c10358)  
 **Downloaded**: June 01, 2023  
@@ -61,13 +61,12 @@ knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message
 ```
 
 ```{r, message = FALSE, warning = FALSE, eval=FALSE}
-#### ERIKA
 required_packages <- c("httr", "R.utils", "raster", "tidyverse", "sf", "RColorBrewer", "googleVis", "maps", "parallel", "foreach", "doParallel", "fasterize", "rasterVis", "terra", "tictoc", "here", "plotly") # create list of required packages (add any new packages here)
 
 install.packages(setdiff(required_packages, installed.packages()[,"Package"])) # install not installed packages
 lapply(required_packages, require, character.only = TRUE) # check all are installed
-#### ERIKA
 
+# load packages
 library(httr)
 library(R.utils)
 library(raster)
@@ -141,11 +140,9 @@ ub <- sprintf("ftp://%s@%s", userpasswd, substr(url, 7, 87)) # here, substr extr
 Pull monthly files from the source into the data directory:
 ```{r, eval=FALSE}
 # within dir_anx_aviso, create new folder for this scenario year of data so the following line runs, name the folder d20?? (scen_year)
-#### ERIKA
 folder_name_anx_aviso <- paste0("d", scen_year)
 folder_path_anx_aviso <- file.path(dir_anx_aviso, folder_name_anx_aviso)
 dir.create(folder_path_anx_aviso)
-#### ERIKA
   
 ## download is quite fast, takes just a minute for 12 files
 for (mo in months){ 
@@ -211,14 +208,12 @@ The following code is used to:
 The output is saved in the folder `int/msla_monthly`
 
 ```{r, eval=FALSE}
-#### ERIKA
 # create the folders for the below loop
 dir.create(dir_prs_slr)
 folder_path_prs_slr_int <- file.path(dir_prs_slr, "int")
 dir.create(folder_path_prs_slr_int)
 folder_path_prs_slr_int_msla_monthly <- file.path(folder_path_prs_slr_int, "msla_monthly")
 dir.create(folder_path_prs_slr_int_msla_monthly)
-#### ERIKA
 
 tic()
 # do not run in parallel because it is not compatible with terra::project() (package might be updated in the future to accommodate parallelization)
@@ -258,10 +253,8 @@ Annual mean sea level anomaly rasters are calculated from the monthly data.
 
 ```{r msla_monthly_to_annual, eval = F}
 ## create 'msla_annual_mean' folder in 'int'
-#### ERIKA
 folder_path_prs_slr_int_msla_annual_mean <- file.path(folder_path_prs_slr_int, "msla_annual_mean")
 dir.create(folder_path_prs_slr_int_msla_annual_mean)
-#### ERIKA
 
 tic()
 msla_files <- list.files(sprintf("%s/int/msla_monthly", dir_prs_slr),
@@ -312,11 +305,9 @@ annual_means <- list.files(file.path(dir_prs_slr, "int/msla_annual_mean"), full 
 ```
 
 ```{r, eval=FALSE}
-#### ERIKA
 ## create 'msla_annual_mol' folder in 'int'
 folder_path_prs_slr_int_msla_annual_mol <- file.path(folder_path_prs_slr_int, "msla_annual_mol")
 dir.create(folder_path_prs_slr_int_msla_annual_mol)
-#### ERIKA
 
 tic()
 # unparallelize loop because working with `terra::project()` and `foreach()` threw the error "external pointer is not valid"
@@ -338,11 +329,9 @@ toc()
 ```
 
 ```{r, eval=FALSE}
-#### ERIKA
 ## create 'msla_annual_mol_coastal' folder in 'int'
 folder_path_prs_slr_int_msla_annual_mol_coastal <- file.path(folder_path_prs_slr_int, "msla_annual_mol_coastal")
 dir.create(folder_path_prs_slr_int_msla_annual_mol_coastal)
-#### ERIKA
 
 tic()
 annual_mol <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol"), full = TRUE)
@@ -415,12 +404,13 @@ if(file.exists(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_
 }
 
 ref_tab$ref_point[ref_tab$pressure == "Sea Level Rise"] <- ref_point_slr # set sea level rise reference to the 99.99 percentile
-#### ERIKA
+
 # create v20?? folder in supplementary_information
 folder_name_supplementary_information_v_scen_year <- paste0("v", scen_year)
 folder_path_supplementary_information_v_scen_year <- file.path(dir_refpt, folder_name_supplementary_information_v_scen_year)
 dir.create(folder_path_supplementary_information_v_scen_year)
-#### ERIKA
+
+# write to reference_points_pressures.csv
 write.csv(ref_tab, sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_year), row.names = FALSE)
 
 ## grab reference value from the supp_info csv
@@ -435,11 +425,9 @@ ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "202
 Each annual raster is rescaled from 0 to 1 using the reference point. If a value is greater than the reference point, it is automatically given a value of 1.
 
 ```{r rescale, eval=FALSE}
-#### ERIKA
 # create output folder in prs_slr v20??
 folder_path_prs_slr_output <- file.path(dir_prs_slr, "output")
 dir.create(folder_path_prs_slr_output)
-#### ERIKA
 
 # foreach() & dopar did not work well with terra in this context
 
@@ -447,6 +435,7 @@ dir.create(folder_path_prs_slr_output)
 neg_vals <- function(x){ifelse(x < 0, 0, x)}
 greater_vals <- function(x){ifelse(x > ref, 1, x/ref)}
 
+tic()
 for(i in seq_along(coastal_rasts)) { # i = coastal_rasts[26]
   yr <- str_sub(coastal_rasts[i], -8,-5)
   
@@ -461,6 +450,8 @@ for(i in seq_along(coastal_rasts)) { # i = coastal_rasts[26]
          filename = sprintf("%s/output/slr_%s.tif", dir_prs_slr, yr), overwrite = TRUE) 
   }
 }
+toc()
+# v2023 - 3937.095 sec elapsed
 ```
 
 # Results
@@ -470,13 +461,19 @@ r <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
 plot(ocean, col = "cornsilk2", axes = FALSE, box = FALSE, main = "Sea Level Rise Pressure 2020", legend = FALSE)		
 plot(r, col = cols, axes = FALSE, box = FALSE, add = TRUE)
 
-r_new <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2)) # changed back to raster package because terra::rast was causing the histograms not to work
-r_old <- raster::raster(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3)) # changed back to raster package because terra::rast was causing the histograms not to work
+# get current scenario year most recent year of data
+r_new <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
+# get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
+r_new_old <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 3))
+# get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
+r_old <- raster::raster(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3))
+# changed above lines back to raster package because terra::rast was causing the histograms not to work
 # Error in UseMethod("histogram") : 
 #  no applicable method for 'histogram' applied to an object of class "data.frame"
 
-rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s old data", scen_year - 2)) # v2023 - plots v2022 2020 data
-rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", scen_year - 2)) # v2023 - plots v2023 2021 data
+rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 2, scen_year)) # v2023 - plots v2023 2021 data
+rasterVis::histogram(r_new_old, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 3, scen_year)) # v2023 - plots v2023 2020 data
+rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s previous version (v%s) data", scen_year - 3, scen_year - 1)) # v2023 - plots v2022 2020 data
 ```
 
 ```{r extract regions, eval=FALSE}
@@ -499,7 +496,7 @@ rgn_data <- read_sf(file.path(dir_M, "git-annex/globalprep/spatial/v2017"), "reg
 tic()
 regions_stats <- zonal(stack_slr, zones, fun = "mean", na.rm = TRUE, progress = "text") %>% data.frame() 
 toc()
-# v2023 - 3745.609 sec elapsed
+# v2023 - 3786.449 sec elapsed
 
 setdiff(regions_stats$zone, rgn_data$rgn_id) # High Seas regions are in there, makes sense....no land
 #[1] 260 261 262 263 264 266 267 269 270 272 273 274 275 276 277
@@ -528,26 +525,24 @@ plotData <- regions_stats_clean %>%
 # plot(Motion)
 # print(Motion, file = "slr.html")
 
-### ERIKA
-# Line charts for all regions (hover for names; useful for seeing general trend info)
+# line charts for all regions (hover for names; useful for seeing general trend info)
 line_plot <- plot_ly(plotData, x = ~year, y = ~pressure_score, color = ~rgn_name, type = "scatter", mode = "lines") %>%
   layout(title = "All Regions: Pressure Score Line Charts",
          xaxis = list(title = "Year"),
          yaxis = list(title = "Pressure Score"))
 
-# Display the plot
+# display plot
 line_plot
-### ERIKA
 ```
 
 ```{r compare, eval=FALSE}
 new_data <- read.csv("output/slr.csv") %>%
   dplyr::select(rgn_id, year, new_pressure_score = pressure_score)
 
-old <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 1)) %>%
+old_data <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 1)) %>%
   left_join(new_data, by = c("year", "rgn_id"))
 
-plot(old$pressure_score, old$new_pressure_score, ylab = "new score", xlab = "old score")
+plot(old_data$pressure_score, old_data$new_pressure_score, ylab = "new score", xlab = "old score")
 abline(0, 1, col = "red")
 ```
 
