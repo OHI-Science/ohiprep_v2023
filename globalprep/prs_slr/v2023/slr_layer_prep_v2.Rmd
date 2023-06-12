@@ -31,10 +31,9 @@ This process is completed entirely within this script. The raw data is downloade
 # Updates from previous assessment
 
 - One additional year of data, 2021, was added. 
-DELETE - The data source's file path (url) changed slightly, so this script's file paths were updated within `sprintf()` and `sub-str()`
-DELETE - The data source's data storage format changed, so not necessary anymore to unzip the files after import.
-DELETE - Converted `raster` functions to `terra`.
-DELETE - Due to incompatibility with `terra::project()` and parallelization, 2 loops were converted from using `foreach` to simple for loops.
+- Add in code to automatically create folders when applicable
+- Add in some more tic/tocs
+- Had to change `terra` code back to `raster` for one chunk to get it to work (check if fine)
 
 ***
 
@@ -63,7 +62,7 @@ knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message
 
 ```{r, message = FALSE, warning = FALSE, eval=FALSE}
 #### ERIKA
-required_packages <- c("httr", "R.utils", "raster", "tidyverse", "sf", "RColorBrewer", "googleVis", "maps", "parallel", "foreach", "doParallel", "fasterize", "rasterVis", "terra", "tictoc", "here") # create list of required packages (add any new packages here)
+required_packages <- c("httr", "R.utils", "raster", "tidyverse", "sf", "RColorBrewer", "googleVis", "maps", "parallel", "foreach", "doParallel", "fasterize", "rasterVis", "terra", "tictoc", "here", "plotly") # create list of required packages (add any new packages here)
 
 install.packages(setdiff(required_packages, installed.packages()[,"Package"])) # install not installed packages
 lapply(required_packages, require, character.only = TRUE) # check all are installed
@@ -84,6 +83,7 @@ library(fasterize)
 library(rasterVis)
 library(terra)
 library(tictoc)
+library(plotly)
 setGDALconfig("GDAL_PAM_ENABLED", "FALSE")
 
 source('../../../workflow/R/common.R')
@@ -365,25 +365,42 @@ plot(terra::rast(file.path(dir_prs_slr, "int/msla_annual_mol_coastal/msla_annual
 The reference point is the 99.99th quantile of the entire data distribution from 1993 - 2015. (This value has been updated due to changes in the source data, previously was 0.246225 m, currently is 0.3359385 m).
 
 ```{r ref, eval=FALSE}
-## ERIKA: LEFT OFF HERE
 coastal_rasts <- list.files(file.path(dir_prs_slr, "int/msla_annual_mol_coastal"), pattern = "tif", full.names = TRUE)
 
 ## get data across all years to 2015
 ## takes a really long times; added foreach dopar to speed...
 ## doesn't really need to be recalcuated each year unless there's reason to believe source updated past years data
 ## script was updated in 2022 to convert from raster to terra, so terra functions were added to the following loop but not run because no reason to believe source updated past years data
-registerDoParallel(8)
+# tic()
+# registerDoParallel(8)
 
-vals <- foreach(i = 1993:2015, .combine = c) %dopar% { # i = 1993
-  coastal_rasts[which(str_sub(coastal_rasts, -8, -5) == i)] %>%
-    #raster() %>%
-    terra::rast() %>%
-    #getValues() %>%
-    terra::values() %>%
-    na.omit()
-}
+# vals <- foreach(i = 1993:2015, .combine = c) %dopar% { # i = 1993
+#   coastal_rasts[which(str_sub(coastal_rasts, -8, -5) == i)] %>%
+#     #raster() %>%
+#     terra::rast() %>%
+#     #getValues() %>%
+#     terra::values() #%>%
+#     #na.omit()
+# }
 
-ref_point_slr <- quantile(vals, 0.9999)
+# possibly better code:
+# vals <- foreach(i = 1993:2015, .combine = c) %dopar% { # i = 1993
+#   coastal_rasts[which(str_sub(coastal_rasts, -8, -5) == i)] %>%
+#     terra::rast() %>%
+#     terra::values() %>%
+#     as.data.frame() %>% 
+#     filter(!is.na(layer))
+#   
+#     # na.omit()
+# }
+# toc()
+
+# for first code option:
+# ref_point_slr <- quantile(vals, 0.9999)
+# for second code option:
+# ref_point_slr <- quantile(unlist(vals), 0.9999)
+
+# v2023 - we recalculated ref_point_slr and were getting varying numbers, but a lot similar to the v2019 reference point below and the source does not seem to have been updated, so we will continue with the ref_point_slr below
 
 ## If not rerunning the above, use this (taken from v2019 reference point csv)
 ref_point_slr <- 0.335938483476639
@@ -398,15 +415,19 @@ if(file.exists(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_
 }
 
 ref_tab$ref_point[ref_tab$pressure == "Sea Level Rise"] <- ref_point_slr # set sea level rise reference to the 99.99 percentile
+#### ERIKA
+# create v20?? folder in supplementary_information
+folder_name_supplementary_information_v_scen_year <- paste0("v", scen_year)
+folder_path_supplementary_information_v_scen_year <- file.path(dir_refpt, folder_name_supplementary_information_v_scen_year)
+dir.create(folder_path_supplementary_information_v_scen_year)
+#### ERIKA
 write.csv(ref_tab, sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_year), row.names = FALSE)
 
 ## grab reference value from the supp_info csv
-ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "2022")) %>%
+ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "2023")) %>%
        filter(pressure == "Sea Level Rise") %>%
        .$ref_point %>%
         as.numeric()
-
-
 ```     
 
 ## Rescale 
@@ -414,6 +435,12 @@ ref <- read_csv(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, "202
 Each annual raster is rescaled from 0 to 1 using the reference point. If a value is greater than the reference point, it is automatically given a value of 1.
 
 ```{r rescale, eval=FALSE}
+#### ERIKA
+# create output folder in prs_slr v20??
+folder_path_prs_slr_output <- file.path(dir_prs_slr, "output")
+dir.create(folder_path_prs_slr_output)
+#### ERIKA
+
 # foreach() & dopar did not work well with terra in this context
 
 # first define functions outside of app()
@@ -439,16 +466,17 @@ for(i in seq_along(coastal_rasts)) { # i = coastal_rasts[26]
 # Results
 
 ```{r plot_results, eval=FALSE}
-
 r <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
 plot(ocean, col = "cornsilk2", axes = FALSE, box = FALSE, main = "Sea Level Rise Pressure 2020", legend = FALSE)		
 plot(r, col = cols, axes = FALSE, box = FALSE, add = TRUE)
 
-r_new <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2)) 
-r_old <- terra::rast(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3)) 
+r_new <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2)) # changed back to raster package because terra::rast was causing the histograms not to work
+r_old <- raster::raster(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3)) # changed back to raster package because terra::rast was causing the histograms not to work
+# Error in UseMethod("histogram") : 
+#  no applicable method for 'histogram' applied to an object of class "data.frame"
 
-rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s old data", scen_year - 2))
-rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", scen_year - 2))
+rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s old data", scen_year - 2)) # v2023 - plots v2022 2020 data
+rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s new data", scen_year - 2)) # v2023 - plots v2023 2021 data
 ```
 
 ```{r extract regions, eval=FALSE}
@@ -468,33 +496,48 @@ rgn_data <- read_sf(file.path(dir_M, "git-annex/globalprep/spatial/v2017"), "reg
 ## extract data for each region
 ## fyi takes awhile... about 2 hours for v2019.... 
 #terra::extent(stack_slr) <- terra::extent(zones)
+tic()
 regions_stats <- zonal(stack_slr, zones, fun = "mean", na.rm = TRUE, progress = "text") %>% data.frame() 
+toc()
+# v2023 - 3745.609 sec elapsed
 
 setdiff(regions_stats$zone, rgn_data$rgn_id) # High Seas regions are in there, makes sense....no land
 #[1] 260 261 262 263 264 266 267 269 270 272 273 274 275 276 277
 setdiff(rgn_data$rgn_id, regions_stats$zone) #integer(0)
 
-regions_stats <- regions_stats %>%
+regions_stats_clean <- regions_stats %>%
   rename(rgn_id = zone) %>%
   filter(rgn_id <= 250) %>%
   gather("year", "pressure_score", -1) %>%
-  mutate(year = as.numeric(as.character(substring(year, 5, 8))))
+  mutate(year = as.numeric(as.character(substring(year, 7, 8)))) %>%
+  mutate(year = 1993 + year - 1) # convert from numbers to actual years
 
-write.csv(regions_stats, "output/slr.csv", row.names = FALSE)
+write.csv(regions_stats_clean, "output/slr.csv", row.names = FALSE)
 
-regions_stats <- read_csv("output/slr.csv")
+regions_stats_clean <- read_csv("output/slr.csv")
 
 ## visualize data
-plotData <- regions_stats %>%
+plotData <- regions_stats_clean %>%
   left_join(rgn_data, by = "rgn_id") %>% 
   dplyr::select(rgn_name, year, pressure_score) %>%
   dplyr::arrange(rgn_name, year) %>%
   data.frame()
 
-Motion <- gvisMotionChart(plotData, idvar = "rgn_name", timevar = "year")
-plot(Motion)
-print(Motion, file = "slr.html")
+# This does not work at the moment, probably due to lack of Flash support
+# Motion <- gvisMotionChart(plotData, idvar = "rgn_name", timevar = "year")
+# plot(Motion)
+# print(Motion, file = "slr.html")
 
+### ERIKA
+# Line charts for all regions (hover for names; useful for seeing general trend info)
+line_plot <- plot_ly(plotData, x = ~year, y = ~pressure_score, color = ~rgn_name, type = "scatter", mode = "lines") %>%
+  layout(title = "All Regions: Pressure Score Line Charts",
+         xaxis = list(title = "Year"),
+         yaxis = list(title = "Pressure Score"))
+
+# Display the plot
+line_plot
+### ERIKA
 ```
 
 ```{r compare, eval=FALSE}
@@ -506,7 +549,6 @@ old <- read.csv(sprintf("../v%s/output/slr.csv", scen_year - 1)) %>%
 
 plot(old$pressure_score, old$new_pressure_score, ylab = "new score", xlab = "old score")
 abline(0, 1, col = "red")
-
 ```
 
 # Gapfill csv
