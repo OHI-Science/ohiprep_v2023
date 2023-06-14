@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Mon Jun 12 15:27:52 2023 by egg" />
+<meta name="author" content="Compiled on Wed Jun 14 12:51:41 2023 by egg" />
 
 
 <title>OHI 2023 - Sea Level Rise Pressure Layer</title>
@@ -1672,7 +1672,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2023 - Sea Level Rise Pressure
 Layer</h1>
-<h4 class="author"><em>Compiled on Mon Jun 12 15:27:52 2023 by
+<h4 class="author"><em>Compiled on Wed Jun 14 12:51:41 2023 by
 egg</em></h4>
 
 </div>
@@ -1704,11 +1704,13 @@ password for data access.</p>
 <h1><span class="header-section-number">2</span> Updates from previous
 assessment</h1>
 <ul>
-<li>One additional year of data, 2021, was added.</li>
+<li>One additional year of data, 2021, was added</li>
 <li>Add in code to automatically create folders when applicable</li>
 <li>Add in some more tic/tocs</li>
 <li>Had to change <code>terra</code> code back to <code>raster</code>
-for one chunk (making the histograms) to get it to work</li>
+for one chunk (making the histograms) to get it to work: commented out
+this code and added a version of histograms that works with
+<code>terra</code></li>
 </ul>
 <hr />
 </div>
@@ -2060,10 +2062,10 @@ changes in the source data, previously was 0.246225 m, currently is
 <span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>ref_tab<span class="sc">$</span>ref_point[ref_tab<span class="sc">$</span>pressure <span class="sc">==</span> <span class="st">&quot;Sea Level Rise&quot;</span>] <span class="ot">&lt;-</span> ref_point_slr <span class="co"># set sea level rise reference to the 99.99 percentile</span></span>
 <span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="co"># create v20?? folder in supplementary_information</span></span>
-<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>folder_name_supplementary_information_v_scen_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, scen_year)</span>
-<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>folder_path_supplementary_information_v_scen_year <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_refpt, folder_name_supplementary_information_v_scen_year)</span>
-<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(folder_path_supplementary_information_v_scen_year)</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="co"># create v20?? folder in supplementary_information (only use if needed)</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="co"># folder_name_supplementary_information_v_scen_year &lt;- paste0(&quot;v&quot;, scen_year)</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="co"># folder_path_supplementary_information_v_scen_year &lt;- file.path(dir_refpt, folder_name_supplementary_information_v_scen_year)</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="co"># dir.create(folder_path_supplementary_information_v_scen_year)</span></span>
 <span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a><span class="co"># write to reference_points_pressures.csv</span></span>
 <span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(ref_tab, <span class="fu">sprintf</span>(<span class="st">&quot;%s/v%s/reference_points_pressures.csv&quot;</span>, dir_refpt, scen_year), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
@@ -2114,19 +2116,31 @@ given a value of 1.</p>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ocean, <span class="at">col =</span> <span class="st">&quot;cornsilk2&quot;</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">&quot;Sea Level Rise Pressure 2020&quot;</span>, <span class="at">legend =</span> <span class="cn">FALSE</span>)        </span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r, <span class="at">col =</span> cols, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># get current scenario year most recent year of data</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>r_new <span class="ot">&lt;-</span> raster<span class="sc">::</span><span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/output/slr_%s.tif&quot;</span>, dir_prs_slr, scen_year <span class="sc">-</span> <span class="dv">2</span>))</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>r_new_old <span class="ot">&lt;-</span> raster<span class="sc">::</span><span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/output/slr_%s.tif&quot;</span>, dir_prs_slr, scen_year <span class="sc">-</span> <span class="dv">3</span>))</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>r_old <span class="ot">&lt;-</span> raster<span class="sc">::</span><span class="fu">raster</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif&quot;</span>, dir_M, scen_year <span class="sc">-</span> <span class="dv">1</span>, scen_year <span class="sc">-</span> <span class="dv">3</span>))</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># changed above lines back to raster package because terra::rast was causing the histograms not to work</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Error in UseMethod(&quot;histogram&quot;) : </span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co">#  no applicable method for &#39;histogram&#39; applied to an object of class &quot;data.frame&quot;</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>rasterVis<span class="sc">::</span><span class="fu">histogram</span>(r_new, <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Sea Level Pressure %s current version (v%s) data&quot;</span>, scen_year <span class="sc">-</span> <span class="dv">2</span>, scen_year)) <span class="co"># v2023 - plots v2023 2021 data</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>rasterVis<span class="sc">::</span><span class="fu">histogram</span>(r_new_old, <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Sea Level Pressure %s current version (v%s) data&quot;</span>, scen_year <span class="sc">-</span> <span class="dv">3</span>, scen_year)) <span class="co"># v2023 - plots v2023 2020 data</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>rasterVis<span class="sc">::</span><span class="fu">histogram</span>(r_old, <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Sea Level Pressure %s previous version (v%s) data&quot;</span>, scen_year <span class="sc">-</span> <span class="dv">3</span>, scen_year <span class="sc">-</span> <span class="dv">1</span>)) <span class="co"># v2023 - plots v2022 2020 data</span></span></code></pre></div>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># # get current scenario year most recent year of data</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># r_new_raster &lt;- raster::raster(sprintf(&quot;%s/output/slr_%s.tif&quot;, dir_prs_slr, scen_year - 2))</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># # get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># r_new_old_raster &lt;- raster::raster(sprintf(&quot;%s/output/slr_%s.tif&quot;, dir_prs_slr, scen_year - 3))</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># # get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># r_old_raster &lt;- raster::raster(sprintf(&quot;%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif&quot;, dir_M, scen_year - 1, scen_year - 3))</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># # changed above lines back to raster package because terra::rast was causing the histograms not to work</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Error in UseMethod(&quot;histogram&quot;) : </span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># #  no applicable method for &#39;histogram&#39; applied to an object of class &quot;data.frame&quot;</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># rasterVis::histogram(r_new_raster, main = sprintf(&quot;Sea Level Pressure %s current version (v%s) data&quot;, scen_year - 2, scen_year)) # v2023 - plots v2023 2021 data</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># rasterVis::histogram(r_new_old_raster, main = sprintf(&quot;Sea Level Pressure %s current version (v%s) data&quot;, scen_year - 3, scen_year)) # v2023 - plots v2023 2020 data</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co"># rasterVis::histogram(r_old_raster, main = sprintf(&quot;Sea Level Pressure %s previous version (v%s) data&quot;, scen_year - 3, scen_year - 1)) # v2023 - plots v2022 2020 data</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co"># updated viz route for histograms if wanting to use terra</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># get current scenario year most recent year of data</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>r_new_terra <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/output/slr_%s.tif&quot;</span>, dir_prs_slr, scen_year <span class="sc">-</span> <span class="dv">2</span>))</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="co"># get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>r_new_old_terra <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/output/slr_%s.tif&quot;</span>, dir_prs_slr, scen_year <span class="sc">-</span> <span class="dv">3</span>))</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="co"># get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>r_old_terra <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif&quot;</span>, dir_M, scen_year <span class="sc">-</span> <span class="dv">1</span>, scen_year <span class="sc">-</span> <span class="dv">3</span>))</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">hist</span>(r_new_terra, <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Sea Level Pressure %s current version (v%s) data&quot;</span>, scen_year <span class="sc">-</span> <span class="dv">2</span>, scen_year), <span class="at">breaks =</span> <span class="dv">70</span>) <span class="co"># v2023 - plots v2023 2021 data</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">hist</span>(r_new_old_terra, <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Sea Level Pressure %s current version (v%s) data&quot;</span>, scen_year <span class="sc">-</span> <span class="dv">3</span>, scen_year), <span class="at">breaks =</span> <span class="dv">70</span>) <span class="co"># v2023 - plots v2023 2020 data</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">hist</span>(r_old_terra, <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Sea Level Pressure %s previous version (v%s) data&quot;</span>, scen_year <span class="sc">-</span> <span class="dv">3</span>, scen_year <span class="sc">-</span> <span class="dv">1</span>), <span class="at">breaks =</span> <span class="dv">70</span>) <span class="co"># v2023 - plots v2022 2020 data</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## raster/zonal data, zones tifs created &amp; spatial rgn updated in 2017</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>slr_loc <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_prs_slr, <span class="st">&quot;output&quot;</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>

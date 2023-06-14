@@ -30,10 +30,10 @@ This process is completed entirely within this script. The raw data is downloade
 
 # Updates from previous assessment
 
-- One additional year of data, 2021, was added. 
+- One additional year of data, 2021, was added 
 - Add in code to automatically create folders when applicable
 - Add in some more tic/tocs
-- Had to change `terra` code back to `raster` for one chunk (making the histograms) to get it to work
+- Had to change `terra` code back to `raster` for one chunk (making the histograms) to get it to work: commented out this code and added a version of histograms that works with `terra`
 
 ***
 
@@ -405,10 +405,10 @@ if(file.exists(sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_
 
 ref_tab$ref_point[ref_tab$pressure == "Sea Level Rise"] <- ref_point_slr # set sea level rise reference to the 99.99 percentile
 
-# create v20?? folder in supplementary_information
-folder_name_supplementary_information_v_scen_year <- paste0("v", scen_year)
-folder_path_supplementary_information_v_scen_year <- file.path(dir_refpt, folder_name_supplementary_information_v_scen_year)
-dir.create(folder_path_supplementary_information_v_scen_year)
+# create v20?? folder in supplementary_information (only use if needed)
+# folder_name_supplementary_information_v_scen_year <- paste0("v", scen_year)
+# folder_path_supplementary_information_v_scen_year <- file.path(dir_refpt, folder_name_supplementary_information_v_scen_year)
+# dir.create(folder_path_supplementary_information_v_scen_year)
 
 # write to reference_points_pressures.csv
 write.csv(ref_tab, sprintf("%s/v%s/reference_points_pressures.csv", dir_refpt, scen_year), row.names = FALSE)
@@ -461,19 +461,31 @@ r <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
 plot(ocean, col = "cornsilk2", axes = FALSE, box = FALSE, main = "Sea Level Rise Pressure 2020", legend = FALSE)		
 plot(r, col = cols, axes = FALSE, box = FALSE, add = TRUE)
 
-# get current scenario year most recent year of data
-r_new <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
-# get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
-r_new_old <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 3))
-# get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
-r_old <- raster::raster(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3))
-# changed above lines back to raster package because terra::rast was causing the histograms not to work
-# Error in UseMethod("histogram") : 
-#  no applicable method for 'histogram' applied to an object of class "data.frame"
+# # get current scenario year most recent year of data
+# r_new_raster <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
+# # get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
+# r_new_old_raster <- raster::raster(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 3))
+# # get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
+# r_old_raster <- raster::raster(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3))
+# # changed above lines back to raster package because terra::rast was causing the histograms not to work
+# # Error in UseMethod("histogram") : 
+# #  no applicable method for 'histogram' applied to an object of class "data.frame"
+# 
+# rasterVis::histogram(r_new_raster, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 2, scen_year)) # v2023 - plots v2023 2021 data
+# rasterVis::histogram(r_new_old_raster, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 3, scen_year)) # v2023 - plots v2023 2020 data
+# rasterVis::histogram(r_old_raster, main = sprintf("Sea Level Pressure %s previous version (v%s) data", scen_year - 3, scen_year - 1)) # v2023 - plots v2022 2020 data
 
-rasterVis::histogram(r_new, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 2, scen_year)) # v2023 - plots v2023 2021 data
-rasterVis::histogram(r_new_old, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 3, scen_year)) # v2023 - plots v2023 2020 data
-rasterVis::histogram(r_old, main = sprintf("Sea Level Pressure %s previous version (v%s) data", scen_year - 3, scen_year - 1)) # v2023 - plots v2022 2020 data
+# updated viz route for histograms if wanting to use terra
+# get current scenario year most recent year of data
+r_new_terra <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 2))
+# get current scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
+r_new_old_terra <- terra::rast(sprintf("%s/output/slr_%s.tif", dir_prs_slr, scen_year - 3))
+# get previous scenario year most recent year of data IN COMMON (ie. will likely be one more year back)
+r_old_terra <- terra::rast(sprintf("%s/git-annex/globalprep/prs_slr/v%s/output/slr_%s.tif", dir_M, scen_year - 1, scen_year - 3))
+
+terra::hist(r_new_terra, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 2, scen_year), breaks = 70) # v2023 - plots v2023 2021 data
+terra::hist(r_new_old_terra, main = sprintf("Sea Level Pressure %s current version (v%s) data", scen_year - 3, scen_year), breaks = 70) # v2023 - plots v2023 2020 data
+terra::hist(r_old_terra, main = sprintf("Sea Level Pressure %s previous version (v%s) data", scen_year - 3, scen_year - 1), breaks = 70) # v2023 - plots v2022 2020 data
 ```
 
 ```{r extract regions, eval=FALSE}
