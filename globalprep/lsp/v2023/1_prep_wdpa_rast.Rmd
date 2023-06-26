@@ -23,6 +23,39 @@ pdf_document:
 
 View lsp_data_prep.Rmd for full description of Lasting Special Places data preparation.
 
+# Methods
+
+## Downloading Data
+
+Accessing and downloading the data was difficult in 2023 due to a downloading bug, luckly there are multiple ways to download the data from the webpage. The below directions sound easy; but it is easy to be navigated to a page where the download functionality is broken.
+
+Directions to download data:
+
+1: Link to specific website: <https://www.protectedplanet.net/en/thematic-areas/wdpa?tab=WDPA>
+
+2: Select the download button in the top right hand corner.
+
+3: Download and unzip the file
+
+4: There will be additional zip files within the zip file you download. Once unzipped, these are the three files you will use throughout the LSP dataprep.
+
+## Filter and re-project WDPA polygons
+
+The WDPA-MPA dataset comes as a shapefile or geodatabase in WGS84 coordinate reference system.
+
+-   For OHI we have chosen to count only protected areas with defined legal protection, so we apply a filter on the STATUS attribute that selects only STATUS == "Designated".
+    -   According to the WDPA Manual: STATUS as "Designated" means: "Is recognized or dedicated through legal means. Implies specific binding commitment to conservation in the long term. Applicable to government and non-government sources."
+    -   Other values for STATUS include "Proposed", "Adopted", "Inscribed", or "Not Reported" and "Established".
+        -   "Adopted" and "Inscribed" are World Heritage or Barcelona Convention sites; while these may seem important, they are generally protected by other means (as overlapping "Designated" polygons) in addition to these values.
+-   In 2015, the USA started including polygons that represent marine management plans, in addition to more strictly defined protected areas. This info is contained in the "MANG_PLAN" field.
+    -   These programmatic management plans variously protect species, habitats, and (??) and can be MPA or non-MPA.
+    -   For OHI we have chosen to count only MPA programmatic management plans, omitting Non-MPA programmatic management plans.
+-   For ease of tallying areas, we convert the polygons to a Mollweide equal-area projection before rasterizing.
+
+Once the polygons have been prepped, we rasterize the results to 500 m resolution.
+
+This process is all done in the script: `1_prep_wdpa_rast.Rmd`. After that is complete, move on to computing zonal statistics.
+
 # Updates from previous assessment
 
 2021 Changed data source to 2021 The source data has now been split into 3 different files, so we will need to merge all three shapefiles together, before we can work with the data.
@@ -218,7 +251,7 @@ wdpa_poly_2 <- st_read(dsn = dirname(shp_reorder_2),
                           layer = basename(shp_reorder_2),
                           stringsAsFactors = FALSE)
 
-# put the sf objects
+# put the sf objects in a list
 wdpa_list <- list(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)    
 
 # create function to run over list and change the CRS to Mollweide
@@ -330,19 +363,16 @@ if(!file.exists(rast_wdpa_file)) {
 }
 ```
 
-![](https://mazu.nceas.ucsb.edu/rstudio/chunk_output/418CEF0Eca0cb146/3D6EB0DA/cznz328ifyqhr/000014.png?fixed_size=1)
-
 ```{r test and examine rasters}
+# you are encouraged to use this space to examing the raster created from the WDPA data 
 
-rast_base <- clamp(rast_base, 1, 1)
-plot(rast_base, col = 'blue')
+# read in this year and last year's data
+check_current <- terra::rast(rast_wdpa_file)
+check_past <- terra::rast(file.path("/home/shares/ohi/git-annex/globalprep/lsp/v2022/rast/wdpa_2022_moll_500m.tif"))
 
-plot(check, col = 'blue')
-plot(check2, col = 'blue')
-
-check <- terra::rast(rast_wdpa_file)
-check2 <- terra::rast(file.path("/home/shares/ohi/git-annex/globalprep/lsp/v2022/rast/wdpa_2022_moll_500m.tif"))
-
+# visualize both rasters
+plot(check_current, col = 'blue')
+plot(check_past, col = 'blue')
 ```
 
 ## Data Checking
@@ -354,11 +384,12 @@ Compare shapefile 2021 v 2022.
 library(sf)
 library(raster)
 
-# 2021 data as SF
-shp_reorder_21_0 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/shps/WDPA_Feb2021_shp_ordered_0')
-shp_reorder_21_1 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/shps/WDPA_Feb2021_shp_ordered_0')
-shp_reorder_21_2 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2021/WDPA_WDOECM_wdpa_shp/shps/WDPA_Feb2021_shp_ordered_0')
+# file paths for previous data as SF
+shp_reorder_21_0 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/shps/WDPA_Jun2022_shp_ordered_0')
+shp_reorder_21_1 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/shps/WDPA_Jun2022_shp_ordered_0')
+shp_reorder_21_2 <- file.path('/home/shares/ohi/git-annex/globalprep/_raw_data/wdpa_mpa/d2022/WDPA_Jun2022_Public_shp/shps/WDPA_Jun2022_shp_ordered_0')
 
+# read in previous data
 wdpa_poly_21_0 <- st_read(dsn = dirname(shp_reorder_21_0), 
                           layer = basename(shp_reorder_21_0),
                           stringsAsFactors = FALSE)
@@ -369,14 +400,16 @@ wdpa_poly_21_2 <- st_read(dsn = dirname(shp_reorder_21_2),
                           layer = basename(shp_reorder_21_2),
                           stringsAsFactors = FALSE)
 
-wdpa_poly_all_21 <- rbind(wdpa_poly_21_0, wdpa_poly_21_1, wdpa_poly_21_2)
+# bind all into one
+wdpa_poly_all_previous <- rbind(wdpa_poly_21_0, wdpa_poly_21_1, wdpa_poly_21_2)
 
 
-# 2021 data as SF
-shp_reorder_0 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_0')
-shp_reorder_1 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_1')
-shp_reorder_2 <- file.path(dir_data, 'shps', 'WDPA_Jun2022_shp_ordered_2')
-    
+# file paths for current data as SF
+shp_reorder_0 <- file.path(dir_data, 'shps', 'WDPA_Jun2023_shp_ordered_0')
+shp_reorder_1 <- file.path(dir_data, 'shps', 'WDPA_Jun2023_shp_ordered_1')
+shp_reorder_2 <- file.path(dir_data, 'shps', 'WDPA_Jun2023_shp_ordered_2')
+
+# read in current data
 wdpa_poly_0 <- st_read(dsn = dirname(shp_reorder_0), 
                           layer = basename(shp_reorder_0),
                           stringsAsFactors = FALSE)
@@ -387,21 +420,31 @@ wdpa_poly_2 <- st_read(dsn = dirname(shp_reorder_2),
                           layer = basename(shp_reorder_2),
                           stringsAsFactors = FALSE)
 
-wdpa_poly_all_22 <- rbind(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)
+# bind current data together
+wdpa_poly_all_current <- rbind(wdpa_poly_0, wdpa_poly_1, wdpa_poly_2)
+
+# check colnames
+colnames(wdpa_poly_all_previous) == colnames(wdpa_poly_all_current)
+
+# check names
+unique(wdpa_poly_all_current$orig_name)
+unique(wdpa_poly_all_previous$orig_name)
 
 
-colnames(wdpa_poly_all_22)
-
-unique(wdpa_poly_all_22$orig_name)
-
-
-test <- wdpa_poly_all_22 %>%
+# test area to see if things look right
+test_area_current <- wdpa_poly_all_current %>%
   filter(parent_iso == "GBR") %>%
   filter(iso3 == "PCN")
 
-mapview(test)
+test_area_previous <- wdpa_poly_all_previous %>%
+  filter(parent_iso == "GBR") %>%
+  filter(iso3 == "PCN")
 
-st_area(test) 
+
+mapview(test_area_current)
+mapview(test_area_previous)
+
+st_area(test_area_current) 
 # 2021 836075862002 m2 
 # 2022 841909966909 m2
 ```
