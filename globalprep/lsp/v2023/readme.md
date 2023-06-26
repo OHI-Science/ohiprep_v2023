@@ -69,6 +69,6 @@ This is a list of the .csv files created and their associated layer:
 -   rgn_area_inland1km.csv - rgn_area_inland1km
 -   rgn_area_offshore3nm.csv - rgn_area_offshore3nm
 
-To be sure, this is a tricky OHI score update. Be sure all the layer years are updated in the scenario_data_years.csv. The "rgn_area_inland1km.csv - rgn_area_inland1km" and the "rgn_area_offshore3nm.csv - rgn_area_offshore3nm", as you can imagine, are the same each year and remains static and unupdated. They not even present as layers in the scenario_data_years.csv file. There are also multiple places to update in the layers_eez_base.csv, luckely all of them have the same file path with the "lsp" folder so you can use this to search the .csv file.
+To be sure, this is a tricky OHI score update. Be sure all the layer years are updated in the scenario_data_years.csv. The "rgn_area_inland1km.csv - rgn_area_inland1km" and the "rgn_area_offshore3nm.csv - rgn_area_offshore3nm", as you can imagine, are the same each year and remains static and unupdated. They are not present as layers in the scenario_data_years.csv file. There are also multiple places to update in the layers_eez_base.csv, luckely all of them have the same file path with the "lsp" folder so you can use this to search the .csv file.
 
 
