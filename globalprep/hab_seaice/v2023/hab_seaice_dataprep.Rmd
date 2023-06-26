@@ -308,7 +308,7 @@ script for more details.
 ```{r function 1: source obtaining data script, eval=FALSE}
 tic()
 ## Previously (<2022) update to some file paths with the correct assessment year in ObtainingData.R was needed
-## Currently (2022) this is automatic from this script with `assess_year` variable
+## Currently (2023) this is automatic from this script with `assess_year` variable
 source("ObtainingData.R")
 toc()
 ## should take ~30 minutes to completely run 
