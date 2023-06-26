@@ -1,4 +1,4 @@
-## Ocean Health Index: Lasting Special Places (LSP)
+![image](https://github.com/OHI-Science/ohiprep_v2023/assets/6896068/e2e62dc5-d552-474c-bd18-13ad57b225ab)![image](https://github.com/OHI-Science/ohiprep_v2023/assets/6896068/04c34968-b4b9-4e0b-80e0-ae21cec03ed0)## Ocean Health Index: Lasting Special Places (LSP)
 
 See full data prep details [here](http://ohi-science.github.io/ohiprep_v2022/globalprep/lsp/v2022/lsp_data_prep.html).
 
@@ -56,3 +56,19 @@ The WDPA-MPA dataset comes as a shapefile or geodatabase in WGS84 coordinate ref
 Once the polygons have been prepped, we rasterize the results to 500 m resolution.
 
 This process is all done in the script: `1_prep_wdpa_rast.Rmd`. After that is complete, move on to computing zonal statistics.
+
+## Note: Updating Scores
+
+As with all datapreps, the .csv files in the output folder are grabbed by the functions in the calculate_scores.Rmd to update the OHI scores for the year. This data layer creates 6 different .csv files with 8 different associated layers that are used for score calculation. 
+
+This is a list of the .csv files created and their associated layer:
+mpa_eez_resilience.csv - fp_mpa_eez, hd_mpa_eez
+mpa_3nm_resilience.csv - fp_mpa_coast, hd_mpa_coast
+lsp_prot_area_inland1km.csv - lsp_prot_area_inland1km
+lsp_prot_area_offshore3nm.csv - lsp_prot_area_offshore3nm
+rgn_area_inland1km.csv - rgn_area_inland1km
+rgn_area_offshore3nm.csv - rgn_area_offshore3nm
+
+To be sure, this is a tricky OHI score update. Be sure all the layer years are updated in the scenario_data_years.csv. The "rgn_area_inland1km.csv - rgn_area_inland1km" and the "rgn_area_offshore3nm.csv - rgn_area_offshore3nm", as you can imagine, are the same each year and remains static and unupdated. They not even present as layers in the scenario_data_years.csv file. There are also multiple places to update in the layers_eez_base.csv, luckely all of them have the same file path with the "lsp" folder so you can use this to search the .csv file.
+
+
