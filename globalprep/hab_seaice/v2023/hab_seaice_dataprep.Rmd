@@ -14,6 +14,7 @@ output:
 editor_options: 
   markdown: 
     wrap: 72
+  chunk_output_type: console
 ---
 
 [REFERENCE RMD
@@ -29,27 +30,32 @@ for more information.
 
 # Updates from previous assessment
 
-Version 1 of the data set which had been used previously was retired,
-and is no longer available. The new data is in netcdf format, while the
-data was previously stored in .bin files.
+[Version 1](https://doi.org/10.5067/8GQ8LZQVL0VL.) of the data set which
+had been used previously was retired. The version 2 data available was
+in netcdf format, while the data was previously stored in .bin files.
+The workflow was updated to accommodate the new file type and file
+naming system.
 
 ------------------------------------------------------------------------
 
 # Data Source
 
-**Reference**:\
-Cavalieri, D. J., C. L. Parkinson, P. Gloersen, and H. J. Zwally.
-(1996). Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS
-Passive Microwave Data, Version 1 [Data Set]. Boulder, Colorado USA.
-NASA National Snow and Ice Data Center Distributed Active Archive
-Center. <https://doi.org/10.5067/8GQ8LZQVL0VL>. Date Accessed
-08-22-2022.
+**Reference:**
 
-**Downloaded**: 2022 June 6
+DiGirolamo, N., C. L. Parkinson, D. J. Cavalieri, P. Gloersen, and H. J.
+Zwally. (2022). Sea Ice Concentrations from Nimbus-7 SMMR and DMSP
+SSM/I-SSMIS Passive Microwave Data, Version 2 [Data Set]. Boulder,
+Colorado USA. NASA National Snow and Ice Data Center Distributed Active
+Archive Center. <https://doi.org/10.5067/MPYG15WAA4WX.> Date Accessed
+06-05-2023.
+
+**Downloaded**: June 5th 2023
 
 **Description**: Monthly sea ice extent data.
 
-Data can be downloaded here: <https://nsidc.org/data/nsidc-0051>
+Data can be downloaded here: <https://nsidc.org/data/nsidc-0051>. The
+user guide for the data is located
+[`here`](https://nsidc.org/sites/default/files/documents/user-guide/nsidc-0051-v002-userguide.pdf).
 
 ## Downloading the raw data
 
@@ -63,27 +69,23 @@ to this workflow.
 1.  To download the raw data, go to this website:
     <https://nsidc.org/data/nsidc-0051> and make an account.
 
-2.  To download the raw data, you must go to this website:
-    <https://nsidc.org/data/nsidc-0051>, and navigate to the data access
-    tool. Type \_??????\_v into the search bar.
+2.  After making an account, scroll down from the link above and
+    navigate to the data access tool. Type \_??????\_v into the search
+    bar. This is because all monthly files follow the format
+    "NSIDC0051_SEAICE_PS_H25km_YYYYMMDD_v2.0.nc", with H replaced with
+    hemisphere (N or S).
 
-    This is because all monthly files follow the format
-    "NSIDC0051_SEAICE_PS_N25km_20220630_v2.0.ncc", with H hemisphere (N
-    or S).
-
-3.  
-
-4.  Click the download script option just below the search results. It
+3.  Click the download script option just below the search results. It
     is important that you first input the search option as this will be
     placed into the python script automatically to filter the results to
     what we want.
 
-5.  Place this file (eg. `nsidc-download_NSIDC-0051.001_2022-06-06.py`)
+4.  Place this file (eg. `nsidc-download_NSIDC-0051.001_2022-06-06.py`)
     in the folder
     `/home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/<version_year>`
 
-6.  Create "xml", "north" and "south" folders in the same directory
-    above
+5.  Create "xml", "north" , "south" and "tmp" folders in the same
+    directory above
 
 -   Open a terminal on Mazu in your R session and run:
 
@@ -94,6 +96,8 @@ to this workflow.
     -   `mkdir south`
 
     -   `mkdir xml`
+
+    -   `mkdir tmp`
 
 6.  Run the python script
 
@@ -107,13 +111,14 @@ to this workflow.
 
         -   This may take quite a while to run
 
+        -   If you experience server disconnection issues, download the
+            data using option 2
+
 7.  next we move the files to the folders we created
 
 -   You should ensure you are still in
     `/home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/<version_year>`
     and then run:
-
--   `mv **/*PS_N*.nc /home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2023/north`
 
     -   `mv ./*.xml ./xml`
 
@@ -130,14 +135,13 @@ To download the raw data, you must go to this website:
 <https://nsidc.org/data/nsidc-0051>, and navigate to the data access
 tool. Type \_??????\_v into the search bar.
 
-This is because all monthly files follow the formatThis is because all
-monthly files follow the format
-"NSIDC0051_SEAICE_PS_N25km_20220630_v2.0.ncc", with H hemisphere (N or
-S). Click "Order Files" and wait until your order is processed. Once
-processed (should only take a couple of minutes, you will receive an
-email with instructions), download the zip file and place it into the
-git-annex/globalprep/\_raw_data/NSIDC_SeaIce/vyear folder on Mazu and
-extract it.
+This is because all monthly files follow the format
+"NSIDC0051_SEAICE_PS_H25km_YYYYMMDD_v2.0.nc", with H replaced with
+hemisphere (N or S). Click "Order Files" and wait until your order is
+processed. Once processed (should only take a couple of minutes, you
+will receive an email with instructions), download the zip file and
+place it into the git-annex/globalprep/\_raw_data/NSIDC_SeaIce/\<vyear\>
+folder on Mazu and extract it.
 
 The zip file contains numbered folders, each with two files in them,
 .xml and .nc files.
@@ -155,21 +159,21 @@ do it manually, but it takes much longer, see v2020 script).
 Open the terminal within R Studion on Mazu. Now we need to cd into the
 correct folder on mazu, which where we have placed our seaice raw
 data: - Enter
-`cd /home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2021/5000001093042`
+`cd /home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/<vyear>/<folder_number>`
 to do this.
 
-Now move all of the xml files to the xml folder that your have
-created: -
-`mv **/*.xml /home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2021/xml`
+Now move all of the xml files to the xml folder that your have created:
 
-And do the same with the n.bin files and s.bin files: -
-`mv **/*PS_N*.nc /home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2023/north` -
-`mv **/*PS_S*.nc /home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2023/south`
+-   `mv **/*.xml`
+
+And do the same with the North files and South files:
+
+-   `mv **/*PS_N*.nc ./north`
+
+-   `mv **/*PS_S*.nc ./south`
 
 NOTE: remember to change the assessment year to whatever assessment you
 are conducting.
-
-`/home/shares/ohi/git-annex/globalprep/_raw_data/NSIDC_SeaIce/v2023_a/north`
 
 The final folder structure looks like this, where you have created new
 "north", "south", and "xml" folders:
@@ -184,9 +188,8 @@ option moving forward. See [the NOAA
 tutorial](https://coastwatch.pfeg.noaa.gov/projects/r/Projected.html#download-the-sea-ice-concentration-data)
 for downloading directly with R through the PolarWatch ERDDAP server.
 
-This will download the data as NETCDF (`.nc`) files. This is very
-different from the previous workflow and it would take a bit of
-investment to make it work for OHI.
+This will download the data as NETCDF (`.nc`) files. This is the same
+file format that is currently used in version 2 of the data set.
 
 See [issue
 206](https://github.com/OHI-Science/globalfellows-issues/issues/206#issuecomment-1147696785)
@@ -212,7 +215,7 @@ CIRES, 449 UCB University of Colorado Boulder, CO USA 80309-0449 Phone:
 +1 303-492-6199 Fax: +1 303-492-2468 E-mail:
 [nsidc\@nsidc.org](mailto:nsidc@nsidc.org){.email}
 
-**Time range**: 1979-2021
+**Time range**: 1979-2022
 
 ------------------------------------------------------------------------
 
@@ -227,7 +230,7 @@ assessment year (v) in setup code chunk.
 
 ```{r setup, eval=FALSE}
 ## Install R packages where necessary
-pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc", "dplyr", "ncdf2") # "fields" for colors in Status_Trend.R
+pkg <- c("raster", "fasterize", "sf", "sp", "rgdal", "fields", "here", "tictoc", "dplyr", "ggplot2") # "fields" for colors in Status_Trend.R
 new.pkg <- pkg[!(pkg %in% installed.packages())]
 if (length(new.pkg)){install.packages(new.pkg)}
 if (!("ohicore" %in% installed.packages())){devtools::install_github("ohi-science/ohicore")}
@@ -259,7 +262,7 @@ points).
 The original polygon files are used from:
 git-annex/globalprep/\_raw_data/NSIDC_SeaIce/v2015. However, we use the
 `fasterize` package to rasterize the polygons and save them to:
-git-annex/globalprep/\_raw_data/NSIDC_SeaIce/v2020.
+git-annex/globalprep/\_raw_data/NSIDC_SeaIce/v2023.
 
 ```{r define file path to ohi region maps (polygons), eval=FALSE}
 maps <- file.path(dir_M, "git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_year)
@@ -269,8 +272,7 @@ maps <- file.path(dir_M, "git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_y
 
 Establish: CRS, website to collect data, data selection parameters.
 Filename format for final monthly data is `nt_YYYYMM_SSS_vVV_R.bin`.
-Parameters will be used to scrape the data from the web in ObtainingData
-script.
+Parameters will be used to take data from MAZU in ObtainingData script.
 
 -   epsg projection 3411 - nsidc sea ice polar stereographic north
     (<http://spatialreference.org/ref/epsg/3411/>)
@@ -284,7 +286,7 @@ prj.n = "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=63782
 prj.s = "+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs"
 prj.mol = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 
-## Filepath (fp), filepath for the final monthly data is nt_YYYYMM_SSS_vVV_R.bin
+## Filepath (fp), filepath for the final monthly data in north and south folders
 fp.n <- file.path(dir_M, "git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_year, "north")
 fp.s <- file.path(dir_M, "git-annex/globalprep/_raw_data/NSIDC_SeaIce", assess_year, "south")
 
@@ -306,7 +308,7 @@ script for more details.
 ```{r function 1: source obtaining data script, eval=FALSE}
 tic()
 ## Previously (<2022) update to some file paths with the correct assessment year in ObtainingData.R was needed
-## Currently (2022) this is automatic from this script with `assess_year` variable
+## Currently (2023) this is automatic from this script with `assess_year` variable
 source("ObtainingData.R")
 toc()
 ## should take ~30 minutes to completely run 
@@ -406,70 +408,87 @@ write.csv(extent, "output/hab_ice_extent_eez.csv", row.names = FALSE) # save sea
 
 ```{r data checks, eval=FALSE}
 ## Health comparison
+
+#compare same years with different version year 
 health <- read.csv("output/hab_ice_health_eez.csv")
 ice_health_eez <- read.csv(sprintf("../%s/output/hab_ice_health_eez.csv", previous_year)) %>% # compare to last year's data
   dplyr::rename(health_prev_assess = health) %>%
   dplyr::left_join(health, by = c("rgn_id", "habitat", "year")) %>% 
   na.omit("health")
-plot(ice_health_eez$health_prev_assess, ice_health_eez$health)
-abline(0, 1, col="red")
 
-### let's compare the data year 2020 to data year 2019
+comp_plot <-ggplot() + geom_point(data = ice_health_eez, aes(x = health_prev_assess, y = health)) + labs(x = "previous health (2012-2021)", y = "health (2012-2021)") + geom_abline(slope = 1, intercept = 0, col = "red")
+ggplotly(comp_plot)
 
-health_2020 <- health %>%
+
+### let's compare the data year 2022 to data year 2021 (current data year vs the year before)
+
+## Pair with region names
+regions <- rgn_master %>%
+  dplyr::select(rgn_id = rgn_id_2013, rgn_name = rgn_nam_2013) %>%
+  unique()
+
+
+health_2022 <- health %>%
   dplyr::filter(year == current_year-1)
 
-health_2019 <- ice_health_eez %>%
+health_2021 <- ice_health_eez %>%
   dplyr::filter(year == last_year-1) %>%
   dplyr::select(-year, -health)
 
-health_old_new <-  dplyr::left_join(health_2020, health_2019)
+health_old_new <-  dplyr::left_join(health_2022, health_2021) %>% mutate(difference = (health - health_prev_assess)) %>% left_join(regions)
 
-plot(health_old_new$health_prev_assess, health_old_new$health)
-abline(0, 1, col="red") ## ok makes more sense to me now 
 
+year_change_plot <-ggplot() +
+  geom_point(data = health_old_new,
+             aes(x = health_prev_assess,
+                 y = health, text = paste("Region ID:", rgn_id, "<br>Habitat:", habitat))) + labs(x = "previous assessment health", y = "current health") + geom_abline(slope = 1, intercept = 0, col = "red")
+
+ggplotly(year_change_plot, tooltip = "text")
 ## Trend comparison
 trend <- read.csv("output/hab_ice_trend_eez.csv")
 ice_trend_eez <- read.csv(sprintf("../%s/output/hab_ice_trend_eez.csv", previous_year)) %>% # compare to last year's data
   dplyr::rename(trend_prev_assess = trend) %>%
   dplyr::left_join(trend, by = c("rgn_id", "habitat", "year")) %>% 
   na.omit("trend")
-plot(ice_trend_eez$trend_prev_assess, ice_trend_eez$trend)
-abline(0, 1, col="red")
 
-### let's compare the data year 2020 to data year 2019
+#update label years 
+trend_comp <- ggplot() + geom_point(data = ice_trend_eez, aes(x = trend_prev_assess, y = trend)) + labs(x = "previous assessment trend (2016-2021)", y= "current assessment trend (2016-2021)") + geom_abline(slope = 1, intercept = 0, col = "red")
 
-trend_2020 <- trend %>%
+ggplotly(trend_comp)
+
+### let's compare the data year 2022 to data year 2021 (current data year vs the year before)
+
+trend_2022 <- trend %>%
   dplyr::filter(year == (current_year - 1))
 
-trend_2019 <- ice_trend_eez %>%
+trend_2021 <- ice_trend_eez %>%
   dplyr::filter(year == last_year -1) %>%
   dplyr::select(-year, -trend)
 
-trend_old_new <- dplyr::left_join(trend_2020, trend_2019)
+trend_old_new <- dplyr::left_join(trend_2022, trend_2021) %>% mutate(difference = (trend - trend_prev_assess)) %>% left_join(regions)
 
-plot(trend_old_new$trend_prev_assess, trend_old_new$trend)
-abline(0, 1, col="red") ## ok makes more sense to me now 
+year_trend_change_plot <-ggplot() + geom_point(data = trend_old_new, aes(x = trend_prev_assess, y = trend, text = paste("Region ID:", rgn_id, "<br>Habitat:", habitat))) + labs(x = "previous year trend", y = "current trend") + geom_abline(slope = 1, intercept = 0, col = "red")
 
+ggplotly(year_trend_change_plot, tooltip = "text")
 
 ## Extent comparison
 extent <- read.csv("output/hab_ice_extent_eez.csv", stringsAsFactors = FALSE)
 ice_extent_eez <- read.csv(sprintf("../%s/output/hab_ice_extent_eez.csv", previous_year), stringsAsFactors = FALSE) %>% # compare to last year's data
-  dplyr::rename(km2_prev_assess = km2)
-plot(ice_extent_eez$km2_prev_assess, extent$km2)
-abline(0, 1, col="red")
+  dplyr::rename(km2_prev_assess = km2) %>% left_join(extent)
 
-### let's compare the data year 2020 to data year 2019
+ggplot(data = ice_extent_eez) +geom_point(aes(x =km2_prev_assess, y = km2)) + geom_abline(slope = 1, intercept = 0, col = "red")
 
-extent_2020 <- extent 
 
-extent_2019 <- ice_extent_eez
+### let's compare the data year 2022 to data year 2021
 
-extent_old_new <- dplyr::left_join(extent_2020, extent_2019)
+extent_2022 <- extent 
 
-plot(extent_old_new$km2_prev_assess, extent_old_new$km2)
-abline(0, 1, col="red") # extent doesn't change at all, because we use the same year for extent every year
+extent_2021 <- ice_extent_eez
 
+extent_old_new <- dplyr::left_join(extent_2022, extent_2021)
+
+ # extent doesn't change at all, because we use the same year for extent every year
+ggplot(data = extent_old_new) + geom_point(aes(x = km2_prev_assess, y = km2)) + geom_abline(slope = 1, intercept = 0, col = "red")
 
 
 ## Pair with region names
@@ -486,7 +505,10 @@ data <- read.csv("output/hab_ice_health_eez.csv") %>%
 
 #### Check largest score changes for v2021 ####
 
+
+
 ## Bouvet Island, rgn_id == 105, HAB score +15.15
+
 
 # health 
 bouv_health <- health_old_new %>%
