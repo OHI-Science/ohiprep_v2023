@@ -22,6 +22,7 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 # Updates from previous assessment
 
 -   New year of FAO mariculture yield data for 2021.
+-    updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data.
 -   updated code: removed 2 extra rows with totals and info
 
 old-update at the end - Updated sustainability scores from seafood watch. - Updated code for new column names from seafood watch data. - Added species name conversions when cross-checking Seafood Watch species with those in FAO data.
@@ -140,13 +141,13 @@ mar <- mar %>%
 
 ## Update species names
 
-Update species name in the `raw/species_list.csv` file with names in the `mar` dataset (exclude non-food species). I simplified the species_list. I cut the "species" name columns because it wasn't clear what this was trying to accomplish and created potential error.
+Update species name in the `raw/species_list.csv` file with names in the `mar` dataset (exclude non-food species).
 
 **Instructions for updating the species list:**
 
 More information can be found in issues #8, #81, #241, #246 for reference.
 
-The species_list.csv is a master list of all the mariculture species in the FAO data. Every year there are potential changes to the FAO data, additional species may be added or names can change, etc. When a species in the FAO data, but not the species_list.csv it will need to be added to the species_list.csv. To do this, do a quick search within the species_list.csv to make sure it wasn't some small change to the name (e.g. "long-back eel" vs. "longback eel"). Otherwise, do some research to see if any of the synonyms for the FAO species match the names in species_list.csv. If it is one of these scenarios, the information can be copied to a new row with the name modification. **Alternatively, this is where the "alias" info. might be used....but I would have to look at that more carefully because I can't remember.** If it seems to be a new taxa, You need to add the species output from this (new.spp) to species_list.csv and fill out the corresponding information. Add the new taxa name, alias, Taxon_code (categories defined in the README in the /raw folder), and family (general family from google) to the species_list.csv. Do some research to make sure the species is being used for food and is marine/brackish. If it is not used for food or is freshwater then it is excluded from the analysis (i.e., an 1 in the exclude column). I.e. add FAO_name, exclude (whether to include in assessment or not. If they are only harvested for medicinal purposes, do not include, or not eaten by humans do not include). Because seaweeds are generally used for both human and non-human consumption, we quantify whether to exclude or not for seaweed species as proportions. For example, if a seaweed species is 80% used for non-human consumption, we would exclude 80% of the harvest (exclude = 0.8). However, for fish species, we only classify as 0 or 1.
+The species_list.csv is a master list of all the mariculture species in the FAO data. Every year there are potential changes to the FAO data, additional species may be added or names can change, etc. When a species in the FAO data, but not the species_list.csv it will need to be added to the species_list.csv. To do this, do a quick search within the species_list.csv to make sure it wasn't some small change to the name (e.g. "long-back eel" vs. "longback eel"). Otherwise, do some research to see if any of the synonyms for the FAO species match the names in species_list.csv. If it is one of these scenarios, the information can be copied to a new row with the name modification. If it seems to be a new taxa, You need to add the species output from this (new.spp) to species_list.csv and fill out the corresponding information. Add the new taxa name, alias, Taxon_code (categories defined in the README in the /raw folder), and family (general family from google) to the species_list.csv. Do some research to make sure the species is being used for food and is marine/brackish. If it is not used for food or is freshwater then it is excluded from the analysis (i.e., an 1 in the exclude column). I.e. add FAO_name, exclude (whether to include in assessment or not. If they are only harvested for medicinal purposes, do not include, or not eaten by humans do not include). Because seaweeds are generally used for both human and non-human consumption, we quantify whether to exclude or not for seaweed species as proportions. For example, if a seaweed species is 80% used for non-human consumption, we would exclude 80% of the harvest (exclude = 0.8). However, for fish species, we only classify as 0 or 1.
 
 ```{r update-species, eval = FALSE}
 
@@ -161,7 +162,7 @@ new.spp # Check: if dim has 0 rows it means all match
 ### NOTE: if the list of species to add is huge, and it is unmanagable to do by hand, see the mar_dataprep.Rmd in the v2020 folder, and it will have code to use Taxize. Otherwise just do it by hand, because taxize is a pain, and most of them won't be found in taxize anyways... 
 
 ## REMOVE SPECIES not relevant to mariculture goal (i.e., non-food species)
-mar <- mar %>% left_join(mar_sp, by="FAO_name") 
+mar <- mar %>% left_join(mar_sp, by="FAO_name")
 
 ## Filters out species that should be excluded from the MAR subgoal Searches for column name "exclude"
 mar <- mar %>% filter(exclude < 1)
