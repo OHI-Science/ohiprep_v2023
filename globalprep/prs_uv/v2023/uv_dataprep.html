@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Jun 29 09:18:49 2023 by egg" />
+<meta name="author" content="Compiled on Thu Jun 29 12:01:09 2023 by egg" />
 
 
 <title>OHI 2023 - Pressure: Ultraviolet Radiation</title>
@@ -1672,7 +1672,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2023 - Pressure: Ultraviolet
 Radiation</h1>
-<h4 class="author"><em>Compiled on Thu Jun 29 09:18:49 2023 by
+<h4 class="author"><em>Compiled on Thu Jun 29 12:01:09 2023 by
 egg</em></h4>
 
 </div>
@@ -1938,7 +1938,7 @@ files</p>
 <span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
 <span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co"># v2023: all look good; later 3 cannot be read in, and I manually added those to Mazu using Cyberduck on 6/28/2023</span></span></code></pre></div>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co"># v2023: all look good; later, 3 cannot be read in, and I manually added those to Mazu using Cyberduck on 6/28/2023</span></span></code></pre></div>
 </div>
 <div id="create-rasters-from-netcdf-files" class="section level2" number="5.3">
 <h2><span class="header-section-number">5.3</span> Create rasters from
@@ -2105,9 +2105,11 @@ Means and Standard Deviations</h3>
 <span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">writeRaster</span>(m_sd, </span>
 <span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s/weekly_climatologies/mean_sd_week_%s&quot;</span>, int_sp_data, i), </span>
 <span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>                    <span class="at">overwrite =</span> <span class="cn">TRUE</span>) <span class="do">## climatologies based on mean &amp; sd of all years, additional year each assessment...</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co"># v2023: get Error in x@ptr$nrow() : external pointer is not valid. does not seem to affect anything. however, the results of tic/toc() don&#39;t show.</span></span></code></pre></div>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>      <span class="co"># like mentioned before, lapp should be the true equivalent of the old raster::overlay() but this also seems to work</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="co"># v2023: get Error in x@ptr$nrow() : external pointer is not valid. does not seem to affect anything. however, the results of tic/toc() don&#39;t show.</span></span></code></pre></div>
 </div>
 </div>
 <div id="compare-to-climatology" class="section level2" number="5.4">
