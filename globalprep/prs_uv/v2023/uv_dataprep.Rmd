@@ -246,7 +246,7 @@ for(i in 1:nrow(file_list)){
 
 toc()
 
-# v2023: all look good; later 3 cannot be read in, and I manually added those to Mazu using Cyberduck on 6/28/2023
+# v2023: all look good; later, 3 cannot be read in, and I manually added those to Mazu using Cyberduck on 6/28/2023
 ```
 
 ## Create rasters from NetCDF files
@@ -421,6 +421,8 @@ foreach(i = match_weeks) %dopar% {
   terra::writeRaster(m_sd, 
                     filename = sprintf("%s/weekly_climatologies/mean_sd_week_%s", int_sp_data, i), 
                     overwrite = TRUE) ## climatologies based on mean & sd of all years, additional year each assessment...
+  
+      # like mentioned before, lapp should be the true equivalent of the old raster::overlay() but this also seems to work
 }
 toc()
 # v2023: get Error in x@ptr$nrow() : external pointer is not valid. does not seem to affect anything. however, the results of tic/toc() don't show.
