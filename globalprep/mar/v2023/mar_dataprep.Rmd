@@ -228,8 +228,18 @@ mar <- mar %>%
   # Yugoslavia SFR: no longer a country after 1992
 
 mar <- mar %>%
-  mutate(country = ifelse(country=="Réunion", "Reunion", country)) %>%  # This one is hard to get right; v2020: last year it was "R\xe9union", but this year it was "Réunion"
+  mutate(country = case_when(country=="Réunion"~"Reunion", 
+                             country == "Micronesia (Fed. States)" ~ "Micronesia", 
+                             country == "Netherlands (Kingdom of the)" ~ "Netherlands",
+                             country == "Palestine" ~ "Israel",
+                             country == "Türkiye" ~ "Turkey",
+                             country == "United Republic of Tanzania, Zanzibar" ~ "Tanzania",
+                             country == "Venezuela (Boliv Rep of)" ~ "Venezuela",
+                             country == " Yugoslavia SFR" ~  "Montenegro",
+                             TRUE ~country)) %>%  # This one is hard to get right; v2020: last year it was "R\xe9union", but this year it was "Réunion"
   mar_split()  # function in mar_fxs.R
+
+
 
 mar_rgn <- name_2_rgn(df_in = mar, 
                        fld_name='country', 
@@ -291,7 +301,7 @@ table(mar_rgn_gf$gap_0_fill)
 ## 5932 of these out of 29305 +5932 cases had NA values converted to 0 - 2020 assessment
 ## 6441 of these out of 30170 + 6441 cases had NA values converted to 0 - 2021 assessment
 ## 7037 of these out of 30975 + 7037 cases had NA values converted to 0 - 2022 assessment
-##7117 of these out of 33051 + 7117 cases had NA values converted to 0 -2023
+##7381 of these out of 33995 + 7381 cases had NA values converted to 0 -2023 assessment
 
 ```
 
@@ -371,11 +381,10 @@ sw_sus <- sw_sus %>%
          water_body = 'BOWs',
          country = 'Countries',
         scientific_name = 'ScientificName',
-         #state_territory = 'CountrySubs',
          method = 'Methods',
-         score = 'AssessmentScore', # in 2021 was 'Overall Score', in 2022 changed to 'AssessmentScore'
+         score = 'AssessmentScore', 
          escapes_score = 'C6Score',
-         rec = 'AssessmentColor' # in 2021 was 'Overall Recommendation', in 2022 changed to AssessmentColor
+         rec = 'AssessmentColor' 
          ) %>% 
   dplyr::select(report_title, published_date, sw_species, scientific_name, fao_species, fda_species, country, water_body, method, escapes_score, score, rec) %>%
   filter(!(method %in% c("Freshwater net pen")))
@@ -450,10 +459,6 @@ sort(setdiff(maric$species, sw_sus_rgn$species)) # FAO species with no Seafood W
 ```{r sw-sus_fix-non-matches, eval = FALSE}
 
 ## Rename species in Seafood Watch data to match FAO species data
-#sw_sus_rgn$species <- gsub("Abalones", "Abalones nei", sw_sus_rgn$species)
-#sw_sus_rgn$species <- gsub("Clams", "Clams, etc. nei", sw_sus_rgn$species) # Japanese carpet shell is another name for Manila clam (thanks animal crossing :P )
-sw_sus_rgn$species <- gsub("Cockles", "Blood cockle", sw_sus_rgn$species)
-
 sw_sus_rgn$species <- gsub("Atlantic Bluefin tuna", "Atlantic bluefin tuna", sw_sus_rgn$species)
 #sw_sus_rgn$species <- gsub("Scallops", "Scallops nei", sw_sus_rgn$species)
 
@@ -461,7 +466,7 @@ sw_sus_rgn$species <- gsub("Atlantic Bluefin tuna", "Atlantic bluefin tuna", sw_
 maric$species <- gsub("blood cockle", "Blood cockle", maric$species)
 maric$species <- gsub("\\[Solea spp\\]", "Common sole", maric$species)
 
-#rename FAO species to general categories when used in FAO data
+#rename FAO species to general categories when used in seafood watch data 
 maric <- maric %>% 
   # Oysters
   mutate(species = case_when(
@@ -469,11 +474,18 @@ maric <- maric %>%
     str_detect(species,"oyster") ~ "Oysters",
     #clams
     str_detect(species, "clam") ~ "Clams",
+    str_detect(species, "Clam") ~ "Clams",
     str_detect(species, "mussel") ~ "Mussels",
     Taxon_code == "AL" ~ "Seaweed",
     family == "Haliotidae" ~ "Abalones", 
     family == "Pectinidae" ~ "Scallops",
     TRUE ~ species))
+
+
+
+#run again after cleaning to check it worked
+sort(setdiff(sw_sus_rgn$species, maric$species)) # Seafood Watch species with no FAO data
+sort(setdiff(maric$species, sw_sus_rgn$species))
 ```
 
 # FAO mariculture and Seafood Watch sustainability scores
@@ -491,7 +503,7 @@ sw_sus_rgn <- sw_sus_rgn %>%
 table(sw_sus_rgn$match_type)
 
 #sw_sp_c sw_sp_g sw_sp_w 
-#    145     114       1
+#    144     114       1
 ```
 
 **Assign a Mediterranean bordering rgn id to each waterbody row**
@@ -522,6 +534,7 @@ sw_sp_c <- sw_sus_rgn %>%
   filter(match_type == 'sw_sp_c') %>%
   select(rgn_id, species, Sust_sw_sp_c = score, esc_sw_sp_c = escapes_score)
 
+#there will be many to many relationship b/c maric has more than one of the same species for a rgn_id due to year and the sustainability may have more than one method for a species/rgn combination
 mar_sw_sus <- maric %>%
   left_join(sw_sp_c, by = c("species", "rgn_id"))
 
@@ -579,6 +592,7 @@ Average sustainability scores within regions with more than one score (due to mo
 # check which countries have duplicates
 anyDuplicated(mar_sw_sus)
 # 2022 scenario year: 532
+#2023 51
 
 mar_sw_sus <- mar_sw_sus %>% 
   dplyr::group_by(rgn_id, species) %>% 
@@ -586,7 +600,7 @@ mar_sw_sus <- mar_sw_sus %>%
                 esc_avg = mean(esc_score, na.rm = TRUE)) %>% 
   dplyr::ungroup()
 
-# code NA values in Sust_avg and esc_avg columns as NaN 
+# code NAN values in Sust_avg and esc_avg columns as NA 
 mar_sw_sus$Sust_avg[is.nan(mar_sw_sus$Sust_avg)] <- NA
 mar_sw_sus$esc_avg[is.nan(mar_sw_sus$esc_avg)] <- NA
 # nrows = 48,748
@@ -609,8 +623,9 @@ mar_sw_sus <- mar_sw_sus %>%
 **Now look at a summary after appending all the Seafood Watch data**
 
 ```{r sw-sus-summary, eval = FALSE}
-summary(mar_sw_sus)
+summary(mar_sw_sus) 
 # 21215 NA values out of 32051 total obs; ~68% without scores (2022)
+# 16364 NA values out of 33543 total obs ~ 49% without scores (2023)
 ```
 
 Gapfilling based on families and taxon_code
@@ -632,21 +647,21 @@ mar_sw_sus <- mar_sw_sus %>%
   add_georegion_id() %>%
   dplyr::select(-level)
 
-## Exploratory plots on whether regions or species drive the sustainability scores...
+# ## Exploratory plots on whether regions or species drive the sustainability scores...
 # plot(mar_sw_sus$georgn_id, mar_sw_sus$Sust)
-# plot(as.numeric(mar_sw_sus$species), mar_sw_sus$Sust)
-# 
-# mod_spp <- lm(Sust ~ as.factor(georgn_id) + species, data = mar_sw_sus)
-# anova(mod_spp)
-# summary(mod_spp)
-# 
-# mod_rgn <- lm(Sust ~ as.factor(georgn_id), data = mar_sw_sus)
-# anova(mod_rgn)
-# summary(mod_rgn)
-# 
+#  plot(as.factor(mar_sw_sus$species), mar_sw_sus$Sust)
+# # 
+#  mod_spp <- lm(Sust ~ as.factor(georgn_id) + species, data = mar_sw_sus)
+# # anova(mod_spp)
+#  summary(mod_spp)
+# # 
+#  mod_rgn <- lm(Sust ~ as.factor(georgn_id), data = mar_sw_sus)
+# # anova(mod_rgn)
+# # summary(mod_rgn)
+# # 
 # mod_spp1 <- lm(Sust ~ family, data = mar_sw_sus)
-# anova(mod_rgn)
-# summary(mod_spp1)
+# # anova(mod_rgn)
+#  summary(mod_spp1)
 # it makes more sense to use species/taxon gapfilling methods
 
 #unique(mar_sw_sus$avg_global_esc)
@@ -875,11 +890,11 @@ Comparing this year's data to previous year's data. Expect small variation from 
 
 ```{r data-check, eval = FALSE}
 ## Compare mariculture yield data for all countries: 2020 versus 2019
-mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
-  filter(year == 2019) %>% 
+mar_old <- read.csv("../v2022/output/MAR_FP_data.csv") %>% 
+  filter(year == 2020) %>% 
   select(rgn_id, species, fao, old_value = value)
 mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(year == 2020) %>% 
+  filter(year == 2021) %>% 
   select(rgn_id, species, fao, value)
 
 yield <- mar_old %>% 
@@ -888,8 +903,9 @@ yield <- mar_old %>%
 plot(yield$old_value, yield$value);abline(0,1,col="red")
 
 
+
 ## Compare mariculture yield data for all countries: 2019 last year to 2019 this year
-mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
+mar_old <- read.csv("../v2022/output/MAR_FP_data.csv") %>% 
   filter(year == 2019) %>% 
   select(rgn_id, species, fao, old_value = value)
 mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
