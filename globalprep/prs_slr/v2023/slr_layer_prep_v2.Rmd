@@ -545,6 +545,9 @@ line_plot <- plot_ly(plotData, x = ~year, y = ~pressure_score, color = ~rgn_name
 
 # display plot
 line_plot
+
+# save plot
+htmlwidgets::saveWidget(line_plot, file = "slr.html")
 ```
 
 ```{r compare, eval=FALSE}
