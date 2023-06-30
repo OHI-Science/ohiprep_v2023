@@ -24,7 +24,10 @@ editor_options:
 This analysis converts FAO commodities data into data layers used to calculate OHI 2023 global coral harvest pressure.
 
 # Updates from previous assessment
-- New year of FAO data (1976-2020) 
+- New year of FAO data (1976-2020)
+- Add/edit code for the Datacheck section
+- Add a tic/toc
+- Add more programmtic year usage
 
 ***
 
