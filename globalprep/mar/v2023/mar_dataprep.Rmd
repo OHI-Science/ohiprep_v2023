@@ -95,7 +95,8 @@ last_year <- 2022 #last year of analysis
 
 #last year of data available
 #update if not two years behind the current assessment year
-last_data_year <- current_year-2
+latest_data_year <- current_year-2 #most up to date year in the data
+previous_latest_data_year <- last_year -2 #last year of data in the last assessment, for comparison plots
 
 current_data_folder <- paste0("d", current_year) # assessment year for file paths
 previous_data_folder <- paste0("d", last_year)  # previous assessment year
@@ -136,7 +137,7 @@ mar <- mar %>%
   select(-Unit)
 
 mar <- mar %>% 
-  pivot_longer(cols = paste0("1950":last_data_year),
+  pivot_longer(cols = paste0("1950":latest_data_year),
                names_to = "year",
                values_to = "value") %>% 
   fao_clean_data_new() 
@@ -233,11 +234,10 @@ mar <- mar %>%
                              country == "Netherlands (Kingdom of the)" ~ "Netherlands",
                              country == "Palestine" ~ "Israel",
                              country == "Türkiye" ~ "Turkey",
-                             country == "United Republic of Tanzania, Zanzibar" ~ "Tanzania",
+                            country == "United Republic of Tanzania, Zanzibar" ~ "Tanzania",
                              country == "Venezuela (Boliv Rep of)" ~ "Venezuela",
-                             country == " Yugoslavia SFR" ~  "Montenegro",
-                             TRUE ~country)) %>%  # This one is hard to get right; v2020: last year it was "R\xe9union", but this year it was "Réunion"
-  mar_split()  # function in mar_fxs.R
+                             country == "Yugoslavia SFR" ~  "Montenegro",
+                             TRUE ~country)) %>% mar_split()  # function in mar_fxs.R
 
 
 
@@ -257,8 +257,8 @@ mar_rgn <- mar_rgn %>%
 **Take a look at the tidied data for a single year and region**
 
 ```{r see-tidy-data, eval = FALSE}
-data.frame(filter(mar_rgn, rgn_id==80) %>%
-  filter(year==2021) %>%
+data.frame(filter(mar_rgn, rgn_id==202) %>%
+  filter(year==2020) %>%
   arrange(species))
 ```
 
@@ -276,7 +276,7 @@ mar_rgn_spread <- pivot_wider(mar_rgn, names_from = year, values_from = value)
 dim(mar_rgn_spread)
 
 ## Turn data frame back into long format
-mar_rgn_gf <- pivot_longer(mar_rgn_spread, cols = num_range("",paste0(1950:last_data_year)), names_to = "year", values_to = "value") %>% arrange(rgn_id, species, year, Taxon_code, family, fao, environment)
+mar_rgn_gf <- pivot_longer(mar_rgn_spread, cols = num_range("",paste0(1950:latest_data_year)), names_to = "year", values_to = "value") %>% arrange(rgn_id, species, year, Taxon_code, family, fao, environment)
 
 ## NA values are converted to zero.
 mar_rgn_gf <- mar_rgn_gf %>%
@@ -301,7 +301,7 @@ table(mar_rgn_gf$gap_0_fill)
 ## 5932 of these out of 29305 +5932 cases had NA values converted to 0 - 2020 assessment
 ## 6441 of these out of 30170 + 6441 cases had NA values converted to 0 - 2021 assessment
 ## 7037 of these out of 30975 + 7037 cases had NA values converted to 0 - 2022 assessment
-##7381 of these out of 33995 + 7381 cases had NA values converted to 0 -2023 assessment
+##7380 of these out of 34185 + 7380 cases had NA values converted to 0 -2023 assessment
 
 ```
 
@@ -387,7 +387,9 @@ sw_sus <- sw_sus %>%
          rec = 'AssessmentColor' 
          ) %>% 
   dplyr::select(report_title, published_date, sw_species, scientific_name, fao_species, fda_species, country, water_body, method, escapes_score, score, rec) %>%
-  filter(!(method %in% c("Freshwater net pen")))
+  filter(!(method %in% c("Freshwater net pen"))) %>% 
+  mutate(score = case_when(score < 0 ~ 0,
+            TRUE ~ score))
 
 ## Change species names using FAO species name (fao_species); if NA, use common name (sw_species)
 sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$sw_species)
@@ -481,6 +483,12 @@ maric <- maric %>%
     family == "Pectinidae" ~ "Scallops",
     TRUE ~ species))
 
+#this creates duplicate species which we will need to sum
+#code is new and in progress
+maric <- maric %>%
+  group_by(fao, environment, species, year, Taxon_code, rgn_id, family) %>% 
+  summarize(value = sum(value), species_code = max(species_code), gap_0_fill =first(gap_0_fill)) %>%
+  ungroup()
 
 
 #run again after cleaning to check it worked
@@ -590,7 +598,7 @@ Average sustainability scores within regions with more than one score (due to mo
 ```{r sw-sus-avg, eval = FALSE}
 
 # check which countries have duplicates
-anyDuplicated(mar_sw_sus)
+anyDuplicated(mar_sw_sus) 
 # 2022 scenario year: 532
 #2023 51
 
@@ -668,7 +676,7 @@ mar_sw_sus <- mar_sw_sus %>%
 
 mar_sw_sus <- mar_sw_sus %>%
   group_by(rgn_id, family) %>%
-  mutate(avg_rgn_fam_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 scecario year)
+  mutate(avg_rgn_fam_sust = mean(Sust, na.rm = TRUE), # produced NaN values (2022 scenario year)
          avg_rgn_fam_esc = mean(esc_score, na.rm = TRUE)) %>% # produced NaN values (2022 secario year)
   ungroup() %>%
   group_by(georgn_id, family) %>%
@@ -713,8 +721,9 @@ Steps:
 
 ```{r sw-sus-gapfill-missing, eval = FALSE}
 # define gapfilling scores for global seaweed and escapes (a subcomponent of the global seaweed score) found in pdf here (updated occasionally): https://www.seafoodwatch.org/recommendation/seaweed/seaweed-31568
-seaweed_gf_score <- 6.72
-escapes_gf_score <- 4 
+# seaweed_gf_score <- 6.72
+# escapes_gf_score <- 4 
+#in 2023 this wasn't necessary because these scores were already included in the seafood watch data, and I already applied them to all seaweed species when cleaning seafood watch data. Left the code above in case it is needed in future years. 
 
 mar_sw_sus_final = mar_sw_sus %>%
   
@@ -727,8 +736,8 @@ mar_sw_sus_final = mar_sw_sus %>%
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_fam_sust, "family_avg", gapfill_sus)) %>% ## Add in family gapfill record
   mutate(Sust = ifelse(is.na(Sust), avg_taxon_code_sust, Sust)) %>%
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_taxon_code_sust, "taxon_group_avg", gapfill_sus)) %>%
-  mutate(Sust = ifelse(Taxon_code == "AL", seaweed_gf_score, Sust)) %>% ## assign any algae with the overall SFW seaweed score, see Steps above for reference to document
-  mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == seaweed_gf_score, "seaweed_score", gapfill_sus)) %>%
+  #mutate(Sust = ifelse(Taxon_code == "AL", seaweed_gf_score, Sust)) %>% ## assign any algae with the overall SFW seaweed score, see Steps above for reference to document
+  #mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == seaweed_gf_score, "seaweed_score", gapfill_sus)) %>%
   mutate(Sust = ifelse(is.na(Sust), avg_global, Sust)) %>% 
   mutate(gapfill_sus = ifelse(is.na(gapfill_sus) & Sust == avg_global, "global_avg", gapfill_sus)) %>%
   
@@ -741,8 +750,8 @@ mar_sw_sus_final = mar_sw_sus %>%
   mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == avg_fam_esc, "family_avg", gapfill_esc)) %>% ## Add in family gapfill record
   mutate(esc_score = ifelse(is.na(esc_score), avg_taxon_code_esc, esc_score)) %>%
   mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == avg_taxon_code_esc, "taxon_group_avg", gapfill_esc)) %>%
-  mutate(esc_score = ifelse(Taxon_code == "AL", escapes_gf_score, esc_score)) %>% ## assign any algae with the SFW seaweed score for C6 Escapes, see Steps above for reference to document
-  mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == escapes_gf_score, "seaweed_score", gapfill_esc)) %>%
+  #mutate(esc_score = ifelse(Taxon_code == "AL", escapes_gf_score, esc_score)) %>% ## assign any algae with the SFW seaweed score for C6 Escapes, see Steps above for reference to document
+  #mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == escapes_gf_score, "seaweed_score", gapfill_esc)) %>%
   mutate(esc_score = ifelse(is.na(esc_score), avg_global_esc, esc_score)) %>% 
   mutate(gapfill_esc = ifelse(is.na(gapfill_esc) & esc_score == avg_global_esc, "global_avg", gapfill_esc)) %>%
 
@@ -786,7 +795,7 @@ genEscapes_gf <- tonnes_esc %>%
   group_by(rgn_id, year) %>%
   summarize(genEscapes = weighted.mean(gapfill, tonnes, na.rm=TRUE)) %>%
   ungroup() %>%
-  filter(year == 2020) %>%
+  filter(year == latest_data_year) %>%
   select(rgn_id, pressures.score=genEscapes) %>%
   mutate(pressures.score=ifelse(pressures.score == "NaN", NA, pressures.score)) %>%
   data.frame()
@@ -848,9 +857,9 @@ write.csv(mar_harvest_tonnes_gf, 'output/mar_harvest_tonnes_gf.csv', row.names=F
 # define the maximum sustainability score, check with: summary(mar_sw_sus_final)
 max_sus <- 0.77
 
-## Save sustainability scores data for 2022 (SFW data year)
+## Save sustainability scores data for 2023 (SFW data year)
 mar_sustainability_score = mar_sw_sus_final %>%
-  mutate(year = 2022) %>% # 2022 sustainability scores exist (Seafood Watch)
+  mutate(year = current_year) %>% #change year if data not updated to current year
   select(rgn_id, year, taxa_code, sust_coeff = Sust) %>%
   unique() %>%
   mutate(sust_coeff = ifelse(sust_coeff > max_sus, 1, sust_coeff/max_sus)) # rescale to the highest sust score
@@ -874,7 +883,7 @@ write.csv(mar_sustainability_score_gf, 'output/mar_sustainability_gf.csv', row.n
 
 ## save mar sustainability for data checking; rgn_id, species, score
 mar_sustainability_score = mar_sw_sus_final %>%
-  mutate(year = 2022) %>% # Only 2022 sustainability scores exist (Seafood Watch)
+  mutate(year = current_year) %>% # Only 2023 sustainability scores exist (Seafood Watch)
   select(rgn_id, year, species, sust_coeff = Sust) %>%
   unique() %>% 
     mutate(sust_coeff = ifelse(sust_coeff > max_sus, 1, sust_coeff/max_sus)) # rescale to the highest sust score
@@ -889,42 +898,61 @@ write.csv(mar_sustainability_score, 'int/mar_sustainability_check.csv', row.name
 Comparing this year's data to previous year's data. Expect small variation from year to year. Plot to view differences.
 
 ```{r data-check, eval = FALSE}
-## Compare mariculture yield data for all countries: 2020 versus 2019
-mar_old <- read.csv("../v2022/output/MAR_FP_data.csv") %>% 
-  filter(year == 2020) %>% 
-  select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(year == 2021) %>% 
-  select(rgn_id, species, fao, value)
+
+#read old and new data for plots
+mar_old_data <- read.csv(file.path("..", paste0( "v", last_year), "output/MAR_FP_data.csv")) 
+mar_new_data <- read.csv("output/MAR_FP_data.csv") 
+
+
+## Compare mariculture yield data for all countries: 2021 versus 2020
+mar_old <- mar_old_data %>% 
+  filter(year == previous_latest_data_year) %>% 
+  select(rgn_id, species, fao, old_value = value, environment)
+mar_new <- mar_new_data %>% 
+  filter(year == latest_data_year) %>% 
+  select(rgn_id, species, fao, value, environment)
 
 yield <- mar_old %>% 
-  full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
+  full_join(mar_new, by = c("rgn_id","species","fao"))#; View(yield)
 
-plot(yield$old_value, yield$value);abline(0,1,col="red")
+comp_plot <- ggplot() + 
+  geom_point(data = yield, aes(x = old_value, y = value, text = paste("species", species, "<br>Regionid:", rgn_id))) +
+  labs(x = paste("previous value",previous_latest_data_year), y = paste("Current Value", latest_data_year)) +
+  geom_abline(slope = 1, intercept = 0, col = "red")
+
+
+ggplotly(comp_plot)
 
 
 
-## Compare mariculture yield data for all countries: 2019 last year to 2019 this year
-mar_old <- read.csv("../v2022/output/MAR_FP_data.csv") %>% 
-  filter(year == 2019) %>% 
-  select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(year == 2019) %>% 
-  select(rgn_id, species, fao, value)
+## Compare mariculture yield data for all countries: 2020 last year to 2020 this year
+mar_old <- mar_old_data %>% 
+  filter(year == previous_latest_data_year) %>% 
+  select(rgn_id, species, fao, old_value = value, environment)
+mar_new <- mar_new_data %>% 
+  filter(year == previous_latest_data_year) %>% 
+  select(rgn_id, species, fao, value, environment)
 
 yield <- mar_old %>% 
-  full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
+  full_join(mar_new, by = c("rgn_id","species","fao", "environment")); View(yield)
 
-plot(yield$old_value, yield$value);abline(0,1,col="red")
+
+comp_plot <- ggplot() + 
+  geom_point(data = yield, aes(x = old_value, y = value, text = paste("species", species, "<br>Regionid:", rgn_id))) +
+  labs(x = paste("Previous value",previous_latest_data_year), y = paste("Current Value", previous_latest_data_year)) +
+  geom_abline(slope = 1, intercept = 0, col = "red")
+
+
+ggplotly(comp_plot)
 
 
 ## Compare mariculture yield data for Russia: 2019 data from 2021 assessment to 2020 data from 2022 assessment
-mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 73, year == 2019) %>% 
-  select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 73, year == 2020) %>% 
-  select(rgn_id, species, fao, value)
+mar_old <- mar_old_data %>% 
+  filter(rgn_id == 73, year == previous_latest_data_year) %>% 
+  select(rgn_id, species, fao, old_value = value, environment)
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 73, year == latest_data_year) %>% 
+  select(rgn_id, species, fao, value, environment)
 
 yield <- mar_old %>% 
   full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
@@ -933,11 +961,11 @@ plot(yield$old_value, yield$value);abline(0,1,col="red")
 
 
 ## Compare mariculture yield data for Iceland: 2019 data from 2021 assessment to 2020 data from 2022 assessment
-mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 143, year == 2019) %>% 
+mar_old <- mar_old_data %>% 
+  filter(rgn_id == 143, year == previous_latest_data_year) %>% 
   select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 143, year == 2020) %>% 
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 143, year == latest_data_year) %>% 
   select(rgn_id, species, fao, value)
 
 yield <- mar_old %>% 
@@ -947,11 +975,11 @@ plot(yield$old_value, yield$value);abline(0,1,col="red")
 
 
 ## Compare mariculture yield data for Vietnam
-mar_old <- read.csv("../v2021/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 207, year == 2019) %>% 
+mar_old <- mar_old_data %>% 
+  filter(rgn_id == 207, year == previous_latest_data_year) %>% 
   select(rgn_id, species, fao, environment, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 207, year == 2020) %>% 
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 207, year == latest_data_year) %>% 
   select(rgn_id, species, fao, environment, value)
 
 yield <- mar_old %>% 
@@ -960,50 +988,38 @@ yield <- mar_old %>%
 plot(yield$old_value, yield$value)
 
 
-## Compare yield data for Iceland. Atlantic Salmon increased by a lot between 2018 and 2019 assessment years. Atlantic Salmon stayed relatively stable between 2020 and 2019 assessment years. However, Senegalese sole has an NA value in 2019 assessment; maybe a gapfilling error from last year?
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 143, year == 2018) %>% 
-  select(rgn_id, species, fao, environment, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 143, year == 2019) %>% 
-  select(rgn_id, species, fao, environment, value)
-
-yield <- mar_old %>% 
-  full_join(mar_new, by = c("rgn_id","species","fao", "environment")); View(yield)
-
-
 ## Compare yield data for Belize; yield of Whiteleg shrimp was halved between 2019 and 2020 assessment years.
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 164, year == 2018) %>% 
+mar_old <- mar_old_data%>% 
+  filter(rgn_id == 164, year == previous_latest_data_year) %>% 
   select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 164, year == 2019) %>% 
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 164, year == latest_data_year) %>% 
   select(rgn_id, species, fao, value)
 
 yield <- mar_old %>% 
   full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
 
 
-## Compare yield data for France
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 179, year == 2018) %>% 
-  select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 179, year == 2019) %>% 
-  select(rgn_id, species, fao, value)
+## Compare yield data for tanzania
+mar_old <- mar_old_data %>% 
+  filter(rgn_id == 202, year == previous_latest_data_year) %>% 
+  select(rgn_id, species, fao, old_value = value, environment)
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 202, year == previous_latest_data_year) %>% 
+  select(rgn_id, species, fao, value, environment)
 
 yield <- mar_old %>% 
-  full_join(mar_new, by = c("rgn_id","species","fao")); View(yield)
+  full_join(mar_new, by = c("rgn_id","species","fao", "environment"))
 
 plot(yield$old_value, yield$value);abline(0,1,col="red")
 
 
 ## Compare yield data for Malta; tuna production dropped drastically - it looks like some new laws were instituted in 2019 for tuna in Malta 
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 68, year == 2018) %>% 
+mar_old <- mar_old_data %>% 
+  filter(rgn_id == 68, year == previous_latest_data_year) %>% 
   select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 68, year == 2019) %>% 
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 68, year == latest_data_year) %>% 
   select(rgn_id, species, fao, value)
 
 yield <- mar_old %>% 
@@ -1012,11 +1028,11 @@ yield <- mar_old %>%
 plot(yield$old_value, yield$value);abline(0,1,col="red")
 
 ## Compare yield data for Ecuador, score increased by a lot
-mar_old <- read.csv("../v2020/output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 137, year == 2018) %>% 
+mar_old <- mar_old_data %>% 
+  filter(rgn_id == 137, year == previous_latest_data_year) %>% 
   select(rgn_id, species, fao, old_value = value)
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 137, year == 2019) %>% 
+mar_new <- mar_new_data %>% 
+  filter(rgn_id == 137, year == latest_data_year) %>% 
   select(rgn_id, species, fao, value)
 
 yield <- mar_old %>% 
@@ -1025,6 +1041,9 @@ yield <- mar_old %>%
 plot(yield$old_value, yield$value)
 
 # ----Sustainability scores--------------------------------------------------------------------------
+
+
+
 
 ## Compare new/old Mariculture sustainability scores for Bosnia
 tmp_old <- read.csv("../v2020/output/mar_sustainability.csv") %>% 
@@ -1069,7 +1088,10 @@ plot(test$sust_old, test$sust_new);abline(0,1,col="red")
 
 
 ## Compare new/old Mariculture sustainability scores
-tmp_old <- read.csv("../v2021/output/mar_sustainability.csv") %>% 
+
+
+tmp_old <- #read old and new data for plots
+mar_old_data <- read.csv(file.path("..", paste0( "v", last_year), "output/mar_sustainability.csv")) %>% 
   select(rgn_id, taxa_code, sust_old = sust_coeff)
   
 tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
@@ -1082,10 +1104,6 @@ test <- tmp_new %>%
   mutate(difference = sust_new - sust_old) %>%
   group_by(rgn_id) %>%
   summarize(mean_rgn_sus_diff = mean(difference, na.rm = TRUE))
-View(test)
-
-#plot(test$sust_old, test$sust_new);abline(0,1,col="red")
-plot(test$rgn_id, test$difference)
 
 mean_diff_sus <- ggplot(test, aes(x = rgn_id, y = mean_rgn_sus_diff)) + 
   geom_point()
@@ -1101,24 +1119,57 @@ Comparing this year's data to previous year's data. Expect small variation from 
 
 ## Compare genetic escapes pressure score; saw large changes between 2018 and 2017 assessment years. No big changes between 2019 and 2018 assessment years. Big changes from 2019 to 2020 due to a data update. Small changes between 2020 and 2021 due to updating the FAO data, gapfilling caused this. Also fixed some name errors. Small changes between 2021 and 2022, added a few name conversions. 
 old <- read.csv("output/GenEsc.csv") %>%
-  filter(year == 2019) %>% 
+  filter(year == previous_latest_data_year) %>% 
   select(rgn_id, year, prs_score_old=pressure_score)
 
 new <- read.csv("output/GenEsc.csv") %>%
-  filter(year == 2020) %>%
+  filter(year == latest_data_year) %>%
   select(rgn_id, year, pressure_score)
 
-compare <- full_join(old, new, by=c("rgn_id","year")); View(compare)
+compare <- full_join(old, new, by=c("rgn_id"))
+
+
+comp_plot <- ggplot() + 
+  geom_point(data = compare, aes(x = prs_score_old, y = pressure_score, text = paste("Regionid:", rgn_id))) +
+  labs(x = paste("Previous pressure",previous_latest_data_year), y = paste("Current pressre", latest_data_year)) +
+  geom_abline(slope = 1, intercept = 0, col = "red")
+
+
+ggplotly(comp_plot)
+
+
+#compare old genetic escape pressure scores for the same year 
+old <- read.csv(file.path("..", paste0( "v", last_year), "output/GenEsc.csv")) %>%
+  filter(year == previous_latest_data_year) %>% 
+  select(rgn_id, year, prs_score_old=pressure_score)
+
+new <-  read.csv("output/GenEsc.csv") %>% 
+  filter(year == previous_latest_data_year) %>%
+  select(rgn_id, year, pressure_score)
+
+compare <- full_join(old, new, by=c("rgn_id"))#; View(compare)
+
+comp_plot <- ggplot() + 
+  geom_point(data = compare, aes(x = prs_score_old, y = pressure_score, text = paste("Regionid:", rgn_id))) +
+  labs(x = paste("Previous pressure",previous_latest_data_year), y = paste("Current pressre", previous_latest_data_year)) +
+  geom_abline(slope = 1, intercept = 0, col = "red")
+
+
+ggplotly(comp_plot)
+
 
 plot(compare$prs_score_old, compare$pressure_score);abline(0,1,col="red")
 
 
-## Compare genetic escapes pressure scores for Vietnam; no change in pressures between 2021 and 2020 assessment years.
-old <- read.csv("../v2021/output/GenEsc.csv") %>%
+
+
+
+## Compare genetic escapes pressure scores for Vietnam; no change in pressures between 2023 and 2021 assessment years.
+old <- read.csv(file.path("..", paste0( "v", last_year), "output/GenEsc.csv")) %>%
   filter(rgn_id == 232) %>% 
   select(rgn_id, year, prs_score_old=pressure_score)
 
-new <- read.csv("../v2022/output/GenEsc.csv") %>%
+new <- read.csv("output/GenEsc.csv") %>%
   filter(rgn_id == 232) %>% 
   select(rgn_id, year, pressure_score)
 
@@ -1128,11 +1179,11 @@ plot(compare$prs_score_old, compare$pressure_score);abline(0,1,col="red")
 
 
 ## Compare genetic escapes pressure scores for Iceland
-old <- read.csv("../v2021/output/GenEsc.csv") %>%
+old <- read.csv(file.path("..", paste0( "v", last_year), "output/GenEsc.csv")) %>%
   filter(rgn_id == 143) %>% 
   select(rgn_id, year, prs_score_old=pressure_score)
 
-new <- read.csv("../v2022/output/GenEsc.csv") %>%
+new <- read.csv("output/GenEsc.csv") %>%
   filter(rgn_id == 143) %>% 
   select(rgn_id, year, pressure_score)
 
