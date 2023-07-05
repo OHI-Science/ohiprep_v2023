@@ -22,7 +22,7 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 # Updates from previous assessment
 
 -   New year of FAO mariculture yield data for 2021.
--   updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data. Also removed the alias column, as it was being inconsistently used, and instead grouped by family when removing species with less than four years of mariculture for a region. Reorganized code as needed to keep this from creating errors. 
+-   updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data. Removed the alias column, as it was being inconsistently used, and instead grouped by family when removing species with less than four years of mariculture for a region. Reorganized code as needed to keep this from creating errors. 
 -   updated code to programmatically fill in analysis and data years throughout script
 - fixed an issue in the mar_split function (mar_fxs.R) that was duplicating Netherlands data by binding the same rows multiple times. 
 -  Fixed a problem that was removing data due to duplicates in the fao column (FAO major fishing area (Name)) for some species/region/environment/year combinations in the FAO data. See issue 246 for more information. 
@@ -45,7 +45,7 @@ FAO metadata found [here](https://www.fao.org/fishery/en/collection/aquaculture?
 
 Note that for future years it appears the data can be directly downloaded through the link included above without using the fishstatj software.
 
-Instructions on downloading the data: Navigate to this link: https://www.fao.org/fishery/statistics-query/en/home. Click browse on Global aquaculture production. Click browse on Global aquaculture production Quantity (1950 - 2021). Go to the bottom and de-select all of the pre-selected years. Scroll to the query definition section and drag Country Name En, ASFIS species Name En, FAO major fishing area Name En, and Environment Name En, into the selected rows column. Click on show data and confirm that data is present for 1950- two years prior to current date. Click download and select yes to include Null Values. Upload the file to the FAO_mariculture folder on MAZU. 
+Instructions on downloading the aquaculture data: Navigate to this link: https://www.fao.org/fishery/statistics-query/en/home. Click browse on Global aquaculture production. Click browse on Global aquaculture production Quantity (1950 - last data year). Scroll to the bottom of the dimensions section, and de-select all of the pre-selected years. Under the query definition section, drag Country Name En (if not already present), ASFIS species Name En, FAO major fishing area Name En, and Environment Name En, into the selected rows column from the possible fields column. Click on show data and confirm that data is present for 1950- two years prior to current date. Click download and select yes to include Null Values. Upload the file to the FAO_mariculture folder on MAZU. 
 
 **Description**: Quantity (tonnes) and Value (thousand US\$) of mariculture for each country, species, year.
 
