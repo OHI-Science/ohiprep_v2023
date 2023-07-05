@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Jun 29 12:01:09 2023 by egg" />
+<meta name="author" content="Compiled on Wed Jul 5 11:20:56 2023 by egg" />
 
 
 <title>OHI 2023 - Pressure: Ultraviolet Radiation</title>
@@ -1672,7 +1672,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2023 - Pressure: Ultraviolet
 Radiation</h1>
-<h4 class="author"><em>Compiled on Thu Jun 29 12:01:09 2023 by
+<h4 class="author"><em>Compiled on Wed Jul 5 11:20:56 2023 by
 egg</em></h4>
 
 </div>
@@ -2276,8 +2276,10 @@ Region</h2>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="do">## get raster data</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>rasts <span class="ot">&lt;-</span> <span class="fu">list.files</span>(out_dir, <span class="at">full =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">&quot;uv_.*_mol_1km.tif&quot;</span>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>pressure_stack <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(rasts)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pressure_stack) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;uv_2005_2009.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2006_2010.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2007_2011.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2008_2012.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2009_2013.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2010_2014.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2011_2015.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2012_2016.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2013_2017.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2014_2018.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2015_2019.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2016_2020.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2017_2021.2005_2009_mol_1km&quot;</span>,<span class="st">&quot;uv_2018_2022.2005_2009_mol_1km&quot;</span>)</span></code></pre></div>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>extracted_names <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(rasts, <span class="st">&quot;uv_</span><span class="sc">\\</span><span class="st">d{4}_</span><span class="sc">\\</span><span class="st">d{4}-</span><span class="sc">\\</span><span class="st">d{4}_</span><span class="sc">\\</span><span class="st">d{4}_mol_1km&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_replace</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;.&quot;</span>) <span class="co"># this part may not be necessary</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>pressure_stack <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(rasts)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pressure_stack) <span class="ot">&lt;-</span> extracted_names <span class="co"># ensure these are correct!</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveGIF</span>({</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>terra<span class="sc">::</span><span class="fu">nlyr</span>(pressure_stack)){</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    n <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">&quot;UV Pressure %s&quot;</span>, </span>
