@@ -600,7 +600,7 @@ rgn_data <- read.csv("~/ohi-global/eez/spatial/regions_list.csv") %>%
 ## get raster data
 rasts <- list.files(out_dir, full = TRUE, pattern = "uv_.*_mol_1km.tif")
 extracted_names <- str_extract(rasts, "uv_\\d{4}_\\d{4}-\\d{4}_\\d{4}_mol_1km") %>% 
-  str_replace("-", ".") # this part may not be necessary
+  str_replace("-", ".") # this part may not be necessary; kept for consistency with v2022 names
 pressure_stack <- terra::rast(rasts)
 names(pressure_stack) <- extracted_names # ensure these are correct!
 ```
