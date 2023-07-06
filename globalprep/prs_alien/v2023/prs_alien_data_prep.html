@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Jul 6 10:49:54 2023 by egg" />
+<meta name="author" content="Compiled on Thu Jul 6 12:17:40 2023 by egg" />
 
 
 <title>OHI 2023 - Pressure: Invasive Species</title>
@@ -1574,7 +1574,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">OHI 2023 - Pressure: Invasive Species</h1>
-<h4 class="author"><em>Compiled on Thu Jul 6 10:49:54 2023 by
+<h4 class="author"><em>Compiled on Thu Jul 6 12:17:40 2023 by
 egg</em></h4>
 
 </div>
@@ -1589,12 +1589,13 @@ each OHI region.</p>
 <h1><span class="header-section-number">2</span> Updates from previous
 assessment</h1>
 <ul>
-<li>Adding a new year</li>
+<li>Adding updated data</li>
 <li>Changed downloading method</li>
 <li>Accounted for more is_invasive and habitat possibilities</li>
 <li>Added a tic/toc</li>
 <li>Added ensuring Congo - Brazzaville is converted to Republique du
 Congo</li>
+<li>Add code to bind previous year’s data to current year</li>
 <li>Added graph comparison to previous version year</li>
 </ul>
 <hr />
@@ -1678,20 +1679,22 @@ assesments</p></li>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>) </span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="do">### directory paths and relevant files</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>current_year <span class="ot">&lt;-</span> <span class="dv">2023</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>data_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_year)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;workflow&#39;</span>, <span class="st">&#39;R&#39;</span>, <span class="st">&#39;common.R&#39;</span>))</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="do">### Mazu</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;prs_alien&#39;</span>, version_year)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex&#39;</span>, <span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;_raw_data&#39;</span>, <span class="st">&#39;griis&#39;</span>, data_year)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># rgns &lt;- ohicore::georegion_labels # Kiribati is broke v2022</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>rgns <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2017/output/georegion_labels.csv&quot;</span>)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>rgns_eez <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/OHI-Science/ohiprep_v2022/gh-pages/globalprep/spatial/v2017/output/rgn_labels.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">&quot;eez&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>type, <span class="at">rgn_name =</span> label)</span></code></pre></div>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>prev_year <span class="ot">&lt;-</span> current_year <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>data_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_year)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;workflow&#39;</span>, <span class="st">&#39;R&#39;</span>, <span class="st">&#39;common.R&#39;</span>))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="do">### Mazu</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>dir_here  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;prs_alien&#39;</span>, version_year)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>dir_here_prev  <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;prs_alien&#39;</span>, <span class="fu">paste0</span>(<span class="st">&#39;v&#39;</span>, prev_year))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>dir_data <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M, <span class="st">&#39;git-annex&#39;</span>, <span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;_raw_data&#39;</span>, <span class="st">&#39;griis&#39;</span>, data_year)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># rgns &lt;- ohicore::georegion_labels # Kiribati is broke v2022</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>rgns <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2017/output/georegion_labels.csv&quot;</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>rgns_eez <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/OHI-Science/ohiprep_v2022/gh-pages/globalprep/spatial/v2017/output/rgn_labels.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">&quot;eez&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>type, <span class="at">rgn_name =</span> label)</span></code></pre></div>
 </div>
 <div id="download-the-data" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> Download the
@@ -2024,7 +2027,7 @@ unlikely scenario that will ensure complete data</p>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">invasive_count =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(invasive_count), r0_inv, invasive_count),</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gapfilled      =</span> <span class="fu">ifelse</span>(has_data <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(spp_count) <span class="sc">&amp;</span> <span class="fu">is.na</span>(gapfilled), <span class="st">&quot;yes&quot;</span>, gapfilled),</span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method         =</span> <span class="fu">ifelse</span>(has_data <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(spp_count) <span class="sc">&amp;</span> <span class="fu">is.na</span>(method), <span class="st">&quot;used r0 average&quot;</span>, method),</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="dv">2023</span>)</span></code></pre></div>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="dv">2022</span>) <span class="co"># match to latest data year; ie. this is for v2023. v2022 data was changed to use 2019 now.</span></span></code></pre></div>
 </div>
 </div>
 <div id="calculate-the-pressure-score" class="section level2" number="4.7">
@@ -2063,7 +2066,26 @@ data</h2>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Save pressure score dataset</span></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>pressure <span class="sc">%&gt;%</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, pressure_score) <span class="sc">%&gt;%</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>))</span></code></pre></div>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># v2023: bind the previous version&#39;s data to the new data</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>old_data_to_bind <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here_prev, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>old_data_to_bind_gf <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here_prev, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien_gf.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>new_data_to_bind <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>new_data_to_bind_gf <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien_gf.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>data_to_write <span class="ot">&lt;-</span> <span class="fu">rbind</span>(old_data_to_bind, new_data_to_bind)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>data_to_write_gf <span class="ot">&lt;-</span> <span class="fu">rbind</span>(old_data_to_bind_gf, new_data_to_bind_gf)</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>data_to_write <span class="sc">%&gt;%</span> readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien.csv&quot;</span>))</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>data_to_write_gf <span class="sc">%&gt;%</span> readr<span class="sc">::</span><span class="fu">write_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;prs_alien_gf.csv&quot;</span>))</span></code></pre></div>
 </div>
 <div id="datacheck" class="section level2" number="4.9">
 <h2><span class="header-section-number">4.9</span> Datacheck</h2>
@@ -2084,7 +2106,7 @@ data</h2>
 <span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>plot_diff <span class="ot">&lt;-</span> </span>
 <span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    compare, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">2023</span><span class="st">`</span>, <span class="at">y =</span> <span class="st">`</span><span class="at">2008</span><span class="st">`</span>, <span class="at">text =</span> rgn_name, <span class="at">label =</span> rgn_id), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span> <span class="co"># make sure to update version year here</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    compare, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">2022</span><span class="st">`</span>, <span class="at">y =</span> <span class="st">`</span><span class="at">2008</span><span class="st">`</span>, <span class="at">text =</span> rgn_name, <span class="at">label =</span> rgn_id), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span> <span class="co"># make sure to update data year here</span></span>
 <span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.025</span>, <span class="at">height =</span> .<span class="dv">025</span>) <span class="sc">+</span></span>
 <span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_abline</span>() <span class="sc">+</span></span>
 <span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Invasive species pressure (comparsion to before change in data)&quot;</span>) <span class="sc">+</span></span>
@@ -2093,23 +2115,15 @@ data</h2>
 <span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(plot_diff, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;rgn_name&quot;</span>, <span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>))</span>
 <span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare to previous year</span></span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>prev_yr_data <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;globalprep&#39;</span>, <span class="st">&#39;prs_alien&#39;</span>, <span class="st">&#39;v2022&#39;</span>, <span class="st">&#39;output&#39;</span>, <span class="st">&#39;prs_alien.csv&#39;</span>) <span class="sc">%&gt;%</span> <span class="co"># make sure to change version year to previous year</span></span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(rgns_eez)</span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>compare_prev_yr <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(prev_yr_data) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> pressure_score)</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>plot_diff_prev_yr <span class="ot">&lt;-</span> </span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    compare, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">2022</span><span class="st">`</span>, <span class="at">y =</span> <span class="st">`</span><span class="at">2019</span><span class="st">`</span>, <span class="at">text =</span> rgn_name, <span class="at">label =</span> rgn_id), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span> <span class="co"># make sure to update data years here</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.025</span>, <span class="at">height =</span> .<span class="dv">025</span>) <span class="sc">+</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Invasive species pressure (comparsion to previous year)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() </span>
 <span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>plot_diff_prev_yr <span class="ot">&lt;-</span> </span>
-<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
-<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>    compare_prev_yr, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">2023</span><span class="st">`</span>, <span class="at">y =</span> <span class="st">`</span><span class="at">2022</span><span class="st">`</span>, <span class="at">text =</span> rgn_name, <span class="at">label =</span> rgn_id), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span> <span class="co"># make sure to update years here</span></span>
-<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.025</span>, <span class="at">height =</span> .<span class="dv">025</span>) <span class="sc">+</span></span>
-<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_abline</span>() <span class="sc">+</span></span>
-<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Invasive species pressure (comparsion to previous year)&quot;</span>) <span class="sc">+</span></span>
-<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() </span>
-<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(plot_diff_prev_yr, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;rgn_name&quot;</span>, <span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>))</span></code></pre></div>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(plot_diff_prev_yr, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;rgn_name&quot;</span>, <span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>))</span></code></pre></div>
 </div>
 </div>
 
