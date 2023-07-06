@@ -22,13 +22,16 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 # Updates from previous assessment
 
 -   New year of FAO mariculture yield data for 2021.
--   updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data. Removed the alias column, as it was being inconsistently used, and instead grouped by family when removing species with less than four years of mariculture for a region. Reorganized code as needed to keep this from creating errors. 
+
+-   updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data. Removed the alias column, as it was being inconsistently used, and instead grouped by family when removing species with less than four years of mariculture for a region. Reorganized code as needed to keep this from creating errors.
+
 -   updated code to programmatically fill in analysis and data years throughout script
-- fixed an issue in the mar_split function (mar_fxs.R) that was duplicating Netherlands data by binding the same rows multiple times. 
--  Fixed a problem that was removing data due to duplicates in the fao column (FAO major fishing area (Name)) for some species/region/environment/year combinations in the FAO data. See issue 246 for more information. 
 
-- updated gather to pivot_longer
+-   fixed an issue in the mar_split function (mar_fxs.R) that was duplicating Netherlands data by binding the same rows multiple times.
 
+-   Fixed a problem that was removing data due to duplicates in the fao column (FAO major fishing area (Name)) for some species/region/environment/year combinations in the FAO data. See issue 246 for more information.
+
+-   updated gather to pivot_longer
 
 ------------------------------------------------------------------------
 
@@ -41,13 +44,15 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 
 FAO metadata found [here](https://www.fao.org/fishery/en/collection/aquaculture?lang=en).
 
-**Downloaded**: May 8th, 2023
+**Downloaded**: July 5th, 2023
 
-Note that for future years it appears the data can be directly downloaded through the link included above without using the fishstatj software.
+**Instructions on downloading the FAO aquaculture data:**
 
-Instructions on downloading the aquaculture data: Navigate to this link: https://www.fao.org/fishery/statistics-query/en/home. Click browse on Global aquaculture production. Click browse on Global aquaculture production Quantity (1950 - last data year). Scroll to the bottom of the dimensions section, and de-select all of the pre-selected years. Under the query definition section, drag Country Name En (if not already present), ASFIS species Name En, FAO major fishing area Name En, and Environment Name En, into the selected rows column from the possible fields column. Click on show data and confirm that data is present for 1950- two years prior to current date. Click download and select yes to include Null Values. Upload the file to the FAO_mariculture folder on MAZU. 
+Navigate to this link: <https://www.fao.org/fishery/statistics-query/en/home>.
 
-**Description**: Quantity (tonnes) and Value (thousand US\$) of mariculture for each country, species, year.
+Click browse on Global aquaculture production. Click browse on Global aquaculture production (Quantity). Scroll to the bottom of the dimensions section, and de-select all of the pre-selected years. Under the query definition section, drag Country Name En (if not already present), ASFIS species Name En, FAO major fishing area Name En, ASFIS species Family scientific name, and Environment Name En, from the possible fields column into the selected rows column. Click on show data and confirm that data is present for 1950- two years prior to current year. Click download and select yes to include Null Values. Rename the file in the format FAO_GlobalAquacultureProduction_Quantity_1950_last_data_year. Upload the file to the appropriate year folder in the FAO_mariculture folder on mazu.
+
+**Description**: Quantity (tonnes) of mariculture for each country, species, year.
 
 **Time range**: 1950-2021
 
@@ -108,7 +113,9 @@ previous_data_folder <- paste0("d", last_year)  # previous assessment year
 
 # for scen_year 2023, Gage already downloaded mar production data to git_annex
 #update the data file name to the current last year of data 
-mar <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mariculture", current_data_folder, "FAO_GlobalAquacultureProduction_Quantity_1950-2021.csv"), check.names=FALSE, stringsAsFactors=FALSE) ; head(mar)
+mar <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mariculture", current_data_folder, "FAO_GlobalAquacultureProduction_Quantity_1950_2021.csv")) ; head(mar)
+
+
 ```
 
 # Wrangle:
@@ -120,33 +127,55 @@ Filter freshwater mariculture, make long format, and clean FAO codes.
 ```{r tidy-data, eval = FALSE}
 
 mar <- mar %>%
-  dplyr::select(-`Unit (Name)`) %>% #should all be "Tonnes - live weight"
-  rename(country = `Country (Name)`,
-         FAO_name = `ASFIS species (Name)`, 
-         fao = `FAO major fishing area (Name)`, 
-         environment = `Environment (Name)`) %>%
+  dplyr::select(-`Unit Name`) %>% #should all be "Tonnes - live weight"
+  rename(country = `Country Name En`,
+         FAO_name = `ASFIS species Name En`, 
+         fao = `FAO major fishing area Name En`, 
+         environment = `Environment Name En`,
+         family_scientific = `Family Scientific name`) %>%
   rename_at(vars(matches("\\[")), ~ str_remove(., "\\[")) %>%
-  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]")) %>% 
-  filter(!str_detect(country, "Fishery and Aquaculture Statistics")) %>% 
-  filter(!str_detect(country, "Totals - Tonnes")) #removing rows that are not actually part of the data
+  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]"))
 
 
 table(mar$environment) 
 
 ## Include only marine environments
 mar <- mar %>%
-filter(environment %in% c("Brackishwater", "Marine"))  
+filter(environment %in% c("Brackishwater", "Marine")) 
 
-## Convert to long format and clean FAO codes:
-mar <- mar %>%
-  select(-Unit)
 
-mar <- mar %>% 
+#we no longer need to run the entire fao_clean_data_new function
+# NAs are no longer saved as ... and the flags are in a separate column
+#however we should still replace columns where the flag is N w/.1
+sub_N = 0.1
+
+mar <- mar %>% mutate(row_id = row_number())
+
+
+#pivot all of the year/value columns 
+mar_values <- mar %>% 
+  select(-c(paste("1950":latest_data_year, "Flag"))) %>% 
   pivot_longer(cols = paste0("1950":latest_data_year),
                names_to = "year",
-               values_to = "value") %>% 
-  fao_clean_data_new() 
-# the value column represents the harvest quantity (units are in tonnes or not documented)
+               values_to = "value")
+
+#pivot all of the flag columns   
+mar_flags <- mar %>% select(-paste0("1950":latest_data_year)) %>% 
+  pivot_longer(cols = paste("1950":latest_data_year, "Flag"),
+               names_to = "flag_year",
+               values_to = "flag") %>% 
+  mutate(year = str_remove(flag_year, " Flag")) %>% 
+  select(year, flag, row_id)
+  
+#combine flag and row id 
+mar <- mar_values %>% left_join(mar_flags, by = c("row_id", "year"))
+
+mar <- mar %>% 
+  mutate(value = case_when(str_detect(flag, "N") ~ sub_N,
+                               TRUE ~value)) %>%
+  select(-row_id) %>% 
+  mutate(FAO_name = ifelse(!is.na(FAO_name), FAO_name, family_scientific)) 
+
 ```
 
 ## Update species names
@@ -261,7 +290,7 @@ mar_rgn <- mar_rgn %>%
 **Take a look at the tidied data for a single year and region**
 
 ```{r see-tidy-data, eval = FALSE}
-data.frame(filter(mar_rgn, rgn_id==202) %>%
+test <- data.frame(filter(mar_rgn, rgn_id==207) %>%
   filter(year==2020) %>%
   arrange(species))
 ```
@@ -305,7 +334,7 @@ table(mar_rgn_gf$gap_0_fill)
 ## 5932 of these out of 29305 +5932 cases had NA values converted to 0 - 2020 assessment
 ## 6441 of these out of 30170 + 6441 cases had NA values converted to 0 - 2021 assessment
 ## 7037 of these out of 30975 + 7037 cases had NA values converted to 0 - 2022 assessment
-##7380 of these out of 34185 + 7380 cases had NA values converted to 0 -2023 assessment
+##7367 of these out of 34187 + 7367 cases had NA values converted to 0 -2023 assessment
 
 ```
 
@@ -464,6 +493,7 @@ maric <- maric %>%
     family == "Cardiidae" ~ "Cockles",
     str_detect(species,"oyster") ~ "Oysters",
     #clams
+    species == "CORBICULIDAE" ~ "Clams",
     str_detect(species, "clam") ~ "Clams",
     str_detect(species, "Clam") ~ "Clams",
     str_detect(species, "mussel") ~ "Mussels",
@@ -483,6 +513,12 @@ maric <- maric %>%
   group_by(environment, species, year, Taxon_code, rgn_id, family) %>% 
   summarize(value = sum(value), gap_0_fill =first(gap_0_fill)) %>%
   ungroup()
+
+#run this code to check that there are no duplicates for any species, year, rgn_id combinations. If there are they will be unintentionally deleted later, so you may need to change family or taxon codes to match and rerun the above group by
+duplicate_check <- maric %>% group_by(environment, species, year, rgn_id) %>% 
+  summarize(n = n())
+unique(duplicate_check$n) #should be one
+
 
 #Add a unique identifier per cultivated stock that describes each species, region, and environment grouping.
 identifier = maric %>% 
@@ -634,7 +670,7 @@ mar_sw_sus <- mar_sw_sus %>%
 ```{r sw-sus-summary, eval = FALSE}
 summary(mar_sw_sus) 
 # 21215 NA values out of 32051 total obs; ~68% without scores (2022)
-# 16364 NA values out of 33732 total obs ~ 49% without scores (2023)
+# 16378 NA values out of 33732 total obs ~ 49% without scores (2023)
 ```
 
 Gapfilling based on families and taxon_code
@@ -1045,50 +1081,6 @@ plot(yield$old_value, yield$value)
 # ----Sustainability scores--------------------------------------------------------------------------
 
 
-
-
-## Compare new/old Mariculture sustainability scores for Bosnia
-tmp_old <- read.csv("../v2020/output/mar_sustainability.csv") %>% 
-  select(rgn_id, taxa_code, sust_old = sust_coeff) %>%
-  filter(rgn_id == 232) 
-  tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
-
-
-  
-tmp_new <- read.csv("int/mar_sustainability_check.csv") %>% 
-  select(rgn_id, species, sust_new = sust_coeff) %>% 
-  filter(rgn_id == 232)
-
-test <- tmp_new %>% 
-  full_join(tmp_old, by=c("rgn_id", "species"))
-View(test)
-
-plot(test$sust_old, test$sust_new);abline(0,1,col="red")
-## now look at bosnia production 
-mar_new <- read.csv("output/MAR_FP_data.csv") %>% 
-  filter(rgn_id == 232, year == 2019) %>% 
-  select(rgn_id, species, fao, value)
-
-
-## Compare new/old Mariculture sustainability scores for Greece
-tmp_old <- read.csv("../v2020/output/mar_sustainability.csv") %>% 
-  select(rgn_id, taxa_code, sust_old = sust_coeff) %>%
-  filter(rgn_id == 80) 
-  tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
-
-
-  
-tmp_new <- read.csv("int/mar_sustainability_check.csv") %>% 
-  select(rgn_id, species, sust_new = sust_coeff) %>% 
-  filter(rgn_id == 80)
-
-test <- tmp_new %>% 
-  full_join(tmp_old, by=c("rgn_id", "species"))
-View(test)
-
-plot(test$sust_old, test$sust_new);abline(0,1,col="red")
-
-
 ## Compare new/old Mariculture sustainability scores
 
 
@@ -1119,7 +1111,7 @@ Comparing this year's data to previous year's data. Expect small variation from 
 
 ```{r data-check-gen-esc, eval = FALSE}
 
-## Compare genetic escapes pressure score; saw large changes between 2018 and 2017 assessment years. No big changes between 2019 and 2018 assessment years. Big changes from 2019 to 2020 due to a data update. Small changes between 2020 and 2021 due to updating the FAO data, gapfilling caused this. Also fixed some name errors. Small changes between 2021 and 2022, added a few name conversions. Some changes between 2022 and 2023. 
+## Compare genetic escapes pressure score; saw large changes between 2018 and 2017 assessment years. No big changes between 2019 and 2018 assessment years. Big changes from 2019 to 2020 due to a data update. Small changes between 2020 and 2021 due to updating the FAO data, gapfilling caused this. Also fixed some name errors. Small changes between 2021 and 2022, added a few name conversions. Some changes between 2022 and 2023, fixed a handfull of errors. 
 old <- read.csv("output/GenEsc.csv") %>%
   filter(year == previous_latest_data_year) %>% 
   select(rgn_id, year, prs_score_old=pressure_score)
@@ -1161,13 +1153,13 @@ ggplotly(comp_plot)
 
 
 
-## Compare genetic escapes pressure scores for Vietnam; no change in pressures between 2023 and 2021 assessment years.
+## Compare genetic escapes pressure scores for Vietnam, data was updated by fao
 old <- read.csv(file.path("..", paste0( "v", last_year), "output/GenEsc.csv")) %>%
-  filter(rgn_id == 232) %>% 
+  filter(rgn_id == 207) %>% 
   select(rgn_id, year, prs_score_old=pressure_score)
 
 new <- read.csv("output/GenEsc.csv") %>%
-  filter(rgn_id == 232) %>% 
+  filter(rgn_id == 207) %>% 
   select(rgn_id, year, pressure_score)
 
 compare <- full_join(old, new, by=c("rgn_id","year")); #View(compare)
