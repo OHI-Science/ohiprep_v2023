@@ -21,11 +21,12 @@ This script generates the pressure incurred from invasive species for each OHI r
 
 # Updates from previous assessment
 
-- Adding a new year
+- Adding updated data
 - Changed downloading method
 - Accounted for more is_invasive and habitat possibilities
 - Added a tic/toc
 - Added ensuring Congo - Brazzaville is converted to Republique du Congo
+- Add code to bind previous year's data to current year
 - Added graph comparison to previous version year
 
 
@@ -95,12 +96,14 @@ librarian::shelf(
 ) 
 ### directory paths and relevant files
 current_year <- 2023
+prev_year <- current_year - 1
 version_year <- paste0("v", current_year)
 data_year <- paste0("d", current_year)
 source(here::here('workflow', 'R', 'common.R'))
 
 ### Mazu
 dir_here  <- here::here('globalprep', 'prs_alien', version_year)
+dir_here_prev  <- here::here('globalprep', 'prs_alien', paste0('v', prev_year))
 dir_data <- file.path(dir_M, 'git-annex', 'globalprep', '_raw_data', 'griis', data_year)
 
 # rgns <- ohicore::georegion_labels # Kiribati is broke v2022
@@ -481,7 +484,7 @@ gf_step_3 <- gf_step_2 %>%
     invasive_count = ifelse(is.na(invasive_count), r0_inv, invasive_count),
     gapfilled      = ifelse(has_data == 0 & !is.na(spp_count) & is.na(gapfilled), "yes", gapfilled),
     method         = ifelse(has_data == 0 & !is.na(spp_count) & is.na(method), "used r0 average", method),
-    year = 2023)
+    year = 2022) # match to latest data year; ie. this is for v2023. v2022 data was changed to use 2019 now.
 ```
 
 ## Calculate the pressure score
@@ -518,6 +521,25 @@ gf_step_3 %>%
 pressure %>%
   dplyr::select(rgn_id, year, pressure_score) %>%
   readr::write_csv(here::here(dir_here, "output", "prs_alien.csv"))
+
+# v2023: bind the previous version's data to the new data
+old_data_to_bind <- here::here(dir_here_prev, "output", "prs_alien.csv") %>% 
+  readr::read_csv()
+
+old_data_to_bind_gf <- here::here(dir_here_prev, "output", "prs_alien_gf.csv") %>% 
+  readr::read_csv()
+
+new_data_to_bind <- here::here(dir_here, "output", "prs_alien.csv") %>% 
+  readr::read_csv()
+
+new_data_to_bind_gf <- here::here(dir_here, "output", "prs_alien_gf.csv") %>% 
+  readr::read_csv()
+
+data_to_write <- rbind(old_data_to_bind, new_data_to_bind)
+data_to_write_gf <- rbind(old_data_to_bind_gf, new_data_to_bind_gf)
+
+data_to_write %>% readr::write_csv(here::here(dir_here, "output", "prs_alien.csv"))
+data_to_write_gf %>% readr::write_csv(here::here(dir_here, "output", "prs_alien_gf.csv"))
 ```
 
 ## Datacheck
@@ -541,7 +563,7 @@ compare <- new_data %>%
 
 plot_diff <- 
   ggplot2::ggplot(
-    compare, ggplot2::aes(x = `2023`, y = `2008`, text = rgn_name, label = rgn_id), color = "black") + # make sure to update version year here
+    compare, ggplot2::aes(x = `2022`, y = `2008`, text = rgn_name, label = rgn_id), color = "black") + # make sure to update data year here
   ggplot2::geom_jitter(width = 0.025, height = .025) +
   ggplot2::geom_abline() +
   ggplot2::labs(title = "Invasive species pressure (comparsion to before change in data)") +
@@ -550,17 +572,9 @@ plot_diff <-
 plotly::ggplotly(plot_diff, tooltip = c("rgn_id", "rgn_name", "x", "y"))
 
 # Compare to previous year
-prev_yr_data <- here::here('globalprep', 'prs_alien', 'v2022', 'output', 'prs_alien.csv') %>% # make sure to change version year to previous year
-  readr::read_csv() %>%
-  dplyr::left_join(rgns_eez)
-
-compare_prev_yr <- new_data %>%
-  dplyr::bind_rows(prev_yr_data) %>% 
-  tidyr::pivot_wider(names_from = year, values_from = pressure_score)
-
 plot_diff_prev_yr <- 
   ggplot2::ggplot(
-    compare_prev_yr, ggplot2::aes(x = `2023`, y = `2022`, text = rgn_name, label = rgn_id), color = "black") + # make sure to update years here
+    compare, ggplot2::aes(x = `2022`, y = `2019`, text = rgn_name, label = rgn_id), color = "black") + # make sure to update data years here
   ggplot2::geom_jitter(width = 0.025, height = .025) +
   ggplot2::geom_abline() +
   ggplot2::labs(title = "Invasive species pressure (comparsion to previous year)") +
