@@ -105,7 +105,7 @@ last_year <- 2022 #last year of analysis
 
 #last year of data available
 #update if not two years behind the current assessment year
-latest_data_year <- current_year-2 #most up to date year in the data
+latest_data_year <- current_year-2 #most up to date year in the data aquaculture data
 previous_latest_data_year <- last_year -2 #last year of data in the last assessment, for comparison plots
 
 current_data_folder <- paste0("d", current_year) # assessment year for file paths
@@ -522,7 +522,7 @@ unique(duplicate_check$n) #should be one
 
 #Add a unique identifier per cultivated stock that describes each species, region, and environment grouping.
 identifier = maric %>% 
-  select(rgn_id, species,environment) %>% 
+  select(rgn_id, species, environment) %>% 
   unique() %>% 
   mutate(species_code = 1:n())
 
@@ -1083,18 +1083,15 @@ plot(yield$old_value, yield$value)
 
 ## Compare new/old Mariculture sustainability scores
 
-
-tmp_old <- #read old and new data for plots
-mar_old_data <- read.csv(file.path("..", paste0( "v", last_year), "output/mar_sustainability.csv")) %>% 
+sust_old <- read.csv(file.path("..", paste0( "v", last_year), "output/mar_sustainability.csv")) %>% 
   select(rgn_id, taxa_code, sust_old = sust_coeff)
-  
-tmp_old$species = str_remove(tmp_old$taxa_code, "\\_[^.]*$")
 
-tmp_new <- read.csv("int/mar_sustainability_check.csv") %>% 
+  sust_old$species = str_remove(sust_old$taxa_code, "\\_[^.]*$")
+sust_new <- read.csv("int/mar_sustainability_check.csv") %>% 
   select(rgn_id, species, sust_new = sust_coeff)
 
-test <- tmp_new %>% 
-  full_join(tmp_old, by=c("rgn_id", "species")) %>%
+test <- sust_new %>% 
+  full_join(sust_old, by=c("rgn_id", "species")) %>%
   mutate(difference = sust_new - sust_old) %>%
   group_by(rgn_id) %>%
   summarize(mean_rgn_sus_diff = mean(difference, na.rm = TRUE))
