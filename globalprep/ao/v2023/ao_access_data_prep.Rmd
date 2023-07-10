@@ -15,7 +15,7 @@ output:
 pdf_document:
   toc: true
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 # Summary
@@ -34,7 +34,7 @@ Link: https://www.fao.org/sustainable-development-goals/indicators/14b1/en/
 
 **Reference**: Food and Agriculture Organization of the United Nations, 2020. Progress in the degree of implementation of international instruments to promote and protect small-scale fisheries, 2020.
 
-**Downloaded**: 6/24/2022
+**Downloaded**: 7/10/2023
 
 **Description**: Progress by countries in the degree of application of a legal/regulatory/policy/institutional framework which recognizes and protects access rights for small-scale fisheries. It is a composite indicator based on FAO member country responses to the Code of Conduct for Responsible Fisheries (CCRF) survey questionnaire which is circulated by FAO every two years to members and IGOs and INGOs. This indicator is calculated on the basis of the efforts being made by countries to implement selected key provisions of the Voluntary Guidelines for Securing Sustainable Small-Scale Fisheries in the Context of Food Security and Poverty Eradication (SSF Guidelines), as reported in a given year of the survey. 
 
@@ -77,8 +77,12 @@ API query builder: https://unstats.un.org/SDGAPI/swagger/
 
 ```{r eval = F}
 ### Update me!
-current_year <- 2022
+current_year <- 2023
 version_year <- paste0("v", current_year)
+
+#update with the current and previous data year, updated every two years 
+current_data_year <- 2022
+previous_data_year <- 2022
 
 ### This is the list of UN M49 codes for regional groupings (not countries)
 ### These will be used for gapfilling purposes. More info: https://en.wikipedia.org/wiki/UN_M49
@@ -107,7 +111,7 @@ region_info <- here::here("globalprep", "ao", version_year, "raw", "un_region_in
   dplyr::filter(!m49_code %in% c(344, 446))   # filter out hongkong/macao, they are NA anyways
   
 ## Query the API for new data (released every 2 years, i.e. 2018, 2020, 2022)
-## page size arbitrarily large in order to insure all data is downloaded in a single page
+## page size arbitrarily large in order to ensure all data is downloaded in a single page
 ## v2022 returned 882 rows of data (with countries and region groupings)
 url <- "https://unstats.un.org/SDGAPI/v1/sdg/Indicator/Data?indicator=14.b.1&pageSize=10000"
 
@@ -115,7 +119,7 @@ api_get_indicator_data <- jsonlite::fromJSON(url)
 
 clean_data <- api_get_indicator_data$data %>% 
   dplyr::tibble() %>%
-  tidyr::unnest() %>% # unnest list and df columns then save raw file to csv before cleaning
+  tidyr::unnest(cols = c(goal, target, indicator, footnotes, attributes, dimensions)) %>% # unnest list and df columns then save raw file to csv before cleaning
   readr::write_csv(here::here("globalprep", "ao", version_year, "raw", "raw_sdg_14_data.csv")) %>% 
   janitor::clean_names() %>% 
   dplyr::mutate(
@@ -141,7 +145,8 @@ clean_data <- api_get_indicator_data$data %>%
 region_df <- clean_data %>%
   dplyr::filter(region_type == "region") 
 
-## make sure no region has more than 3 observations (2018, 2020, 2022) 
+## make sure no region has more than 3 observations (2018, 2020, 2022, 2023)
+#will increase with each new year of data
 test_1 <- clean_data %>%
   dplyr::group_by(geo_area_name) %>%
   dplyr::summarise(dplyr::n()) 
@@ -155,7 +160,7 @@ region_data() ## load rgns_eez from common.R
 ## Find the differences between OHI regions and UN regions
 setdiff(rgns_eez$rgn_name, test_2$geo_area_name)
 
-## it looks like we are missing quite a few... 63 in v2022
+## it looks like we are missing quite a few... 64 in v2023
 ## however, many of these are name mis-matches or regions that need to be split. We will fix these below.
 ```
 
@@ -188,6 +193,8 @@ country_df <- clean_data %>%
     geo_area_name == "Côte d'Ivoire" ~ "Ivory Coast", 
     geo_area_name == "Saint Martin (French Part)" ~ "Northern Saint-Martin", 
     geo_area_name == "Svalbard and Jan Mayen Islands" ~ "Jan Mayen",
+    geo_area_name == "Türkiye" ~ "Turkey",
+    geo_area_name == "Netherlands (Kingdom of the)" ~ "Netherlands",
     TRUE ~ geo_area_name
   )) %>%
   dplyr::select(
@@ -203,7 +210,7 @@ country_split <- dplyr::tibble(
     rep("Bonaire, Sint Eustatius and Saba", 3),
     rep("French Southern Territories", 8),
     rep("United States Minor Outlying Islands", 5),
-    # rep("Channel Islands", 2), # v2022 this no longer needs to be split as it is already split in the data
+    #rep("Channel Islands", 2),
     rep("China", 2)), 
   region = c(
     ### Bonaire, Sint Eustatius and Saba
@@ -216,13 +223,13 @@ country_split <- dplyr::tibble(
     ### United States Minor Outlying Islands
     'Wake Island', 'Jarvis Island', 'Palmyra Atoll', 
     'Howland Island and Baker Island', 'Johnston Atoll',
-    ### Channel Islands  v2022 this no longer needs to be split as it is already split in the data
-    # "Jersey", "Guernsey", 
+     #"Jersey", "Guernsey", 
     ### China - give Taiwan and China same score (Since UN STILL doesn't recognize Taiwan...)
     "China", "Taiwan")) %>%
   dplyr::left_join(country_df, by = "geo_area_name") %>%
   dplyr::select(-geo_area_name) %>%
-  dplyr::rename(geo_area_name = region)  
+  dplyr::rename(geo_area_name = region)
+  
 
 # Join country split data with country_df
 country_df <- rbind(country_df, country_split)
@@ -234,35 +241,24 @@ match_country_data <- ohicore::name_2_rgn(
   fld_name='geo_area_name', 
   flds_unique=c('time_detail'))
 
-## v2021 & v2022 
-## removed: 
+## v2023
+# removed 
 ## Aland Islands     (not OHI), 
-## Bonaire Sint Saba (fixed above), 
-## Channel Islands   (fixed with API data), 
-## Eswatini          (not OHI), 
-## French southern   (fixed above), 
-## Isle of man       (not OHI), 
+#Bonaire, Saint Eustatius and Saba (fixed above)
+#Channel Islands (fixed above)
+## Eswatini (not OHI),
+## French southern (fixed above), 
+## Isle of man    (not OHI), 
 ## North Macedonia   (land locked),
 ## Saint Barthelemy  (not OHI), 
 ## Palestine         (not OHI), 
 ## USMOI             (fixed above) 
-## perfect! 
+
 
 ## removed landlocked countries ie. Afghanistan, Andorra... Zimbabwe
 
-# v2022 there are fewer than v2021 due to Channel Islands not needing to be split
-# geo_area_name
-# China				
-# Guadeloupe				
-# Guam				
-# Martinique				
-# Micronesia				
-# Micronesia (Federated States of)				
-# Northern Mariana Islands				
-# Puerto Rico				
-# United States Virgin Islands
 
-## deal with the duplicates - v2022 this brought from 636 rows to 624 rows
+## deal with the duplicates - v2022 this brought from 642 rows to 624 rows
 fix_dups <- match_country_data %>%
   dplyr::group_by(rgn_id, time_detail, rgn_name, region_type) %>%
   dplyr::summarise(score = mean(score, na.rm =TRUE)) %>%
@@ -317,7 +313,7 @@ sort(setdiff(rgns_eez$rgn_name, all_rgns_data$rgn_name))
 # "Tristan da Cunha"     (include)
 
 ## None of these are located in the raw UN data. 
-## I we will have to manually assign them the appropriate larger regions by googling. 
+## We will have to manually assign them the appropriate larger regions by googling. 
 remaining_rgns <- dplyr::tibble(            
                         geo_area_name = c("Andaman and Nicobar",
                                           "Ascension","Azores","Canary Islands",
@@ -579,7 +575,7 @@ final_data <- final_gf_df %>%
 
 ## Datacheck
 
-Lets compare to last years AO data. 
+Lets compare to last years AO data.  
 
 ```{r, eval = F}
 ## This section is checking if we get the same values as last years assesment 
@@ -606,7 +602,7 @@ compare <- new_data %>%
 
 compare_diff <- compare %>% 
   dplyr::filter(difference != 0) %>% 
-  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2021, value_v2022, difference)
+  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2022, value_v202, difference)
 
 plot_diff <- 
   ggplot2::ggplot(
@@ -630,11 +626,11 @@ plotly::ggplotly(plot_diff, tooltip = c("as.factor(year)", "rgn_id", "rgn_name",
 ```{r, eval = F}
 
 old_data_2 <- old_data %>%
-  dplyr::filter(year == current_year - 2) %>% # Every two years
+  dplyr::filter(year == current_data_year) %>% # Every two years
   dplyr::mutate(version = version_year_old)
 
 new_data_2 <- new_data %>%
-  dplyr::filter(year == current_year) %>% 
+  dplyr::filter(year == previous_data_year) %>% 
   dplyr::mutate(version = version_year_new)
 
 data_year_old = max(old_data_2$year)
@@ -666,3 +662,4 @@ plot_diff <-
 
 plotly::ggplotly(plot_diff, tooltip = c("rgn_name", "x", "y"))
 ```
+
