@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Thu Jul 6 11:50:59 2023 by arobinson" />
+<meta name="author" content="Compiled on Mon Jul 10 10:13:33 2023 by arobinson" />
 
 
 <title>OHI 2023: Mariculture</title>
@@ -427,7 +427,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">OHI 2023: Mariculture</h1>
-<h4 class="author"><em>Compiled on Thu Jul 6 11:50:59 2023 by
+<h4 class="author"><em>Compiled on Mon Jul 10 10:13:33 2023 by
 arobinson</em></h4>
 
 </div>
@@ -521,7 +521,10 @@ mariculture pressure data.</p>
 <h1><span class="header-section-number">2</span> Updates from previous
 assessment</h1>
 <ul>
-<li><p>New year of FAO mariculture yield data for 2021.</p></li>
+<li><p>New year of FAO mariculture yield data for 2021. Downloaded the
+data online instead of using the fishstatj software. Updated
+instructions for downlaoding the data. Updated the script to work with
+minor changes in formatting in the new data.</p></li>
 <li><p>updated the species_list.csv so that any of the duplicate species
 that were relevant and had been excluded are now included. Also updated
 this file with any new species names in the fao data. Removed the alias
@@ -532,13 +535,13 @@ errors.</p></li>
 <li><p>updated code to programmatically fill in analysis and data years
 throughout script</p></li>
 <li><p>fixed an issue in the mar_split function (mar_fxs.R) that was
-duplicating Netherlands data by binding the same rows multiple
-times.</p></li>
+duplicating Netherlands Antilles data (Aruba, Bonaire, ‘Curacao’) by
+binding the same rows multiple times.</p></li>
 <li><p>Fixed a problem that was removing data due to duplicates in the
 fao column (FAO major fishing area (Name)) for some
 species/region/environment/year combinations in the FAO data. See issue
 246 for more information.</p></li>
-<li><p>updated gather to pivot_longer</p></li>
+<li><p>updated outdated function gather to pivot_longer</p></li>
 </ul>
 <hr />
 </div>
@@ -631,15 +634,14 @@ Mariculture data</h1>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#last year of data available</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#update if not two years behind the current assessment year</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>latest_data_year <span class="ot">&lt;-</span> current_year<span class="dv">-2</span> <span class="co">#most up to date year in the data</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>latest_data_year <span class="ot">&lt;-</span> current_year<span class="dv">-2</span> <span class="co">#most up to date year in the data aquaculture data</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>previous_latest_data_year <span class="ot">&lt;-</span> last_year <span class="sc">-</span><span class="dv">2</span> <span class="co">#last year of data in the last assessment, for comparison plots</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>current_data_folder <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, current_year) <span class="co"># assessment year for file paths</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>previous_data_folder <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, last_year)  <span class="co"># previous assessment year</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># for scen_year 2023, Gage already downloaded mar production data to git_annex</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#update the data file name to the current last year of data </span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>mar <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/_raw_data/FAO_mariculture&quot;</span>, current_data_folder, <span class="st">&quot;FAO_GlobalAquacultureProduction_Quantity_1950_2021.csv&quot;</span>)) ; <span class="fu">head</span>(mar)</span></code></pre></div>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#update the data file name to the current last year of data </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>mar <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_M, <span class="st">&quot;git-annex/globalprep/_raw_data/FAO_mariculture&quot;</span>, current_data_folder, <span class="st">&quot;FAO_GlobalAquacultureProduction_Quantity_1950_2021.csv&quot;</span>)) ; <span class="fu">head</span>(mar)</span></code></pre></div>
 </div>
 <div id="wrangle" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Wrangle:</h1>
@@ -666,7 +668,7 @@ codes.</p>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(environment <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Brackishwater&quot;</span>, <span class="st">&quot;Marine&quot;</span>)) </span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#we no longer need to run the entire fao_clean_data_new function</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#As of 2023 we no longer need to run the fao_clean_data_new function</span></span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># NAs are no longer saved as ... and the flags are in a separate column</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#however we should still replace columns where the flag is N w/.1</span></span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>sub_N <span class="ot">=</span> <span class="fl">0.1</span></span>
@@ -798,31 +800,30 @@ to OHI regions</h2>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">case_when</span>(country<span class="sc">==</span><span class="st">&quot;Réunion&quot;</span><span class="sc">~</span><span class="st">&quot;Reunion&quot;</span>, </span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Micronesia (Fed. States)&quot;</span> <span class="sc">~</span> <span class="st">&quot;Micronesia&quot;</span>, </span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Netherlands (Kingdom of the)&quot;</span> <span class="sc">~</span> <span class="st">&quot;Netherlands&quot;</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Palestine&quot;</span> <span class="sc">~</span> <span class="st">&quot;Israel&quot;</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Türkiye&quot;</span> <span class="sc">~</span> <span class="st">&quot;Turkey&quot;</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                            country <span class="sc">==</span> <span class="st">&quot;United Republic of Tanzania, Zanzibar&quot;</span> <span class="sc">~</span> <span class="st">&quot;Tanzania&quot;</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Venezuela (Boliv Rep of)&quot;</span> <span class="sc">~</span> <span class="st">&quot;Venezuela&quot;</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Yugoslavia SFR&quot;</span> <span class="sc">~</span>  <span class="st">&quot;Montenegro&quot;</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                             <span class="cn">TRUE</span> <span class="sc">~</span>country)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mar_split</span>()  <span class="co"># function in mar_fxs.R </span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Divides mariculture from countries that we report as separate regions (assume equal production in all regions)</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Netherlands Antilles: Conch restoration among Aruba, Bonaire, Curacao</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Channel Islands: Jersey and Guernsey</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Bonaire/S.Eustatius/Saba</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Yugoslavia SFR: no longer a country after 1992</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Türkiye&quot;</span> <span class="sc">~</span> <span class="st">&quot;Turkey&quot;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                            country <span class="sc">==</span> <span class="st">&quot;United Republic of Tanzania, Zanzibar&quot;</span> <span class="sc">~</span> <span class="st">&quot;Tanzania&quot;</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Venezuela (Boliv Rep of)&quot;</span> <span class="sc">~</span> <span class="st">&quot;Venezuela&quot;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                             country <span class="sc">==</span> <span class="st">&quot;Yugoslavia SFR&quot;</span> <span class="sc">~</span>  <span class="st">&quot;Montenegro&quot;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                             <span class="cn">TRUE</span> <span class="sc">~</span>country)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mar_split</span>()  <span class="co"># function in mar_fxs.R </span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Divides mariculture from countries that we report as separate regions (assume equal production in all regions)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Netherlands Antilles: Conch restoration among Aruba, Bonaire, Curacao</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Channel Islands: Jersey and Guernsey</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Bonaire/S.Eustatius/Saba</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Yugoslavia SFR: no longer a country after 1992</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>mar_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> mar, </span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>, </span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>                       <span class="at">flds_unique=</span><span class="fu">c</span>(<span class="st">&#39;species&#39;</span>, <span class="st">&#39;fao&#39;</span>, <span class="st">&#39;environment&#39;</span>, <span class="st">&#39;Taxon_code&#39;</span>, <span class="st">&#39;year&#39;</span>)) </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>mar_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> mar, </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>, </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">flds_unique=</span><span class="fu">c</span>(<span class="st">&#39;species&#39;</span>, <span class="st">&#39;fao&#39;</span>, <span class="st">&#39;environment&#39;</span>, <span class="st">&#39;Taxon_code&#39;</span>, <span class="st">&#39;year&#39;</span>)) </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="do">## Sum values of regions with multiple subregions</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>mar_rgn <span class="ot">&lt;-</span> mar_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(fao, environment, species, year, Taxon_code, rgn_id, family) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">value =</span> <span class="fu">sum</span>(value)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="do">## Sum values of regions with multiple subregions</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>mar_rgn <span class="ot">&lt;-</span> mar_rgn <span class="sc">%&gt;%</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(fao, environment, species, year, Taxon_code, rgn_id, family) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">value =</span> <span class="fu">sum</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
 <p><strong>Take a look at the tidied data for a single year and
 region</strong></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">filter</span>(mar_rgn, rgn_id<span class="sc">==</span><span class="dv">207</span>) <span class="sc">%&gt;%</span></span>
@@ -933,8 +934,7 @@ sustainability data</h3>
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>            <span class="cn">TRUE</span> <span class="sc">~</span> score))</span>
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Change species names using FAO species name (fao_species); if NA, use common name (sw_species)</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>sw_sus<span class="sc">$</span>species <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(sw_sus<span class="sc">$</span>fao_species), sw_sus<span class="sc">$</span>fao_species, sw_sus<span class="sc">$</span>sw_species)</span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 243 entries</span></span></code></pre></div>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>sw_sus<span class="sc">$</span>species <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(sw_sus<span class="sc">$</span>fao_species), sw_sus<span class="sc">$</span>fao_species, sw_sus<span class="sc">$</span>sw_species)</span></code></pre></div>
 </div>
 <div id="keep-na-countries" class="section level3" number="9.2.2">
 <h3><span class="header-section-number">9.2.2</span> Keep NA
@@ -984,10 +984,11 @@ as many species that have sustainability scores as possible</strong></p>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Make sure same species are spelled the same in the two data tables (e.g. check that there are no extra spaces)</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">setdiff</span>(sw_sus_rgn<span class="sc">$</span>species, maric<span class="sc">$</span>species)) <span class="co"># Seafood Watch species with no FAO data</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">setdiff</span>(maric<span class="sc">$</span>species, sw_sus_rgn<span class="sc">$</span>species)) <span class="co"># FAO species with no Seafood Watch data - there will probably be a long list</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Hand check each of the species output here, I mainly check to make sure there aren&#39;t obvious cases when the species is the same, but the names are presented slightly differently in the lists. For example, some species might have an extra space in the name somewhere. If any of these obvious differences exist, we need to go in and change the names to match. </span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Its not too surprising (unfortunately) that the FAO list has far more species than the sustainability list. But, I like to go over them to make sure that we are getting sustainability scores for as many species as we can.</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="do">## cross-checking species can be streamlined by checking the next chunk first to avoid repeating work, and using str_detect() on FAO data in order to find index locations where root words of setdiff(sw_sus_rgn$species, maric$species) appear in FAO data</span></span></code></pre></div>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#this is a baseline check, run the fixes in the next chunk from previous years before hand fixing any species</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#instructions for updating speices:</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Hand check each of the species output here, check to make sure there aren&#39;t obvious cases when the species is the same, but the names are presented slightly differently in the lists. For example, some species might have an extra space in the name somewhere. If any of these obvious differences exist, we need to go in and change the names to match. </span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="do">## The FAO list has far more species than the sustainability list. But, go over them to make sure that we are getting sustainability scores for as many species as we can.</span></span></code></pre></div>
 <p><strong>Fix the non matches</strong></p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Rename species in Seafood Watch data to match FAO species data</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>sw_sus_rgn<span class="sc">$</span>species <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;Atlantic Bluefin tuna&quot;</span>, <span class="st">&quot;Atlantic bluefin tuna&quot;</span>, sw_sus_rgn<span class="sc">$</span>species)</span>
@@ -1033,7 +1034,7 @@ as many species that have sustainability scores as possible</strong></p>
 <span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a><span class="co">#Add a unique identifier per cultivated stock that describes each species, region, and environment grouping.</span></span>
 <span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>identifier <span class="ot">=</span> maric <span class="sc">%&gt;%</span> </span>
-<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species,environment) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, environment) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species_code =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
 <span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a></span>
@@ -1554,26 +1555,23 @@ variation from year to year. Plot to view differences.</p>
 <span id="cb33-145"><a href="#cb33-145" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-146"><a href="#cb33-146" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare new/old Mariculture sustainability scores</span></span>
 <span id="cb33-147"><a href="#cb33-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-148"><a href="#cb33-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-149"><a href="#cb33-149" aria-hidden="true" tabindex="-1"></a>tmp_old <span class="ot">&lt;-</span> <span class="co">#read old and new data for plots</span></span>
-<span id="cb33-150"><a href="#cb33-150" aria-hidden="true" tabindex="-1"></a>mar_old_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(<span class="st">&quot;..&quot;</span>, <span class="fu">paste0</span>( <span class="st">&quot;v&quot;</span>, last_year), <span class="st">&quot;output/mar_sustainability.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb33-151"><a href="#cb33-151" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff)</span>
-<span id="cb33-152"><a href="#cb33-152" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb33-153"><a href="#cb33-153" aria-hidden="true" tabindex="-1"></a>tmp_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(tmp_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
+<span id="cb33-148"><a href="#cb33-148" aria-hidden="true" tabindex="-1"></a>sust_old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(<span class="st">&quot;..&quot;</span>, <span class="fu">paste0</span>( <span class="st">&quot;v&quot;</span>, last_year), <span class="st">&quot;output/mar_sustainability.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-149"><a href="#cb33-149" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, taxa_code, <span class="at">sust_old =</span> sust_coeff)</span>
+<span id="cb33-150"><a href="#cb33-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-151"><a href="#cb33-151" aria-hidden="true" tabindex="-1"></a>  sust_old<span class="sc">$</span>species <span class="ot">=</span> <span class="fu">str_remove</span>(sust_old<span class="sc">$</span>taxa_code, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">_[^.]*$&quot;</span>)</span>
+<span id="cb33-152"><a href="#cb33-152" aria-hidden="true" tabindex="-1"></a>sust_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-153"><a href="#cb33-153" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff)</span>
 <span id="cb33-154"><a href="#cb33-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-155"><a href="#cb33-155" aria-hidden="true" tabindex="-1"></a>tmp_new <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;int/mar_sustainability_check.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb33-156"><a href="#cb33-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, species, <span class="at">sust_new =</span> sust_coeff)</span>
-<span id="cb33-157"><a href="#cb33-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-158"><a href="#cb33-158" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> tmp_new <span class="sc">%&gt;%</span> </span>
-<span id="cb33-159"><a href="#cb33-159" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tmp_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb33-160"><a href="#cb33-160" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> sust_new <span class="sc">-</span> sust_old) <span class="sc">%&gt;%</span></span>
-<span id="cb33-161"><a href="#cb33-161" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
-<span id="cb33-162"><a href="#cb33-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_rgn_sus_diff =</span> <span class="fu">mean</span>(difference, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb33-155"><a href="#cb33-155" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> sust_new <span class="sc">%&gt;%</span> </span>
+<span id="cb33-156"><a href="#cb33-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(sust_old, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;species&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-157"><a href="#cb33-157" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">difference =</span> sust_new <span class="sc">-</span> sust_old) <span class="sc">%&gt;%</span></span>
+<span id="cb33-158"><a href="#cb33-158" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb33-159"><a href="#cb33-159" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_rgn_sus_diff =</span> <span class="fu">mean</span>(difference, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb33-160"><a href="#cb33-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-161"><a href="#cb33-161" aria-hidden="true" tabindex="-1"></a>mean_diff_sus <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(test, <span class="fu">aes</span>(<span class="at">x =</span> rgn_id, <span class="at">y =</span> mean_rgn_sus_diff)) <span class="sc">+</span> </span>
+<span id="cb33-162"><a href="#cb33-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
 <span id="cb33-163"><a href="#cb33-163" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-164"><a href="#cb33-164" aria-hidden="true" tabindex="-1"></a>mean_diff_sus <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(test, <span class="fu">aes</span>(<span class="at">x =</span> rgn_id, <span class="at">y =</span> mean_rgn_sus_diff)) <span class="sc">+</span> </span>
-<span id="cb33-165"><a href="#cb33-165" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb33-166"><a href="#cb33-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-167"><a href="#cb33-167" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(mean_diff_sus)</span></code></pre></div>
+<span id="cb33-164"><a href="#cb33-164" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(mean_diff_sus)</span></code></pre></div>
 </div>
 <div id="data-check-genetic-escapes" class="section level2" number="12.2">
 <h2><span class="header-section-number">12.2</span> Data check genetic

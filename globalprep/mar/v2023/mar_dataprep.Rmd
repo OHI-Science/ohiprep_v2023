@@ -21,17 +21,17 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 
 # Updates from previous assessment
 
--   New year of FAO mariculture yield data for 2021.
+-   New year of FAO mariculture yield data for 2021. Downloaded the data online instead of using the fishstatj software. Updated instructions for downlaoding the data. Updated the script to work with minor changes in formatting in the new data.
 
 -   updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data. Removed the alias column, as it was being inconsistently used, and instead grouped by family when removing species with less than four years of mariculture for a region. Reorganized code as needed to keep this from creating errors.
 
 -   updated code to programmatically fill in analysis and data years throughout script
 
--   fixed an issue in the mar_split function (mar_fxs.R) that was duplicating Netherlands data by binding the same rows multiple times.
+-   fixed an issue in the mar_split function (mar_fxs.R) that was duplicating Netherlands Antilles data (Aruba, Bonaire, 'Curacao') by binding the same rows multiple times.
 
 -   Fixed a problem that was removing data due to duplicates in the fao column (FAO major fishing area (Name)) for some species/region/environment/year combinations in the FAO data. See issue 246 for more information.
 
--   updated gather to pivot_longer
+-   updated outdated function gather to pivot_longer
 
 ------------------------------------------------------------------------
 
@@ -111,11 +111,8 @@ previous_latest_data_year <- last_year -2 #last year of data in the last assessm
 current_data_folder <- paste0("d", current_year) # assessment year for file paths
 previous_data_folder <- paste0("d", last_year)  # previous assessment year
 
-# for scen_year 2023, Gage already downloaded mar production data to git_annex
 #update the data file name to the current last year of data 
 mar <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mariculture", current_data_folder, "FAO_GlobalAquacultureProduction_Quantity_1950_2021.csv")) ; head(mar)
-
-
 ```
 
 # Wrangle:
@@ -144,7 +141,7 @@ mar <- mar %>%
 filter(environment %in% c("Brackishwater", "Marine")) 
 
 
-#we no longer need to run the entire fao_clean_data_new function
+#As of 2023 we no longer need to run the fao_clean_data_new function
 # NAs are no longer saved as ... and the flags are in a separate column
 #however we should still replace columns where the flag is N w/.1
 sub_N = 0.1
@@ -259,7 +256,6 @@ mar <- mar %>%
   mutate(country = case_when(country=="Réunion"~"Reunion", 
                              country == "Micronesia (Fed. States)" ~ "Micronesia", 
                              country == "Netherlands (Kingdom of the)" ~ "Netherlands",
-                             country == "Palestine" ~ "Israel",
                              country == "Türkiye" ~ "Turkey",
                             country == "United Republic of Tanzania, Zanzibar" ~ "Tanzania",
                              country == "Venezuela (Boliv Rep of)" ~ "Venezuela",
@@ -335,7 +331,6 @@ table(mar_rgn_gf$gap_0_fill)
 ## 6441 of these out of 30170 + 6441 cases had NA values converted to 0 - 2021 assessment
 ## 7037 of these out of 30975 + 7037 cases had NA values converted to 0 - 2022 assessment
 ##7367 of these out of 34187 + 7367 cases had NA values converted to 0 -2023 assessment
-
 ```
 
 Remove family-region-environment time series with less than four years of mariculture production \> 0 tonnes (assume these are not established mariculture programs).
@@ -378,7 +373,6 @@ head(sw_sus)
 
 #update with name of data file from previous year 
 old_sw_sus <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/seafood_watch_mar_sustainability", previous_data_folder, "SFW_Aquaculture_ratings_062222.csv"), check.names = FALSE, stringsAsFactors = FALSE, na.strings = c("NA", ""))
-
 ```
 
 ## Wrangle
@@ -411,7 +405,6 @@ sw_sus <- sw_sus %>%
 
 ## Change species names using FAO species name (fao_species); if NA, use common name (sw_species)
 sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$sw_species)
-# 243 entries
 ```
 
 ### Keep NA countries
@@ -421,7 +414,6 @@ sw_sus$species <- ifelse(!is.na(sw_sus$fao_species), sw_sus$fao_species, sw_sus$
 ## These need to be re-added later (get cut when associated with region ids)
 sw_sus_no_rgn <- filter(sw_sus, is.na(country)|country == "Worldwide")
 # 118 entries with no country, in 2023 assessment there were 114 "Worldwide" rows and only 1 NA row
-
 ```
 
 ### Convert country names to OHI region IDs.
@@ -456,7 +448,6 @@ sw_sus_rgn <- bind_rows(sw_sus_rgn, sw_sus_no_rgn) %>%
 
 setdiff(sw_sus_rgn$sw_species, old_sw_sus$CommonNames)
 setdiff(old_sw_sus$CommonNames, sw_sus_rgn$sw_species) 
-
 ```
 
 **Check that the non-matches between Seafood Watch sustainability data species (sw_sus_rgn) and the FAO mariculture species in the wrangled FAO Aquaculture Production data table (maric) are not due to spelling errors or slightly different names. We want to include as many species that have sustainability scores as possible**
@@ -467,11 +458,11 @@ maric <- read_csv("output/MAR_FP_data.csv")
 ## Make sure same species are spelled the same in the two data tables (e.g. check that there are no extra spaces)
 sort(setdiff(sw_sus_rgn$species, maric$species)) # Seafood Watch species with no FAO data
 sort(setdiff(maric$species, sw_sus_rgn$species)) # FAO species with no Seafood Watch data - there will probably be a long list
+#this is a baseline check, run the fixes in the next chunk from previous years before hand fixing any species
 
-## Hand check each of the species output here, I mainly check to make sure there aren't obvious cases when the species is the same, but the names are presented slightly differently in the lists. For example, some species might have an extra space in the name somewhere. If any of these obvious differences exist, we need to go in and change the names to match. 
-## Its not too surprising (unfortunately) that the FAO list has far more species than the sustainability list. But, I like to go over them to make sure that we are getting sustainability scores for as many species as we can.
-## cross-checking species can be streamlined by checking the next chunk first to avoid repeating work, and using str_detect() on FAO data in order to find index locations where root words of setdiff(sw_sus_rgn$species, maric$species) appear in FAO data
-
+#instructions for updating speices:
+## Hand check each of the species output here, check to make sure there aren't obvious cases when the species is the same, but the names are presented slightly differently in the lists. For example, some species might have an extra space in the name somewhere. If any of these obvious differences exist, we need to go in and change the names to match. 
+## The FAO list has far more species than the sustainability list. But, go over them to make sure that we are getting sustainability scores for as many species as we can.
 ```
 
 **Fix the non matches**
