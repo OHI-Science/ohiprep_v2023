@@ -259,14 +259,13 @@ mar <- mar %>%
                              country == "Türkiye" ~ "Turkey",
                             country == "United Republic of Tanzania, Zanzibar" ~ "Tanzania",
                              country == "Venezuela (Boliv Rep of)" ~ "Venezuela",
-                             country == "Yugoslavia SFR" ~  "Montenegro",
                              TRUE ~country)) %>%
   mar_split()  # function in mar_fxs.R 
 #Divides mariculture from countries that we report as separate regions (assume equal production in all regions)
   # Netherlands Antilles: Conch restoration among Aruba, Bonaire, Curacao
   # Channel Islands: Jersey and Guernsey
   # Bonaire/S.Eustatius/Saba
-  # Yugoslavia SFR: no longer a country after 1992
+  # Yugoslavia SFR: no longer a country after 1992, no values 
 
 
 
