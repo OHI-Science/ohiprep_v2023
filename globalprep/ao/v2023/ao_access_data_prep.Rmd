@@ -271,7 +271,11 @@ all_rgns_data <- rgns_data %>%
                                 "Kiribati" ~ "Line Islands (Kiribati), Phoenix Islands (Kiribati), Gilbert Islands (Kiribati)")) %>% 
   separate_longer_delim(split_id, delim = ", ") %>% 
   mutate(rgn_name = case_when(is.na(split_id) ~ rgn_name,
-                                   TRUE ~ split_id)) %>% 
+                                   TRUE ~ split_id),
+         rgn_id = case_when(rgn_name == "Line Islands (Kiribati)" ~ 148,
+                             rgn_name == "Phoenix Islands (Kiribati)" ~157,
+                              rgn_name == "Gilbert Islands (Kiribati)" ~ 212,
+                              TRUE ~ rgn_id)) %>% 
  dplyr::select(
     region_name, sub_region_name, intermediate_region_name, region_type, rgn_id, 
     rgn_name, time_detail, score, small_island_developing_states_sids) 
