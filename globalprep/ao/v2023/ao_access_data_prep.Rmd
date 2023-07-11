@@ -42,7 +42,7 @@ Link: https://www.fao.org/sustainable-development-goals/indicators/14b1/en/
 
 **Download link**: We now use the API to access data (v2022) but alternatively you can access data here: https://unstats.un.org/sdgs/dataportal/database; Click "select indicators and country or area" and select indicator 14.b. Download all data for this indicator. 
 
-**Note**: This data prep is also used for "Artisanal fisheries management effectiveness" (fp_artisinal). This means that when done with the data prep, you will need to update `ohi-global/metadata_documentation/layers_eez_base.csv`, `ao_access` and `fp_artisanal`. You will also need to update `ohi-global/eez/conf/scenario_data_years.csv` twice at `ao_access` and `fp_artisinal`. Each one should be run seperately to see the effect of each update on the scores. 
+**Note**: This data prep is also used for "Artisanal fisheries management effectiveness" (fp_artisinal). This means that when done with the data prep, you will need to update `ohi-global/metadata_documentation/layers_eez_base.csv`, `ao_access` and `fp_artisanal`. You will also need to update `ohi-global/eez/conf/scenario_data_years.csv` twice at `ao_access` and `fp_artisinal`. Each one should be run separately to see the effect of each update on the scores. 
 
 ***
 
@@ -112,7 +112,7 @@ region_info <- here::here("globalprep", "ao", version_year, "raw", "un_region_in
   
 ## Query the API for new data (released every 2 years, i.e. 2018, 2020, 2022)
 ## page size arbitrarily large in order to ensure all data is downloaded in a single page
-## v2022 returned 882 rows of data (with countries and region groupings)
+## v2023 returned 849 rows of data (with countries and region groupings)
 url <- "https://unstats.un.org/SDGAPI/v1/sdg/Indicator/Data?indicator=14.b.1&pageSize=10000"
 
 api_get_indicator_data <- jsonlite::fromJSON(url)  
@@ -147,18 +147,20 @@ region_df <- clean_data %>%
 
 ## make sure no region has more than 3 observations (2018, 2020, 2022, 2023)
 #will increase with each new year of data
-test_1 <- clean_data %>%
+duplicate_check <- clean_data %>%
   dplyr::group_by(geo_area_name) %>%
-  dplyr::summarise(dplyr::n()) 
+  dplyr::summarise(n= dplyr::n()) 
+
+unique(duplicate_check$n)
 
 ## Now lets check which OHI regions we are missing, so that we can gapfill them later on. We want a score for every OHI region
-test_2 <- clean_data %>%
+region_check <- clean_data %>%
   dplyr::filter(region_type == "country")
 
 region_data() ## load rgns_eez from common.R
 
 ## Find the differences between OHI regions and UN regions
-setdiff(rgns_eez$rgn_name, test_2$geo_area_name)
+setdiff(rgns_eez$rgn_name, region_check$geo_area_name)
 
 ## it looks like we are missing quite a few... 64 in v2023
 ## however, many of these are name mis-matches or regions that need to be split. We will fix these below.
@@ -182,9 +184,12 @@ setdiff(rgns_eez$rgn_name, test_2$geo_area_name)
 
 Use the name2rgn function to fix some of the name mismatches. Additionally, we will manually split some regions. There is probably a better way to do this... if next year wants to take the time to do it. 
 
-Name to region function (in OHI core package) reports regions that don't have a match in OHI region list. Here we report certain reported regions at a higher spatial scale, based on the listed regions in the error message. 
+Name to region function (in OHI core package) reports regions that don't have a match in OHI region list. Here we report certain reported regions at a higher spatial scale, based on the listed regions in the error message.
+
 
 ```{r country_split, eval=FALSE}
+
+#rename any regions with different spelling than ohi regions
 country_df <- clean_data %>%
   dplyr::filter(region_type == "country")  %>%
   dplyr::mutate(geo_area_name = case_when(
@@ -202,63 +207,44 @@ country_df <- clean_data %>%
     intermediate_region_name, small_island_developing_states_sids, region_type, score)
 
 ## Report these regions at higher spatial resolution:
-## Resulting data should have:
-## num_countries (20) * num_years (3 in v2022) = num_rows (60 in v2022)
+#these are countries that are included as one in the data but split in ohi regions
 
-country_split <- dplyr::tibble(
-  geo_area_name = c(
-    rep("Bonaire, Sint Eustatius and Saba", 3),
-    rep("French Southern Territories", 8),
-    rep("United States Minor Outlying Islands", 5),
-    #rep("Channel Islands", 2),
-    rep("China", 2)), 
-  region = c(
-    ### Bonaire, Sint Eustatius and Saba
-    'Bonaire', 'Saba', 'Sint Eustatius', 
-    ### French Southern Territories
-    'Glorioso Islands', 'Juan de Nova Island', 
-    'Bassas da India', 'Ile Europa', 
-    'Ile Tromelin', 'Crozet Islands',
-    'Amsterdam Island and Saint Paul Island', 'Kerguelen Islands',
-    ### United States Minor Outlying Islands
-    'Wake Island', 'Jarvis Island', 'Palmyra Atoll', 
-    'Howland Island and Baker Island', 'Johnston Atoll',
-     #"Jersey", "Guernsey", 
-    ### China - give Taiwan and China same score (Since UN STILL doesn't recognize Taiwan...)
-    "China", "Taiwan")) %>%
-  dplyr::left_join(country_df, by = "geo_area_name") %>%
-  dplyr::select(-geo_area_name) %>%
-  dplyr::rename(geo_area_name = region)
-  
+country_df_clean <- country_df %>% 
+  mutate(split_id = case_when(geo_area_name == 
+                                "Bonaire, Sint Eustatius and Saba" ~ 
+                                    "Bonaire, Saba, Sint Eustatius",
+                              geo_area_name == "French Southern Territories" ~ 
+                                "Glorioso Islands, Juan de Nova Island, Bassas da India, Ile Europa, Ile Tromelin, Crozet Islands, Amsterdam Island and Saint Paul Island, Kerguelen Islands",
+                              geo_area_name ==  "United States Minor Outlying Islands" ~ "Wake Island, Jarvis Island, Palmyra Atoll, Howland Island and Baker Island, Johnston Atoll",
+                              geo_area_name == "China" ~ "China, Taiwan"
+         )) %>% 
+  separate_longer_delim(cols = split_id, delim = ", ") %>% 
+  mutate(geo_area_name = case_when(is.na(split_id) ~ geo_area_name,
+                                   TRUE ~ split_id)) %>% 
+  select(-split_id)
 
-# Join country split data with country_df
-country_df <- rbind(country_df, country_split)
 
 ## lots of landlocked countries included here 
 
 match_country_data <- ohicore::name_2_rgn(
-  df_in = country_df, 
+  df_in = country_df_clean, 
   fld_name='geo_area_name', 
   flds_unique=c('time_detail'))
 
 ## v2023
 # removed 
-## Aland Islands     (not OHI), 
-#Bonaire, Saint Eustatius and Saba (fixed above)
-#Channel Islands (fixed above)
+## Aland Islands (not OHI), 
+## Channel Islands, in 2023 this was already present as Jersey and Guernsey, so didn't need to be split (check next year)
 ## Eswatini (not OHI),
-## French southern (fixed above), 
 ## Isle of man    (not OHI), 
 ## North Macedonia   (land locked),
 ## Saint Barthelemy  (not OHI), 
 ## Palestine         (not OHI), 
-## USMOI             (fixed above) 
 
 
 ## removed landlocked countries ie. Afghanistan, Andorra... Zimbabwe
 
-
-## deal with the duplicates - v2022 this brought from 642 rows to 624 rows
+## deal with the duplicates - v2023 this brought from 633 rows to 624 rows
 fix_dups <- match_country_data %>%
   dplyr::group_by(rgn_id, time_detail, rgn_name, region_type) %>%
   dplyr::summarise(score = mean(score, na.rm =TRUE)) %>%
@@ -279,22 +265,17 @@ rgns_data <- match_country_data %>%
 ## There is still a region "Kiribati" which needs to be split. For some reason, trying to do so with match2rgn does not work. 
 ## filter for these regions in country_df and prep so they match rgns_data. What we have to do is:
 ## Split "Kiribati" into "Line Islands (Kiribati)", "Phoenix Islands (Kiribati)", and "Gilbert Islands (Kiribati)"
-kiribati_split <- country_df %>%
-  dplyr::filter(geo_area_name %in% c("Kiribati")) %>%
-  dplyr::mutate(
-    geo_area_name = stringr::str_replace_all(
-      string = geo_area_name, 
-      pattern = "Kiribati", 
-      replacement = "Line Islands (Kiribati), Phoenix Islands (Kiribati), Gilbert Islands (Kiribati)")) %>%
-  tidyr::separate_rows(geo_area_name, sep = ", ") %>%
-  dplyr::left_join(rgns_eez, by = c("geo_area_name" = "rgn_name")) %>% 
-  dplyr::select(
-    region_name, sub_region_name, intermediate_region_name, region_type, rgn_id, 
-    rgn_name = geo_area_name, time_detail, score, small_island_developing_states_sids) 
 
-## now bind with the rgns_data from before (the data that didnt need to be fixed)
-all_rgns_data <- rbind(rgns_data, kiribati_split) %>%
-  dplyr::filter(rgn_name != "Kiribati") # filter out original kiribati
+all_rgns_data <- rgns_data %>% 
+  mutate(split_id = case_when(rgn_name == 
+                                "Kiribati" ~ "Line Islands (Kiribati), Phoenix Islands (Kiribati), Gilbert Islands (Kiribati)")) %>% 
+  separate_longer_delim(split_id, delim = ", ") %>% 
+  mutate(rgn_name = case_when(is.na(split_id) ~ rgn_name,
+                                   TRUE ~ split_id)) %>% 
+ dplyr::select(
+    region_name, sub_region_name, intermediate_region_name, region_type, rgn_id, 
+    rgn_name, time_detail, score, small_island_developing_states_sids) 
+
 
 ## Now lets look to see what OHI regions are still missing 
 sort(setdiff(rgns_eez$rgn_name, all_rgns_data$rgn_name))
@@ -329,7 +310,6 @@ remaining_rgns <- dplyr::tibble(
              intermediate_region_name = c(NA,"Western Africa",NA,NA,NA,NA,NA,NA),
   small_island_developing_states_sids = c("x", "x", NA, NA, NA, "x", NA, "x")) %>%
   dplyr::mutate(region_type = "country", score = NA) %>%
-  # tidyr::crossing(time_detail = c(2018, 2020))
   tidyr::crossing(time_detail = unique(all_rgns_data$time_detail))
 
 ## Now run the match2rgn function to get OHI regions
@@ -526,7 +506,7 @@ gf_step_4c_df <- gf_step_4b_df %>%
     method = dplyr::case_when(
       has_data == 0 & !is.na(score) & is.na(method) ~ "Used region score", 
       TRUE ~ method))
-## In v2022, all scores were filled with this method
+## In v2023, all scores were filled with this method
 ```
 
 #### Step 4.d
@@ -602,7 +582,7 @@ compare <- new_data %>%
 
 compare_diff <- compare %>% 
   dplyr::filter(difference != 0) %>% 
-  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2022, value_v202, difference)
+  dplyr::select(rgn_id, rgn_name, admin_country_name, year, value_v2022, value_v2023, difference)
 
 plot_diff <- 
   ggplot2::ggplot(
