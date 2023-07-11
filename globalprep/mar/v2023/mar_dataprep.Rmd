@@ -87,6 +87,7 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 library(here)
+library(plotly)
 
 ## Load FAO-specific user-defined functions
 source('mar_fxs.R') # functions specific to mariculture dealing with compound countries
