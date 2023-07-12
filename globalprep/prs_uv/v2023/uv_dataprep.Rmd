@@ -399,7 +399,7 @@ tmp <- names_weekly_df %>% # View(tmp)
 
 
 foreach(i = match_weeks) %dopar% {
-  w = names_weekly[(substr(names_weekly, 87, 92) == i)] %>% terra::rast()
+  w <- names_weekly[(substr(names_weekly, 87, 92) == i)] %>% terra::rast()
   
   m   <- terra::app(w, 
               fun = "mean",
@@ -608,7 +608,7 @@ names(pressure_stack) <- extracted_names # ensure these are correct!
 ```{r gif, eval=F}
 saveGIF({
   for(i in 1:terra::nlyr(pressure_stack)){
-    n = sprintf("UV Pressure %s", 
+    n <- sprintf("UV Pressure %s", 
                 substr(names(pressure_stack[[i]]), 4, 12))
     plot(pressure_stack[[i]], 
          zlim = c(0, 1), # don't forget to fix the zlimits
