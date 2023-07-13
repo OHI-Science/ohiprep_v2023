@@ -15,7 +15,7 @@ output:
 pdf_document:
   toc: true
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 # Summary
@@ -25,12 +25,12 @@ This script generates the "need" layer for the artisanal opportunities goal.
 # Updates from previous assessment
 
 One more year of data. 
-
+Updated so that pop_weights data is also read in through the WDI package, and saved as annual data instead of only the most recent year
 ***
 
 # Data Source 
 
-**Downloaded**: 2022-06-30
+**Downloaded**: 2023-07-12
 
 **Description**:  
 GDP adjusted per capita by PPP (ppppcgdp)
@@ -72,7 +72,7 @@ librarian::shelf(
 update.packages("WDI")
 ### directory paths and relevant files
 source(here::here('workflow', 'R', 'common.R'))
-current_year = 2022
+current_year = 2023
 version_year = paste0("v", current_year)
 version_dir = here::here("globalprep", "ao", version_year)
 ```
@@ -84,9 +84,9 @@ version_dir = here::here("globalprep", "ao", version_year)
 ```{r load_data, eval=F}
 ### check website to see what years are available
 yr_start = 1990
-yr_end   = 2021
+yr_end   = 2022
 
-### get description of variables 
+### get description of variables    
 ### NOTE: these descriptions appear out of date, they aren't in sync with the definitions of the World Bank):
 indicators <-  data.frame(WDI_data[[1]])
 
@@ -125,13 +125,13 @@ date <- Sys.Date()
 readr::write_csv(gdppcppp_raw, here(paste0(version_dir, '/raw/raw_gdppcppp_', date,'.csv'))) 
 ### Save file with date, as WDI data changes over even short periods of time. 
 ### For instance, the Mauritania GDP data changed by an order of magnitude over the course of a week. 
-### We want to preserve the date it was downloaded so that data is not being overwritten everytime we run the script. 
+### We want to preserve the date it was downloaded so that data is not being overwritten every time we run the script. 
 ```
 
 
 ```{r raw check, eval=FALSE}
-new_saved_date <- "2022-06-30" # update when new data are downloaded.
-old_saved_date <- "2021-08-04"
+new_saved_date <- "2023-07-12" # update when new data are downloaded.
+old_saved_date <- "2022-06-30"
 
 new <- here::here(version_dir, "raw", paste0('raw_gdppcppp_', new_saved_date,'.csv')) %>% 
   readr::read_csv()
@@ -144,9 +144,11 @@ old <- here::here("globalprep", "ao", paste0("v", current_year-1),
 compare <- dplyr::left_join(new, old, by = c("country", "year"))  %>%
   dplyr::filter(year==current_year-2)
  
-ggplot(compare, aes(x=NY.GDP.PCAP.PP.KD, y=old_value)) + 
+plot <- ggplot(compare, aes(x=NY.GDP.PCAP.PP.KD, y=old_value)) + 
   geom_point() + 
   geom_abline(slope = 1, intercept = 0, color="red")
+
+ggplotly(plot)
   
 ```
 
@@ -156,14 +158,14 @@ For the first case, if there is only one value use this value for all years. Thi
 
 ```{r, eval=F}
 ### Reorganize to create cells for countries that have missing values for some years
-gdppcppp_clean <- here::here(version_dir, "raw", paste0('raw_gdppcppp_', new_saved_date,'.csv')) %>% 
-  readr::read_csv()%>% # change date here also to match filename above 
+gdppcppp_clean <- here::here(version_dir, "raw", paste0('raw_gdppcppp_', new_saved_date,'.csv')) %>% #date here should also to match filename above 
+  readr::read_csv()%>% 
   dplyr::select(country, value=NY.GDP.PCAP.PP.KD, year) %>%
   dplyr::filter(year >= 2005) %>%
   tidyr::complete()
 
 head(gdppcppp_clean)
-summary(gdppcppp_clean) # 457 NAs v2022
+summary(gdppcppp_clean) # 473 NAs v2023
 
 ### Drop Countries with no data and
 ### Gapfill countries with only 1 year of data with that single value
@@ -178,7 +180,8 @@ gdppcppp_gf_1 <- gdppcppp_clean %>%
   dplyr::ungroup() 
 
 head(gdppcppp_gf_1)
-summary(gdppcppp_gf_1) # 49 NAs v2022 (mostly lower from dropping countries with no data)
+summary(gdppcppp_gf_1) # 41 NAs v2023 (mostly lower from dropping countries with no data)
+
 ```
 
 When a country has more than one value (but not a complete series), a within-country regression model is used to predict the missing values.
@@ -219,10 +222,11 @@ summary(gdppcppp_gf_2) # no more NAs because everything has been gap-filled.
 This is performed by taking the natural log of each value and then dividing by the 95th quantile of values across all years (from 2005 to current data year). 
 
 ```{r, eval=F}
+##
 ### Values at the 95th Quantile or greater are given a rescaled score of '1' (the highest value)
 gdppcppp_rescale <- gdppcppp_gf_2 %>%
   dplyr::mutate(
-    ### gives a single value - the 95th quant (v2020=57245.33, v2022=58817.79)
+    ### gives a single value - the 95th quant (v2020=57245.33, v2022=58817.7, v2023 = 58780)
     quantile_95 = quantile(value, probs=0.95),
     ### where does value scale relative to 95th quantile
     value_stand = value/quantile_95,
@@ -240,38 +244,57 @@ rescale_vis <- ggplot(gdppcppp_rescale) +
   geom_point(aes(x = value , y = score, text = country))
 
 ggplotly(rescale_vis)
+
 ```
 
 ## Convert country names to ohi regions
 
 ```{r, eval=F}
+#manually change names as needed 
+
+gdppcpp_rename <- gdppcppp_rescale %>% 
+  mutate(country = case_when(country == "Turkiye" ~ "Turkey",
+                   TRUE ~ country))
+
+
 ### Function to add OHI region ID based on country name
 d_stand_rgn <- ohicore::name_2_rgn(
-  df_in = gdppcppp_rescale, 
+  df_in = gdppcpp_rename, 
   fld_name='country', 
   flds_unique=c('year'))
 
-### v2021: Lots of error messages about missing regions from lookup table; 
+### v2021: Lots of warning messages about missing regions from lookup table; 
 ### lots of them are broad areas (e.g. "Arab World" and "fragile regions"), 
 ### some are landlocked areas like N. Macedonia and Eswatini. 
 ### Check to make sure there aren't any regions that need to be reported at different scales 
 ### China, Hong Kong and Macao are all reported separately, combine into one
+### Puerto Rico and Virgin Islands are also reported separately, although Value is NA for all years for Virigin Islands so we don't see it as a duplicate here. Included in pop_weights file creation in case this changes. 
 
 ### This should match the duplicate regions
 dplyr::filter(d_stand_rgn, rgn_id == 209)
 
 ### Combine the duplicate regions (we report these at lower resolution)
 ### In this case, we take the average score weighted by population.
-### I updated this population data set for 2020 using https://population.un.org/wpp/Download/Standard/Population/
 
-population_weights <- here::here("globalprep", "supplementary_information", version_year, "pop_weights.csv") %>% 
-  readr::read_csv() 
+##2023 updated so that population data is read in through the WDI package 
+#iso2c codes VI (Virgin Islands USA), PR (Puerto Rico), CN (China), HK (Hong Kong SAR), MO (China, Macao SAR, China)
+
+population_weights <- WDI(
+  country = c("VI", "PR", "CN", "HK", "MO"),
+  indicator = "SP.POP.TOTL", 
+  start = yr_start, end=yr_end) %>%
+  select(country, population = SP.POP.TOTL, year)
+
 
 ### Weight the `score`, `value`, and `gapfilled` column by population
-d_stand_rgn <- d_stand_rgn %>%
-  dplyr::left_join(population_weights, by="country") %>% # does it make sense to backfill population data with static data?
-  dplyr::mutate(population = ifelse(is.na(population), 1, population)) %>% # If no value available, input 1 (these values will not change)
-  dplyr::group_by(rgn_id, year, method, gapfilled) %>% 
+population_weights_all <- d_stand_rgn %>%
+  dplyr::left_join(population_weights, by=c("country", "year")) %>%
+  dplyr::mutate(population = ifelse(is.na(population), 1, population)) # If no value available, input 1 (these values will not change)
+  
+#save the population weights file
+population_weights_all %>% select(country,population,year) %>%  write_csv(file.path("globalprep", "supplementary_information", version_year, "pop_weights.csv"))
+
+d_stand_rgn <- population_weights_all %>% dplyr::group_by(rgn_id, year, method, gapfilled) %>% 
   dplyr::summarize(score = weighted.mean(score, population), # weight the single score value by pop.
             value = weighted.mean(value, population)) %>%
   dplyr::ungroup() 
@@ -306,7 +329,7 @@ summary(UNgeorgn)
 ### Create dataframe pairing each UN geopolitical region id with a year from 2005 to current
 ### Assign georegion labels to each region for each level (r0, r1, r2)
 d_stand_gf <- data.frame(year=min(d_stand_rgn$year):max(d_stand_rgn$year)) %>% 
-  base::merge(UNgeorgn, by = NULL) 
+  base::merge(UNgeorgn, by = NULL)
 
 ### Combine the two data frames by region id and year
 ### Calculate means across increasing geopolitical levels (e.g. r2, r1), using the highest resolution possible
@@ -359,6 +382,7 @@ d_stand_gf <- d_stand_gf %>%
 
 ### Check number of NAs in score column 
 ### v2022 has 340 (17 years of data and 20 low pop countries)
+### v2023 has 360 (18 years of data and 20 low pop countries)
 summary(d_stand_gf)
 ```
 
@@ -379,18 +403,23 @@ final_gf <- d_stand_gf %>%
 readr::write_csv(final_gf, here::here(version_dir, "output", "wb_gdppcppp_rescaled_gf.csv"))
 ```
 
-## Compare data to previous year
+## Compare data to previous year (for the same data year)
 
 Use most recent data year shared by current and previous assessment.
 
 ```{r, eval=F}
-old_gdppcppp <- here::here(version_dir, "output", "wb_gdppcppp_rescaled.csv") %>% 
-  readr::read_csv() %>% 
-  dplyr::rename(old_value=value) %>% 
-  dplyr::filter(year == 2019)
+
+comparison_year <- current_year - 2
+
+old_gdppcppp <- here::here("globalprep", "ao",paste0("v", current_year -1), "output", "wb_gdppcppp_rescaled.csv") %>%
+  readr::read_csv() %>% dplyr::rename(old_value=value) %>%  dplyr::filter(year == comparison_year)
+
+
 summary(old_gdppcppp) # 20 NAs  
 
-comparison_year <- current_year - 1
+region_data()
+
+
 compare <- here::here("globalprep", "ao", paste0("v", current_year), "output", "wb_gdppcppp_rescaled.csv") %>% 
   readr::read_csv() %>%
   dplyr::filter(year == comparison_year) %>% 
@@ -404,12 +433,40 @@ summary(compare) # still 20 NAs - this is because of converting unpopulated/low 
 p1 <- ggplot(compare, aes(x = value, y = old_value, labels = rgn_name)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0, color = "red") +
-  labs(title = paste0("Data year ", comparison_year, " - v2021 vs v2022"),
-       x = "v2022", y = "v2021") +
+  labs(title = paste0("Data year ", comparison_year, " -", "v", current_year-1, " vs ", version_year),
+       x = version_year, y = paste0("v", current_year -1)) +
+  theme_minimal()
+
+ggplotly(p1)
+
+```
+
+## Compare changes from this year to last year 
+```{r,eval=F}
+old_gdppcppp <-  here::here("globalprep", "ao", paste0("v", current_year), "output", "wb_gdppcppp_rescaled.csv")  %>% 
+  readr::read_csv() %>% 
+  dplyr::rename(old_value=value) %>% 
+  dplyr::filter(year == current_year -2)
+summary(old_gdppcppp) # 20 NAs  
+
+compare <- here::here("globalprep", "ao", paste0("v", current_year), "output", "wb_gdppcppp_rescaled.csv") %>% 
+  readr::read_csv() %>%
+  dplyr::filter(year == current_year-1) %>% 
+  dplyr::left_join(old_gdppcppp, by = "rgn_id") %>% 
+  dplyr::select(rgn_id, value, old_value) %>%
+  dplyr::mutate(difference = value - old_value) %>% 
+  left_join(rgns_eez)
+summary(compare) # still 20 NAs - this is because of converting unpopulated/low population regions to NAs
+
+
+p1 <- ggplot(compare, aes(x = value, y = old_value, labels = rgn_name)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, color = "red") +
+  labs(title = paste0("Current vs Previous year", "-", version_year),
+       x = current_year -1, y = current_year-2) +
   theme_minimal()
 ### if anything was off of abline then something went wrong 
 ### however in v2019 data were positively skewed and we attributed this to source data changes. 
 ggplotly(p1)
-
 ```
 
