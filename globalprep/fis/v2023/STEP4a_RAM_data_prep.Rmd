@@ -17,7 +17,7 @@ pdf_document:
 editor_options: 
   chunk_output_type: console
 ---
-check
+
 # Summary
 
 This script prepares the RAM B/Bmsy data:

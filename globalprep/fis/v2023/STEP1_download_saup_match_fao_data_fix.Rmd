@@ -33,6 +33,10 @@ We will assign FAO ids to each year/region/species record to the EEZs and high s
 
 Note: In the future, I think it would be possible to use python to download the data. There are examples [here](https://github.com/UBC-CIC/Sea-Around-Us/tree/main/notebooks), but the code I have written below works fine. We might also be able to download the spatial catch (which would allow us to recalculate fishing pressures): https://github.com/UBC-CIC/Sea_Around_Us_Spatial_Catch
 
+# Updates from previous scenario year
+
+- None. This script wasn't run in v2023.
+
 # Data Source
 
 **Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
@@ -52,7 +56,7 @@ Note: In the future, I think it would be possible to use python to download the 
 
 ***
 
-## Setup
+# Setup
 
 ``` {r setup, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/',message = FALSE, warning = FALSE, echo = TRUE, eval=FALSE)

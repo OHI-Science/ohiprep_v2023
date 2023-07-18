@@ -37,6 +37,10 @@ v2022: Added new SAUP fisheries data to include year 2019 and added 2019 as a ye
 
 ***
 
+# Updates from previous scenario year
+
+- None. This script wasn't run in v2023.
+
 # Data Source
 
 **Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
@@ -53,7 +57,7 @@ v2022: Added new SAUP fisheries data to include year 2019 and added 2019 as a ye
 
 ***
 
-## Setup
+# Setup
 
 ``` {r setup, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/',message = FALSE, warning = FALSE, echo = TRUE, eval=FALSE)

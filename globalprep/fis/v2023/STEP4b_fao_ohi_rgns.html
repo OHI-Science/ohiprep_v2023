@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Mon Jul 17 14:27:16 2023 by egg" />
+<meta name="author" content="Compiled on Tue Jul 18 09:57:24 2023 by egg" />
 
 
 <title>OHI 2023: Food Provision/Fisheries, Identify FAO and OHI regions for RAM stocks</title>
@@ -1666,24 +1666,23 @@ div.tocify {
 
 <h1 class="title toc-ignore">OHI 2023: Food Provision/Fisheries,
 Identify FAO and OHI regions for RAM stocks</h1>
-<h4 class="author"><em>Compiled on Mon Jul 17 14:27:16 2023 by
+<h4 class="author"><em>Compiled on Tue Jul 18 09:57:24 2023 by
 egg</em></h4>
 
 </div>
 
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>, <span class="at">eval=</span><span class="cn">FALSE</span>)</span></code></pre></div>
-<div id="summary" class="section level2">
-<h2>Summary</h2>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
 <p>Generates a dataset describing the OHI and FAO major fishing regions
 that correspond to each stock’s range. This combines last year’s dataset
 of stock-spatial information from RAM v4.491 database and Christopher M.
 Free’s spatial work at Rutgers as well as newly added stocks from RAM
 v4.495 with manually assigned ohi and fao region ids. Dataset only
 contains stocks with B/Bmsy data.</p>
-</div>
-<div id="updates-for-2023" class="section level2">
-<h2>Updates for 2023</h2>
+<div id="updates-from-previous-assessment" class="section level2">
+<h2>Updates from previous assessment</h2>
 <ul>
 <li>The RAM data changed for v2023 so we re-ran this</li>
 </ul>
@@ -2237,6 +2236,7 @@ old stock data table. Make sure there are no NAs!</p>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(RAM_fao_ohi_rgn_final, <span class="st">&quot;int/RAM_fao_ohi_rgns_final.csv&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+</div>
 </div>
 </div>
 
