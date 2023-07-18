@@ -31,6 +31,10 @@ Data source (WHO-UNICEF) now reports sanitation data for three different sectors
 WHO-UNICEF also changed how they report the percentages of the population with access to basic sanitation.  In previous years, some regions were reported with 100% of the population having basic access, which are now denoted as >99 in the raw data. We converted this value to 99.5% as there were other regions with 99%. The data now cover years 2000-2020, vs. last year's assessment which had data for 2000-2017.
 
 Updates on our end: 
+1. Updated data download through the SDMX REST API to programmatically access data. We are looking at the wash_household indicator. 
+
+
+#old delete at the end:
 
 1. We changed the reporting of the Caribbean Netherlands regions to be at a higher resolution, as historical sanitation data for them have been backfilled by WHO-UNICEF as of this year. 
 2. We also changed the way uninhabited regions (which we assign perfect scores in this layer) are identified. The code was changed to match the methods for other goals (AO, etc), which use the low_pop() function in common.R and filter out low population/uninhabited regions.
@@ -61,7 +65,7 @@ Access to improved sanitation facilities is defined as the percentage of the pop
 
 **Native data resolution**: country-wide average (not specific to the coastal region)
 
-**Time range**: 2000 - 2020
+**Time range**: 2000 - 2022
 
 **Format**:  csv
 
@@ -69,7 +73,6 @@ Access to improved sanitation facilities is defined as the percentage of the pop
   
 # Methods
 Percentage of people without sanitation was multiplied by the coastal population (within 25 miles of the coast) to estimate the number of people located along the coast without sanitation. This value was rescaled between 0 and 1 by dividing by the 99th quantile across all regions from years 2000 to 2009. 
-
 ***
 
 
@@ -83,8 +86,15 @@ library(zoo)     # for na.locf: Last Observation Carried Forward
 library(tidyverse)
 library(here)
 library(plotly)
+library(rsdmx)
+library(countrycode)
+library(WDI)
 
 source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2021/gh-pages/workflow/R/common.R')
+
+version_year <- paste0("v", 2023) #update this 
+data_start <- 2000
+data_end <- 2022
 
 ```
 
@@ -101,35 +111,75 @@ sani_raw <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/WHO_UNICEF
 
 # Download the data
 
-```{r}
-url <- "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/data/UNICEF,WASH_HOUSEHOLDS,1.0/.WS_PPL_S-ALB.SAN.._T?format=sdmx-generic-2.0"
+link to api: https://sdmx.data.unicef.org/webservice/data.html
 
-dataset <- readSDMX(url) %>% as_tibble()
+query information: https://data.unicef.org/sdmx-api-documentation/#understanding
+
+
+```{r read data, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
+url <- "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/data/UNICEF,WASH_HOUSEHOLDS,1.0/.WS_PPL_S-ALB+WS_PPL_S-L+WS_PPL_S-OD+WS_PPL_S-UI.SAN.._T?format=sdmx-compact-2.1"
+
+#read in data from the api and save as a tibble
+sanitation <- readSDMX(url) %>% as_tibble()
+
+#save to the raw data folder for reproduceability in case the data changes
+write_csv(sanitation,  here("globalprep/prs_cw_pathogen", version_year, "raw/2023_WASH.csv"))
 ```
 
 
-
-
-
 ## Data wrangling
-Selecting and naming the columns of interest. Scale the percentage of population with access to improved sanitation to proportion (from 0-1). Transform population and percentage into a numeric variable.
+
+Some countries are missing a value for the at least basic category indicator (ws_ppl_s_alb). This can be calculated by adding the proportion of population using limited sanitation services, the proportion of population using unimproved sanitation services, and the proportion of the population using open defecation, and subtract from 100 to get the value if it doesn't exist. 
+
+Scale the percentage of population with access to improved sanitation to proportion (from 0-1). Transform population and percentage into a numeric variable.
 
 ```{r data_wrangling, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
-sani <- sani_raw %>%
-  dplyr::slice(-1) %>%                # cut first row with column names
-  dplyr::select(country = V1,
-         year = V3,
-         pop = V4,
-         basic_pct = V6) %>%
-  dplyr::mutate(basic_pct = ifelse(basic_pct=="-", NA, basic_pct)) %>% 
-  dplyr::mutate(pop = stringr::str_remove_all(pop, pattern = " ")) %>%
-  dplyr::mutate(basic_pct = ifelse(stringr::str_detect(basic_pct,">99"), 99.5, basic_pct)) %>%
-  dplyr::mutate_at(.vars = c("pop", "basic_pct", "year"), .funs = as.numeric)%>%
-  dplyr::mutate(pop = pop * 1000,
-          basic_prop = basic_pct/100) %>%
-  dplyr::filter(!is.na(year))
+#pivot so that each indicator has its own column
+sanitation_wider <- sanitation %>% 
+  pivot_wider(names_from = INDICATOR, values_from = OBS_VALUE) %>% 
+  janitor::clean_names() %>% 
+  select(country_code = ref_area, year = time_period, basic = ws_ppl_s_alb, ws_ppl_s_l, ws_ppl_s_ui, ws_ppl_s_od)
 
+
+sanitation_clean <- sanitation_wider %>%
+  group_by(country_code,year) %>% 
+  mutate(not_basic = sum(as.numeric(ws_ppl_s_l), as.numeric(ws_ppl_s_ui), as.numeric(ws_ppl_s_od), na.rm = TRUE),
+         basic = as.numeric(basic), year = as.numeric(year)) %>% 
+  mutate(alb = 100 - not_basic) %>% #calculate at least basic from the other 3 indicatord
+    mutate(basic = ifelse(is.na(basic), alb, basic)) %>% #replace na values with the calculated value
+  ungroup() %>% 
+  dplyr::mutate(basic_prop = basic/100) %>% #calculate proportion
+  dplyr::filter(!is.na(year)) %>% 
+  tidyr::complete(country_code, year) #make implicit NA values explicit
+
+
+#add in the name for each country
+#receive some warnings because some of the codes included in the data are not actually country codes
+sanitation_clean$country <- countrycode(sanitation_clean$country_code, "iso3c", "country.name")
+
+#add in channel islands because not recognized by the function
+sanitation_clean <- sanitation_clean %>% mutate(country = case_when(country_code == "CHI" ~ "Channel Islands",
+                                                                TRUE ~ country))
+#add the population data
+
+population_weights <- WDI(
+  country = "all",
+  indicator = "SP.POP.TOTL", 
+  start = data_start, end= data_end) %>%
+  select(country_code = iso3c, population = SP.POP.TOTL, year)
+
+#add population data
+sanitation_clean <- sanitation_clean %>% 
+  left_join(population_weights, by= c("country_code", "year")) %>% 
+  select(country_code, country, year, basic, basic_prop, population) %>% 
+  mutate(population = case_when(str_detect(country, "Martinique") ~368000,
+         str_detect(country, "Guadeloupe") ~ 396000,
+         is.na(population) ~ 1,
+         TRUE ~ population)) #add static value for Guadeloupe and Martinique since these are not reported
+
+
+#sani_test <- sani %>% left_join(sanitation_clean, by = c("country_id" = "country_code", "year"= "year"))
 ```
 
 
@@ -139,17 +189,28 @@ If after running 'name_2_rgn' (see next r chunk), there are some coastal regions
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
-sani_improved <- sani %>%
-   dplyr::mutate(country = ifelse(stringr::str_detect(country,"Cura\\Sao"), "Curacao", country))%>% 
-   dplyr::mutate(country = ifelse(stringr::str_detect(country,"R\\Sunion"), "Reunion", country)) %>% 
-   dplyr::mutate(country = ifelse(stringr::str_detect(country, "C\\Ste d\\SIvoire"), "Ivory Coast", country)) %>% 
-   dplyr::mutate(country=ifelse(stringr::str_detect(country,"Hong Kong"), "Hong Kong", country)) %>% 
-   dplyr::mutate(country=ifelse(stringr::str_detect(country,"Macao"), "Macao", country)) %>%
-  dplyr::mutate(country=ifelse(stringr::str_detect(country, "Saint Martin"), "Northern Saint-Martin", country))
+#manually clean country names 
+sanitation_clean <- sanitation_clean %>%
+   mutate(country = str_replace(country, "&", "and")) %>% 
+  mutate(country = case_when(str_detect(country,"Cura\\Sao") ~"Curacao",
+                            str_detect(country,"R\\Sunion") ~ "Reunion",
+                            str_detect(country, "C\\Ste d\\SIvoire") ~ "Ivory Coast",
+                            str_detect(country,"Hong Kong") ~ "Hong Kong",
+                            str_detect(country,"Macao") ~ "Macao",
+                           str_detect(country, "Saint Martin") ~ "Northern Saint-Martin",
+                           str_detect(country, "Helena") ~"Saint Helena",
+                           str_detect(country, "São Tomé and Príncipe")~ "Sao Tome and Principe",
+                           str_detect(country, "St. Vincent and Grenadines") ~ "Saint Vincent and the Grenadines",
+                           str_detect(country, "U.S. Virgin Islands")~ "Virgin Islands (U.S.)",
+                           str_detect(country, "Congo - Kinshasa") ~ "Democratic Republic of the Congo",
+                           str_detect(country, "Congo - Brazzaville") ~"Republique du Congo",
+                           str_detect(country, "Myanmar") ~ "Myanmar",
+                          TRUE ~ country
+                           ))
 
 ## v2021: Reporting Caribbean Netherlands regions (Bonaire, Sint Eustatius, and Saba) at a higher resolution:
 
-CN <- filter(sani_improved, country=="Caribbean Netherlands") %>%
+CN <- filter(sanitation_clean, country=="Caribbean Netherlands") %>%
    rename(country_old = country)
 
 CN_subregions <- data.frame(country_old = "Caribbean Netherlands",
@@ -157,50 +218,60 @@ CN_subregions <- data.frame(country_old = "Caribbean Netherlands",
   left_join(CN) %>%
   select(-country_old)
 
-sani_improved <- sani_improved %>%
+sanitation_clean <- sanitation_clean %>%
    filter(country != "Caribbean Netherlands") %>%
    rbind(CN_subregions)  
 
 # Channel Islands correspond to OHI regions of Guernsey and Jersey. Here the data reported for Channel Islands is used for these two regions.
 
-CI <- dplyr::filter(sani_improved, country=="Channel Islands") %>%
+CI <- dplyr::filter(sanitation_clean, country=="Channel Islands") %>%
   dplyr::rename(country_old = country)
 CI_subregions <- data.frame(country_old = "Channel Islands",
                             country = c("Guernsey", "Jersey")) %>%
   dplyr::left_join(CI) %>%
   dplyr::select(-country_old)
 
-sani_improved <- sani_improved %>%
+sanitation_clean <- sanitation_clean %>%
   dplyr::filter(country != "Channel Islands") %>%
-  rbind(CI_subregions)  
+  rbind(CI_subregions) 
 
 ```
 
 Add rgn_id and merge duplicate regions using a mean weighted by population. 
 
 ```{r rgn_id, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
-rgn_sani <- name_2_rgn(sani_improved, 
+rgn_sani <- name_2_rgn(sanitation_clean, 
                         fld_name     = 'country',
-                        flds_unique  = c('country','year')) 
+                        flds_unique  = c('year'))
 
 ## Check list in warning to make sure all countries removed are not of interest for the OHI global assesment. 
-# v2019 non-matched regions: Eswatini (landlocked), Isle of Man (not reported in OHI), North Macedonia (landlocked), State of Palestine (disputed), Saint Barthelemy (not reported in OHI)
-
+# v2023 non-matched regions: Eswatini (landlocked), Isle of Man (not reported in OHI), North Macedonia (landlocked), Palestinian Territories (disputed), Saint Barthelemy (not reported in OHI)
 ##Check for duplicate regions.
-sort(table(rgn_sani$rgn_id)) #for this analysis, regions which are duplicated are: rgn_id = 209, 140, 116, 13
 
-## Each region has 18 years of data in this case. If there are regions with more than 18 values is because in this database they are reported in a higher resolution than the OHI global assesment (eg: China, Hong Kong and Macao are just one region for the OHI global). For these regions a weighted average will be calculated as its final score.
+ rgn_sani %>%
+  dplyr::group_by(rgn_id) %>%
+  dplyr::summarise(n= dplyr::n()) %>% 
+  filter(n > (data_end - data_start +1)) 
+
+## Each region has 23 years of data in this case. If there are regions with more than 23 values is because in this database they are reported in a higher resolution than the OHI global assessment (eg: China, Hong Kong and Macao are just one region for the OHI global). For these regions a weighted average will be calculated as its final score.
+ #v2023 regions 13, 116, 140 and 2009 had duplicates
+
 
 
 ## Calculating weighted means for the duplicated regions.
 
 sani_final <- rgn_sani %>% 
   dplyr::group_by(rgn_id, rgn_name, year) %>% 
-  dplyr::summarise(basic_sani_prop= weighted.mean(basic_prop, pop, na.rm = TRUE))
+  dplyr::summarise(basic_sani_prop= weighted.mean(basic_prop, population, na.rm = TRUE)) %>% 
+   mutate(basic_sani_prop = ifelse(is.nan(basic_sani_prop), NA, basic_sani_prop))
+
 
 ##Check for duplicate regions. At this point, all regions should have the same sample size.
-sort(table(sani_final$rgn_id))
+year_check <- sani_final %>%
+  dplyr::group_by(rgn_id) %>%
+  dplyr::summarise(n= dplyr::n())
 
+unique(year_check$n)
 ```
 
 # Gapfilling
@@ -214,8 +285,10 @@ sani_gf <- sani_final %>%
   dplyr::mutate(gf_count = sum(is.na(basic_sani_prop))) %>% # create column to count # of NAs (# of data points to gapfill)
   ungroup()
 
-summary(sani_gf) # 161 NAs in v2019
+summary(sani_gf) 
+# 161 NAs in v2019
 # 212 NAs in v2021; makes sense, there are more years of data
+# 191 NAS in v2023
 
 ## list of regions that need gapfilling
 dplyr::filter(sani_gf, gf_count>0) %>% 
@@ -231,7 +304,6 @@ years_data <- mean(table(sani_gf$rgn_id))
 sani_gf <- sani_gf %>%
   dplyr::filter(gf_count != years_data)
 
-# Note: there are regions in this data frame that do not need to be gapfilled.
 ```
 
 ## Gapfilling 1: Linear model
@@ -334,18 +406,19 @@ table(sani_complete$gapfill, sani_complete$method) # no pop is not considered ga
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
-write_csv(sani_complete, here("globalprep/prs_cw_pathogen/v2021/intermediate/sani_complete.csv"))
+write_csv(sani_complete, here("globalprep/prs_cw_pathogen/",version_year, "/intermediate/sani_complete.csv"))
 
 
-# Quick check with v2019 data
-sani_complete_old <- read_csv(here("globalprep/prs_cw_pathogen/v2019/intermediate/sani_complete.csv")) %>% 
-  rename(basic_sani_prop_2019 = basic_sani_prop) %>%
-  rename(gapfill_2019 = gapfill) %>% 
-  rename(method_2019 = method) %>% 
+# Quick check with previous year of data
+#this will need to be updated with the last version year 
+sani_complete_old <- read_csv(here("globalprep/prs_cw_pathogen/v2021/intermediate/sani_complete.csv")) %>% 
+  rename(basic_sani_prop_2021 = basic_sani_prop) %>%
+  rename(gapfill_2021 = gapfill) %>% 
+  rename(method_2021 = method) %>% 
   left_join(sani_complete, by=c("rgn_id", "year", "rgn_name")) %>%
-  filter(year == 2017)
+  filter(year == 2019)
 
-ggplotly(ggplot(sani_complete_old, aes(y = basic_sani_prop, x = basic_sani_prop_2019, labels = rgn_id)) +
+ggplotly(ggplot(sani_complete_old, aes(y = basic_sani_prop, x = basic_sani_prop_2021, labels = rgn_id)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0, color = "red"))
 
@@ -353,7 +426,7 @@ ggplotly(ggplot(sani_complete_old, aes(y = basic_sani_prop, x = basic_sani_prop_
 gf_data <- sani_complete %>%
   dplyr::select(rgn_id, year, gapfill, method)
 
-write_csv(gf_data, here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi_gf.csv"))
+write_csv(gf_data, here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi_gf.csv"))
 
 gf_data_trend <- sani_complete %>%
   dplyr::arrange(rgn_id, year) %>%
@@ -363,7 +436,7 @@ gf_data_trend <- sani_complete %>%
   dplyr::mutate(gapfill = gapfill_5year/5) %>%
   dplyr::select(rgn_id, year, gapfill, method)
 
-write_csv(gf_data, here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi_trend_gf.csv"))
+write_csv(gf_data, here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi_trend_gf.csv"))
 
 ```
 
@@ -374,13 +447,13 @@ First calculate coastal population density (people/km^2^) is calculated by divid
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
-## Population within 25 miles of coastline - v2021; hasn't been udpated for 2021, so use 2020 data
-population <- read_csv(here("globalprep/mar_prs_population/v2020/output/mar_pop_25mi.csv")) %>%
+## Population within 25 miles of coastline - v2021; last updated in 2021
+population <- read_csv(here("globalprep/mar_prs_population/v2021/output/mar_pop_25mi.csv")) %>%
   dplyr::arrange(rgn_id, year)
 
 #Read area 25mi inland to calculate population density
 # (NOTE: this is confusing because it calculates the area in km2 for the 25 mile inland area)
-area <- read_csv(here("globalprep/mar_prs_population/v2020/int/area_km2_25mi.csv"))
+area <- read_csv(here("globalprep/mar_prs_population/v2021/int/area_km2_25mi.csv"))
 
 # People per km2 (for the 25 mile inland area)
 pop_density <- population %>% 
@@ -389,7 +462,7 @@ pop_density <- population %>%
   dplyr::select(rgn_id, year, pop_per_km2)
 
 ##Save population density data
-write_csv(pop_density, here("globalprep/prs_cw_pathogen/v2021/intermediate/pathogen_pop_density_25mi.csv"))
+write_csv(pop_density, here("globalprep/prs_cw_pathogen", version_year, "/intermediate/pathogen_pop_density_25mi.csv"))
 
 ```
 
@@ -407,7 +480,7 @@ unsani_pop <- sani_complete %>%
     dplyr::select(rgn_id, rgn_name, year, basic_sani_prop) %>%
     dplyr::left_join(pop_density, 
               by=c('rgn_id', 'year')) %>%
-    dplyr::mutate(propWO_x_pop     = (1 - basic_sani_prop) * pop_per_km2, # this calculates the population density of people without access (WO)
+    dplyr::mutate(propWO_x_pop = (1 - basic_sani_prop) * pop_per_km2, # this calculates the population density of people without access (WO)
            propWO_x_pop_log = log(propWO_x_pop + 1)) # log is important because the skew was high otherwise
 
 hist(unsani_pop$propWO_x_pop, main = "people without access")
@@ -431,13 +504,19 @@ ref_calc <- unsani_pop %>%
 
 ref_calc
 ## save to the master reference point list - new folder might need to be created for assessment year if this file does not already exist.
-master_refs <- read.csv(here("globalprep/supplementary_information/v2021/reference_points_pressures.csv"), stringsAsFactors = FALSE)
+master_refs <- read.csv(here("globalprep/supplementary_information", version_year, "/reference_points_pressures.csv"), stringsAsFactors = FALSE)
+
+#create a row for sanitation if it doesn't exist yet, uncomment if it does not ei
+row <- tibble(pressure = "Sanitation", data_years = paste0(data_start, "-", data_end), data_description = "Estimated coastal population with inadequate sanitation", method = "99th quantile across regions/years", ref_year = "2000-2009", ref_point = ref_calc, min= NA, max = NA, units = "number of people", notes = "Reference point is log value")
+
+master_refs <- master_refs %>% rbind(row)
+
 
 master_refs$ref_point[master_refs$pressure == "Sanitation"] <- ref_calc
 
-write.csv(master_refs, here("globalprep/supplementary_information/v2021/reference_points_pressures.csv"), row.names=FALSE)
+write.csv(master_refs, here("globalprep/supplementary_information", version_year, "/reference_points_pressures.csv"), row.names=FALSE)
 
-master_refs <- read.csv(here("globalprep/supplementary_information/v2021/reference_points_pressures.csv")) 
+master_refs <- read.csv(here("globalprep/supplementary_information", version_year, "/reference_points_pressures.csv")) 
 ref_value <- as.numeric(as.character(master_refs$ref_point[master_refs$pressure == "Sanitation"])) 
 ref_value #7.10
 
@@ -449,18 +528,17 @@ unsani_prs <- unsani_pop %>%
 summary(unsani_prs)
 
 #Save data pressure scores 
-write_csv(unsani_prs, here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi.csv"))
+write_csv(unsani_prs, here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi.csv"))
 
-# Compare to v2018 data
-
-unsani_prs_old <- read_csv(here("globalprep/prs_cw_pathogen/v2019/output/po_pathogen_popdensity25mi.csv")) %>%
-  rename(pressure_score_2019 = pressure_score) %>% 
+# Compare to v22021 data
+unsani_prs_old <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi.csv")) %>%
+  rename(pressure_score_2021 = pressure_score) %>% 
   left_join(unsani_prs, by=c("rgn_id", "year")) %>%
-  filter(year == 2015)
+  filter(year == 2020)
 
 filter(unsani_prs_old, rgn_id %in% c(185, 208))
 
-  ggplotly(ggplot(unsani_prs_old, aes(y = pressure_score, x = pressure_score_2019, labels = rgn_id)) +
+  ggplotly(ggplot(unsani_prs_old, aes(y = pressure_score, x = pressure_score_2021, labels = rgn_id)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0, color = "red"))
 
@@ -469,15 +547,14 @@ filter(unsani_prs_old, rgn_id %in% c(185, 208))
 
 # Model Trend
 
-Using `CalculateTrend` function form the `ohicore`, trend is calculated by applying a linear regression model to the pressuere scores using a window of 5 years of data. The solope of the linear regression (annual change in pressure) is then divided by the earliest year to get proportional change and then multiplied by 5 to get estimate trend on pressure in the next five years. 
-
+Using `CalculateTrend` function form the `ohicore`, trend is calculated by applying a linear regression model to the pressuere scores using a window of 5 years of data. The slope of the linear regression (annual change in pressure) is then divided by the earliest year to get proportional change and then multiplied by 5 to get estimate trend on pressure in the next five years. 
 
 ```{r trend, eval=FALSE}
 ##Calculate trend using CalculateTrend()
 
 ##Define relevant years: Min and max year of data to calculate trend
 first_assess_year <- 2012 
-current_assess_year <- 2021
+current_assess_year <- 2022
 current_data_year <- max(unsani_prs$year) ##max year of data
 first_data_year <- first_assess_year - (current_assess_year - current_data_year)
 
@@ -500,12 +577,12 @@ trend_data_focal_year <- trend_data_focal_year %>%
   select(rgn_id = region_id, year, trend=score) %>%
   data.frame()
 
-trend_data <- rbind(trend_data, trend_data_focal_year) #add trend calculation to dataframe crearted outside the loop
+trend_data <- rbind(trend_data, trend_data_focal_year) #add trend calculation to data-frame created outside the loop
 }
 summary(trend_data)
 
 ##Save trend data
-write_csv(trend_data, here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi_trend.csv"))
+write_csv(trend_data, here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi_trend.csv"))
 
 ```
 
@@ -517,15 +594,15 @@ write_csv(trend_data, here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_
 
 ```{r, eval=FALSE}
 
-new <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi_trend.csv"))
+new <- read_csv(here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi_trend.csv"))
 
-compare <- read_csv(here("globalprep/prs_cw_pathogen/v2019/output/po_pathogen_popdensity25mi_trend.csv")) %>%
-  select(rgn_id, year, trend_2019 = trend) %>%
+compare <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi_trend.csv")) %>%
+  select(rgn_id, year, trend_2021 = trend) %>%
   left_join(new, by=c('rgn_id', 'year')) %>%
-  filter(year == 2017)
+  filter(year == 2020)
 
 
-ggplotly(ggplot(compare, aes(y = trend, x = trend_2019, labels = rgn_id)) +
+ggplotly(ggplot(compare, aes(y = trend, x = trend_2021, labels = rgn_id)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0, color = "red"))
 
