@@ -18,69 +18,54 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 # Summary
 
 This document describes the steps for preparing the pathogen pollution and pathogen pollution trend data layers for the 2023 global assessment.
 
-The percentage of the population with access to improved sanitation facilities (World Health Organization and United Nations Children’s Fund, Joint Monitoring Programme, 2011) was used in combination with measurements of coastal population as a proxy for pathogens in coastal waters. Access to improved sanitation facilities is defined as the percentage of the population in a country with at least adequate access to disposal facilities that can effectively prevent human, animal, and insect contact with excreta. These data are a country-wide average (not specific to the coastal region). 
+The percentage of the population with access to improved sanitation facilities (World Health Organization and United Nations Children's Fund, Joint Monitoring Programme, 2011) was used in combination with measurements of coastal population as a proxy for pathogens in coastal waters. Access to improved sanitation facilities is defined as the percentage of the population in a country with at least adequate access to disposal facilities that can effectively prevent human, animal, and insect contact with excreta. These data are a country-wide average (not specific to the coastal region).
 
 # Updates from previous assessment
-Data source (WHO-UNICEF) now reports sanitation data for three different sectors: households, schools, and health care facilities. We decided to use the household data as it is most likely to include the greatest number of citizens of each region, and be most comparable with previous datasets. 
+1. Updated data download through the SDMX REST API to programmatically access data, instead of downloading and EXCEL file. We are using the wash_households data flow. This resulted in small changes to the data: for example in the previous data some values for the at least basic sanitation proportion were denoted as >99, which we previously set as 99.5. The total at least basic indicator for these countries (and some others) were often not available from the API, but we were able to calculate the at least basic indicator by summing the limited, unimproved, and open defecation proportions for a given country and subtracting them from 100. The values were previously rounded to the nearest whole percentage, use of the api resulted in more precise values. 
 
-WHO-UNICEF also changed how they report the percentages of the population with access to basic sanitation.  In previous years, some regions were reported with 100% of the population having basic access, which are now denoted as >99 in the raw data. We converted this value to 99.5% as there were other regions with 99%. The data now cover years 2000-2020, vs. last year's assessment which had data for 2000-2017.
+The previous data set included a population column, which was not available from the API. We instead accessed the total population for each region from the WDI package (World Bank World Development Indicators). 
 
-Updates on our end: 
-1. Updated data download through the SDMX REST API to programmatically access data. We are looking at the wash_household indicator. 
+Other changes involved updating data wrangling to get the data from the api into the same format. 
 
+**Consider for future assessments:** make the "Safely managed" data more complete, and reconsider whether these data would be better to use.
 
-#old delete at the end:
+Definition of each variable according to the data source: "At least basic": Use of improved facilities that are not shared with other households.
 
-1. We changed the reporting of the Caribbean Netherlands regions to be at a higher resolution, as historical sanitation data for them have been backfilled by WHO-UNICEF as of this year. 
-2. We also changed the way uninhabited regions (which we assign perfect scores in this layer) are identified. The code was changed to match the methods for other goals (AO, etc), which use the low_pop() function in common.R and filter out low population/uninhabited regions.
+"Safely managed": Use of improved facilities that are not shared with other households and where excreta are safely disposed of in situ or transported and treated offsite.
 
-
-
-**Consider for future assesments:** make the "Safely managed" data more complete, and reconsider whether these data would be better to use.
-
-Definition of each variable according to the data source:
-"At least basic": Use of improved facilities that are not shared with other households.
-
-"Safely managed": Use of improved facilities that are not shared with other households and where excreta are safely disposed of in situ or transported and treated offsite. 
-
-
-
-***
+------------------------------------------------------------------------
 
 # Data Source
-**Reference**: 
-            https://washdata.org/data
-            Updated October 2021
 
-**Downloaded**: Downloaded 10/01/2021
+**Reference**: As of v2023 the data is now downloaded through the SDMX REST API which allows programmatic access to data that is available in UNICEF's Data Warehouse Explorer. The api can be found at: <https://sdmx.data.unicef.org/webservice/data.html>
 
-**Description**:  Percentage of the National population that has access to improved facilities that are not shared with other households (National, At a basic level).
+For information on querying the api visit: <https://data.unicef.org/sdmx-api-documentation/#understanding>. To download data manually in Excel format use this site: <https://washdata.org/data>.
 
-Access to improved sanitation facilities is defined as the percentage of the population within a country with at least adequate access to excreta disposal facilities that can effectively prevent human, animal, and insect contact with excreta.
+**Downloaded**: Downloaded 7/18/2023
 
-**Native data resolution**: country-wide average (not specific to the coastal region)
+**Description**: Percentage of the National population that has access to at improved sanitation facilities that are not shared with other households (National, At a basic level).
+
+Access to improved sanitation facilities is defined as the percentage of the population within a country with at least basic access to excreta disposal facilities that can effectively prevent human, animal, and insect contact with excreta.
+
+Further information: <https://washdata.org/monitoring/sanitation> **Native data resolution**: country-wide average (not specific to the coastal region)
 
 **Time range**: 2000 - 2022
 
-**Format**:  csv
+**Format**: SDMX
 
-***
-  
+------------------------------------------------------------------------
+
 # Methods
-Percentage of people without sanitation was multiplied by the coastal population (within 25 miles of the coast) to estimate the number of people located along the coast without sanitation. This value was rescaled between 0 and 1 by dividing by the 99th quantile across all regions from years 2000 to 2009. 
-***
 
+Percentage of people without sanitation was multiplied by the coastal population (within 25 miles of the coast) to estimate the number of people located along the coast without sanitation. This value was rescaled between 0 and 1 by dividing by the 99th quantile across all regions from years 2000 to 2009. \*\*\*
 
 # Setup
 
 ```{r setup, results="hide", message = FALSE, warning = FALSE}
-
-
 library(ohicore)  #devtools::install_github('ohi-science/ohicore@dev')
 library(zoo)     # for na.locf: Last Observation Carried Forward
 library(tidyverse)
@@ -92,31 +77,19 @@ library(WDI)
 
 source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2021/gh-pages/workflow/R/common.R')
 
-version_year <- paste0("v", 2023) #update this 
+#update these
+version_year <- paste0("v", 2023) 
+previous_version_year <- paste0("v", 2021)
 data_start <- 2000
 data_end <- 2022
-
-```
-
-# Import raw data
-
-```{r raw_data, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
-
-# Load data from Mazu
-sani_raw <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/WHO_UNICEFF/d2021/JMP_2021_WLD.csv"), header=FALSE, sep = ",", na.strings = c(NA, ''), stringsAsFactors = FALSE, strip.white = TRUE)  
-
 ```
 
 # Methods
 
-# Download the data
-
-link to api: https://sdmx.data.unicef.org/webservice/data.html
-
-query information: https://data.unicef.org/sdmx-api-documentation/#understanding
-
+## Download the data
 
 ```{r read data, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
+#data download url
 url <- "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/data/UNICEF,WASH_HOUSEHOLDS,1.0/.WS_PPL_S-ALB+WS_PPL_S-L+WS_PPL_S-OD+WS_PPL_S-UI.SAN.._T?format=sdmx-compact-2.1"
 
 #read in data from the api and save as a tibble
@@ -126,10 +99,9 @@ sanitation <- readSDMX(url) %>% as_tibble()
 write_csv(sanitation,  here("globalprep/prs_cw_pathogen", version_year, "raw/2023_WASH.csv"))
 ```
 
-
 ## Data wrangling
 
-Some countries are missing a value for the at least basic category indicator (ws_ppl_s_alb). This can be calculated by adding the proportion of population using limited sanitation services, the proportion of population using unimproved sanitation services, and the proportion of the population using open defecation, and subtract from 100 to get the value if it doesn't exist. 
+Some countries are missing a value for the at least basic category indicator (ws_ppl_s\_alb). This can be calculated by adding the proportion of the population using limited sanitation services, the proportion of population using unimproved sanitation services, and the proportion of the population using open defecation, and subtractring that sum from 100 to get the value if it doesn't exist.
 
 Scale the percentage of population with access to improved sanitation to proportion (from 0-1). Transform population and percentage into a numeric variable.
 
@@ -140,7 +112,6 @@ sanitation_wider <- sanitation %>%
   pivot_wider(names_from = INDICATOR, values_from = OBS_VALUE) %>% 
   janitor::clean_names() %>% 
   select(country_code = ref_area, year = time_period, basic = ws_ppl_s_alb, ws_ppl_s_l, ws_ppl_s_ui, ws_ppl_s_od)
-
 
 sanitation_clean <- sanitation_wider %>%
   group_by(country_code,year) %>% 
@@ -158,9 +129,9 @@ sanitation_clean <- sanitation_wider %>%
 #receive some warnings because some of the codes included in the data are not actually country codes
 sanitation_clean$country <- countrycode(sanitation_clean$country_code, "iso3c", "country.name")
 
-#add in channel islands because not recognized by the function
-sanitation_clean <- sanitation_clean %>% mutate(country = case_when(country_code == "CHI" ~ "Channel Islands",
-                                                                TRUE ~ country))
+#add in channel islands because country code not recognized by the function
+sanitation_clean <- sanitation_clean %>% 
+  mutate(country = case_when(country_code == "CHI" ~ "Channel Islands", TRUE ~ country))
 #add the population data
 
 population_weights <- WDI(
@@ -176,16 +147,12 @@ sanitation_clean <- sanitation_clean %>%
   mutate(population = case_when(str_detect(country, "Martinique") ~368000,
          str_detect(country, "Guadeloupe") ~ 396000,
          is.na(population) ~ 1,
-         TRUE ~ population)) #add static value for Guadeloupe and Martinique since these are not reported
-
-
-#sani_test <- sani %>% left_join(sanitation_clean, by = c("country_id" = "country_code", "year"= "year"))
+         TRUE ~ population)) #add static value for Guadeloupe and Martinique since these are not reported, found through online search
 ```
-
 
 Change names of regions to match names in ohicore and filter out regions that are not part of the OHI assesment or do not have data.
 
-If after running 'name_2_rgn' (see next r chunk), there are some coastal regions that are not identified by `name_2rgn` function. They must be checked to determine how to best include them (or not include them).
+If after running 'name_2\_rgn' (see next r chunk), there are some coastal regions that are not identified by `name_2rgn` function. They must be checked to determine how to best include them (or not include them).
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
@@ -206,7 +173,7 @@ sanitation_clean <- sanitation_clean %>%
                            str_detect(country, "Congo - Brazzaville") ~"Republique du Congo",
                            str_detect(country, "Myanmar") ~ "Myanmar",
                           TRUE ~ country
-                           ))
+                           )) 
 
 ## v2021: Reporting Caribbean Netherlands regions (Bonaire, Sint Eustatius, and Saba) at a higher resolution:
 
@@ -237,7 +204,7 @@ sanitation_clean <- sanitation_clean %>%
 
 ```
 
-Add rgn_id and merge duplicate regions using a mean weighted by population. 
+Add rgn_id and merge duplicate regions using a mean weighted by population.
 
 ```{r rgn_id, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 rgn_sani <- name_2_rgn(sanitation_clean, 
@@ -262,7 +229,8 @@ rgn_sani <- name_2_rgn(sanitation_clean,
 
 sani_final <- rgn_sani %>% 
   dplyr::group_by(rgn_id, rgn_name, year) %>% 
-  dplyr::summarise(basic_sani_prop= weighted.mean(basic_prop, population, na.rm = TRUE)) %>% 
+  dplyr::summarise(basic_sani_prop= 
+                     ifelse(n() >1, weighted.mean(basic_prop, population, na.rm = TRUE), basic_prop)) %>% 
    mutate(basic_sani_prop = ifelse(is.nan(basic_sani_prop), NA, basic_sani_prop))
 
 
@@ -307,6 +275,7 @@ sani_gf <- sani_gf %>%
 ```
 
 ## Gapfilling 1: Linear model
+
 Use a linear model within country data to estimate missing years.
 
 ```{r gf_lm, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
@@ -327,7 +296,6 @@ sani_gf_lm <- sani_gf_lm %>%
   mutate(basic_sani_prop = ifelse(is.na(basic_sani_prop), gf_lm, basic_sani_prop))
 
 ```
-
 
 ## Gapfilling 2: Georegional averages
 
@@ -401,7 +369,6 @@ table(sani_complete$gapfill, sani_complete$method) # no pop is not considered ga
 
 ```
 
-
 # Save gapfilled data records
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
@@ -410,15 +377,16 @@ write_csv(sani_complete, here("globalprep/prs_cw_pathogen/",version_year, "/inte
 
 
 # Quick check with previous year of data
-#this will need to be updated with the last version year 
-sani_complete_old <- read_csv(here("globalprep/prs_cw_pathogen/v2021/intermediate/sani_complete.csv")) %>% 
+sani_complete_old <- read_csv(here("globalprep/prs_cw_pathogen",previous_version_year, "intermediate/sani_complete.csv")) %>% 
   rename(basic_sani_prop_2021 = basic_sani_prop) %>%
   rename(gapfill_2021 = gapfill) %>% 
   rename(method_2021 = method) %>% 
   left_join(sani_complete, by=c("rgn_id", "year", "rgn_name")) %>%
-  filter(year == 2019)
+  filter(year == 2020)
 
 ggplotly(ggplot(sani_complete_old, aes(y = basic_sani_prop, x = basic_sani_prop_2021, labels = rgn_id)) +
+           labs(x= paste(previous_version_year, "basic_sani_prop"),
+                y = paste(version_year, "basic_sani_prop"), title = "2020 Data Comparison") +
   geom_point() +
   geom_abline(slope = 1, intercept = 0, color = "red"))
 
@@ -440,20 +408,35 @@ write_csv(gf_data, here("globalprep/prs_cw_pathogen", version_year, "output/po_p
 
 ```
 
-
 # Standarizing sanitation data by population density
 
-First calculate coastal population density (people/km^2^) is calculated by dividing the population within 25 miles of the coast by km^2^ within the 25 mile inland coastal area (yes! This is confusing because area is in km^2, despite the boundary being 25 miles inland).
+First calculate coastal population density (people/km^2^) is calculated by dividing the population within 25 miles of the coast by km^2^ within the 25 mile inland coastal area (yes! This is confusing because area is in km\^2, despite the boundary being 25 miles inland).
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
 ## Population within 25 miles of coastline - v2021; last updated in 2021
 population <- read_csv(here("globalprep/mar_prs_population/v2021/output/mar_pop_25mi.csv")) %>%
   dplyr::arrange(rgn_id, year)
+#since this file has not been updated for v2023 yet we will fill 2021 and 2022 values based on the 2020 value for each region
+
+unique_regions <- unique(population$rgn_id)
+
+# Step 2: Create a new DataFrame with two rows for each region, one for 2021 and one for 2022
+new_years <- c(2021, 2022)
+new_data <- expand.grid(rgn_id = unique_regions, year = new_years) %>% 
+  mutate(popsum = NA)
+
+population <- population %>% 
+  rbind(new_data) %>% 
+  group_by(rgn_id) %>% 
+  fill(popsum, .direction = "down")
+
+
 
 #Read area 25mi inland to calculate population density
 # (NOTE: this is confusing because it calculates the area in km2 for the 25 mile inland area)
 area <- read_csv(here("globalprep/mar_prs_population/v2021/int/area_km2_25mi.csv"))
+
 
 # People per km2 (for the 25 mile inland area)
 pop_density <- population %>% 
@@ -468,11 +451,11 @@ write_csv(pop_density, here("globalprep/prs_cw_pathogen", version_year, "/interm
 
 These data are transformed to a pressure, with a zero score indicating no pressure and 1 indicating the highest possible pressure. Given this we want to determine the number of people *without* access.
 
-The number of people per km^2 without access to sanitation is calculated by:
+The number of people per km\^2 without access to sanitation is calculated by:
 
-1. converting proportion with access to sanitation to proportion without access to sanitation (i.e., 1 - proportion_with_access). 
-2. The proportion without access is multiplied by the coastal population density.
-3. Number of people without access are log transformed (ln(x+1))
+1.  converting proportion with access to sanitation to proportion without access to sanitation (i.e., 1 - proportion_with_access).
+2.  The proportion without access is multiplied by the coastal population density.
+3.  Number of people without access are log transformed (ln(x+1))
 
 ```{r, message = FALSE, warning = FALSE, eval=FALSE}
 
@@ -506,10 +489,10 @@ ref_calc
 ## save to the master reference point list - new folder might need to be created for assessment year if this file does not already exist.
 master_refs <- read.csv(here("globalprep/supplementary_information", version_year, "/reference_points_pressures.csv"), stringsAsFactors = FALSE)
 
-#create a row for sanitation if it doesn't exist yet, uncomment if it does not ei
-row <- tibble(pressure = "Sanitation", data_years = paste0(data_start, "-", data_end), data_description = "Estimated coastal population with inadequate sanitation", method = "99th quantile across regions/years", ref_year = "2000-2009", ref_point = ref_calc, min= NA, max = NA, units = "number of people", notes = "Reference point is log value")
+# #create a row for sanitation if it doesn't exist yet, uncomment if it does not ei
+# row <- tibble(pressure = "Sanitation", data_years = paste0(data_start, "-", data_end), data_description = "Estimated coastal population with inadequate sanitation", method = "99th quantile across regions/years", ref_year = "2000-2009", ref_point = ref_calc, min= NA, max = NA, units = "number of people", notes = "Reference point is log value")
 
-master_refs <- master_refs %>% rbind(row)
+#master_refs <- master_refs %>% rbind(row)
 
 
 master_refs$ref_point[master_refs$pressure == "Sanitation"] <- ref_calc
@@ -531,7 +514,7 @@ summary(unsani_prs)
 write_csv(unsani_prs, here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi.csv"))
 
 # Compare to v22021 data
-unsani_prs_old <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi.csv")) %>%
+unsani_prs_old <- read_csv(here("globalprep/prs_cw_pathogen", previous_version_year,"output/po_pathogen_popdensity25mi.csv")) %>%
   rename(pressure_score_2021 = pressure_score) %>% 
   left_join(unsani_prs, by=c("rgn_id", "year")) %>%
   filter(year == 2020)
@@ -540,14 +523,15 @@ filter(unsani_prs_old, rgn_id %in% c(185, 208))
 
   ggplotly(ggplot(unsani_prs_old, aes(y = pressure_score, x = pressure_score_2021, labels = rgn_id)) +
   geom_point() +
+    labs(x = paste("pressure score", previous_version_year),
+         y = paste("pressure score", version_year), title = "2020 Pressure Comparison") +
   geom_abline(slope = 1, intercept = 0, color = "red"))
 
 ```
 
-
 # Model Trend
 
-Using `CalculateTrend` function form the `ohicore`, trend is calculated by applying a linear regression model to the pressuere scores using a window of 5 years of data. The slope of the linear regression (annual change in pressure) is then divided by the earliest year to get proportional change and then multiplied by 5 to get estimate trend on pressure in the next five years. 
+Using `CalculateTrend` function form the `ohicore`, trend is calculated by applying a linear regression model to the pressuere scores using a window of 5 years of data. The slope of the linear regression (annual change in pressure) is then divided by the earliest year to get proportional change and then multiplied by 5 to get estimate trend on pressure in the next five years.
 
 ```{r trend, eval=FALSE}
 ##Calculate trend using CalculateTrend()
@@ -586,8 +570,6 @@ write_csv(trend_data, here("globalprep/prs_cw_pathogen", version_year, "output/p
 
 ```
 
-
-
 # Compare to previous years
 
 ### Trend data
@@ -596,7 +578,7 @@ write_csv(trend_data, here("globalprep/prs_cw_pathogen", version_year, "output/p
 
 new <- read_csv(here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi_trend.csv"))
 
-compare <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi_trend.csv")) %>%
+compare <- read_csv(here("globalprep/prs_cw_pathogen", previous_version_year, "output/po_pathogen_popdensity25mi_trend.csv")) %>%
   select(rgn_id, year, trend_2021 = trend) %>%
   left_join(new, by=c('rgn_id', 'year')) %>%
   filter(year == 2020)
@@ -604,6 +586,8 @@ compare <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_po
 
 ggplotly(ggplot(compare, aes(y = trend, x = trend_2021, labels = rgn_id)) +
   geom_point() +
+    labs(x = paste("Trend",previous_version_year),
+         y = paste("Trend", version_year), title = "Data year 2020 Trend Comparison") +
   geom_abline(slope = 1, intercept = 0, color = "red"))
 
 # A few regions have large variation in trend between v2021 and v2019
@@ -613,67 +597,37 @@ ggplotly(ggplot(compare, aes(y = trend, x = trend_2021, labels = rgn_id)) +
 
 # Outlier investigation 
 
-data_old <- read_csv(here("globalprep/prs_cw_pathogen/v2019/output/po_pathogen_popdensity25mi.csv")) %>% 
+data_old <- read_csv(here("globalprep/prs_cw_pathogen", previous_version_year, "output/po_pathogen_popdensity25mi.csv")) %>% 
   rename(old_pressure_score=pressure_score)
 
-data_new <- read_csv(here("globalprep/prs_cw_pathogen/v2021/output/po_pathogen_popdensity25mi.csv"))
+data_new <- read_csv(here("globalprep/prs_cw_pathogen", version_year, "output/po_pathogen_popdensity25mi.csv"))
 
 outlier <- data_new %>% 
   left_join(data_old, by=c("rgn_id", "year")) %>% 
-  filter(rgn_id == 161)
+  filter(rgn_id == 224)
 
 plot(outlier$pressure_score, outlier$old_pressure_score)
 abline(0,1, col="red")
 
 ```
 
+### Comp are results
 
-### Compare results
-We checked the main discrepancies and these were due to changes in source data.  Fairly small changes in access can lead to fairly large changes in pressure scores, depending on the population. There are slightly higher pressure scores this year (indicated by points tending to be above the 1-1 red line) due to modifications of reference point calculations.
+We checked the main discrepancies and these were due to changes in source data. Fairly small changes in access can lead to fairly large changes in pressure scores, depending on the population. There are slightly higher pressure scores this year (indicated by points tending to be above the 1-1 red line) due to modifications of reference point calculations.
 
 ### Outlier exploration
 
 ```{r outliers, eval=FALSE}
 
-### Comparison of basic access to sanitation scores 
-sani_raw <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/WHO_UNICEFF/d2021/JMP_2021_WLD.csv"), header=FALSE, sep = ",", na.strings = c(NA, ''), stringsAsFactors = FALSE, strip.white = TRUE)
-
-sani_raw_old <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/WHO_UNICEFF/d2019/JMP_2019_WLD.csv"), header=FALSE, sep = ",", na.strings = c(NA, ''), stringsAsFactors = FALSE, strip.white = TRUE)
-
-sani_old <- sani_raw_old %>%
-  dplyr::slice(-1) %>%                # cut first row with column names
-  dplyr::select(country = V1,
-         year = V3,
-         pop = V4,
-         basic_pct = V6) %>%
-  dplyr::mutate(basic_pct = ifelse(basic_pct=="-", NA, basic_pct)) %>% 
-  dplyr::mutate(pop = stringr::str_remove_all(pop, pattern = " ")) %>%
-  dplyr::mutate(basic_pct = ifelse(stringr::str_detect(basic_pct,">99"), 99.5, basic_pct)) %>%
-  dplyr::mutate_at(.vars = c("pop", "basic_pct", "year"), .funs = as.numeric)%>%
-  dplyr::mutate(pop = pop * 1000,
-          basic_prop = basic_pct/100) %>%
-  dplyr::filter(!is.na(year))
-
-sani_old_outliers <- sani_old %>% 
-  filter(country == "Palau" | country == "Oman" | country == "Niue" | country == "Wallis and Futuna") %>% 
-  rename(pop_2019 = pop, basic_pct_2019 = basic_pct, basic_prop_2019 = basic_prop)
-  
-sani_compare <- sani %>%
-  filter(country == "Palau" | country == "Oman" | country == "Niue" | country == "Wallis and Futuna") %>% 
-  left_join(sani_old_outliers, by=c("country", "year")) %>% 
-  select(country, year, pop, pop_2019, basic_pct, basic_pct_2019)  # yep, trends changes in raw data
-
-
 ### Comparison of pressure scores
 
-unsani_prs_old <- read_csv(here("globalprep/prs_cw_pathogen/v2019/output/po_pathogen_popdensity25mi.csv")) %>%
+unsani_prs_old <- read_csv(here("globalprep/prs_cw_pathogen", previous_version_year, "output/po_pathogen_popdensity25mi.csv")) %>%
   rename(pressure_score_2019 = pressure_score) %>% 
   left_join(unsani_prs, by=c("rgn_id", "year")) %>% 
-  filter(rgn_id %in% c(8, 48, 154, 161))
+  filter(rgn_id %in% c(95, 16, 54, 29))
 
-unsani_prs_old_all <- read_csv(here("globalprep/prs_cw_pathogen/v2019/output/po_pathogen_popdensity25mi.csv")) %>%
+unsani_prs_old_all <- read_csv(here("globalprep/prs_cw_pathogen", previous_version_year, "output/po_pathogen_popdensity25mi.csv")) %>%
   rename(pressure_score_2019 = pressure_score) %>% 
   left_join(unsani_prs, by=c("rgn_id", "year")) %>% 
   mutate(diff = pressure_score-pressure_score_2019)
 ```
-
