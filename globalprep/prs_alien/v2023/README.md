@@ -1,6 +1,6 @@
 ## Ocean Health Index: Nonindigenous species pressure
 
-Information about [calculating pressure](http://ohi-science.github.io/ohiprep_v2023/globalprep/prs_alien/v2022/prs_alien_data_prep.html).
+Information about [calculating pressure](http://ohi-science.github.io/ohiprep_v2023/globalprep/prs_alien/v2023/prs_alien_data_prep.html).
 
 ### Files Created
 
