@@ -24,7 +24,7 @@ The [`datalimited`](https://github.com/datalimited/datalimited) R package, devel
 
 # Updates from previous scenario year
 
-- None. This script wasn't run in v2023.
+- None. This script wasn't run in v2023. Associated data files within the repo were copied from v2022 to v2023.
 
 # Setup 
 
