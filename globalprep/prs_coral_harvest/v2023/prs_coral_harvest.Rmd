@@ -18,13 +18,13 @@ editor_options:
   chunk_output_type: console
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2022/globalprep/prs_coral_harvest/v2022/prs_coral_harvest.html]
+[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2023/globalprep/prs_coral_harvest/v2023/prs_coral_harvest.html]
 
 # Summary
 This analysis converts FAO commodities data into data layers used to calculate OHI 2023 global coral harvest pressure.
 
 # Updates from previous assessment
-- New year of FAO data (1976-2020)
+- New 2 years of FAO data (1976-2021; new years 2020 and 2021)
 - Add/edit code for the Datacheck section
 - Add a tic/toc
 - Add more programmatic year usage
@@ -35,22 +35,21 @@ This analysis converts FAO commodities data into data layers used to calculate O
 
 **Reference**:
     http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-    App release date: March 2023
-FAO raw commodities quantity 1976_2020
-FAO raw commodities value 1976_2020
+    App release date: July 2023
+FAO raw commodities quantity 1976_2021
+FAO raw commodities value 1976_2021
 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commodities-production/en)
 
-**Downloaded**: June 29, 2023
+**Downloaded**: July 19, 2023
 
 **Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: shells, corals, ornamental fish, fish oil, seaweed and plants, sponges (see: raw/commodities2products.csv for details).
 
-**Time range**: 1976-2020
+**Time range**: 1976-2021
 
 ***
   
 # Methods
 ```{r setup, warning=FALSE, message=FALSE}
-
 knitr::opts_chunk$set(eval=FALSE)
 
 ## load libraries, set directories
@@ -67,7 +66,7 @@ library(tictoc)
 
 scen_year <- "2023"
 prev_scen_year <- as.character(as.numeric(scen_year) - 1)
-common_year <- as.character(as.numeric(scen_year) - 4) # this depends on what the latest data year is; currently, there's a 3 year lag so the common year between the current and previous version year would be 4 years prior to the current version year
+common_year <- as.character(as.numeric(scen_year) - 4) # this depends on what the latest data year is; there's often a 3 year lag so the common year between the current and previous version year would be 4 years prior to the current version year; this time there is a 2 year lag but the common year is still 4 years prior at the moment
 
 ## Load FAO-specific user-defined functions
 source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO files
@@ -168,15 +167,42 @@ for (f in files){ # f = files[2]
     mutate(country = ifelse(country == "Cura\xe7ao","Curacao", country)) %>%
     mutate(country = ifelse(country == "R\xe9union", "Reunion", country)) %>% 
     mutate(country = ifelse(country == "Réunion", "Reunion", country)) %>% 
-    mutate(country = ifelse(country == "R<e9>union", "Reunion", country)) %>% 
+    mutate(country = ifelse(country == "R<e9>union", "Reunion", country)) %>%
+    mutate(country = ifelse(country == "Micronesia (Fed. States)", "Micronesia", country)) %>%
+    mutate(country = ifelse(country == "Saint Helena/Asc./Trist.", "Saint Helena", country)) %>%
+    mutate(country = ifelse(country == "Türkiye", "Turkey", country)) %>%
+    mutate(country = ifelse(country == "Venezuela (Boliv Rep of)", "Venezuela", country)) %>%
+    mutate(country = ifelse(country == "Netherlands (Kingdom of the)", "Netherlands", country)) %>%
     filter(country != "Azerbaijan") # landlocked, but not being removed by name_2_rgn?
 
     
   m_rgn <- name_2_rgn(df_in = m,
                       fld_name='country', 
                       flds_unique=c('commodity', 'product', 'year'))
+  
+# v2023 removed countries:
+#   These data were removed for not having any match in the lookup tables:
+# 
+#                 Eswatini 
+#                        1 (landlocked/not used)
+# Micronesia (Fed. States) 
+#                        1 (added in above - Micronesia)
+# Netherlands (Kingdom of the) 
+#                        1 (added in above - Netherlands)                           
+#          North Macedonia 
+#                        1 (landlocked/not used)
+#                Palestine 
+#                        1 (not used)
+# Saint Helena/Asc./Trist. 
+#                        1 (added in above - Saint Helena)
+#                  Türkiye 
+#                        1 (added in above - Turkey)
+# Venezuela (Boliv Rep of) 
+#                        1 (added in above - Venezuela)
+#           Yugoslavia SFR 
+#                        1 (not used and only has data in 1984-1988)
     
-# v2021 duplicates:  [1] "China"                 "China, Hong Kong SAR"  "China, Macao SAR"      "Guadeloupe"           
+# v2023 duplicates:  [1] "China"                 "China, Hong Kong SAR"  "China, Macao SAR"      "Guadeloupe"           
 # [5] "Martinique"            "Montenegro"            "Russian Federation"    "Serbia and Montenegro"
 # [9] "Sudan"                 "Sudan (former)"        "Un. Sov. Soc. Rep."     - these are all fixed in the group by and summarise below  
   
@@ -200,7 +226,7 @@ for (f in files){ # f = files[2]
   write.csv(m_rgn, harvest_out, row.names = FALSE, na = '')
 }
 toc()
-# v2023: 15.383 sec elapsed
+# v2023: 18.523 sec elapsed
 ```
 
 # Data Wrangle
@@ -419,15 +445,49 @@ previous_version_coral <- read_csv(paste0("globalprep/prs_coral_harvest/v", prev
 combined_coral <- previous_version_coral %>%
   left_join(current_version_coral, by = c("rgn_id", "year")) 
 
+# if wanting to look at highest differences
+changes <- combined_coral %>%
+  mutate(diff = abs(old_prs-new_prs))
+
 # see what rows have NAs and take note if anything is odd
 na_regions <- combined_coral[!complete.cases(combined_coral), ]
 na_regions %>% select(rgn_id) %>% unique()
-# v2023: region 9 and 139 have NAs (for every row) which is a change from the previous version year
+# v2023: no NAs
 
 # check all data from previous version vs. all data from current version
 plot(combined_coral$old_prs, combined_coral$new_prs,
      xlab = paste0("Old Pressure All Years v", prev_scen_year),
      ylab = paste0("New Pressure All Years v", scen_year))
+abline(0,1, col = "red")
+
+# explore some deviations v2023
+previous_version_coral_latest_yr <- previous_version_coral %>%
+  filter(year == common_year)
+
+current_version_coral_latest_yr <- current_version_coral %>%
+  filter(year == as.character(as.numeric(scen_year) - 2)) # set to latest year of data
+
+combined_latest_yr <- previous_version_coral_latest_yr %>%
+  left_join(current_version_coral_latest_yr, by = "rgn_id") %>%
+  select(-year.x, -year.y)
+
+plot(combined_latest_yr$old_prs, combined_latest_yr$new_prs,
+     xlab = paste0("Old Pressure Data Year ", common_year, " v", prev_scen_year),
+     ylab = paste0("New Pressure Data Year ", (as.numeric(scen_year) - 2), " v", scen_year))
+abline(0,1, col = "red")
+
+# compare within the new data itself 2020 vs. 2021 since both years are new v2023
+current_version_coral_prior_yr <- current_version_coral %>%
+  filter(year == as.character(as.numeric(scen_year) - 3)) # set to 1 prior to latest year of data
+
+combined_two_recent_yrs <- current_version_coral_prior_yr %>%
+  rename(prior_prs = new_prs) %>%
+  left_join(current_version_coral_latest_yr, by = "rgn_id") %>%
+  select(-year.x, -year.y)
+
+plot(combined_two_recent_yrs$prior_prs, combined_two_recent_yrs$new_prs,
+     xlab = paste0("New Pressure Data Year ", (as.numeric(scen_year) - 3), " v", scen_year),
+     ylab = paste0("New Pressure Data Year ", (as.numeric(scen_year) - 2), " v", scen_year))
 abline(0,1, col = "red")
 
 # check the most recent year in common in both versions
