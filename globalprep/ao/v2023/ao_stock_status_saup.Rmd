@@ -20,10 +20,11 @@ editor_options:
 
 # Summary
 
-This script takes prepped non-industrial 2021 SAUP data (created in ao_catch_prep_saup.Rmd), and B/Bmsy estimates of those stocks to calculate a score for artisanal fishing species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
+This script takes prepped non-industrial 2021 SAUP data (created in ao_catch_prep_saup.Rmd), and B/Bmsy estimates of those stocks to calculate a score for artisanal fishing species per OHI region. The FIS data prep will need to be completed prior to this data prep. Also make sure to run ao_catch_prep_saup before this script.  
 
 ## Updates from previous assessment
-Added additional year (2019)
+
+For 2023 the Sea Around us Project (SAUP) data used in the ao_catch_prep_saup had not been updated, only the RAM data was updated for the FIS layers. Data files that were not newly updated and were stored in the repository were copied from the v2022 to v2023 folder for consistency. 
 
 ***
 
@@ -74,9 +75,14 @@ source(here('workflow/R/common.R'))
 ## Join with the final B/Bmsy layer from the fis model, convert the B/Bmsy values to scores (this is done in functions.R for FIS subgoal, but we do it in the dataprep for AO), and take a catch weighted average of B/Bmsy scores for each region/year.
 
 ```{r, eval = FALSE}
-fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis/v2022/output/fis_bbmsy.csv"))
+#update these!! 
+version_year <- "v2023"
+previous_version_year <- "v2022"
 
-catch_AO <- read_csv(file.path(here(), "globalprep/ao/v2022/intermediate/mean_catch.csv")) 
+fis_bbmsy <- read_csv(file.path(here(), "globalprep/fis", version_year, "output/fis_bbmsy.csv"))
+
+
+catch_AO <- read_csv(file.path(here(), "globalprep/ao/", version_year, "intermediate/mean_catch.csv")) 
 
 length(unique(catch_AO$rgn_id)) # there are only 196 regions here... we want there to be 220 regions. Which regions are missing? 
 
@@ -138,7 +144,7 @@ c <- catch_AO %>%
 
 
 ## read in fisheries mean catch so we can use to gapfill missing regions
-  fis_mean_catch <- read.csv("../../fis/v2022/int/mean_catch.csv") %>% 
+  fis_mean_catch <- read.csv(file.path("../../fis", version_year, "int/mean_catch.csv")) %>% 
      dplyr::mutate(stock_id_taxonkey = as.character(stock_id_taxonkey)) %>%
     dplyr::mutate(taxon_key = sub('.*_', '', stock_id_taxonkey)) %>%
     dplyr::mutate(stock_id = sub('_[^_]*$', '', stock_id_taxonkey)) %>%
@@ -227,7 +233,7 @@ b <- b %>%
            gapfilled,
            method) 
   
-  write.csv(gap_fill_data, here('globalprep/ao/v2022/output/AO_bbmsy_summary_gf.csv'), row.names = FALSE)
+  write.csv(gap_fill_data, here(file.path("globalprep/ao", version_year, "output/AO_bbmsy_summary_gf.csv")), row.names = FALSE)
   
   score_data <- data_fis_gf %>%
     dplyr::select(rgn_id, stock_id, year, mean_catch, score)
@@ -249,7 +255,7 @@ length(unique(score_data$rgn_id)) # 220 - perfect!
 test <- score_data %>%
   filter(rgn_id %in% missing_id) # perfect! 
 
-write.csv(score_data, here('globalprep/ao/v2022/output/ao_nind_scores.csv'), row.names = FALSE)
+write.csv(score_data, here("globalprep/ao/", version_year, "output/ao_nind_scores.csv"), row.names = FALSE)
 
 ```
 
@@ -258,10 +264,10 @@ Data check
 ```{r, eval = FALSE}
 region_data()
 
-stk <- read.csv(here('globalprep/ao/v2022/output/ao_nind_scores.csv')) %>%
+stk <- read.csv(here("globalprep/ao/",version_year, "output/ao_nind_scores.csv")) %>%
   left_join(rgns_eez)
 
-need <- read.csv(here('globalprep/ao/v2022/output/wb_gdppcppp_rescaled_gf.csv')) %>%
+need <- read.csv(here("globalprep/ao/", version_year, "output/wb_gdppcppp_rescaled_gf.csv")) %>%
   left_join(rgns_eez)
 
 setdiff(need$rgn_name, stk$rgn_name)
