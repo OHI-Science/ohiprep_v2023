@@ -120,10 +120,10 @@ test <- fis_bbmsy %>%
 setdiff(missing, unique(test$rgn_name)) # bouvet island is missing?
 ## they do have b/bmsy data! Lets just use their overall b/bmsy scores (for industrial fishing), as their AO b/bsmy scores.. not perfect, but better than nothing!
 
-test <- fis_bbmsy %>%
+bouvet_test <- fis_bbmsy %>%
   filter(rgn_id == 105)
 
-test <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv") %>%
+bouvet_test <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv") %>%
   filter(region_id == 105,
          goal == "FIS") # bouvet has fisheries scores... so lets use that for their AO score
 
@@ -273,5 +273,24 @@ need <- read.csv(here("globalprep/ao/", version_year, "output/wb_gdppcppp_rescal
 setdiff(need$rgn_name, stk$rgn_name)
 
 # character(0); perfect! 
+
+#update these!!
+latest_data_year <- 2019
+previous_assessment_latest_data_year <- 2019
+
+#look at the difference between this year and last
+new <- read.csv(here("globalprep/ao/",version_year, "output/ao_nind_scores.csv")) %>%
+  left_join(rgns_eez)
+
+old <- read.csv(here("globalprep/ao/",previous_version_year, "output/ao_nind_scores.csv")) %>% select(rgn_id, year, old_score = score)
+
+compare <- new %>% left_join(old, by = c("year", "rgn_id")) %>% filter(year == previous_assessment_latest_data_year)
+
+compare_plot <- ggplot(data = compare) + geom_point(aes(x = old_score, y = score, text = rgn_id))  +
+  geom_abline(color = "red") + 
+  labs(x = paste("score", previous_assessment_latest_data_year, previous_version_year),
+                                    y = paste("score", previous_assessment_latest_data_year, version_year), title = paste(previous_assessment_latest_data_year, "data comparison"))
+
+ggplotly(compare_plot, tooltip = c("text", "score", "old_score"))
 ```
 

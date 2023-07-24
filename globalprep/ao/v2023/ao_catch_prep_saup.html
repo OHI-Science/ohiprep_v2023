@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Mon Jul 24 12:16:04 2023 by arobinson" />
+<meta name="author" content="Compiled on Mon Jul 24 12:15:56 2023 by arobinson" />
 
 
-<title>OHI 2023 - Artisanal Opportunities: Preparing need data</title>
+<title>OHI 2023 - Artisanal Opportunities, Preparing non-industrial catch data for BBmsy calculations</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1664,449 +1664,232 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">OHI 2023 - Artisanal Opportunities:
-Preparing need data</h1>
-<h4 class="author"><em>Compiled on Mon Jul 24 12:16:04 2023 by
+<h1 class="title toc-ignore">OHI 2023 - Artisanal Opportunities,
+Preparing non-industrial catch data for BBmsy calculations</h1>
+<h4 class="author"><em>Compiled on Mon Jul 24 12:15:56 2023 by
 arobinson</em></h4>
 
 </div>
 
 
-<div id="summary" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Summary</h1>
-<p>This script generates the “need” layer for the artisanal
-opportunities goal.</p>
-</div>
-<div id="updates-from-previous-assessment" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Updates from previous
-assessment</h1>
-<p>One more year of data. Updated so that pop_weights data is also read
-in through the WDI package, and saved as annual data instead of only the
-most recent year ***</p>
-</div>
-<div id="data-source" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Data Source</h1>
-<p><strong>Downloaded</strong>: 2023-07-12</p>
-<p><strong>Description</strong>:<br />
-GDP adjusted per capita by PPP (ppppcgdp) <a href="http://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD" class="uri">http://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD</a>
-Reported at country scale.</p>
-<p>GDP per capita based on purchasing power parity (PPP). PPP GDP is
-gross domestic product converted to international dollars using
-purchasing power parity rates. An international dollar has the same
-purchasing power over GDP as the U.S. dollar has in the United States.
-GDP at purchaser’s prices is the sum of gross value added by all
-resident producers in the economy plus any product taxes and minus any
-subsidies not included in the value of the products. It is calculated
-without making deductions for depreciation of fabricated assets or for
-depletion and degradation of natural resources. Data are in constant
-international dollars based on the 2011 ICP round.</p>
-<p>Data is available directly to R through the WDI package.</p>
-<p><strong>Time range</strong>: 1990-2021</p>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>This script takes the SAUP 2022 catch data and creates 1 data
+layer:</p>
+<ol style="list-style-type: decimal">
+<li>An average non-industrial catch dataset used to weight B/Bmsy values
+in the fisheries model. For this dataset, the catch is assigned to FAO
+and OHI regions.</li>
+</ol>
+<p><strong>IMPORTANT NOTE: the fisheries subgoal data preps will need to
+be run first before this can be completed. That is where the RAM stock
+status dataprep and the fisheries catch download occurs.</strong></p>
+<div id="updates-from-previous-assessment" class="section level2">
+<h2>Updates from previous assessment</h2>
+<p>The SAUP data was not updated in v2023, and so this script was not
+run for that year. Raw and intermediate data stored on Mazu is pulled
+from the previous data year (V2022). Repository data files were copied
+over from the V2022 to the V2023 folders.</p>
 <hr />
 </div>
-<div id="methods" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Methods</h1>
-<div id="setup" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Setup</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">fig.width =</span> <span class="dv">6</span>, <span class="at">fig.height =</span> <span class="dv">4</span>, <span class="at">fig.path =</span> <span class="st">&#39;figs/&#39;</span>, <span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(ohicore)){</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;ohi-science/ohicore@dev&#39;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(ohicore)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(librarian)){</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;librarian&quot;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(librarian)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>librarian<span class="sc">::</span><span class="fu">shelf</span>(</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  tidyverse,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  here,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  janitor,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  jsonlite,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  plotly,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  WDI,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  modelr</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>) </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="do">## if the data has been updated you will need to re install the WDI package to get the updated data </span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">update.packages</span>(<span class="st">&quot;WDI&quot;</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">### directory paths and relevant files</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&#39;workflow&#39;</span>, <span class="st">&#39;R&#39;</span>, <span class="st">&#39;common.R&#39;</span>))</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>current_year <span class="ot">=</span> <span class="dv">2023</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">=</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>version_dir <span class="ot">=</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;ao&quot;</span>, version_year)</span></code></pre></div>
 </div>
-<div id="download-and-save-data" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Download and save
-data</h2>
-<p><strong>Skip if you have already downloaded data.</strong></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">### check website to see what years are available</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>yr_start <span class="ot">=</span> <span class="dv">1990</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>yr_end   <span class="ot">=</span> <span class="dv">2022</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">### get description of variables    </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">NOTE</span><span class="do">: these descriptions appear out of date, they aren&#39;t in sync with the definitions of the World Bank):</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>indicators <span class="ot">&lt;-</span>  <span class="fu">data.frame</span>(WDI_data[[<span class="dv">1</span>]])</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(indicators)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(WDI_data)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(WDI_data) </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="do">### current dollars (influenced by inflation, not being used)</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>indicators[<span class="fu">grep</span>(<span class="st">&quot;NY.GDP.PCAP.PP.CD&quot;</span>, indicators<span class="sc">$</span>indicator), ] </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># constant dollars. grep helps identify rows to select based on a string. (used this data)</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>indicators[<span class="fu">grep</span>(<span class="st">&quot;NY.GDP.PCAP.PP.KD&quot;</span>, indicators<span class="sc">$</span>indicator), ] </span>
+<div id="data-source" class="section level1">
+<h1>Data Source</h1>
+<p><strong>Reference</strong>: Pauly D., Zeller D., Palomares M.L.D.
+(Editors), 2020. Sea Around Us Concepts, Design and Data
+(seaaroundus.org).</p>
+<p><strong>Downloaded</strong>: September 27, 2022</p>
+<p><strong>Description</strong>: Tons per year and SAUP region with
+information on sector type, industry type, fishing entitity, reporting
+status and taxonomic information.</p>
+<p><strong>Time range</strong>: 1950 - 2019</p>
+<p><strong>Format</strong>: CSV</p>
+<p><strong>Additional Information</strong>: <a href="http://www.seaaroundus.org/sea-around-us-methods-index/">Methods</a></p>
+<hr />
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>Note: the same data was used to prepare fisheries subgoal scores. We
+will be using the prepped annual catch csv file prepared in the mazu
+fis/ folder. This means that fis will need to be run before this.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">fig.width =</span> <span class="dv">6</span>, <span class="at">fig.height =</span> <span class="dv">4</span>, <span class="at">fig.path =</span> <span class="st">&#39;figs/&#39;</span>,<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>, <span class="at">echo =</span> <span class="cn">TRUE</span>, <span class="at">eval=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Libraries</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(parallel)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(foreach)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep/ao/v2022&quot;</span>))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;../../../workflow/R/common.R&#39;</span>)</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="do">### download the data using the WDI package </span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="do">### This is the data we are going to work with. Create a variable for the data frame</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>gdppcppp_raw <span class="ot">&lt;-</span> <span class="fu">WDI</span>(</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="st">&quot;all&quot;</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">indicator =</span> <span class="st">&quot;NY.GDP.PCAP.PP.KD&quot;</span>, </span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">start =</span> yr_start, <span class="at">end=</span>yr_end)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gdppcppp_raw)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="do">### check if &#39;raw&#39;, &#39;intermediate&#39;, and &#39;final&#39; folders exist in the current assessment folder, if not, then create them</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="fu">file.path</span>(version_dir, <span class="st">&quot;raw&quot;</span>))){</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="fu">file.path</span>(version_dir, <span class="st">&quot;raw&quot;</span>))</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>} </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="fu">file.path</span>(version_dir, <span class="st">&quot;intermediate&quot;</span>))){</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="fu">file.path</span>(version_dir, <span class="st">&quot;intermediate&quot;</span>))</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="fu">file.path</span>(version_dir, <span class="st">&quot;output&quot;</span>))){</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="fu">file.path</span>(version_dir, <span class="st">&quot;output&quot;</span>))</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>date <span class="ot">&lt;-</span> <span class="fu">Sys.Date</span>()</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="do">### Save the file into the raw folder</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(gdppcppp_raw, <span class="fu">here</span>(<span class="fu">paste0</span>(version_dir, <span class="st">&#39;/raw/raw_gdppcppp_&#39;</span>, date,<span class="st">&#39;.csv&#39;</span>))) </span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="do">### Save file with date, as WDI data changes over even short periods of time. </span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="do">### For instance, the Mauritania GDP data changed by an order of magnitude over the course of a week. </span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="do">### We want to preserve the date it was downloaded so that data is not being overwritten every time we run the script. </span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>new_saved_date <span class="ot">&lt;-</span> <span class="st">&quot;2023-07-12&quot;</span> <span class="co"># update when new data are downloaded.</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>old_saved_date <span class="ot">&lt;-</span> <span class="st">&quot;2022-06-30&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>new <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(version_dir, <span class="st">&quot;raw&quot;</span>, <span class="fu">paste0</span>(<span class="st">&#39;raw_gdppcppp_&#39;</span>, new_saved_date,<span class="st">&#39;.csv&#39;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;ao&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year<span class="dv">-1</span>), </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;raw&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;raw_gdppcppp_&quot;</span>, old_saved_date, <span class="st">&quot;.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, <span class="at">old_value =</span> NY.GDP.PCAP.PP.KD, year)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">left_join</span>(new, old, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))  <span class="sc">%&gt;%</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year<span class="sc">==</span>current_year<span class="dv">-2</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(compare, <span class="fu">aes</span>(<span class="at">x=</span>NY.GDP.PCAP.PP.KD, <span class="at">y=</span>old_value)) <span class="sc">+</span> </span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">color=</span><span class="st">&quot;red&quot;</span>)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(plot)</span></code></pre></div>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#update as needed</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>version_year <span class="ot">&lt;-</span> <span class="st">&quot;v2023&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>raw_data_version_year <span class="ot">&lt;-</span> <span class="st">&quot;v2022&quot;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Paths for data</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>fis_path <span class="ot">=</span> <span class="fu">file.path</span>(dir_M,<span class="st">&quot;git-annex/globalprep/fis/v2022/int&quot;</span>) <span class="co"># filepath to fisheries path</span></span></code></pre></div>
+<hr />
 </div>
-<div id="gapfilling-1-linear-regression-within-a-countrys-data" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> Gapfilling 1: Linear
-Regression within a country’s data</h2>
-<p>For the first case, if there is only one value use this value for all
-years. This is not ideal, but likely better than other forms of
-gapfilling</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Reorganize to create cells for countries that have missing values for some years</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>gdppcppp_clean <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(version_dir, <span class="st">&quot;raw&quot;</span>, <span class="fu">paste0</span>(<span class="st">&#39;raw_gdppcppp_&#39;</span>, new_saved_date,<span class="st">&#39;.csv&#39;</span>)) <span class="sc">%&gt;%</span> <span class="co">#date here should also to match filename above </span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()<span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, <span class="at">value=</span>NY.GDP.PCAP.PP.KD, year) <span class="sc">%&gt;%</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2005</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">complete</span>()</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gdppcppp_clean)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gdppcppp_clean) <span class="co"># 473 NAs v2023</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="do">### Drop Countries with no data and</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="do">### Gapfill countries with only 1 year of data with that single value</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>gdppcppp_gf_1 <span class="ot">&lt;-</span> gdppcppp_clean <span class="sc">%&gt;%</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">%&gt;%</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="do">### counts the numbers of non-missing values for each country (logical TRUEs regarded as one)</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">value_num =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(value))) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="do">### filter out the countries with no data between 2005 and 2019 </span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(value_num <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span>    </span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="do">### mean() function is used on regions with one year of data, applies that single value to all NAs for that region</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">ifelse</span>(value_num<span class="sc">==</span><span class="dv">1</span>, <span class="fu">mean</span>(value, <span class="at">na.rm=</span><span class="cn">TRUE</span>), value)) <span class="sc">%&gt;%</span>  </span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() </span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gdppcppp_gf_1)</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gdppcppp_gf_1) <span class="co"># 41 NAs v2023 (mostly lower from dropping countries with no data)</span></span></code></pre></div>
-<p>When a country has more than one value (but not a complete series), a
-within-country regression model is used to predict the missing
-values.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Predict values using a linear regression with &#39;year&#39; as an independent variable </span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">### Create new column with these predicted values</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">### Fill in the remaining NA values using the predicted values</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">### See https://r4ds.had.co.nz/many-models.html for explanation on workflow</span></span>
+</div>
+<div id="load-data" class="section level1">
+<h1>Load Data</h1>
+<div id="non-industrial-catch" class="section level2">
+<h2>Non-Industrial Catch</h2>
+<p>The SAUP data is separated into commercial, recreational,
+subsistence, and artisanal fishing. We will only grab the artisanal and
+subsistence catch for Artisanal Opportunities.</p>
+<p>Look at catch data</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## read in the catch data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(fis_path, <span class="st">&quot;stock_catch_by_rgn_taxa.csv&quot;</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">unique</span>(catch<span class="sc">$</span>rgn_id))</span></code></pre></div>
+</div>
+</div>
+<div id="aggregate-nonindustrial-catch" class="section level1">
+<h1>Aggregate Nonindustrial catch</h1>
+<p>Aggregate catch per OHI region and FAO area. This catch will be used
+twice.</p>
+<ol style="list-style-type: decimal">
+<li><p>The catch is used to weight scores per region. For this we need
+to use catch records, including those not reported at the species level.
+See note below.</p></li>
+<li><p>The catch data at species level is used to calculate stock status
+(BBmsy) per stock (remember that our definition of a stock is a species
+caught within a single FAO area).</p></li>
+</ol>
+<p>Note: Save IUU and Reported only (<code>CatchTotal</code>) as the
+catch sum.</p>
+<p><strong>NonIndustrial Catch</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>output_df <span class="ot">&lt;-</span> catch <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(discard_id <span class="sc">!=</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="co"># filter out discards</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(other_id <span class="sc">!=</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="co"># filter out catch not used for humans</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(year, rgn_id, fao_rgn, TaxonName, CommonName, human_use_id, fishing_sector, tons, stock_id, TaxonKey) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(fishing_sector <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Subsistence&quot;</span>, <span class="st">&quot;Artisanal&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(year, rgn_id, fao_rgn, TaxonName, CommonName, stock_id, TaxonKey) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">tons =</span> <span class="fu">sum</span>(tons)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(output_df, <span class="at">file =</span> <span class="fu">file.path</span>(dir_M,<span class="st">&#39;git-annex/globalprep/ao/v2022/int/ao_stock_catch_by_rgn_taxa.csv&#39;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> output_df <span class="sc">%&gt;%</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">sum =</span> <span class="fu">sum</span>(tons)) <span class="co"># looks good</span></span></code></pre></div>
+<div id="data-check" class="section level2">
+<h2>Data Check</h2>
+<p>Take a look at catch data with missing ohi and fao regions in
+<strong>stock_catch_by_rgn_taxa</strong>. These have taxon key matches,
+but no ohi or fao regions assigned to them.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">region_data</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_M,<span class="st">&#39;git-annex/globalprep/ao/v2022/int/ao_stock_catch_by_rgn_taxa.csv&#39;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">### Define the model</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>country_model <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {<span class="fu">lm</span>(value <span class="sc">~</span> year, <span class="at">data =</span> df)}</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>gdppcppp_gf_2 <span class="ot">&lt;-</span> gdppcppp_gf_1 <span class="sc">%&gt;%</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">nest</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Apply the model to all country groupings</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> purrr<span class="sc">::</span><span class="fu">map</span>(data, country_model),</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Use the trained model to get predicted values</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">predictions =</span> purrr<span class="sc">::</span><span class="fu">map2</span>(data, model, add_predictions)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(predictions)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>data, <span class="sc">-</span>model, <span class="at">prediction =</span> pred) <span class="sc">%&gt;%</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">gapfilled =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(<span class="fu">is.na</span>(value) <span class="sc">|</span> value_num <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>, T <span class="sc">~</span> <span class="dv">0</span>),</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(<span class="fu">is.na</span>(value) <span class="sc">~</span> prediction, T <span class="sc">~</span> value),</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      value_num <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;gapfilled using one year of data&quot;</span>,</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      gapfilled <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> value_num <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="fu">paste0</span>(<span class="st">&quot;lm based on N years data: &quot;</span>, value_num),</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      T <span class="sc">~</span> <span class="fu">as.character</span>(<span class="cn">NA</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gdppcppp_gf_2) <span class="co"># no more NAs because everything has been gap-filled.</span></span></code></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># they all have ohi or fao regions; however there are only 197 regions with artisanal or subsistence catch in the SAUP data.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(df<span class="sc">$</span>rgn_id))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(df<span class="sc">$</span>year)</span></code></pre></div>
+<hr />
+<hr />
 </div>
-<div id="calculate-rescaled-values" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> Calculate rescaled
-values</h2>
-<p>This is performed by taking the natural log of each value and then
-dividing by the 95th quantile of values across all years (from 2005 to
-current data year).</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">### Values at the 95th Quantile or greater are given a rescaled score of &#39;1&#39; (the highest value)</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>gdppcppp_rescale <span class="ot">&lt;-</span> gdppcppp_gf_2 <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="do">### gives a single value - the 95th quant (v2020=57245.33, v2022=58817.7, v2023 = 58780)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">quantile_95 =</span> <span class="fu">quantile</span>(value, <span class="at">probs=</span><span class="fl">0.95</span>),</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="do">### where does value scale relative to 95th quantile</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">value_stand =</span> value<span class="sc">/</span>quantile_95,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Replace values greater than the 95th percntile with 1</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">value_stand =</span> <span class="fu">ifelse</span>(value_stand <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, value_stand)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="do">### rename value_stand &#39;score&#39;</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, year, value, <span class="at">score=</span>value_stand, gapfilled, method) </span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gdppcppp_rescale)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gdppcppp_rescale)</span>
+</div>
+<div id="prep-data-for-mean-catch" class="section level1">
+<h1>Prep data for mean catch</h1>
+<div id="wrangle" class="section level2">
+<h2>Wrangle</h2>
+<p>Mean catch data is used to weight the B/Bmsy values in the fishery
+subgoal.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir_M,<span class="st">&#39;git-annex/globalprep/ao/v2022/int/ao_stock_catch_by_rgn_taxa.csv&#39;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(file) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">common =</span> CommonName, <span class="at">fao_id =</span> fao_rgn, <span class="at">species=</span>TaxonName)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(catch)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="do">## filter out non ohi eez regions </span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> catch <span class="sc">%&gt;%</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(rgn_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fao_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">213</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="do">### Check to see if scores make sense - anything above reference point (quant_95) should = 1</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="do">### everything below it should have a value between 0 and 1 </span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>rescale_vis <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(gdppcppp_rescale) <span class="sc">+</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> value , <span class="at">y =</span> score, <span class="at">text =</span> country))</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(rescale_vis)</span></code></pre></div>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate total annual catch for each stock</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> catch <span class="sc">%&gt;%</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(year, rgn_id, fao_id, stock_id, TaxonKey, tons) <span class="sc">%&gt;%</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, fao_id, TaxonKey, stock_id, year) <span class="sc">%&gt;%</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">catch =</span> <span class="fu">sum</span>(tons)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># missing &lt;- c(&quot;Belgium&quot;, &quot;Latvia&quot;, &quot;Estonia&quot;, &quot;Kerguelen Islands&quot;, &quot;Faeroe Islands&quot;, &quot;Iceland&quot;, &quot;Finland&quot;, &quot;Poland&quot;, &quot;Lithuania&quot;, &quot;Sweden&quot;)</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co"># test &lt;- catch %&gt;%</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(rgns_eez) %&gt;%</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(rgn_name %in% missing)</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># sort(unique(test$rgn_name))</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co"># sort(missing)</span></span></code></pre></div>
+<p>Take a look at a few stocks.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(dplyr<span class="sc">::</span><span class="fu">filter</span>(catch, stock_id <span class="sc">==</span> <span class="st">&quot;Marine_fishes_not_identified-57&quot;</span> <span class="sc">&amp;</span> rgn_id<span class="sc">==</span><span class="dv">1</span>))</span></code></pre></div>
 </div>
-<div id="convert-country-names-to-ohi-regions" class="section level2" number="4.5">
-<h2><span class="header-section-number">4.5</span> Convert country names
-to ohi regions</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#manually change names as needed </span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>gdppcpp_rename <span class="ot">&lt;-</span> gdppcppp_rescale <span class="sc">%&gt;%</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">case_when</span>(country <span class="sc">==</span> <span class="st">&quot;Turkiye&quot;</span> <span class="sc">~</span> <span class="st">&quot;Turkey&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                   <span class="cn">TRUE</span> <span class="sc">~</span> country))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="do">### Function to add OHI region ID based on country name</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>d_stand_rgn <span class="ot">&lt;-</span> ohicore<span class="sc">::</span><span class="fu">name_2_rgn</span>(</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">df_in =</span> gdppcpp_rename, </span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>, </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">flds_unique=</span><span class="fu">c</span>(<span class="st">&#39;year&#39;</span>))</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="do">### v2021: Lots of warning messages about missing regions from lookup table; </span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="do">### lots of them are broad areas (e.g. &quot;Arab World&quot; and &quot;fragile regions&quot;), </span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="do">### some are landlocked areas like N. Macedonia and Eswatini. </span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="do">### Check to make sure there aren&#39;t any regions that need to be reported at different scales </span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="do">### China, Hong Kong and Macao are all reported separately, combine into one</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="do">### Puerto Rico and Virgin Islands are also reported separately, although Value is NA for all years for Virigin Islands so we don&#39;t see it as a duplicate here. Included in pop_weights file creation in case this changes. </span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="do">### This should match the duplicate regions</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(d_stand_rgn, rgn_id <span class="sc">==</span> <span class="dv">209</span>)</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="do">### Combine the duplicate regions (we report these at lower resolution)</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="do">### In this case, we take the average score weighted by population.</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="do">##2023 updated so that population data is read in through the WDI package </span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">#iso2c codes VI (Virgin Islands USA), PR (Puerto Rico), CN (China), HK (Hong Kong SAR), MO (China, Macao SAR, China)</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>population_weights <span class="ot">&lt;-</span> <span class="fu">WDI</span>(</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">c</span>(<span class="st">&quot;VI&quot;</span>, <span class="st">&quot;PR&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;HK&quot;</span>, <span class="st">&quot;MO&quot;</span>),</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">indicator =</span> <span class="st">&quot;SP.POP.TOTL&quot;</span>, </span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">start =</span> yr_start, <span class="at">end=</span>yr_end) <span class="sc">%&gt;%</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country, <span class="at">population =</span> SP.POP.TOTL, year)</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="do">### Weight the `score`, `value`, and `gapfilled` column by population</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>population_weights_all <span class="ot">&lt;-</span> d_stand_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(population_weights, <span class="at">by=</span><span class="fu">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(population), <span class="dv">1</span>, population)) <span class="co"># If no value available, input 1 (these values will not change)</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="co">#save the population weights file</span></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>population_weights_all <span class="sc">%&gt;%</span> <span class="fu">select</span>(country,population,year) <span class="sc">%&gt;%</span>  <span class="fu">write_csv</span>(<span class="fu">file.path</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;supplementary_information&quot;</span>, version_year, <span class="st">&quot;pop_weights.csv&quot;</span>))</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>d_stand_rgn <span class="ot">&lt;-</span> population_weights_all <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">group_by</span>(rgn_id, year, method, gapfilled) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">score =</span> <span class="fu">weighted.mean</span>(score, population), <span class="co"># weight the single score value by pop.</span></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>            <span class="at">value =</span> <span class="fu">weighted.mean</span>(value, population)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() </span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="do">### check again:</span></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(d_stand_rgn, rgn_id <span class="sc">==</span> <span class="dv">209</span>)</span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a><span class="do">### Removed `Azerbaijan` (255) because the adjacent body of water is a sea not the ocean - is this not done in names2region? </span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>d_stand_rgn <span class="ot">&lt;-</span> d_stand_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>)</span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d_stand_rgn) <span class="co"># no NAs</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a><span class="do">### save the cleaned gdppcppp for other goals</span></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>gdppcppp_data <span class="ot">&lt;-</span> d_stand_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, value)</span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(gdppcppp_data, here<span class="sc">::</span><span class="fu">here</span>(version_dir, <span class="st">&quot;intermediate&quot;</span>, <span class="st">&quot;gdppcppp_ohi.csv&quot;</span>))</span></code></pre></div>
+<div id="fill-in-zeros" class="section level2">
+<h2>Fill in Zeros</h2>
+<p>For years with no reported catch, add zero values (after first
+reported catch)</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## these data have no zero catch values, so add years with no reported catch to data table:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>catch_zeros <span class="ot">&lt;-</span> catch <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(year, catch) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(<span class="st">&quot;year&quot;</span>, <span class="st">&quot;catch&quot;</span>, <span class="fu">num_range</span>(<span class="st">&quot;X&quot;</span>, <span class="fu">min</span>(catch<span class="sc">$</span>year)<span class="sc">:</span><span class="fu">max</span>(catch<span class="sc">$</span>year))) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">&quot;X&quot;</span>, <span class="st">&quot;&quot;</span>, year))) <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">catch =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(catch), <span class="dv">0</span>, catch))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="do">## this part eliminates the zero catch values prior to the first reported non-zero catch   </span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>catch_zeros <span class="ot">&lt;-</span> catch_zeros <span class="sc">%&gt;%</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(fao_id, TaxonKey, stock_id, rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cum_catch =</span> <span class="fu">cumsum</span>(catch)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cum_catch <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>cum_catch) <span class="sc">%&gt;%</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
 </div>
-<div id="gapfilling-part-2" class="section level2" number="4.6">
-<h2><span class="header-section-number">4.6</span> Gapfilling: part
-2</h2>
-<p>In this case, we gapfill regions with no data using means based on
-UN-designated geopolitical levels.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">### how is this different from Mel&#39;s georegion function in ohicore? </span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">UNgeorgn</span>() </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(UNgeorgn)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(UNgeorgn)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="do">### Create dataframe pairing each UN geopolitical region id with a year from 2005 to current</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">### Assign georegion labels to each region for each level (r0, r1, r2)</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>d_stand_gf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year=</span><span class="fu">min</span>(d_stand_rgn<span class="sc">$</span>year)<span class="sc">:</span><span class="fu">max</span>(d_stand_rgn<span class="sc">$</span>year)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  base<span class="sc">::</span><span class="fu">merge</span>(UNgeorgn, <span class="at">by =</span> <span class="cn">NULL</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="do">### Combine the two data frames by region id and year</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="do">### Calculate means across increasing geopolitical levels (e.g. r2, r1), using the highest resolution possible</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>d_stand_gf <span class="ot">&lt;-</span> d_stand_gf <span class="sc">%&gt;%</span>  </span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(d_stand_rgn, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(r2_label, year) <span class="sc">%&gt;%</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">r2_value =</span> <span class="fu">mean</span>(score, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(r1_label, year) <span class="sc">%&gt;%</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">r1_value =</span> <span class="fu">mean</span>(score, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(r0_label, year) <span class="sc">%&gt;%</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">r0_value =</span> <span class="fu">mean</span>(score, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d_stand_gf) </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="do">### For `score` cells that still have NA values (still several hundred):</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="do">### Check to see if r2 has a value, if so use that to gapfill `score`, otherwise use r1, otherwise use r0</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>d_stand_gf <span class="ot">&lt;-</span> d_stand_gf <span class="sc">%&gt;%</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">gapfilled =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r2_value) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r1_value) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r0_value) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>      T <span class="sc">~</span> gapfilled),</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r2_value) <span class="sc">~</span> <span class="st">&quot;UN_geopolitical region avg, r2&quot;</span>,</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r1_value) <span class="sc">~</span> <span class="st">&quot;UN_geopolitical region avg, r1&quot;</span>,</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r0_value) <span class="sc">~</span> <span class="st">&quot;UN_geopolitical region avg, r0&quot;</span>,</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>      T <span class="sc">~</span> method),</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">score =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r2_value) <span class="sc">~</span> r2_value,</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r1_value) <span class="sc">~</span> r1_value,</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(r0_value) <span class="sc">~</span> r0_value,</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>      T <span class="sc">~</span> score)) </span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="do">### Load in low population areas</span></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="fu">low_pop</span>()</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="do">### filter out regions that have populations &gt; 3000 and keep NA values </span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>low_pop <span class="ot">&lt;-</span> low_pop <span class="sc">%&gt;%</span></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(est_population <span class="sc">&lt;</span> <span class="dv">3000</span> <span class="sc">|</span> <span class="fu">is.na</span>(est_population)) </span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="do">### make a vector of low population areas </span></span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>low_pop_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(low_pop<span class="sc">$</span>rgn_id) </span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="do">### Use NA values in score column for low population areas</span></span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>d_stand_gf <span class="ot">&lt;-</span> d_stand_gf <span class="sc">%&gt;%</span> </span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">score =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(rgn_id <span class="sc">%in%</span> low_pop_vector <span class="sc">~</span> <span class="cn">NA_real_</span>, T <span class="sc">~</span> score))</span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="do">### Check number of NAs in score column </span></span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="do">### v2022 has 340 (17 years of data and 20 low pop countries)</span></span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="do">### v2023 has 360 (18 years of data and 20 low pop countries)</span></span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(d_stand_gf)</span></code></pre></div>
+<div id="calculate-mean-catch" class="section level2">
+<h2>Calculate Mean Catch</h2>
+<p>Calculate mean catch for ohi regions (using data from 1980 onward).
+These data are used to weight the RAM b/bmsy values.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mean_catch <span class="ot">&lt;-</span> catch_zeros <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">1980</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, fao_id, TaxonKey, stock_id) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mean_catch =</span> <span class="fu">mean</span>(catch, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="co"># mean catch for each stock (in a specific ohi-fao region)</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mean_catch <span class="sc">!=</span> <span class="dv">0</span>)  <span class="sc">%&gt;%</span>      <span class="do">## some stocks have no reported catch for time period</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
+<p>Check out the data</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">filter</span>(mean_catch, stock_id <span class="sc">==</span> <span class="st">&quot;Marine_fishes_not_identified-57&quot;</span> <span class="sc">&amp;</span> rgn_id<span class="sc">==</span><span class="dv">1</span>)) <span class="co"># includes finfishes (100139) and other marine fishes (100039)</span></span></code></pre></div>
 </div>
-<div id="save-the-data" class="section level2" number="4.7">
-<h2><span class="header-section-number">4.7</span> Save the data</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save dataframe with adjusted, gapfilled, and rescaled score information</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>final <span class="ot">&lt;-</span> d_stand_gf <span class="sc">%&gt;%</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, <span class="at">value =</span> score)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(final, here<span class="sc">::</span><span class="fu">here</span>(version_dir, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;wb_gdppcppp_rescaled.csv&quot;</span>))</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">### Save dataframe with gapfilled method and status information</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="do">### Note this includes regions which were made NA for being low pop</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>final_gf <span class="ot">&lt;-</span> d_stand_gf <span class="sc">%&gt;%</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, gapfilled, method)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(final_gf, here<span class="sc">::</span><span class="fu">here</span>(version_dir, <span class="st">&quot;output&quot;</span>, <span class="st">&quot;wb_gdppcppp_rescaled_gf.csv&quot;</span>))</span></code></pre></div>
-</div>
-<div id="compare-data-to-previous-year-for-the-same-data-year" class="section level2" number="4.8">
-<h2><span class="header-section-number">4.8</span> Compare data to
-previous year (for the same data year)</h2>
-<p>Use most recent data year shared by current and previous
-assessment.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>comparison_year <span class="ot">&lt;-</span> current_year <span class="sc">-</span> <span class="dv">2</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>old_gdppcppp <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;ao&quot;</span>,<span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year <span class="sc">-</span><span class="dv">1</span>), <span class="st">&quot;output&quot;</span>, <span class="st">&quot;wb_gdppcppp_rescaled.csv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">old_value=</span>value) <span class="sc">%&gt;%</span>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> comparison_year)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(old_gdppcppp) <span class="co"># 20 NAs  </span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">region_data</span>()</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;ao&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year), <span class="st">&quot;output&quot;</span>, <span class="st">&quot;wb_gdppcppp_rescaled.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> comparison_year) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(old_gdppcppp, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, value, old_value) <span class="sc">%&gt;%</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">difference =</span> value <span class="sc">-</span> old_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez)</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(compare) <span class="co"># still 20 NAs - this is because of converting unpopulated/low population regions to NAs</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(compare, <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">y =</span> old_value, <span class="at">labels =</span> rgn_name)) <span class="sc">+</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;Data year &quot;</span>, comparison_year, <span class="st">&quot; -&quot;</span>, <span class="st">&quot;v&quot;</span>, current_year<span class="dv">-1</span>, <span class="st">&quot; vs &quot;</span>, version_year),</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> version_year, <span class="at">y =</span> <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year <span class="sc">-</span><span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(p1)</span></code></pre></div>
-</div>
-<div id="compare-changes-from-this-year-to-last-year" class="section level2" number="4.9">
-<h2><span class="header-section-number">4.9</span> Compare changes from
-this year to last year</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>old_gdppcppp <span class="ot">&lt;-</span>  here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;ao&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year), <span class="st">&quot;output&quot;</span>, <span class="st">&quot;wb_gdppcppp_rescaled.csv&quot;</span>)  <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">old_value=</span>value) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> current_year <span class="sc">-</span><span class="dv">2</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(old_gdppcppp) <span class="co"># 20 NAs  </span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>compare <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;globalprep&quot;</span>, <span class="st">&quot;ao&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;v&quot;</span>, current_year), <span class="st">&quot;output&quot;</span>, <span class="st">&quot;wb_gdppcppp_rescaled.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> current_year<span class="dv">-1</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(old_gdppcppp, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, value, old_value) <span class="sc">%&gt;%</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">difference =</span> value <span class="sc">-</span> old_value) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(compare) <span class="co"># still 20 NAs - this is because of converting unpopulated/low population regions to NAs</span></span>
+<div id="toolbox-formatting-and-save" class="section level2">
+<h2>Toolbox formatting and save</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>) <span class="co"># to prevent taxonkey from turning into scientific notation</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>mean_catch_toolbox <span class="ot">&lt;-</span> mean_catch <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stock_id_taxonkey =</span> <span class="fu">paste</span>(stock_id, TaxonKey, <span class="at">sep=</span><span class="st">&quot;_&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, stock_id_taxonkey, year, mean_catch) <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2001</span>) <span class="sc">%&gt;%</span>  <span class="co"># filter to include only analysis years</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>()</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(mean_catch_toolbox, <span class="st">&quot;intermediate/mean_catch.csv&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>) <span class="do">## save the total mean catch csv for reference if needed</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(mean_catch_toolbox<span class="sc">$</span>rgn_id)) <span class="co"># only 196 regions... We will gapfill the missing regions...</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>old <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../v2021/intermediate/mean_catch.csv&quot;</span>)</span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(compare, <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">y =</span> old_value, <span class="at">labels =</span> rgn_name)) <span class="sc">+</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;Current vs Previous year&quot;</span>, <span class="st">&quot;-&quot;</span>, version_year),</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> current_year <span class="sc">-</span><span class="dv">1</span>, <span class="at">y =</span> current_year<span class="dv">-2</span>) <span class="sc">+</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="do">### if anything was off of abline then something went wrong </span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="do">### however in v2019 data were positively skewed and we attributed this to source data changes. </span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(p1)</span></code></pre></div>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(old<span class="sc">$</span>rgn_id)) <span class="co"># only 196 regions</span></span></code></pre></div>
+<hr />
 </div>
 </div>
 
