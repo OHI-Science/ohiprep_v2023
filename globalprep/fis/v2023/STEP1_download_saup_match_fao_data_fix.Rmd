@@ -35,7 +35,7 @@ Note: In the future, I think it would be possible to use python to download the 
 
 # Updates from previous scenario year
 
-- None. This script wasn't run in v2023.
+- None. This script wasn't run in v2023. Associated data files within the repo were copied from v2022 to v2023.
 
 # Data Source
 

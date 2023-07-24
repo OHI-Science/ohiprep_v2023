@@ -265,7 +265,7 @@ clean_output <- binded_df %>%
     country = str_replace_all(country, "St. Lucia", "Saint Lucia"),
     country = str_replace_all(country, "&", "and"),
     country = str_replace_all(country, "Congo - Kinshasa", "Democratic Republic of the Congo"),
-    country = str_replace_all(country, "Côte d’Ivoire", "	Ivory Coast"),
+    country = str_replace_all(country, "Côte d’Ivoire", "Ivory Coast"),
     country = str_replace_all(country, "Curaçao", "Curacao"),
     country = str_replace_all(country, "Myanmar \\(Burma\\)", "Myanmar"),
     country = str_replace_all(country, "Saint Martin \\(French part\\)", "Northern Saint-Martin"),

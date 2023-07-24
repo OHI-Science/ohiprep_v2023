@@ -335,7 +335,7 @@ summary(mod)
 
 ## Identify FAO and OHI regions for RAM stocks
 
-Identify the FAO/OHI regions where each RAM stock is located (fao and ohi regions are assigned to RAM Data in [STEP4b_fao_ohi_rgns.Rmd](https://mazu.nceas.ucsb.edu/rstudio/files/github/ohiprep_v2021/globalprep/fis/v2022/STEP4b_fao_ohi_rgns.html). **Run STEP4b_fao_ohi_rgns.Rmd now.**
+Identify the FAO/OHI regions where each RAM stock is located (fao and ohi regions are assigned to RAM Data in [STEP4b_fao_ohi_rgns.Rmd](https://mazu.nceas.ucsb.edu/rstudio/files/github/ohiprep_v2023/globalprep/fis/v2023/STEP4b_fao_ohi_rgns.html). **Run STEP4b_fao_ohi_rgns.Rmd now.**
 
 
 If there are many differences between RAM spatial file and RAM metadata, check the STEP4_fao_ohi_rgns.Rmd prep again. 
@@ -376,7 +376,7 @@ ram_sp <- ram_bmsy_gf_final %>%
 
 
 # SAUP species, sci name (read in the datatable that includes TaxonKey)
-SAUP_sp <- read_csv(file.path(dir_M,'git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn_taxa.csv')) %>% 
+SAUP_sp <- read_csv(file.path(dir_M,'git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn_taxa.csv')) %>% # use most recent one available
   dplyr::rename(SAUP_scientificname = TaxonName) %>%
   dplyr::select(SAUP_scientificname) %>%
   unique() %>%
@@ -402,7 +402,7 @@ ram_sp_fao_ohi <- tmp %>%
 write_csv(ram_sp_fao_ohi, "int/new_ram_sp.csv")  
 
 ## get SAUP fao_ohi regions
-SAUP_sp_fao_ohi <- read_csv(file.path(dir_M,'git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn_taxa.csv')) %>% 
+SAUP_sp_fao_ohi <- read_csv(file.path(dir_M,'git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn_taxa.csv')) %>% # use most recent one available
   dplyr::rename(SAUP_scientificname = TaxonName) %>%
    dplyr::filter(year > 1979) # %>%
   #filter(str_detect(SAUP_scientificname, "Lepidorhombus"))
