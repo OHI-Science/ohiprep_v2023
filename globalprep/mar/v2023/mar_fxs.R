@@ -5,12 +5,13 @@ mar_split <- function(m) {
   
   m_ant <- m %>%
     filter(country == 'Netherlands Antilles') %>%  # Conch was cultivated for restoration purposes in a joint programme across these 3 countries
-    mutate(value            = value/3,  
-      'Aruba'        = value,
-      'Bonaire'           = value,
-      'Curacao'   = value) %>%
+    mutate(value = value/3,  
+      'Aruba' = value,
+      'Bonaire' = value,
+      'Curacao' = value) %>%
     select(-value, -country) %>%
-    gather('country', 'value', -species, -fao, -environment, -year, -Taxon_code, -family) %>%
+    pivot_longer(cols = -c(species, fao, environment, year, Taxon_code, family), names_to = 'country',
+                 values_to = 'value') %>%
     mutate(country = as.character(country))
 
   m <- m %>%
@@ -26,11 +27,12 @@ m_ant2 <- m %>%
     'Saba'           = value,
     'Sint Eustatius'   = value) %>%
   select(-value, -country) %>%
-  gather(country, value, -species, -fao, -environment, -year, -Taxon_code, -family) %>%
+  pivot_longer(cols = -c(species, fao, environment, year, Taxon_code, family), names_to = 'country',
+               values_to = 'value') %>%
   mutate(country = as.character(country)) 
 m <- m %>%
   filter(country != 'Bonaire/S.Eustatius/Saba') %>%
-    bind_rows(m_ant) %>% 
+    bind_rows(m_ant2) %>% 
   arrange(country, fao, environment, species, year, value) 
 
 m_ant3 <- m %>%
@@ -40,11 +42,12 @@ m_ant3 <- m %>%
     'Guernsey'        = value,
     'Jersey'           = value) %>%
   select(-value, -country) %>%
-  gather(country, value, -species, -fao, -environment, -year, -Taxon_code, -family) %>%
+  pivot_longer(cols = -c(species, fao, environment, year, Taxon_code, family), names_to = 'country',
+               values_to = 'value') %>%
   mutate(country = as.character(country))  
 m <- m %>%
   filter(country != 'Channel Islands') %>%
-      bind_rows(m_ant) %>%  
+      bind_rows(m_ant3) %>%  
   arrange(country, fao, environment, species, year, value) 
 
 

@@ -399,7 +399,7 @@ tmp <- names_weekly_df %>% # View(tmp)
 
 
 foreach(i = match_weeks) %dopar% {
-  w = names_weekly[(substr(names_weekly, 87, 92) == i)] %>% terra::rast()
+  w <- names_weekly[(substr(names_weekly, 87, 92) == i)] %>% terra::rast()
   
   m   <- terra::app(w, 
               fun = "mean",
@@ -599,14 +599,16 @@ rgn_data <- read.csv("~/ohi-global/eez/spatial/regions_list.csv") %>%
 
 ## get raster data
 rasts <- list.files(out_dir, full = TRUE, pattern = "uv_.*_mol_1km.tif")
+extracted_names <- str_extract(rasts, "uv_\\d{4}_\\d{4}-\\d{4}_\\d{4}_mol_1km") %>% 
+  str_replace("-", ".") # this part may not be necessary; kept for consistency with v2022 names
 pressure_stack <- terra::rast(rasts)
-names(pressure_stack) <- c("uv_2005_2009.2005_2009_mol_1km","uv_2006_2010.2005_2009_mol_1km","uv_2007_2011.2005_2009_mol_1km","uv_2008_2012.2005_2009_mol_1km","uv_2009_2013.2005_2009_mol_1km","uv_2010_2014.2005_2009_mol_1km","uv_2011_2015.2005_2009_mol_1km","uv_2012_2016.2005_2009_mol_1km","uv_2013_2017.2005_2009_mol_1km","uv_2014_2018.2005_2009_mol_1km","uv_2015_2019.2005_2009_mol_1km","uv_2016_2020.2005_2009_mol_1km","uv_2017_2021.2005_2009_mol_1km","uv_2018_2022.2005_2009_mol_1km")
+names(pressure_stack) <- extracted_names # ensure these are correct!
 ```
 
 ```{r gif, eval=F}
 saveGIF({
   for(i in 1:terra::nlyr(pressure_stack)){
-    n = sprintf("UV Pressure %s", 
+    n <- sprintf("UV Pressure %s", 
                 substr(names(pressure_stack[[i]]), 4, 12))
     plot(pressure_stack[[i]], 
          zlim = c(0, 1), # don't forget to fix the zlimits
