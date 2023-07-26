@@ -195,7 +195,7 @@ When a country has more than one value (but not a complete series), a within-cou
 ### Define the model
 country_model <- function(df) {lm(value ~ year, data = df)}
 
-gdppcppp_gf_2 <- gdppcppp_gf_1 %>%
+gdppcppp_gf_2 <- gdppcppp_gf_1 %>% 
   dplyr::group_by(country) %>% 
   tidyr::nest() %>% 
   dplyr::mutate(
@@ -252,9 +252,7 @@ ggplotly(rescale_vis)
 ```{r, eval=F}
 #manually change names as needed 
 
-gdppcpp_rename <- gdppcppp_rescale %>% 
-  mutate(country = case_when(country == "Turkiye" ~ "Turkey",
-                   TRUE ~ country))
+gdppcpp_rename <- gdppcppp_rescale
 
 
 ### Function to add OHI region ID based on country name
