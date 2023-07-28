@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # Ocean Health Index: Sea Surface Temperature Pressure
 
 See full data prep details
@@ -14,7 +8,7 @@ policy](http://ohi-science.org/citation-policy/).
 
 ## PRS_SST Data Layer
 
-### [**Step 1:**]{.underline} **To full update or not to full update**
+### **Step 1:** **To full update or not to full update**
 
 -   Investigate status of SST and SSTA Data. CoRTAD, the origin of the
     data, updates their data set every year with an addtional year of
@@ -33,7 +27,7 @@ policy](http://ohi-science.org/citation-policy/).
     \
     The current last update year was 2023.
 
-### [**Step 2 (a):**]{.underline} **Not full update**
+### **Step 2 (a):** **Not full update**
 
 -   If the historical CoRTAD data stayed the same, create a new scenario
     year folder like normally done for new data layers:\
@@ -43,7 +37,7 @@ policy](http://ohi-science.org/citation-policy/).
 -   Use the sst_layer_prep to update the layer rasters with the most
     recent year of data and complete the data prep!
 
-### [**Step 2 (b):**]{.underline} **Full update**
+### **Step 2 (b):** **Full update**
 
 -   If the historical CoRTAD has been updated, create a new update year
     in this folder path:\
