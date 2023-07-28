@@ -368,7 +368,9 @@ df <- clean_output %>%
 ## Match countries to OHI regions
 
 ```{r eval = F}
-df_ohi <- ohicore::name_2_rgn(df_in = df)
+df_ohi <- ohicore::name_2_rgn(df_in = df,
+                              fld_name = "country",
+                              flds_unique = c("id")) # v2023 - added this so unnecessary duplicates don't show up
 
 # v2022
 # These data were removed for not having any match in the lookup tables:
