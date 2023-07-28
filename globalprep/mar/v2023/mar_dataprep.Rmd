@@ -254,13 +254,6 @@ mar <- mar %>%
 #update names before using name_to_rgn
 
 mar <- mar %>%
-  mutate(country = case_when(country=="Réunion"~"Reunion", 
-                             country == "Micronesia (Fed. States)" ~ "Micronesia", 
-                             country == "Netherlands (Kingdom of the)" ~ "Netherlands",
-                             country == "Türkiye" ~ "Turkey",
-                            country == "United Republic of Tanzania, Zanzibar" ~ "Tanzania",
-                             country == "Venezuela (Boliv Rep of)" ~ "Venezuela",
-                             TRUE ~country)) %>%
   mar_split()  # function in mar_fxs.R 
 #Divides mariculture from countries that we report as separate regions (assume equal production in all regions)
   # Netherlands Antilles: Conch restoration among Aruba, Bonaire, Curacao

@@ -95,6 +95,7 @@ sanitation <- readSDMX(url) %>% as_tibble()
 
 #save to the raw data folder for reproduceability in case the data changes
 write_csv(sanitation,  here("globalprep/prs_cw_pathogen", version_year, "raw/2023_WASH.csv"))
+
 ```
 
 ## Data wrangling
@@ -157,10 +158,7 @@ If after running 'name_2\_rgn' (see next r chunk), there are some coastal region
 #manually clean country names 
 sanitation_clean <- sanitation_clean %>%
    mutate(country = str_replace(country, "&", "and")) %>% 
-  mutate(country = case_when(str_detect(country,"Cura\\Sao") ~"Curacao",
-                            str_detect(country,"R\\Sunion") ~ "Reunion",
-                            str_detect(country, "C\\Ste d\\SIvoire") ~ "Ivory Coast",
-                            str_detect(country,"Hong Kong") ~ "Hong Kong",
+  mutate(country = case_when(str_detect(country,"Hong Kong") ~ "Hong Kong",
                             str_detect(country,"Macao") ~ "Macao",
                            str_detect(country, "Saint Martin") ~ "Northern Saint-Martin",
                            str_detect(country, "Helena") ~"Saint Helena",

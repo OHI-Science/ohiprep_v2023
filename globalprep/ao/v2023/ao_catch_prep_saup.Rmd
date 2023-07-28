@@ -28,7 +28,7 @@ This script takes the SAUP 2022 catch data and creates 1 data layer:
 
 ## Updates from previous assessment
 
-v2022 - Added new year of data (2019)
+The SAUP data was not updated in v2023, and so this script was not run for that year. Raw and intermediate data stored on Mazu is pulled from the previous data year (V2022). Repository data files were copied over from the V2022 to the V2023 folders. 
 
 ***
 
@@ -73,6 +73,10 @@ library(readxl)
 
 setwd(here::here("globalprep/ao/v2022"))
 source('../../../workflow/R/common.R')
+
+#update as needed
+version_year <- "v2023"
+raw_data_version_year <- "v2022"
 
 ## Paths for data
 fis_path = file.path(dir_M,"git-annex/globalprep/fis/v2022/int") # filepath to fisheries path
