@@ -19,7 +19,7 @@ This script generates the extent of saltmarsh for each OHI region.
 
 
 ## Updates from previous assessment
-No updates. 
+No updates to script or data from previous year, copied over from v2021. 
 ***
 ## Data Source 
 

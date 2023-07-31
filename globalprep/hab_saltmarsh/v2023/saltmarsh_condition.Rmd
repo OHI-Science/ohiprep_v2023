@@ -15,19 +15,19 @@ output:
 
 # Summary
 
-https://cdnsciencepub.com/doi/10.1139/anc-2017-0001
+<https://cdnsciencepub.com/doi/10.1139/anc-2017-0001>
 
-This script generates the condition of saltmarsh. Based on the following references, global saltmarsh has decreased by 25-50% from historical extent (no idea of the timeframe this refers to) and there is an estimated 1-2% decrease every year. Given this, we will apply a condition of 0.75 globally (using the more conservative 25% decline estimate). 
-
-
+This script generates the condition of saltmarsh. Based on the following references, global saltmarsh has decreased by 25-50% from historical extent (no idea of the timeframe this refers to) and there is an estimated 1-2% decrease every year. Given this, we will apply a condition of 0.75 globally (using the more conservative 25% decline estimate).
 
 ## Updates from previous assessment
 
-***
-## Data Source 
+No code or data updates in 2023, copied over from v2021.
 
-Mcowen, C., Weatherdon, L., Bochove, J.-W., Sullivan, E., Blyth, S., Zockler, C., Stanwell-Smith, D., Kingston, N., Martin, C., Spalding, M., Fletcher, S., 2017. A global map of saltmarshes. BDJ 5, e11764. https://doi.org/10.3897/BDJ.5.e11764
+------------------------------------------------------------------------
 
+## Data Source
+
+Mcowen, C., Weatherdon, L., Bochove, J.-W., Sullivan, E., Blyth, S., Zockler, C., Stanwell-Smith, D., Kingston, N., Martin, C., Spalding, M., Fletcher, S., 2017. A global map of saltmarshes. BDJ 5, e11764. <https://doi.org/10.3897/BDJ.5.e11764>
 
 **Downloaded**: October 5, 2021
 
@@ -35,14 +35,13 @@ Mcowen, C., Weatherdon, L., Bochove, J.-W., Sullivan, E., Blyth, S., Zockler, C.
 
 **Time range**: NA
 
+------------------------------------------------------------------------
 
-***
 # Methods
 
-
-
 ## Setup
-``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 library(readr)      # for read_csv()
 library(raster)
 library(here)
@@ -67,7 +66,7 @@ dir_git_old  <- file.path('~/github/ohiprep_v2021', "globalprep/hab_saltmarsh/v2
 
 ```
 
-Apply a global value to each region.. not satisfying. 
+Apply a global value to each region.. not satisfying.
 
 ```{r, eval = FALSE}
 ## read in extent data
@@ -96,13 +95,3 @@ health <- trend_gaps %>%
   mutate(year = 2021)
 write.csv(health, here('globalprep/hab_saltmarsh/v2021/data/habitat_health_saltmarsh_updated.csv'), row.names=FALSE)
 ```
-
-
-
-
-
-
-
-
-
-

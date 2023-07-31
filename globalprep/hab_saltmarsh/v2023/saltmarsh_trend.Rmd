@@ -11,6 +11,8 @@ output:
       in_header: '../../../workflow/templates/ohi_hdr.html'
   pdf_document:
     toc: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Summary
@@ -37,7 +39,7 @@ Campbell, A.D., Fatoyinbo, L., Goldberg, L. et al. Global hotspots of salt marsh
 **Description**:  Estimate of a global percentage of loss of saltmarsh habitat per year. 
 
 
-**Time range**: NA
+**Time range**: NA, based on a study from 2000 to 2019
 
 
 ***
