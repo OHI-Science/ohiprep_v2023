@@ -62,7 +62,8 @@ library(rgeos)
 
 source(here('workflow/R/common.R'))
 
-version_year <- paste0("v",2023)
+current_year <- 2023
+version_year <- paste0("v",current_year)
 previous_version_year <- paste0("v", 2021)
 
 goal     <- 'globalprep/hab_saltmarsh/v2023'
@@ -99,7 +100,7 @@ write.csv(trend_gaps, here("globalprep/hab_saltmarsh/", version_year, "data/tren
 ### save trend data:
 trend <- trend_gaps %>%
   dplyr::select(rgn_id, habitat, trend) %>%
-  mutate(year = 2021)
+  mutate(year = current_year)
 write.csv(trend, here("globalprep/hab_saltmarsh/", version_year, "/data/habitat_trend_saltmarsh_updated.csv"), row.names=FALSE)
 
 ```
