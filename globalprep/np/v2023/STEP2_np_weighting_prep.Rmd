@@ -11,85 +11,106 @@ output:
       in_header: '../../../workflow/templates/ohi_hdr.html'
   pdf_document:
     toc: true
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP2_np_weighting_prep.html]
+[REFERENCE RMD FILE:
+<http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP2_np_weighting_prep.html>]
 
 # Summary
-This analysis converts FAO commodities tonnes data for ornamental fish trade, SAUP fisheries tonnes data for FOFM, and FAO mariculture tonnes data for seaweeds into a weighting scheme per each ohi region, based off of 5 year averages of tonnes and values (in usd) for each product. This weighting scheme will be applied to the scores to determine how much of each natural products layer affects the overall NP score when updating in ohi global. 
 
+This analysis converts FAO commodities tonnes data for ornamental fish
+trade, SAUP fisheries tonnes data for FOFM, and FAO mariculture tonnes
+data for seaweeds into a weighting scheme per each ohi region, based off
+of 5 year averages of tonnes and values (in usd) for each product. This
+weighting scheme will be applied to the scores to determine how much of
+each natural products layer affects the overall NP score when updating
+in ohi global.
 
-***
+------------------------------------------------------------------------
 
 # Data Source
 
-**Reference**:      
-    http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-    App release date: July 2021 
-FAO raw commodities quantity 1976_2019
-FAO raw commodities value 1976_2019
-[FAO metadata](http://www.fao.org/fishery/statistics/global-commodities-production/en)
+**Reference**:\
+<http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp>
+App release date: July 2021 FAO raw commodities quantity 1976_2021 FAO
+raw commodities value 1976_2019 [FAO
+metadata](http://www.fao.org/fishery/statistics/global-commodities-production/en)
 
-**Downloaded**: June, 23, 2022
+**Downloaded**: July, 19, 2023
 
-**Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: ornamental fish, fish oil, seaweed and plants (see: raw/commodities2products_weighting.csv for details).
+**Description**: Quantity (tonnes) and value (USD) of raw commodities
+(Exports only) for each country, taxa, year. The FAO data is subset to
+include commodities in these categories: ornamental fish, fish oil,
+seaweed and plants (see: raw/commodities2products_weighting.csv for
+details).
 
-**Time range**: 1976-2019
+**Time range**: 1976-2021
 
-
-**Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
+**Reference**: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020.
+Sea Around Us Concepts, Design and Data (seaaroundus.org).
 
 **Downloaded**: September 27, 2022
 
-**Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
+**Description**: Tons per year and SAUP region with information on
+sector type, industry type, fishing entitity, reporting status and
+taxonomic information.
 
 **Time range**: 1950 - 2019
 
 **Format**: CSV
 
-**Additional Information**: [Methods](http://www.seaaroundus.org/sea-around-us-methods-index/)
+**Additional Information**:
+[Methods](http://www.seaaroundus.org/sea-around-us-methods-index/)
 
+**Reference**: Froehlich, H.E., Jacobsen, N.S., Essington, T.E.,
+Clavelle, T., and Halpern, B.S. (2018). Avoiding the ecological limits
+of forage fish for fed aquaculture. Nature Sustainability 1, 298.
 
-**Reference**: Froehlich, H.E., Jacobsen, N.S., Essington, T.E., Clavelle, T., and Halpern, B.S. (2018). Avoiding the ecological limits of forage fish for fed aquaculture. Nature Sustainability 1, 298.
+**Downloaded**: July 7, 2020. Obtained from Melanie Frazier (NCEAS).
 
-**Downloaded**: July 7, 2020. Obtained from Melanie Frazier (NCEAS). 
+**Description**: List of FOFM species from Watson v3 data.
 
-**Description**:  List of FOFM species from Watson v3 data. 
+**Native data resolution**:
 
-**Native data resolution**:   
+**Format**: CSV format
 
-**Format**:  CSV format
-
-
-**Reference**: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.491
+**Reference**: [RAM Legacy Stock Assessment
+Database](http://ramlegacy.org) v4.491
 
 **Downloaded**: 06/03/2021
 
-**Description**: B/Bmsy value by stock and year (other data, which we do not use, are also available in the database)
+**Description**: B/Bmsy value by stock and year (other data, which we do
+not use, are also available in the database)
 
-**Native data resolution**: stock (fish stock, species and region specific)
+**Native data resolution**: stock (fish stock, species and region
+specific)
 
 **Time range**: 1950 - 2024
 
-**Format**: CSV format 
+**Format**: CSV format
 
-**Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here. We only use up to year == 2018.
+**Additional Information**: We use the finalized b/bmsy layer from
+OHI-global for this data prep. We do not actually read in the raw RAM
+data here. We only use up to year == 2018.
 
-* DOI: 10.5281/zenodo.2542919
+-   DOI: 10.5281/zenodo.2542919
 
+**Reference**:\
+<http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp>
+FAO Global Aquaculture Production Quantity 1950_2020 FAO metadata found
+[here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
-**Reference**:      
-http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-FAO Global Aquaculture Production Quantity 1950_2020
-FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
+**Downloaded**: July 5, 2023
 
-**Downloaded**:  April 25, 2022
+**Description**: Quantity (tonnes) of mariculture for each country,
+species, year.
 
-**Description**:  Quantity (tonnes) of mariculture for each country, species, year.
+**Time range**: 1950-2021
 
-**Time range**: 1950-2020
-
-***
+------------------------------------------------------------------------
 
 ## Setup
 
@@ -109,10 +130,13 @@ prep <- file.path(here(paste0("globalprep/np/v", prep_year, "/")))
 
 
 ```
-  
+
 ## Methods
 
-Import prepped FAO commodities data set and find 5 year average $USD / Tonne average value per product per region. Gapfill these based on the UN geopolitical region/global values. 
+Import prepped FAO commodities data set and find 5 year average \$USD /
+Tonne average value per product per region. Gapfill these based on the
+UN geopolitical region/global values.
+
 ```{r}
 ## read in the prepped FAO commodities data set 
 harvest_tonnes_usd <- read_csv(file.path(prep, "int/np_harvest_tonnes_usd.csv")) %>%
@@ -185,7 +209,9 @@ write.csv(weighting_usd_values_final, file.path(prep, "int/harvest_weighting_val
 
 ```
 
-Now prep the tonnes data from each product to be per each region for the 6 year average (2013-2018). 
+Now prep the tonnes data from each product to be per each region for the
+6 year average (2013-2018).
+
 ```{r}
 ## Read in FOFM tonnes data
 fofm_tonnes <- read_csv(file.path(prep, "int/mean_catch_FOFM.csv")) %>%
@@ -240,7 +266,11 @@ sw_tonnes <- read_csv(file.path(prep, "int/np_seaweeds_tonnes_weighting.csv")) %
 
 ```
 
-Now we will calculate the weights per each product. To do this we need to multiply our average $ value for each product * tonnes of each product, and then divide by the total per each region. We will also assign year = 2022 so that this can be read into OHI-global (2022 corresponds to the year that these weights were calculated).
+Now we will calculate the weights per each product. To do this we need
+to multiply our average \$ value for each product \* tonnes of each
+product, and then divide by the total per each region. We will also
+assign year = 2022 so that this can be read into OHI-global (2022
+corresponds to the year that these weights were calculated).
 
 ```{r}
 harvest_weighting_values <- read_csv(file.path(prep, "int/harvest_weighting_values.csv")) %>%
@@ -315,4 +345,3 @@ plot(check_fofm$new_weight, check_fofm$weight)
 abline(0,1, col="red") ## these change because of new SAUP fisheries catch data... 
 
 ```
-

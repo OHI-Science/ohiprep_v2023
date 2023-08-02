@@ -13,35 +13,33 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1a_np_ornamentals_prep.html]
+[REFERENCE RMD FILE: <http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1a_np_ornamentals_prep.html>]
 
 # Summary
-This analysis converts FAO commodities data into data layers used to calculate OHI `r format(Sys.time(), "%Y")` global natural products scores. We will conduct this data prep on the commodities seaweed, fish oil, and ornamentals, so that we can produce $ values for weighting later on, however, our final layer (saved to the output folder) from this data prep will only consist of ornamental fish. This will also calculate a sustainability layer based off of risk and exposure for ornamental fishing. 
+
+This analysis converts FAO commodities data into data layers used to calculate OHI `r format(Sys.time(), "%Y")` global natural products scores. We will conduct this data prep on the commodities seaweed, fish oil, and ornamentals, so that we can produce \$ values for weighting later on, however, our final layer (saved to the output folder) from this data prep will only consist of ornamental fish. This will also calculate a sustainability layer based off of risk and exposure for ornamental fishing.
 
 # Updates from previous assessment
-New year of FAO data (2021).
-Replaced deprecated functions (`replace_at()`, `spread()`, `gather()`)
 
-***
+New year of FAO data (2021). Replaced deprecated functions (`replace_at()`, `spread()`, `gather()`)
+
+------------------------------------------------------------------------
 
 # Data Source
 
-**Reference**:      
-    http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-    App release date: June 2023
-FAO raw commodities quantity 1976_2021
-FAO raw commodities value 1976_2021
-[FAO metadata](http://www.fao.org/fishery/statistics/global-commodities-production/en)
+**Reference**:\
+<http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp> App release date: June 2023 FAO raw commodities quantity 1976_2021 FAO raw commodities value 1976_2021 [FAO metadata](http://www.fao.org/fishery/statistics/global-commodities-production/en)
 
-**Downloaded**: June, 23, 2023
+**Downloaded**: July, 19, 2023
 
-**Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: ornamental fish, fish oil, seaweed and plants (see: raw/commodities2products_weighting.csv for details).
+**Description**: Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year. The FAO data is subset to include commodities in these categories: ornamental fish, fish oil, seaweed and plants (see: raw/commodities2products_weighting.csv for details).
 
 **Time range**: 1976-2021
 
-***
-  
+------------------------------------------------------------------------
+
 # Methods
+
 ```{r setup, warning=FALSE, message=FALSE}
 
 knitr::opts_chunk$set(eval=FALSE)
@@ -206,7 +204,8 @@ for (f in files){
 
 # Data Wrangle
 
-Combining the quantity and value data and a bit of cleaning to remove data prior to first reporting year for each commodity and region. 
+Combining the quantity and value data and a bit of cleaning to remove data prior to first reporting year for each commodity and region.
+
 ```{r}
 
 ## Read in quant dataset from intermediate folder
@@ -238,17 +237,17 @@ h <- h %>%
     dplyr::filter(product %in% c("fish_oil", "ornamentals", "seaweeds")) ##filter for our commodities of interest
 ```
 
-# Gapfilling 
+# Gapfilling
 
 Summary of gapfilling that is performed:
 
-  * Zero-fill: for observations with NAs for both values (tonnes & usd), fill both as zero. Also cross-fills zeros where one value is zero, other is NA.
-  * Regression fill, first pass: Where enough non-zero paired observations exist at the country level, use country-level data to create regression models (tonnes ~ usd and vice versa) for gapfilling.  About 25% success. 
-  * Regression fill, second pass: Where pass 1 failed, and enough non-zero paired observations exist at georegional level, use georegional-level data to create regression models (tonnes ~ usd + year, and vice versa) for gapfilling.  About 90% success. 
- * Regression fill third pass: Where passes 1 and 2 failed, use global-scale data to create  regression models (tonnes ~ usd + year, and vice versa) for gapfilling.  100% success.
- * End-fill:  For years where NAs still exist in final year, carry forward data from prior year (after other gapfilling techniques).
+-   Zero-fill: for observations with NAs for both values (tonnes & usd), fill both as zero. Also cross-fills zeros where one value is zero, other is NA.
+-   Regression fill, first pass: Where enough non-zero paired observations exist at the country level, use country-level data to create regression models (tonnes \~ usd and vice versa) for gapfilling. About 25% success.
+-   Regression fill, second pass: Where pass 1 failed, and enough non-zero paired observations exist at georegional level, use georegional-level data to create regression models (tonnes \~ usd + year, and vice versa) for gapfilling. About 90% success.
+-   Regression fill third pass: Where passes 1 and 2 failed, use global-scale data to create regression models (tonnes \~ usd + year, and vice versa) for gapfilling. 100% success.
+-   End-fill: For years where NAs still exist in final year, carry forward data from prior year (after other gapfilling techniques).
 
-```{r}  
+```{r}
 
 h <- h %>% np_harvest_gapflag()
 ## Adds flag for required gap-filling, based upon NAs in data. 
@@ -315,6 +314,7 @@ write.csv(h_gap, 'output/np_ornamentals_harvest_tonnes_gf.csv', row.names = FALS
 ## Summarize values
 
 Summarize each product per country per year, e.g., all corals in Albania in 2011. And, do some error checking.
+
 ```{r}
 
 h_prod <- h_comm %>%
@@ -354,9 +354,9 @@ write.csv(h_x_usd,    'int/np_harvest_usd_wide.csv',    row.names = FALSE, na = 
 
 ```
 
-
 ## Calculate Rolling Averages
-Determine rolling averages for tonnes and USD in order to determine peak values.  This is based upon total harvests by product group, not individual commodity.  
+
+Determine rolling averages for tonnes and USD in order to determine peak values. This is based upon total harvests by product group, not individual commodity.
 
 ```{r}
 
@@ -546,5 +546,3 @@ np_harvest_orn <- read_csv("int/np_harvest_tonnes_usd.csv") %>%
     write.csv(np_risk_orn, "output/np_risk_ornamentals.csv", row.names = FALSE)
 
 ```
-
-
