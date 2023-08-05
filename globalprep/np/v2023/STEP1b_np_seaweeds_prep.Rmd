@@ -13,45 +13,43 @@ output:
     toc: true
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2022/globalprep/np/v2021/STEP1b_np_seaweeds_prep.Rmd]
+[REFERENCE RMD FILE: <http://ohi-science.org/ohiprep_v2022/globalprep/np/v2021/STEP1b_np_seaweeds_prep.Rmd>]
 
 # Summary
+
 This analysis converts FAO mariculture data into one of the data layers used to calculate OHI `r format(Sys.time(), "%Y")` global natural products (NP) scores. We will conduct the overall NP data prep on seaweeds, fish oil/fish meal (FOFM), and ornamentals, however, our final layer from this data prep will only consist of seaweeds.
 
 # Updates from previous assessment
+
 New year of FAO mariculture data (1950-2021).
 
-***
+------------------------------------------------------------------------
 
-# Data Source 
+# Data Source
 
 ## Production data
 
-**Reference**:      
-http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-FAO Global Aquaculture Production Quantity 1950_2021
-FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
+**Reference**:\
+<http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp> FAO Global Aquaculture Production Quantity 1950_2021 FAO metadata found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
 
-**Downloaded**:  June 5, 2023
+**Downloaded**: July 5, 2023
 
-**Description**:  Quantity (tonnes) of mariculture for each country, species, year.
+**Description**: Quantity (tonnes) of mariculture for each country, species, year.
 
 **Time range**: 1950-2021
 
 ## Seafood Watch sustainability data
 
-**Reference**: 
-https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf
-Release date: March 4, 2023
+**Reference**: <https://www.seafoodwatch.org/globalassets/sfw/pdf/whats-new/seafood-watch-complete-recommendation-list.pdf> Release date: March 4, 2023
 
 **Downloaded**: May 31, 2023
 
 **Description**: Monterey Bay Aquarium Seafood Watch aquaculture recommendations. Sustainability scored from 0-10. Rescaled to 0-1. There is only one value for seaweeds in the data... 0.67
 
+------------------------------------------------------------------------
 
-***
-  
 # Methods
+
 ```{r setup, warning=FALSE, message=FALSE, results='hide'}
 knitr::opts_chunk$set(eval=FALSE)
 ## load libraries, set directories
@@ -82,12 +80,11 @@ mar <- read.csv(paste0(dir_M, '/git-annex/globalprep/_raw_data/FAO_mariculture/d
 head(mar) 
 ```
 
-# Wrangle: 
+# Wrangle:
 
 ## Tidy mariculture data
 
 Filter freshwater mariculture, make long format, and clean FAO codes.
-
 
 ```{r}
 
@@ -161,10 +158,9 @@ seaweed_sp <- read.csv(here(paste0('globalprep/mar/v', version_year, '/raw/speci
 write.csv(seaweed_sp, "raw/species_list_np_seaweeds.csv", row.names = FALSE)
 ```
 
-
 ## Update species names
 
-Update species name in the `raw/species_list_np_seaweeds_edited.csv` file with names in the `mar` dataset. Simplified the species list and cut the "species" name columns because it wasn't clear what this was trying to accomplish and created potential error.  
+Update species name in the `raw/species_list_np_seaweeds_edited.csv` file with names in the `mar` dataset. Simplified the species list and cut the "species" name columns because it wasn't clear what this was trying to accomplish and created potential error.
 
 ```{r}
 
@@ -239,7 +235,6 @@ mar_rgn <- mar_rgn_all %>%
 setdiff(mar_rgn$rgn_id, mar_rgn_all$rgn_id)
 ```
 
-
 **Take a look at the tidied data for a single year and region**
 
 ```{r}
@@ -288,7 +283,7 @@ table(mar_rgn_gf$gap_0_fill)
 ## 419 out of 2543+419 had NA converted to 0 - v2023
 ```
 
-Remove species-region-environment time series with less than four years of seaweeed mariculture production > 0 tonnes (assume these are not established seaweed mariculture programs).
+Remove species-region-environment time series with less than four years of seaweeed mariculture production \> 0 tonnes (assume these are not established seaweed mariculture programs).
 
 ```{r}
 mar_rgn_gf = mar_rgn_gf %>% 
@@ -331,7 +326,7 @@ write.csv(maric,"int/np_seaweeds_tonnes_weighting.csv", row.names = FALSE)
 
 ## Import data: Seafood Watch sustainability scores
 
-These data describe the sustainability country/species combinations. In cases where these data were not available for a specific county/species, we just used the seafood watch seaweed sustainability score (6.72) (this was all of the seaweed species listed). 
+These data describe the sustainability country/species combinations. In cases where these data were not available for a specific county/species, we just used the seafood watch seaweed sustainability score (6.72) (this was all of the seaweed species listed).
 
 ```{r sw-scores, eval = FALSE}
 ## Load in Seafood Watch sustainability scores data from mazu. Go look at the file path, the file name changes from year to year
@@ -404,7 +399,6 @@ sw_sus_rgn <- bind_rows(sw_sus_rgn, sw_sus_no_rgn) %>%
   # 269 obs - v2023
 ```
 
-
 **Join the seaweed sustainability data with the mariculture data**
 
 ```{r sw-fao-joining, eval = FALSE}
@@ -443,14 +437,13 @@ mar_sw_sus <- maric %>%
 
 **Since there are no sustainability scores for any of the species listed, we will gapfill with the seafood watch "Seaweed (Global)" score, which is 6.72.**
 
-NOTE FOR v2022: Scale this score the max in the seafood watch data, like we did for mariculture. 
+NOTE FOR v2022: Scale this score the max in the seafood watch data, like we did for mariculture.
 
 ```{r}
 mar_sw_sus <- mar_sw_sus %>%
   mutate(Sust = round(6.72/10,2)) %>% ## since none of the species match, we will give the general worldwide seaweed score from seafood watch (6.72)
   dplyr::select(-score)
 ```
-
 
 Since some regions have multiple sustainability scores for the same species due to multiple aquaculture methods, but we don't know what proportions of which methods are used, we take the average of the sustainability scores in these instances.
 
@@ -493,7 +486,8 @@ anyDuplicated(seaweed_harvest_tonnes) # check for duplication
 write.csv(seaweed_harvest_tonnes, 'output/np_seaweed_harvest_tonnes.csv', row.names=F)
 ```
 
-## Save gapfill datasets 
+## Save gapfill datasets
+
 ```{r}
 	
  
@@ -517,7 +511,7 @@ mar_sust_gf <- mar_sw_sus %>%
 write.csv(mar_sust_gf, "output/np_seaweed_sust_gf.csv", row.names = FALSE)
 ```
 
-Datacheck: 
+Datacheck:
 
 ```{r}
 ## compare the harvest
@@ -552,4 +546,3 @@ yield <- np_old %>%
 
 
 ```
-

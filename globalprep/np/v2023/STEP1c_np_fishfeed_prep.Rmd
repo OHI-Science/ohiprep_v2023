@@ -18,15 +18,15 @@ editor_options:
   chunk_output_type: console
 ---
 
-[REFERENCE RMD FILE: http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1c_np_fishfeed_prep.html]
+[REFERENCE RMD FILE: <http://ohi-science.org/ohiprep_v2021/globalprep/np/v2021/STEP1c_np_fishfeed_prep.html>]
 
 # Summary
 
-This script takes the SAUP 2023 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. The FIS data prep will need to be completed prior to this data prep.  
+This script takes the SAUP 2023 catch data, a list of fish oil/fish meal (FOFM) species, and B/Bmsy estimates to calculate a score for FOFM species per OHI region. The FIS data prep will need to be completed prior to this data prep.
 
 ## Updates from previous assessment
 
-***
+------------------------------------------------------------------------
 
 # Data Source
 
@@ -34,7 +34,7 @@ This script takes the SAUP 2023 catch data, a list of fish oil/fish meal (FOFM) 
 
 **Downloaded**: September 27, 2022
 
-**Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information. 
+**Description**: Tons per year and SAUP region with information on sector type, industry type, fishing entitity, reporting status and taxonomic information.
 
 **Time range**: 1950 - 2019
 
@@ -42,17 +42,15 @@ This script takes the SAUP 2023 catch data, a list of fish oil/fish meal (FOFM) 
 
 **Additional Information**: [Methods](http://www.seaaroundus.org/sea-around-us-methods-index/)
 
-
 **Reference**: Froehlich, H.E., Jacobsen, N.S., Essington, T.E., Clavelle, T., and Halpern, B.S. (2018). Avoiding the ecological limits of forage fish for fed aquaculture. Nature Sustainability 1, 298.
 
-**Downloaded**: July 7, 2020. Obtained from Melanie Frazier (NCEAS). 
+**Downloaded**: July 7, 2020. Obtained from Melanie Frazier (NCEAS).
 
-**Description**:  List of FOFM species from Watson v3 data. 
+**Description**: List of FOFM species from Watson v3 data.
 
-**Native data resolution**:   
+**Native data resolution**:
 
-**Format**:  CSV format
-
+**Format**: CSV format
 
 **Reference**: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.495
 
@@ -64,12 +62,11 @@ This script takes the SAUP 2023 catch data, a list of fish oil/fish meal (FOFM) 
 
 **Time range**: 1950 - 2024
 
-**Format**: CSV format 
+**Format**: CSV format
 
-**Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here. 
+**Additional Information**: We use the finalized b/bmsy layer from OHI-global for this data prep. We do not actually read in the raw RAM data here.
 
-
-***
+------------------------------------------------------------------------
 
 ## Setup
 
@@ -89,25 +86,24 @@ scenario_year <- "2023"
 
 **Steps to this**
 
-1. Subset the forage fish catch stocks for each region/year (keep FAO and OHI rgn ids)
-2. Multiply by 0.70 to reflect the amount going to feed/oils
-3. Join with the final B/Bmsy layer used in the FIS model
-4. Convert the B/Bmsy values to scores (this is done in functions.R)
-5. Apply the underharvest penalty
-6. Take a catch weighted average of B/Bmsy scores for each region/year.
+1.  Subset the forage fish catch stocks for each region/year (keep FAO and OHI rgn ids)
+2.  Multiply by 0.70 to reflect the amount going to feed/oils
+3.  Join with the final B/Bmsy layer used in the FIS model
+4.  Convert the B/Bmsy values to scores (this is done in functions.R)
+5.  Apply the underharvest penalty
+6.  Take a catch weighted average of B/Bmsy scores for each region/year.
 
-# Step 1 
+# Step 1
 
 ## Create a master list of forage species
 
 This forage fish list is based on the older Watson fisheries data. Basically, the code takes the list from Froehlich et al. (2018) and then cross references it with the SAUP taxa data and identifies some extra SAUP taxa that appeared to be fish oil/fish meal (FOFM) fish.
 
-The following is a list from:
-Froehlich, H.E., Jacobsen, N.S., Essington, T.E., Clavelle, T., and Halpern, B.S. (2018). Avoiding the ecological limits of forage fish for fed aquaculture. Nature Sustainability 1, 298.
+The following is a list from: Froehlich, H.E., Jacobsen, N.S., Essington, T.E., Clavelle, T., and Halpern, B.S. (2018). Avoiding the ecological limits of forage fish for fed aquaculture. Nature Sustainability 1, 298.
 
-They identify 238 forage fish species which account for >99% of forage fish catches in 2012.
+They identify 238 forage fish species which account for \>99% of forage fish catches in 2012.
 
-~31 million tons per year of captured forage fish (since 1980).
+\~31 million tons per year of captured forage fish (since 1980).
 
 Get the list of forage fish used for FOFM:
 
@@ -149,7 +145,8 @@ write.csv(foragefish_list, here(paste0("globalprep/np/v", scenario_year, "/int/m
 
 ```
 
-## Read in v2021 catch data 
+## Read in v2021 catch data
+
 ```{r}
 # This was not updated in v2023 so we call out to the v2022 year on Mazu
 file <- file.path(dir_M,'git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn_taxa.csv')
@@ -169,7 +166,7 @@ catch <- catch %>%
 
 ```
 
-## Subset the v2022 catch data for our forage fish species 
+## Subset the v2022 catch data for our forage fish species
 
 ```{r}
 ## need to get TaxonKey's for each species to join with catch
@@ -210,7 +207,7 @@ test <- catch_fishfeed %>%
   summarise(sum = sum(tons)) ## looks good.. ~30 million per year
 ```
 
-# Step 2 
+# Step 2
 
 ## Multiply by 0.90 to reflect the amount going to feed/oils, and not the amount going to human consumption (that is accounted for in food provision)
 
@@ -450,4 +447,3 @@ ab_scores <- ggplot(check, aes(x=new_score, y=score)) +
 ggplotly(ab_scores)
 
 ```
-
