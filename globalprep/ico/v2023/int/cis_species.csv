@@ -1,0 +1,129 @@
+name,code,habitat,suitability,season,majorimportance,region_identifier
+Mugil liza,13.4,Marine Coastal/Supratidal - Coastal Brackish/Saline Lagoons/Marine Lakes,Suitable,Resident,Yes,NA
+Mugil liza,9.10,Marine Neritic - Estuaries,Suitable,Resident,Yes,NA
+Falco cherrug,12.4,Marine Intertidal - Mud Flats and Salt Flats,Suitable,Non-Breeding Season,No,NA
+Panthera tigris,13.4,Marine Coastal/Supratidal - Coastal Brackish/Saline Lagoons/Marine Lakes,Suitable,Resident,Yes,NA
+Haliotis iris,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Resident,Yes,NA
+Haliotis iris,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,Resident,Yes,NA
+Hippoglossus stenolepis,11.1,"Marine Deep Benthic - Continental Slope/Bathyl Zone (200-4,000m)",NA,NA,NA,global
+Hippoglossus stenolepis,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Resident,Yes,global
+Hippoglossus stenolepis,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,Resident,Yes,global
+Hippoglossus stenolepis,9.4,Marine Neritic - Subtidal Sandy,Suitable,Resident,Yes,global
+Hippoglossus stenolepis,9.5,Marine Neritic - Subtidal Sandy-Mud,Suitable,Resident,Yes,global
+Hippoglossus stenolepis,9.6,Marine Neritic - Subtidal Muddy,Suitable,Resident,Yes,global
+Bitis arietans,13.3,Marine Coastal/Supratidal - Coastal Sand Dunes,Suitable,Resident,NA,NA
+Sus barbatus,12.2,"Marine Intertidal - Sandy Shoreline and/or Beaches, Sand Bars, Spits, Etc",Marginal,NA,NA,global
+Sus barbatus,9.1,Marine Neritic - Pelagic,Marginal,NA,NA,global
+Clupea pallasii,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Resident,Yes,NA
+Clupea pallasii,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Resident,Yes,NA
+Clupea pallasii,9.1,Marine Neritic - Pelagic,Suitable,Resident,Yes,NA
+Clupea pallasii,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Breeding Season,Yes,NA
+Clupea pallasii,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,Breeding Season,Yes,NA
+Entosphenus tridentatus,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Resident,Yes,NA
+Entosphenus tridentatus,9.10,Marine Neritic - Estuaries,Suitable,Resident,Yes,NA
+Larus glaucescens,12.1,Marine Intertidal - Rocky Shoreline,Suitable,Breeding Season,No,NA
+Larus glaucescens,12.1,Marine Intertidal - Rocky Shoreline,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,12.6,Marine Intertidal - Tidepools,Suitable,Breeding Season,No,NA
+Larus glaucescens,12.6,Marine Intertidal - Tidepools,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,13.1,Marine Coastal/Supratidal - Sea Cliffs and Rocky Offshore Islands,Suitable,Breeding Season,Yes,NA
+Larus glaucescens,9.1,Marine Neritic - Pelagic,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.1,Marine Neritic - Pelagic,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.10,Marine Neritic - Estuaries,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.10,Marine Neritic - Estuaries,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.4,Marine Neritic - Subtidal Sandy,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.4,Marine Neritic - Subtidal Sandy,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.5,Marine Neritic - Subtidal Sandy-Mud,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.5,Marine Neritic - Subtidal Sandy-Mud,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,Breeding Season,No,NA
+Larus glaucescens,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,Non-Breeding Season,No,NA
+Larus glaucescens,9.9,Marine Neritic - Seagrass (Submerged),Suitable,Breeding Season,No,NA
+Larus glaucescens,9.9,Marine Neritic - Seagrass (Submerged),Suitable,Non-Breeding Season,No,NA
+Oncorhynchus nerka,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,NA,Yes,NA
+Oncorhynchus nerka,13.1,Marine Coastal/Supratidal - Sea Cliffs and Rocky Offshore Islands,Suitable,NA,NA,NA
+Oncorhynchus nerka,9.1,Marine Neritic - Pelagic,Suitable,NA,Yes,NA
+Oncorhynchus nerka,9.10,Marine Neritic - Estuaries,Suitable,NA,Yes,NA
+Thaleichthys pacificus,9.1,Marine Neritic - Pelagic,Suitable,NA,Yes,NA
+Thaleichthys pacificus,9.10,Marine Neritic - Estuaries,Suitable,NA,Yes,NA
+Anguilla australis,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Breeding Season,Yes,NA
+Anguilla australis,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Breeding Season,Yes,NA
+Anguilla australis,9.1,Marine Neritic - Pelagic,Suitable,Breeding Season,Yes,NA
+Anguilla reinhardtii,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Breeding Season,Yes,NA
+Anguilla reinhardtii,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Breeding Season,Yes,NA
+Anguilla reinhardtii,9.1,Marine Neritic - Pelagic,Suitable,Breeding Season,Yes,NA
+Anguilla reinhardtii,9.10,Marine Neritic - Estuaries,Suitable,Non-Breeding Season,NA,NA
+Ardenna grisea,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Breeding Season,Yes,NA
+Ardenna grisea,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Breeding Season,Yes,NA
+Ardenna grisea,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.1,Marine Neritic - Pelagic,Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.1,Marine Neritic - Pelagic,Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.4,Marine Neritic - Subtidal Sandy,Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.4,Marine Neritic - Subtidal Sandy,Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.5,Marine Neritic - Subtidal Sandy-Mud,Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.5,Marine Neritic - Subtidal Sandy-Mud,Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,Non-Breeding Season,Yes,NA
+Ardenna grisea,9.9,Marine Neritic - Seagrass (Submerged),Suitable,Breeding Season,Yes,NA
+Ardenna grisea,9.9,Marine Neritic - Seagrass (Submerged),Suitable,Non-Breeding Season,Yes,NA
+Dugong dugon,12.2,"Marine Intertidal - Sandy Shoreline and/or Beaches, Sand Bars, Spits, Etc",Marginal,NA,NA,NA
+Dugong dugon,12.7,Marine Intertidal - Mangrove Submerged Roots,Marginal,NA,NA,NA
+Dugong dugon,9.10,Marine Neritic - Estuaries,Suitable,NA,Yes,NA
+Dugong dugon,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Marginal,NA,NA,NA
+Dugong dugon,9.4,Marine Neritic - Subtidal Sandy,Suitable,NA,Yes,NA
+Dugong dugon,9.5,Marine Neritic - Subtidal Sandy-Mud,Suitable,NA,Yes,NA
+Dugong dugon,9.6,Marine Neritic - Subtidal Muddy,Suitable,NA,Yes,NA
+Dugong dugon,9.8,Marine Neritic - Coral Reef,Suitable,NA,Yes,NA
+Dugong dugon,9.9,Marine Neritic - Seagrass (Submerged),Suitable,NA,Yes,NA
+Jasus edwardsii,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,NA,NA,NA
+Jasus edwardsii,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,NA,NA,NA
+Santalum acuminatum,13.3,Marine Coastal/Supratidal - Coastal Sand Dunes,Suitable,Resident,NA,NA
+Anguilla rostrata,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Breeding Season,Yes,NA
+Anguilla rostrata,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Passage,NA,NA
+Anguilla rostrata,12.5,Marine Intertidal - Salt Marshes (Emergent Grasses),Suitable,Non-Breeding Season,NA,NA
+Anguilla rostrata,13.4,Marine Coastal/Supratidal - Coastal Brackish/Saline Lagoons/Marine Lakes,Suitable,Non-Breeding Season,NA,NA
+Anguilla rostrata,9.1,Marine Neritic - Pelagic,Suitable,Passage,NA,NA
+Anguilla rostrata,9.10,Marine Neritic - Estuaries,Suitable,Non-Breeding Season,NA,NA
+Anguilla rostrata,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Non-Breeding Season,NA,NA
+Haliotis kamtschatkana,12.1,Marine Intertidal - Rocky Shoreline,Suitable,Resident,Yes,NA
+Haliotis kamtschatkana,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,Resident,Yes,NA
+Anguilla dieffenbachii,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Breeding Season,Yes,global
+Anguilla dieffenbachii,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Breeding Season,Yes,global
+Anguilla dieffenbachii,9.1,Marine Neritic - Pelagic,Suitable,Breeding Season,Yes,global
+Anguilla dieffenbachii,9.10,Marine Neritic - Estuaries,Suitable,Non-Breeding Season,NA,global
+Nypa fruticans,12.7,Marine Intertidal - Mangrove Submerged Roots,Suitable,NA,Yes,NA
+Asparagus albus,13.1,Marine Coastal/Supratidal - Sea Cliffs and Rocky Offshore Islands,Marginal,Resident,NA,NA
+coris julis,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,NA,NA,NA
+coris julis,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,NA,NA,NA
+coris julis,9.9,Marine Neritic - Seagrass (Submerged),Suitable,NA,NA,NA
+Engraulis encrasicolus,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,NA,NA,NA
+Engraulis encrasicolus,9.1,Marine Neritic - Pelagic,Suitable,NA,NA,NA
+Engraulis encrasicolus,9.10,Marine Neritic - Estuaries,Suitable,NA,NA,NA
+Grus grus,12.4,Marine Intertidal - Mud Flats and Salt Flats,Suitable,Non-Breeding Season,No,NA
+Sparisoma cretense,9.2,Marine Neritic - Subtidal Rock and Rocky Reefs,Suitable,NA,NA,NA
+Sparisoma cretense,9.3,Marine Neritic - Subtidal Loose Rock/pebble/gravel,Suitable,NA,NA,NA
+Sparisoma cretense,9.7,Marine Neritic - Macroalgal/Kelp,Suitable,NA,NA,NA
+Sparisoma cretense,9.9,Marine Neritic - Seagrass (Submerged),Suitable,NA,NA,NA
+Ardea herodias,12.4,Marine Intertidal - Mud Flats and Salt Flats,Suitable,Breeding Season,No,NA
+Ardea herodias,12.4,Marine Intertidal - Mud Flats and Salt Flats,Suitable,Non-Breeding Season,No,NA
+Odocoileus virginianus,12.5,Marine Intertidal - Salt Marshes (Emergent Grasses),Marginal,NA,NA,global
+Odocoileus virginianus,9.10,Marine Neritic - Estuaries,Marginal,NA,NA,global
+Epinephelus polyphekadion,9.8,Marine Neritic - Coral Reef,Suitable,Resident,Yes,NA
+Delphinapterus leucas,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Resident,Yes,NA
+Delphinapterus leucas,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Resident,Yes,NA
+Delphinapterus leucas,10.3,Marine Oceanic - Bathypelagic (1000-4000m),Suitable,Non-Breeding Season,Yes,NA
+Delphinapterus leucas,9.1,Marine Neritic - Pelagic,Suitable,Resident,Yes,NA
+Delphinapterus leucas,9.10,Marine Neritic - Estuaries,Suitable,Non-Breeding Season,Yes,NA
+Monodon monoceros,10.1,Marine Oceanic - Epipelagic (0-200m),Suitable,Resident,Yes,NA
+Monodon monoceros,10.2,Marine Oceanic - Mesopelagic (200-1000m),Suitable,Resident,Yes,NA
+Monodon monoceros,10.3,Marine Oceanic - Bathypelagic (1000-4000m),Suitable,Resident,Yes,NA
+Monodon monoceros,9.1,Marine Neritic - Pelagic,Suitable,Resident,Yes,NA
+Melaleuca quinquenervia,13.3,Marine Coastal/Supratidal - Coastal Sand Dunes,Suitable,Resident,NA,NA
+Melaleuca quinquenervia,13.4,Marine Coastal/Supratidal - Coastal Brackish/Saline Lagoons/Marine Lakes,Suitable,Resident,NA,NA
