@@ -151,24 +151,7 @@ for (f in files){
   m <- np_split_antilles(m)
     
   ## Some changes to region names that aren't working in name_2_rgn()
-  m <- m %>%
-    mutate(country = case_when(
-        country == "Côte d'Ivoire" ~ "Ivory Coast",
-        country == "C<f4>te d'Ivoire" ~ "Ivory Coast",
-        country == "C\xf4te d'Ivoire" ~ "Ivory Coast",
-        country == "Cura<e7>ao" ~ "Curacao",
-        country == "Curaçao" ~ "Curacao",
-        country == "Cura\xe7ao" ~ "Curacao",
-        country == "R\xe9union" ~ "Reunion",
-        country == "Réunion" ~ "Reunion",
-        country == "R<e9>union" ~ "Reunion",
-        country == "Türkiye" ~ "Turkey",
-        country == "Micronesia (Fed. States)" ~ "Micronesia",
-        country == "Netherlands (Kingdom of the)" ~ "Netherlands",
-        country == "Saint Helena/Asc./Trist." ~ "Saint Helena",
-        country == "Venezuela (Boliv Rep of)" ~ "Venezuela",
-        TRUE ~ country
-    )) %>%
+  m <- m  %>%
     filter(country != "Azerbaijan") 
 
   m_rgn <- name_2_rgn(df_in = m,

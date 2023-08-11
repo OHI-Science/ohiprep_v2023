@@ -16,39 +16,35 @@ output:
     toc: true
 ---
 
-
 # Summary
 
-This script .rmd creates the Sea Surface Temperature (SST) anomaly threshold rasters for the prs_sst data layer. This notebook was created by Carlo Broderick based on the previous notebook code and structure in the beautiful summer of 2023. This notebook and other changes to the structure and process of the prs_sst dataprep are the result of a structural shift in how this layer is calculated. To read more on the background of this change refer to the github issue: https://github.com/OHI-Science/globalfellows-issues/issues/244
+This script .rmd creates the Sea Surface Temperature (SST) anomaly threshold rasters for the prs_sst data layer. This notebook was created by Carlo Broderick based on the previous notebook code and structure in the beautiful summer of 2023. This notebook and other changes to the structure and process of the prs_sst dataprep are the result of a structural shift in how this layer is calculated. To read more on the background of this change refer to the github issue: <https://github.com/OHI-Science/globalfellows-issues/issues/244>
 
 This .rmd should not be run every year, the sea surface temperature anomaly threshold rasters should only be created if the [CoRTAD version 6](https://www.ncei.noaa.gov/products/coral-reef-temperature-anomaly-database) dataset has been updated to version 7. This is because the historical data for this data set does not change and thus the standard deviation and mean SST for the reference period from 1982 - 2011 do not change. Only if historical SST numbers are updated should these rasters be recalculated.
 
-In addition to this .rmd, there is an R script in the background_job_scripts folder that has the same code present in this .rmd. This script will allow you to run this computation as a background job which frees your console for other more important, fulfilling activities. 
+In addition to this .rmd, there is an R script in the background_job_scripts folder that has the same code present in this .rmd. This script will allow you to run this computation as a background job which frees your console for other more important, fulfilling activities.
 
-***
+------------------------------------------------------------------------
 
 # Data Source
 
 Data come from NOAA's NCEI: [CoRTAD version 6](https://www.ncei.noaa.gov/products/coral-reef-temperature-anomaly-database)
 
-See `prs_sst/v2015/dataprep.R` for preparation of the "annual_pos_anomalies" data. 
+See `prs_sst/v2015/dataprep.R` for preparation of the "annual_pos_anomalies" data.
 
-**Native Data Resolution**: ~4km   
-**Description**: 
-Cortadv6_SSTA.nc = SST anomalies (weekly SST minus weekly climatological SST), weekly data for all years, degrees Kelvin
-Cortadv6_weeklySST.nc =  SST, weekly data for all years, degrees Kelvin  
-**Time Range**: 1982 - 2021 (weekly averages across all years)  
-**Format**: NetCDF
-**Downloaded**: June 22, 2022
+**Native Data Resolution**: \~4km\
+**Description**: Cortadv6_SSTA.nc = SST anomalies (weekly SST minus weekly climatological SST), weekly data for all years, degrees Kelvin Cortadv6_weeklySST.nc = SST, weekly data for all years, degrees Kelvin\
+**Time Range**: 1982 - 2021 (weekly averages across all years)\
+**Format**: NetCDF **Downloaded**: June 22, 2022
 
-***  
+------------------------------------------------------------------------
 
 # Methods
 
-1. Extreme events per year based calculated as number of times SST anomaly exceeds one SST Standard Deviation above mean SST based on weekly values (annual_pos_anomalies data, see v2015/dataprep.R for analysis).
-2. Sum extreme events for five year periods to control for yearly variation.
-3. Change in extreme events: Subtract number of extreme events for each five year period from control period (1985-1989). 85-89 was used instead of 82-86 due to non-normative weather data during those years.
-4. Rescale "Change in extreme events" data to values between 0 and 1 by dividing by the 99.99th quantile among all years of data.
+1.  Extreme events per year based calculated as number of times SST anomaly exceeds one SST Standard Deviation above mean SST based on weekly values (annual_pos_anomalies data, see v2015/dataprep.R for analysis).
+2.  Sum extreme events for five year periods to control for yearly variation.
+3.  Change in extreme events: Subtract number of extreme events for each five year period from control period (1985-1989). 85-89 was used instead of 82-86 due to non-normative weather data during those years.
+4.  Rescale "Change in extreme events" data to values between 0 and 1 by dividing by the 99.99th quantile among all years of data.
 
 ## Setup
 
@@ -85,6 +81,8 @@ prev_scen_year <- as.character(scen_year_number - 1)
 # Standard OHI file paths
 dir_data <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year)
 dir_int  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/int")
+
+# Change this file path for full update to correct update scenario year
 dir_rasters <- paste0(dir_M, 
                       "/git-annex/globalprep/prs_sst/prs_sst_calculated_rasters/v2023_update")
 
@@ -101,7 +99,7 @@ land <- regions %>% subset(rgn_type %in% c("land", "land-disputed", "land-noeez"
 
 ```
 
-***
+------------------------------------------------------------------------
 
 ## Get new data if available
 
@@ -124,7 +122,7 @@ closeAllConnections()
 
 ```
 
-***
+------------------------------------------------------------------------
 
 ## Generate annual positive anomalies
 
@@ -158,7 +156,7 @@ sst_df <- data.frame(name = names_weekly) %>%
 
 ```
 
-## ~15 min per layer, 53 layers, 5 cores (2023)
+## \~15 min per layer, 53 layers, 5 cores (2023)
 
 This loop takes the weekly SST data and creates 53 standard deviation raster files, one for each week of the year, and saves them to Mazu. Each weekly raster file's cell values correspond to the standard deviation SST values for all years in the reference period (1982 - 2011) for that week. This gives us a measure of variability in SST for that time of the year that will allow us to identify SST values that are "anomalous" for that time of the year.
 

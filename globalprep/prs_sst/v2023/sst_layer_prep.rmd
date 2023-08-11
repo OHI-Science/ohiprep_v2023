@@ -67,6 +67,9 @@ Before starting this notebook, please read through the read me for guidance on h
 # Set options for code chunks
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.path = 'figs/', message = FALSE, warning = FALSE)
 
+# Install ohi core if needed
+#devtools::install_github('ohi-science/ohicore@dev')
+
 # Load packages
 library(raster)
 library(RColorBrewer)
@@ -79,7 +82,6 @@ library(ncdf4)
 library(httr)
 library(lubridate)
 library(animation)
-library(plotly)
 library(here)
 library(snow)
 library(terra)
@@ -107,7 +109,7 @@ dir_rasters <- paste0(dir_M,
 ohi_rasters()
 regions_shape()
 
-# Specify years for calculations, the data set's years
+# Specify years for calculations, the data set's years, often 1 year behind scenario year
 yrs <- 1982:2022
 
 # Rainbow color scheme and load in OHI regions
@@ -481,26 +483,20 @@ rgn_data <- read.csv(file.path(rast_loc, "regionData.csv"))
 # Load normalized anomaly raster list
 sst_rasters <- list.files(dir_output, pattern = "sst_.*1985-1989.tif", full.names = TRUE)
 
-# Visualize for validation
-plot(rast(sst_rasters[[length(sst_rasters)]])) 
-
 # Apply ice mask
 ice_mask <- terra::rast(raster("/home/shares/ohi/git-annex/Global/NCEAS-Pressures-Summaries_frazier2013/ice_mask_resampled"))
 
-# Visualize ice mask
-plot(ice_mask)
-
 # Prepare for paralel processing, v2023 - took 10 minutes
-registerDoParallel(3)
+registerDoParallel(2)
 
 # This loop applies the ice mask to each rescaled excess 5yr anomaly
-foreach(rast = sst_rasters) %dopar% {
+foreach(rast = sst_rasters) %do% {
   
   # Skip if file already exists
-  if(file.exists(sprintf("%s/sst_%s_rescaled_icemask.tif", dir_output, substr(rast, 64, 82)))){
-    print(paste("skipping", substr(rast, 64, 82)))
-    return()
-  } else {
+  #if(file.exists(sprintf("%s/sst_%s_rescaled_icemask.tif", dir_output, substr(rast, 64, 82)))){
+  #  print(paste("skipping", substr(rast, 64, 82)))
+  #  return()
+  #} else {
     
     # Load rescaled excess 5yr anomaly 
     temp <- terra::rast(rast)
@@ -514,7 +510,7 @@ foreach(rast = sst_rasters) %dopar% {
                                        substr(rast, 64, 82))),
           overwrite = TRUE)
   
-    } # End if statement
+    #} # End if statement
   
   # Print time stamp
   print(paste("completed", substr(rast, 64, 82), Sys.time()))
@@ -643,75 +639,6 @@ for (year in 2012:max(yrs)){
 
 # Save dataframe in output
 write.csv(sst_final, "output/sst_updated.csv", row.names=FALSE)
-
-```
-
-------------------------------------------------------------------------
-
-# Results
-
-```{r plot results, eval = FALSE}
-## plot results to check, for most recent year
-res <- list.files(dir_output, pattern = "sst.*icemask.tif", full.names = TRUE)
-
-plot(raster(res[[length(res)]]), axes = FALSE, 
-     main = paste0("Sea Surface Temperature Pressure Layer \n OHI ", scen_year))
-```
-
-```{r compare results, eval = FALSE}
-
-# 2021 vs 2023 pressure scores dot plot
-p <- ggplot(data = compare) +
-  geom_point(aes(x = v2021, y = v2023)) +
-  geom_abline(intercept = 0, slope = 1) +
-  facet_wrap(~year)
-
-print(p)
-
-# histogram comparing 2021 values to 2023 values
-hist2021 <- ggplot(compare, aes(x = v2021)) +
-  geom_histogram(fill = "gray", color = "black") + 
-  theme_bw() + 
-  labs(title = "SST 2021")
-
-hist2023 <- ggplot(compare, aes(x = v2023)) +
-  geom_histogram(fill = "gray", color = "black") + 
-  theme_bw() + 
-  labs(title = "SST 2023")
-
-
-hist2021 + hist2023
-
-# compare sd between new and old methods
-
-
-```
-
-## Compare final outputs of v2022 and v2021
-
-After combining sst data into the output table `sst_updated.csv`, compare to last year. Compare scenario years that used data year 2020, the most recent shared year between v2022 and v2021.
-
-```{r, eval=FALSE}
-
-old_sst <- read.csv("../v2021/output/sst_updated.csv") %>% 
-  filter(year == 2020) %>% 
-  select(rgn_id, old_prs_score = pressure_score)
-
-sst <- read.csv("output/sst_updated.csv") %>%
-  filter(year == 2020) %>% 
-  select(rgn_id, prs_score = pressure_score)
-
-combine <- sst %>% 
-  left_join(old_sst, by = "rgn_id")
-
-plot(combine$old_prs_score, combine$prs_score)
-
-p <- ggplot(combine, aes(x = old_prs_score, y = prs_score, label = rgn_id)) +
-  geom_point(shape = 19) + 
-  theme_bw() + 
-  geom_abline(intercept = 0, slope = 1) + 
-  labs(title = "SST comparison v2022 and v2021 \n (data year 2021)")
-ggplotly(p)
 
 ```
 

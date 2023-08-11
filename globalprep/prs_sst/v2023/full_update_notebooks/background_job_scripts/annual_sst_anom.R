@@ -14,10 +14,6 @@ library(plotly)
 library(here)
 library(snow)
 library(terra)
-library(tictoc)
-
-# suppress progress bars for terra
-terraOptions(progress=0)
 
 # OHI spatial files, directories, etc
 source(here("workflow/R/common.R"))
@@ -27,12 +23,17 @@ scen_year_number <- 2023
 scen_year <- as.character(scen_year_number)
 prev_scen_year <- as.character(scen_year_number - 1)
 
+# suppress progress bars for terra
+terraOptions(progress=0)
+
 # Standard OHI file paths
 dir_data <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year)
 dir_int  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/int")
 dir_output  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/output")
-dir_anom_threshold  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/sd_mean_30yr_rasters")
 
+# Change this file path for full update to correct update scenario year
+dir_rasters <- paste0(dir_M, 
+                      "/git-annex/globalprep/prs_sst/prs_sst_calculated_rasters/v2023_update")
 # Load in OHI spatial data
 ohi_rasters()
 regions_shape()
@@ -41,7 +42,9 @@ regions_shape()
 target_years = 1985:prev_scen_year
 
 # See if files exist or are already created
-anom_files <- list.files(dir_int, pattern = "annual_pos_anomalies", full.names = TRUE)
+anom_files <- list.files(file.path(dir_rasters,
+                                   "annual_positive_anomalies"), 
+                         pattern = "annual_pos_anomalies", full.names = TRUE)
 
 # Extracting years from file names
 file_years <- sapply(anom_files, function(x) as.integer(substr(x, nchar(x)-7, nchar(x)-4)))
@@ -86,16 +89,16 @@ ssta_df <- data.frame(name = names_weekly) %>%
 # 50 minutes per year
 
 # Plan for a multicore future
-cores <- 4
+cores <- 3
 registerDoParallel(cores)
 
-# Wrap the outer loop inside the foreach function
+# Loop runs each week in a year past the weekly SD rasters to identify and sum anomalies
 foreach(j = yrs, .packages = c("terra", "dplyr")) %dopar% {
   
-  # Start timer with tic()
+  # Start timer
   start_time <- Sys.time()
-
-  # Print a message indicating the year for which the anomaly is being calculated and the start time.
+  
+  # Print a time stamp
   print(paste("calculating anomaly for", j, "-- started at", start_time))
   
   # Filter 'ssta_df' for the current year 'j' and select the 'week' column. 
@@ -110,7 +113,9 @@ foreach(j = yrs, .packages = c("terra", "dplyr")) %dopar% {
   for(i in wks$week) {
     
     # Load a raster layer 'sd_sst' from a TIFF file specific to the current week 'i'.
-    sd_sst <- terra::rast(file.path(dir_anom_threshold, sprintf("sst_sd_week_%s.tif", i)))
+    sd_sst <- terra::rast(file.path(dir_rasters, 
+                                    "weekly_sd_30yr_rasters", 
+                                    sprintf("sst_sd_week_%s.tif", i)))
     
     # Find the index 'w' of the current week 'i' in the 'names_ssta' vector for the current year 'j'.
     w <- which(substr(names_weekly, 1, 4) == j)[i]
@@ -140,7 +145,9 @@ foreach(j = yrs, .packages = c("terra", "dplyr")) %dopar% {
   yr <- terra::app(s_stack, fun = sum)
   
   # Write the raster layer 'yr' to a TIFF file named "annual_pos_anomalies_sd_<year>.tif".
-  writeRaster(yr, filename = file.path(dir_int, sprintf("annual_pos_anomalies_sd_%s.tif", j)),
+  writeRaster(yr, filename = file.path(dir_rasters,
+                                       "annual_positive_anomalies",
+                                       sprintf("annual_pos_anomalies_sd_%s.tif", j)),
               overwrite=TRUE)
   
   # End timer and calculate elapsed time
@@ -148,6 +155,6 @@ foreach(j = yrs, .packages = c("terra", "dplyr")) %dopar% {
   elapsed_time <- end_time - start_time
   
   # Print time message
-  print(paste("Anom for year", j, "started at", start_time, "and took", elapsed_time, "to complete"))
+  print(paste("Anom for year", j, "started at", start_time, "and took", elapsed_time, "minutes to complete"))
   
 } # End of outer loop

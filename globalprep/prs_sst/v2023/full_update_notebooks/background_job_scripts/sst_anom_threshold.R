@@ -33,6 +33,8 @@ prev_scen_year <- as.character(scen_year_number - 1)
 dir_data <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year)
 dir_int  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/int")
 dir_output  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/output")
+
+# Change this file path for full update to correct update scenario year
 dir_rasters <- paste0(dir_M, 
                       "/git-annex/globalprep/prs_sst/prs_sst_calculated_rasters/v2023_update")
 
