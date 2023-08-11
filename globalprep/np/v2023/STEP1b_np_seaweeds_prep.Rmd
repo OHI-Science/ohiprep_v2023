@@ -11,6 +11,8 @@ output:
       in_header: '../../../workflow/templates/ohi_hdr.html'
   pdf_document:
     toc: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 [REFERENCE RMD FILE: <http://ohi-science.org/ohiprep_v2022/globalprep/np/v2021/STEP1b_np_seaweeds_prep.Rmd>]
@@ -74,8 +76,13 @@ source(here(paste0('globalprep/mar/v', version_year, '/mar_fxs.R'))) # functions
 Mariculture production in tonnes.
 
 ```{r}
-mar <- read.csv(paste0(dir_M, '/git-annex/globalprep/_raw_data/FAO_mariculture/d', version_year, paste0('/FAO_GlobalAquacultureProduction_Quantity_1950_', data_years[2], '.csv')),
-                check.names=FALSE, stringsAsFactors=FALSE)
+mar <- read.csv(paste0(dir_M, 
+                       '/git-annex/globalprep/_raw_data/FAO_mariculture/d', 
+                       version_year, paste0('/FAO_GlobalAquacultureProduction_Quantity_1950_', 
+                                            data_years[2], 
+                                            '.csv')),
+                check.names=FALSE, 
+                stringsAsFactors=FALSE)
 
 head(mar) 
 ```
@@ -155,7 +162,7 @@ seaweed_sp <- read.csv(here(paste0('globalprep/mar/v', version_year, '/raw/speci
   rename(include = exclude)
 
 ## Save in 'globalprep/np/vSenario_Year/raw' as 'species_list_np_seaweeds.csv'.
-write.csv(seaweed_sp, "raw/species_list_np_seaweeds.csv", row.names = FALSE)
+write.csv(seaweed_sp, paste0("globalprep/np/v", version_year, "/raw/species_list_np_seaweeds.csv"), row.names = FALSE)
 ```
 
 ## Update species names
@@ -319,7 +326,7 @@ Used to estimate total seaweed mariculture yield per country.
 maric <- maric %>% 
   mutate(tonnes = include*value)
 ## Save for weighting purposes later on
-write.csv(maric,"int/np_seaweeds_tonnes_weighting.csv", row.names = FALSE)
+write.csv(maric, paste0("globalprep/np/v", version_year, "/int/np_seaweeds_tonnes_weighting.csv"), row.names = FALSE)
 ```
 
 # Sustainability Scores from Seafood Watch Data
@@ -402,7 +409,7 @@ sw_sus_rgn <- bind_rows(sw_sus_rgn, sw_sus_no_rgn) %>%
 **Join the seaweed sustainability data with the mariculture data**
 
 ```{r sw-fao-joining, eval = FALSE}
-maric <- read_csv("int/np_seaweeds_tonnes_weighting.csv")
+maric <- read_csv(paste0("globalprep/np/v", version_year, "/int/np_seaweeds_tonnes_weighting.csv"))
 
 maric <- maric %>%
   group_by(environment, species, year, Taxon_code, rgn_id) %>% 
@@ -478,12 +485,12 @@ summary(mar_sw_sus)
 ## save seaweed mariculture sustainability dataset
 seaweed_sust <- mar_sw_sus %>%
   dplyr::select(rgn_id, taxa_code, year, sust_coeff)
-write_csv(seaweed_sust, "output/np_seaweed_sust.csv")
+write_csv(seaweed_sust,  paste0("globalprep/np/v", version_year, "/output/np_seaweed_sust.csv"))
 ## Save seaweed mariculture harvest tonnes data ("tonnes" column already incorporated include proportions)
 seaweed_harvest_tonnes <- mar_sw_sus %>%
   dplyr::select(rgn_id, taxa_code, year, tonnes)
 anyDuplicated(seaweed_harvest_tonnes) # check for duplication
-write.csv(seaweed_harvest_tonnes, 'output/np_seaweed_harvest_tonnes.csv', row.names=F)
+write.csv(seaweed_harvest_tonnes, paste0("globalprep/np/v", version_year, "/output/np_seaweed_harvest_tonnes.csv"), row.names=F)
 ```
 
 ## Save gapfill datasets
@@ -499,7 +506,7 @@ mar_FAO_gf <- mar_sw_sus %>%
          gapfilled = ifelse(gapfill_fao == 0, 0, 1)) %>%
   dplyr::select(rgn_id, taxa_code, year, gapfilled, method)
  
-write.csv(mar_FAO_gf, "output/np_seaweed_harvest_tonnes_gf.csv", row.names = FALSE)
+write.csv(mar_FAO_gf, paste0("globalprep/np/v", version_year, "/output/np_seaweed_harvest_tonnes_gf.csv"), row.names = FALSE)
  
 ## save a gapfill dataset for sustainability dataset
  
@@ -508,7 +515,7 @@ mar_sust_gf <- mar_sw_sus %>%
          gapfilled = 1) %>%
   dplyr::select(rgn_id, year, taxa_code, gapfilled, method)
  
-write.csv(mar_sust_gf, "output/np_seaweed_sust_gf.csv", row.names = FALSE)
+write.csv(mar_sust_gf, paste0("globalprep/np/v", version_year, "/output/np_seaweed_sust_gf.csv"), row.names = FALSE)
 ```
 
 Datacheck:

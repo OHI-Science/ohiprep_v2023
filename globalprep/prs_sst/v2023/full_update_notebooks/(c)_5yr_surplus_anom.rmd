@@ -61,7 +61,13 @@ prev_scen_year <- as.character(scen_year_number - 1)
 dir_data <- paste0(dir_M, "/git-annex/globalprep/_raw_data/CoRTAD_sst/d", scen_year)
 dir_int  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/int")
 dir_output  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/v", scen_year, "/output")
-dir_anom_threshold  <- paste0(dir_M, "/git-annex/globalprep/prs_sst/sd_mean_30yr_rasters")
+
+# Change this file path for full update to correct update scenario year
+dir_rasters <- paste0(dir_M, 
+                      "/git-annex/globalprep/prs_sst/prs_sst_calculated_rasters/v2023_update")
+
+# Specify years for calculations, the data set's years, often 1 year behind scenario year
+yrs <- 1982:2022
 
 # Load in OHI spatial data
 ohi_rasters()
@@ -82,7 +88,7 @@ This chunk creates and saves the 5 year reference period anomaly raster that sum
 ```{r create reference 5 year anomalies}
 
 # List all pos anom files 
-anom_files <- list.files(dir_int, pattern = "annual_pos_anomalies", full.names = TRUE)
+anom_files <- list.files(file.path(dir_rasters, "annual_positive_anomalies"), pattern = "annual_pos_anomalies", full.names = TRUE)
 
 # Initialize an empty vector 'ref_years'
 ref_years <- c()
@@ -94,9 +100,8 @@ for(i in 1985:1989){ref_years = c(ref_years, grep(i, anom_files))}
 ref <- rast(anom_files[ref_years]) %>% app(., fun=sum)
 
 # Write the raster to a TIFF file named "85_89_ref_anom.tif".
-writeRaster(ref, filename = file.path(dir_int, "85_89_ref_anom.tif"),
+writeRaster(ref, filename = file.path(file.path(dir_rasters, "referenc_period_5yr_positive_anomalies"), "85_89_ref_anom.tif"),
             overwrite=TRUE)
-
 ```
 
 ------------------------------------------------------------------------
@@ -126,10 +131,10 @@ foreach(i = seq(1986, yrs[length(yrs)-4])) %do% {
   years <- i:(i + 4)
   
   # Load reference anomaly period raster
-  ref <- rast(file.path(dir_int, "85_89_ref_anom.tif"))
+  ref <- rast(file.path(dir_rasters, "referenc_period_5yr_positive_anomalies", "85_89_ref_anom.tif"))
   
   # Load OHI five year anomaly period raster stack
-  five_year_rast <- rast(c(anom_files[substr(anom_files, 81, 84) %in% years]))
+  five_year_rast <- rast(c(anom_files[substr(anom_files, 137, 140) %in% years]))
 
   # Sum pos anoms in 5 year period then subtract reference period 
   r <- app(five_year_rast, fun=sum) - ref
@@ -139,7 +144,7 @@ foreach(i = seq(1986, yrs[length(yrs)-4])) %do% {
   
   # Save raster file
   terra::writeRaster(r, file=sprintf("%s/sst_diff_ocean_%s-%s.tif", 
-                                      dir_int, years[1], years[5]), 
+                                      file.path(dir_rasters, "surplus_5yr_positive_anomalies"), years[1], years[5]), 
                       overwrite=TRUE)
   
   # End timer and calculate elapsed time
@@ -161,7 +166,7 @@ This code chunk extracts all the values from all the 5 year surplus anomaly file
 
 ```{r}
 # List all surplus pos anom files
-diffs <- list.files(dir_int, pattern = "diff", full.names = TRUE)
+diffs <- list.files(file.path(dir_rasters, "surplus_5yr_positive_anomalies"), pattern = "diff", full.names = TRUE)
 
 # Initialize an empty vector to store raster values
 vals <- c()
@@ -179,7 +184,7 @@ for(i in 1:length(diffs)){
 # Calculate minimum (-142 v2018; -159 v2021; -157 v2022; -166 v2023)
 min_val   <- min(vals, na.rm = TRUE) 
 
-# Calculate maximum (182 v2018; 228 v2021; 247 v2022)
+# Calculate maximum (182 v2018; 228 v2021; 247 v2023)
 max_val   <- max(vals, na.rm = TRUE) 
 
 # Calculate 99.99th percentile (128 v2018; 148 v2021; 148 v2022, 159 v2023)
@@ -208,7 +213,7 @@ This code chunk takes the 99.99th percentile value and uses it to rescale all th
 ```{r rescale surplus pos anoms}
 
 # List surplus pos anom files
-diffs <- list.files(dir_int, pattern = "diff.*tif", full.names = TRUE)
+diffs <- list.files(file.path(dir_rasters, "surplus_5yr_positive_anomalies"), pattern = "diff.*tif", full.names = TRUE)
 
 # Read in 99.99th percentile rescaling value
 resc_num <- read.csv(file.path(sup_info, "reference_points_pressures.csv")) %>%
@@ -231,7 +236,7 @@ for(i in 1:length(diffs)) {
   r = terra::rast(diffs[i])
 
   # Extract the year from the filename
-  years = substr(diffs[i], 72, 80)
+  years = substr(diffs[i], 133, 141)
   
   # Check if output file for this year already exists
   if(file.exists(sprintf("%s/sst_%s_1985-1989.tif", dir_output, years))){
@@ -255,7 +260,8 @@ for(i in 1:length(diffs)) {
                     filename = sprintf("%s/sst_%s_1985-1989.tif", dir_output, years),
                     overwrite = TRUE,
                     threads = TRUE)
-  }
+    
+  } # End if statement
   
   # End timer and calculate elapsed time
   end_time <- Sys.time()
@@ -269,7 +275,7 @@ for(i in 1:length(diffs)) {
   # Free up memory
   gc()
   
-}
+} # End loop
 
 ```
 
