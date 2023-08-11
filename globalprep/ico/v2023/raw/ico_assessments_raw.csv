@@ -95,6 +95,7 @@ iucn_sid,year,assess_year,code,category,sciname
 13249,2008,2008,DD,Data Deficient,Mesoplodon layardii
 13249,1996,1996,DD,Data Deficient,Mesoplodon layardii
 13249,1994,1994,K,Insufficiently Known,Mesoplodon layardii
+13250,2022,2022,LC,Least Concern,Mesoplodon mirus
 13250,2020,2020,LC,Least Concern,Mesoplodon mirus
 13250,2008,2008,DD,Data Deficient,Mesoplodon mirus
 13250,1996,1996,DD,Data Deficient,Mesoplodon mirus
@@ -108,6 +109,150 @@ iucn_sid,year,assess_year,code,category,sciname
 133706,2018,2017,CR,Critically Endangered,Eubalaena japonica
 133706,2008,2008,CR,Critically Endangered,Eubalaena japonica
 134817215,2021,2020,LC,Least Concern,Delphinus delphis
+135301,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135301,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135302,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135302,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135303,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135303,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135306,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135306,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135308,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135308,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135309,2011,2010,CR,Critically Endangered,Oncorhynchus nerka
+135309,2008,2008,CR,Critically Endangered,Oncorhynchus nerka
+135310,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135310,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135311,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135311,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135312,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135312,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135313,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135313,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135315,2011,2010,EN,Endangered,Oncorhynchus nerka
+135315,2008,2008,CR,Critically Endangered,Oncorhynchus nerka
+135316,2011,2010,EX,Extinct,Oncorhynchus nerka
+135316,2008,2008,EX,Extinct,Oncorhynchus nerka
+135317,2011,2010,NT,Near Threatened,Oncorhynchus nerka
+135317,2008,2008,NT,Near Threatened,Oncorhynchus nerka
+135318,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135318,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135319,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135319,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135320,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135320,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135321,2011,2010,EN,Endangered,Oncorhynchus nerka
+135321,2008,2008,EN,Endangered,Oncorhynchus nerka
+135322,2011,2010,VU,Vulnerable,Oncorhynchus nerka
+135322,2008,2008,VU,Vulnerable,Oncorhynchus nerka
+135323,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135323,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135324,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135324,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135325,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135325,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135326,2011,2010,EX,Extinct,Oncorhynchus nerka
+135326,2008,2008,EX,Extinct,Oncorhynchus nerka
+135327,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135327,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135328,2011,2010,EN,Endangered,Oncorhynchus nerka
+135328,2008,2008,EN,Endangered,Oncorhynchus nerka
+135329,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135329,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135330,2011,2010,CR,Critically Endangered,Oncorhynchus nerka
+135330,2008,2008,CR,Critically Endangered,Oncorhynchus nerka
+135331,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135331,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135332,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135332,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135333,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135333,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135334,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135334,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135335,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135335,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135336,2011,2010,EN,Endangered,Oncorhynchus nerka
+135336,2008,2008,EN,Endangered,Oncorhynchus nerka
+135337,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135337,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135338,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135338,2008,2008,EN,Endangered,Oncorhynchus nerka
+135339,2011,2010,EX,Extinct,Oncorhynchus nerka
+135339,2008,2008,EX,Extinct,Oncorhynchus nerka
+135340,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135340,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135341,2011,2010,EX,Extinct,Oncorhynchus nerka
+135341,2008,2008,EX,Extinct,Oncorhynchus nerka
+135342,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135342,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135343,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135343,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135344,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135344,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135345,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135345,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135346,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135346,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135347,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135347,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135348,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135348,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135351,2011,2010,EN,Endangered,Oncorhynchus nerka
+135351,2008,2008,EN,Endangered,Oncorhynchus nerka
+135352,2011,2010,VU,Vulnerable,Oncorhynchus nerka
+135352,2008,2008,EN,Endangered,Oncorhynchus nerka
+135353,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135353,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135354,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135354,2008,2008,EN,Endangered,Oncorhynchus nerka
+135355,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135355,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135356,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135356,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135357,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135357,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135358,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135358,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135359,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135359,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135360,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135360,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135361,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135361,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135362,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135362,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135363,2011,2010,NT,Near Threatened,Oncorhynchus nerka
+135363,2008,2008,NT,Near Threatened,Oncorhynchus nerka
+135365,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135365,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135366,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135366,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135368,2011,2010,EX,Extinct,Oncorhynchus nerka
+135368,2008,2008,EX,Extinct,Oncorhynchus nerka
+135369,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135369,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135370,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135370,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135371,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135371,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135372,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135372,2008,2008,VU,Vulnerable,Oncorhynchus nerka
+135373,2011,2010,CR,Critically Endangered,Oncorhynchus nerka
+135373,2008,2008,CR,Critically Endangered,Oncorhynchus nerka
+135374,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135374,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135375,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135375,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135376,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135376,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135377,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135377,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135379,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+135379,2008,2008,DD,Data Deficient,Oncorhynchus nerka
+135380,2011,2010,LC,Least Concern,Oncorhynchus nerka
+135380,2008,2008,LC,Least Concern,Oncorhynchus nerka
+135381,2011,2010,EN,Endangered,Oncorhynchus nerka
+135381,2008,2008,EN,Endangered,Oncorhynchus nerka
 135631,2018,2011,LC,Least Concern,Esox lucius
 135631,2013,2011,LC,Least Concern,Esox lucius
 135631,2008,2008,LC,Least Concern,Esox lucius
@@ -124,6 +269,13 @@ iucn_sid,year,assess_year,code,category,sciname
 13653,1988,1988,E,Endangered,Monachus monachus
 13653,1986,1986,E,Endangered,Monachus monachus
 13653,1965,1965,NA,"""Very rare and believed to be decreasing in numbers""",Monachus monachus
+13704,2017,2017,LC,Least Concern,Monodon monoceros
+13704,2012,2008,NT,Near Threatened,Monodon monoceros
+13704,2008,2008,NT,Near Threatened,Monodon monoceros
+13704,1996,1996,DD,Data Deficient,Monodon monoceros
+13704,1994,1994,K,Insufficiently Known,Monodon monoceros
+13704,1990,1990,K,Insufficiently Known,Monodon monoceros
+13704,1988,1988,K,Insufficiently Known,Monodon monoceros
 142121108,2019,2018,VU,Vulnerable,Chelonia mydas
 142121866,2019,2019,LC,Least Concern,Chelonia mydas
 14363,1996,1996,DD,Data Deficient,Natator depressus
@@ -142,6 +294,19 @@ iucn_sid,year,assess_year,code,category,sciname
 15421,1994,1994,K,Insufficiently Known,Orcinus orca
 155123,2010,2009,LC,Least Concern,Clupea harengus
 156206333,2020,2019,CR,Critically Endangered,Delphinus delphis
+157011948,2019,2019,CR,Critically Endangered,Dugong dugon
+158625941,2021,2020,LC,Least Concern,Hippoglossus stenolepis
+15955,2022,2021,EN,Endangered,Panthera tigris
+15955,2015,2014,EN,Endangered,Panthera tigris
+15955,2011,2010,EN,Endangered,Panthera tigris
+15955,2010,2010,EN,Endangered,Panthera tigris
+15955,2008,2008,EN,Endangered,Panthera tigris
+15955,2002,2002,EN,Endangered,Panthera tigris
+15955,1996,1996,EN,Endangered,Panthera tigris
+15955,1994,1994,E,Endangered,Panthera tigris
+15955,1990,1990,E,Endangered,Panthera tigris
+15955,1988,1988,E,Endangered,Panthera tigris
+15955,1986,1986,E,Endangered,Panthera tigris
 160158217,2021,2020,NT,Near Threatened,Steno bredanensis
 161749,2009,2004,VU,Vulnerable,Isurus oxyrinchus
 161750,2009,2004,VU,Vulnerable,Isurus oxyrinchus
@@ -168,6 +333,7 @@ iucn_sid,year,assess_year,code,category,sciname
 16674437,2022,2020,LC,Least Concern,Stenella coeruleoalba
 16674437,2012,2010,VU,Vulnerable,Stenella coeruleoalba
 169473392,2021,2021,CR,Critically Endangered,Glyphis gangeticus
+170025,2011,2009,LC,Least Concern,Jasus edwardsii
 17013,2016,2016,LC,Least Concern,Phoca vitulina
 17013,2008,2008,LC,Least Concern,Phoca vitulina
 17013,1996,1996,LR/lc,Lower Risk/least concern,Phoca vitulina
@@ -188,6 +354,8 @@ iucn_sid,year,assess_year,code,category,sciname
 17028,1986,1986,V,Vulnerable,Phocoena sinus
 17031,2008,2008,CR,Critically Endangered,Phocoena phocoena
 17031,1996,1996,VU,Vulnerable,Phocoena phocoena
+176528,2018,2018,LC,Least Concern,Asparagus albus
+178800,2010,2008,LC,Least Concern,Nypa fruticans
 17978,2017,2017,VU,Vulnerable,Pontoporia blainvillei
 17978,2012,2008,VU,Vulnerable,Pontoporia blainvillei
 17978,2008,2008,VU,Vulnerable,Pontoporia blainvillei
@@ -196,13 +364,21 @@ iucn_sid,year,assess_year,code,category,sciname
 17978,1990,1990,K,Insufficiently Known,Pontoporia blainvillei
 17978,1988,1988,K,Insufficiently Known,Pontoporia blainvillei
 181208820,2021,2020,CR,Critically Endangered,Tursiops truncatus
+181500967,2020,2020,LC,Least Concern,Ardea herodias
 183775,2021,2020,LC,Least Concern,Engraulis ringens
 183775,2010,2008,LC,Least Concern,Engraulis ringens
 18596,2018,2018,NT,Near Threatened,Pseudorca crassidens
 18596,2008,2008,DD,Data Deficient,Pseudorca crassidens
 18596,1996,1996,LR/lc,Lower Risk/least concern,Pseudorca crassidens
 18596,1994,1994,K,Insufficiently Known,Pseudorca crassidens
+187752,2010,2009,LC,Least Concern,Coris julis
 189865869,2022,2020,EN,Endangered,Delphinus delphis
+190409,2019,2018,DD,Data Deficient,Mugil liza
+190409,2015,2011,DD,Data Deficient,Mugil liza
+190710,2012,2009,LC,Least Concern,Sparisoma cretense
+190710,2010,2009,LC,Least Concern,Sparisoma cretense
+191108,2014,2013,EN,Endangered,Anguilla rostrata
+193989455,2022,2020,LC,Least Concern,Santalum acuminatum
 194300,2011,2010,CR,Critically Endangered,Tursiops truncatus
 19488,2016,2016,EN,Endangered,Rhincodon typus
 19488,2005,2005,VU,Vulnerable,Rhincodon typus
@@ -210,13 +386,46 @@ iucn_sid,year,assess_year,code,category,sciname
 19488,1996,1996,DD,Data Deficient,Rhincodon typus
 19488,1994,1994,I,Indeterminate,Rhincodon typus
 19488,1990,1990,I,Indeterminate,Rhincodon typus
+195502,2019,2018,NT,Near Threatened,Anguilla australis
+196303,2019,2018,LC,Least Concern,Anguilla reinhardtii
+197276,2019,2018,EN,Endangered,Anguilla dieffenbachii
+197461,2021,2014,LC,Least Concern,Bitis arietans
 19855,1996,1996,LR/lc,Lower Risk/least concern,Salmo salar
+198568,2015,2013,LC,Least Concern,Engraulis encrasicolus
 198583,2018,2018,LC,Least Concern,Sprattus sprattus
 19861,2011,2010,LC,Least Concern,Salmo trutta
 19861,2008,2008,LC,Least Concern,Salmo trutta
 19861,1996,1996,LR/lc,Lower Risk/least concern,Salmo trutta
 198785664,2021,2021,EN,Endangered,Globicephala melas
 198787290,2021,2021,CR,Critically Endangered,Globicephala melas
+201429,2011,2010,VU,Vulnerable,Oncorhynchus nerka
+201430,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201431,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201432,2011,2010,EN,Endangered,Oncorhynchus nerka
+201433,2011,2010,CR,Critically Endangered,Oncorhynchus nerka
+201434,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201435,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201436,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201437,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201438,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201439,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+201440,2011,2010,EN,Endangered,Oncorhynchus nerka
+201441,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201442,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201444,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201445,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201446,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201447,2011,2010,EN,Endangered,Oncorhynchus nerka
+201448,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+201449,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+201450,2011,2010,EN,Endangered,Oncorhynchus nerka
+201451,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201452,2011,2010,LC,Least Concern,Oncorhynchus nerka
+201453,2011,2010,EN,Endangered,Oncorhynchus nerka
+201454,2011,2010,EN,Endangered,Oncorhynchus nerka
+201499,2011,2010,DD,Data Deficient,Oncorhynchus nerka
+201500,2011,2010,LC,Least Concern,Oncorhynchus nerka
+202415,2013,2012,LC,Least Concern,Thaleichthys pacificus
 20729,2018,2018,LC,Least Concern,Stenella attenuata
 20729,2012,2008,LC,Least Concern,Stenella attenuata
 20729,2008,2008,LC,Least Concern,Stenella attenuata
@@ -240,11 +449,52 @@ iucn_sid,year,assess_year,code,category,sciname
 21500,2008,2008,DD,Data Deficient,Tasmacetus shepherdi
 21500,1996,1996,DD,Data Deficient,Tasmacetus shepherdi
 21500,1994,1994,K,Insufficiently Known,Tasmacetus shepherdi
+218582754,2022,2022,EN,Endangered,Dugong dugon
+218582764,2022,2022,CR,Critically Endangered,Dugong dugon
 22563,2019,2018,LC,Least Concern,Tursiops truncatus
 22563,2012,2008,LC,Least Concern,Tursiops truncatus
 22563,2008,2008,LC,Least Concern,Tursiops truncatus
 22563,1996,1996,DD,Data Deficient,Tursiops truncatus
 22563,1994,1994,K,Insufficiently Known,Tursiops truncatus
+22692146,2016,2016,LC,Least Concern,Grus grus
+22692146,2015,2012,LC,Least Concern,Grus grus
+22692146,2012,2012,LC,Least Concern,Grus grus
+22692146,2009,2009,LC,Least Concern,Grus grus
+22692146,2008,2008,LC,Least Concern,Grus grus
+22692146,2004,2004,LC,Least Concern,Grus grus
+22692146,2000,2000,LR/lc,Lower Risk/least concern,Grus grus
+22692146,1994,1994,LR/lc,Lower Risk/least concern,Grus grus
+22692146,1988,1988,LR/lc,Lower Risk/least concern,Grus grus
+22694334,2018,2018,LC,Least Concern,Larus glaucescens
+22694334,2016,2016,LC,Least Concern,Larus glaucescens
+22694334,2012,2012,LC,Least Concern,Larus glaucescens
+22694334,2009,2009,LC,Least Concern,Larus glaucescens
+22694334,2008,2008,LC,Least Concern,Larus glaucescens
+22694334,2004,2004,LC,Least Concern,Larus glaucescens
+22694334,2000,2000,LR/lc,Lower Risk/least concern,Larus glaucescens
+22694334,1994,1994,LR/lc,Lower Risk/least concern,Larus glaucescens
+22694334,1988,1988,LR/lc,Lower Risk/least concern,Larus glaucescens
+22696495,2021,2021,EN,Endangered,Falco cherrug
+22696495,2016,2016,EN,Endangered,Falco cherrug
+22696495,2015,2013,EN,Endangered,Falco cherrug
+22696495,2013,2013,EN,Endangered,Falco cherrug
+22696495,2012,2012,EN,Endangered,Falco cherrug
+22696495,2010,2010,VU,Vulnerable,Falco cherrug
+22696495,2008,2008,EN,Endangered,Falco cherrug
+22696495,2004,2004,EN,Endangered,Falco cherrug
+22696495,2000,2000,LR/lc,Lower Risk/least concern,Falco cherrug
+22696495,1994,1994,LR/lc,Lower Risk/least concern,Falco cherrug
+22696495,1988,1988,NT,Near Threatened,Falco cherrug
+22698209,2019,2019,NT,Near Threatened,Ardenna grisea
+22698209,2018,2018,NT,Near Threatened,Ardenna grisea
+22698209,2016,2016,NT,Near Threatened,Ardenna grisea
+22698209,2012,2012,NT,Near Threatened,Ardenna grisea
+22698209,2010,2010,NT,Near Threatened,Ardenna grisea
+22698209,2008,2008,NT,Near Threatened,Ardenna grisea
+22698209,2004,2004,NT,Near Threatened,Ardenna grisea
+22698209,2000,2000,LR/lc,Lower Risk/least concern,Ardenna grisea
+22698209,1994,1994,LR/lc,Lower Risk/least concern,Ardenna grisea
+22698209,1988,1988,LR/lc,Lower Risk/least concern,Ardenna grisea
 22823,2015,2015,VU,Vulnerable,Ursus maritimus
 22823,2008,2008,VU,Vulnerable,Ursus maritimus
 22823,2006,2006,VU,Vulnerable,Ursus maritimus
@@ -310,6 +560,7 @@ iucn_sid,year,assess_year,code,category,sciname
 2480,2018,2018,NT,Near Threatened,Balaenoptera bonaerensis
 2480,2008,2008,DD,Data Deficient,Balaenoptera bonaerensis
 2480,1996,1996,LR/cd,Lower Risk/conservation dependent,Balaenoptera bonaerensis
+2762,2021,2020,LC,Least Concern,Berardius arnuxii
 2762,2020,2020,LC,Least Concern,Berardius arnuxii
 2762,2008,2008,DD,Data Deficient,Berardius arnuxii
 2762,1996,1996,LR/cd,Lower Risk/conservation dependent,Berardius arnuxii
@@ -318,6 +569,7 @@ iucn_sid,year,assess_year,code,category,sciname
 3778,2008,2008,DD,Data Deficient,Caperea marginata
 3778,1996,1996,LR/lc,Lower Risk/least concern,Caperea marginata
 3778,1994,1994,K,Insufficiently Known,Caperea marginata
+3855,2022,2018,VU,Vulnerable,Carcharodon carcharias
 3855,2019,2018,VU,Vulnerable,Carcharodon carcharias
 3855,2009,2005,VU,Vulnerable,Carcharodon carcharias
 3855,2000,2000,VU,Vulnerable,Carcharodon carcharias
@@ -336,6 +588,7 @@ iucn_sid,year,assess_year,code,category,sciname
 39338,2015,2015,LC,Least Concern,Megachasma pelagios
 39338,2005,2005,DD,Data Deficient,Megachasma pelagios
 39338,2000,2000,DD,Data Deficient,Megachasma pelagios
+39339,2022,2018,VU,Vulnerable,Alopias vulpinus
 39339,2019,2018,VU,Vulnerable,Alopias vulpinus
 39339,2009,2007,VU,Vulnerable,Alopias vulpinus
 39339,2002,2002,DD,Data Deficient,Alopias vulpinus
@@ -398,7 +651,12 @@ iucn_sid,year,assess_year,code,category,sciname
 41761,2012,2003,VU,Vulnerable,Pontoporia blainvillei
 41761,2003,2003,VU,Vulnerable,Pontoporia blainvillei
 41762,2003,2003,EN,Endangered,Delphinus delphis
-4292,2021,2018,EN,Endangered,Cetorhinus maximus
+41772,2017,2016,VU,Vulnerable,Sus barbatus
+41772,2008,2008,VU,Vulnerable,Sus barbatus
+41772,1996,1996,LR/lc,Lower Risk/least concern,Sus barbatus
+42394,2016,2015,LC,Least Concern,Odocoileus virginianus
+42394,2008,2008,LC,Least Concern,Odocoileus virginianus
+42394,1996,1996,LR/lc,Lower Risk/least concern,Odocoileus virginianus
 4292,2019,2018,EN,Endangered,Cetorhinus maximus
 4292,2009,2005,VU,Vulnerable,Cetorhinus maximus
 4292,2000,2000,VU,Vulnerable,Cetorhinus maximus
@@ -418,6 +676,7 @@ iucn_sid,year,assess_year,code,category,sciname
 4615,1988,1988,E,Endangered,Chelonia mydas
 4615,1986,1986,E,Endangered,Chelonia mydas
 4615,1982,1982,E,Endangered,Chelonia mydas
+4616,1996,1996,CR,Critically Endangered,Chelonia mydas
 46967807,2013,2013,CR,Critically Endangered,Dermochelys coriacea
 46967817,2013,2013,CR,Critically Endangered,Dermochelys coriacea
 46967827,2019,2019,EN,Endangered,Dermochelys coriacea
@@ -426,10 +685,26 @@ iucn_sid,year,assess_year,code,category,sciname
 46967848,2013,2013,DD,Data Deficient,Dermochelys coriacea
 46967863,2013,2013,CR,Critically Endangered,Dermochelys coriacea
 46967873,2013,2013,DD,Data Deficient,Dermochelys coriacea
+49278407,2019,2018,LC,Least Concern,Melaleuca quinquenervia
 60217,2021,2019,EN,Endangered,Carcharhinus perezi
 60217,2006,2006,NT,Near Threatened,Carcharhinus perezi
 60225,2019,2018,EN,Endangered,Isurus paucus
 60225,2006,2006,VU,Vulnerable,Isurus paucus
+61339,2018,2016,VU,Vulnerable,Epinephelus polyphekadion
+61339,2006,2006,NT,Near Threatened,Epinephelus polyphekadion
+61442,2019,2018,CR,Critically Endangered,Delphinapterus leucas
+61442,2012,2006,CR,Critically Endangered,Delphinapterus leucas
+61442,2006,2006,CR,Critically Endangered,Delphinapterus leucas
+61743,2021,2021,EN,Endangered,Haliotis kamtschatkana
+61743,2006,2006,EN,Endangered,Haliotis kamtschatkana
+62225,2022,2020,LC,Least Concern,Entosphenus tridentatus
+6335,2017,2017,LC,Least Concern,Delphinapterus leucas
+6335,2012,2008,NT,Near Threatened,Delphinapterus leucas
+6335,2008,2008,NT,Near Threatened,Delphinapterus leucas
+6335,1996,1996,VU,Vulnerable,Delphinapterus leucas
+6335,1994,1994,K,Insufficiently Known,Delphinapterus leucas
+6335,1990,1990,K,Insufficiently Known,Delphinapterus leucas
+6335,1988,1988,K,Insufficiently Known,Delphinapterus leucas
 6494,2013,2013,VU,Vulnerable,Dermochelys coriacea
 6494,2000,2000,CR,Critically Endangered,Dermochelys coriacea
 6494,1996,1996,EN,Endangered,Dermochelys coriacea
@@ -438,7 +713,19 @@ iucn_sid,year,assess_year,code,category,sciname
 6494,1988,1988,E,Endangered,Dermochelys coriacea
 6494,1986,1986,E,Endangered,Dermochelys coriacea
 6494,1982,1982,E,Endangered,Dermochelys coriacea
+6909,2019,2015,VU,Vulnerable,Dugong dugon
+6909,2015,2015,VU,Vulnerable,Dugong dugon
+6909,2008,2008,VU,Vulnerable,Dugong dugon
+6909,2006,2006,VU,Vulnerable,Dugong dugon
+6909,1996,1996,VU,Vulnerable,Dugong dugon
+6909,1994,1994,V,Vulnerable,Dugong dugon
+6909,1990,1990,V,Vulnerable,Dugong dugon
+6909,1988,1988,V,Vulnerable,Dugong dugon
+6909,1986,1986,V,Vulnerable,Dugong dugon
+6909,1982,1982,V,Vulnerable,Dugong dugon
+6909,1965,1965,NA,"""Status inadequately known-survey required or data sought""",Dugong dugon
 74491261,2016,2015,LC,Least Concern,Halichoerus grypus
+78769001,2021,2019,LC,Least Concern,Haliotis iris
 8005,2008,2008,CR,Critically Endangered,Eretmochelys imbricata
 8005,1996,1996,CR,Critically Endangered,Eretmochelys imbricata
 8005,1994,1994,E,Endangered,Eretmochelys imbricata
@@ -467,7 +754,6 @@ iucn_sid,year,assess_year,code,category,sciname
 83776383,2015,2015,EN,Endangered,Caretta caretta
 84126444,2015,2015,CR,Critically Endangered,Caretta caretta
 84127873,2015,2015,CR,Critically Endangered,Caretta caretta
-84131194,2017,2015,LC,Least Concern,Caretta caretta
 84131194,2015,2015,LC,Least Concern,Caretta caretta
 84156809,2015,2015,CR,Critically Endangered,Caretta caretta
 84189617,2015,2015,NT,Near Threatened,Caretta caretta
@@ -495,3 +781,4 @@ iucn_sid,year,assess_year,code,category,sciname
 9660,2016,2016,LC,Least Concern,Halichoerus grypus
 9660,2008,2008,LC,Least Concern,Halichoerus grypus
 9660,1996,1996,LR/lc,Lower Risk/least concern,Halichoerus grypus
+98471199,2019,2019,DD,Data Deficient,Clupea pallasii
