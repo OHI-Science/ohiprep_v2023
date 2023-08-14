@@ -2324,6 +2324,37 @@ rgn_id,rgn_name,year,mean_cat,ico_status,n_spp
 84,Algeria,2020,0.38,62,10
 84,Algeria,2021,0.39,61,10
 84,Algeria,2022,0.39,61,10
+85,Ascension,1992,0.31667,68.333,12
+85,Ascension,1993,0.31667,68.333,12
+85,Ascension,1994,0.31667,68.333,12
+85,Ascension,1995,0.31667,68.333,12
+85,Ascension,1996,0.35,65,12
+85,Ascension,1997,0.35,65,12
+85,Ascension,1998,0.35,65,12
+85,Ascension,1999,0.35,65,12
+85,Ascension,2000,0.35833,64.167,12
+85,Ascension,2001,0.35833,64.167,12
+85,Ascension,2002,0.35833,64.167,12
+85,Ascension,2003,0.35833,64.167,12
+85,Ascension,2004,0.35833,64.167,12
+85,Ascension,2005,0.35833,64.167,12
+85,Ascension,2006,0.35833,64.167,12
+85,Ascension,2007,0.35833,64.167,12
+85,Ascension,2008,0.325,67.5,12
+85,Ascension,2009,0.34167,65.83300000000001,12
+85,Ascension,2010,0.34167,65.83300000000001,12
+85,Ascension,2011,0.34167,65.83300000000001,12
+85,Ascension,2012,0.34167,65.83300000000001,12
+85,Ascension,2013,0.325,67.5,12
+85,Ascension,2014,0.325,67.5,12
+85,Ascension,2015,0.325,67.5,12
+85,Ascension,2016,0.34167,65.83300000000001,12
+85,Ascension,2017,0.34167,65.83300000000001,12
+85,Ascension,2018,0.325,67.5,12
+85,Ascension,2019,0.375,62.5,12
+85,Ascension,2020,0.375,62.5,12
+85,Ascension,2021,0.375,62.5,12
+85,Ascension,2022,0.375,62.5,12
 86,Saint Helena,1992,0.31667,68.333,12
 86,Saint Helena,1993,0.31667,68.333,12
 86,Saint Helena,1994,0.31667,68.333,12
@@ -2355,6 +2386,37 @@ rgn_id,rgn_name,year,mean_cat,ico_status,n_spp
 86,Saint Helena,2020,0.375,62.5,12
 86,Saint Helena,2021,0.375,62.5,12
 86,Saint Helena,2022,0.375,62.5,12
+88,Tristan da Cunha,1992,0.31667,68.333,12
+88,Tristan da Cunha,1993,0.31667,68.333,12
+88,Tristan da Cunha,1994,0.31667,68.333,12
+88,Tristan da Cunha,1995,0.31667,68.333,12
+88,Tristan da Cunha,1996,0.35,65,12
+88,Tristan da Cunha,1997,0.35,65,12
+88,Tristan da Cunha,1998,0.35,65,12
+88,Tristan da Cunha,1999,0.35,65,12
+88,Tristan da Cunha,2000,0.35833,64.167,12
+88,Tristan da Cunha,2001,0.35833,64.167,12
+88,Tristan da Cunha,2002,0.35833,64.167,12
+88,Tristan da Cunha,2003,0.35833,64.167,12
+88,Tristan da Cunha,2004,0.35833,64.167,12
+88,Tristan da Cunha,2005,0.35833,64.167,12
+88,Tristan da Cunha,2006,0.35833,64.167,12
+88,Tristan da Cunha,2007,0.35833,64.167,12
+88,Tristan da Cunha,2008,0.325,67.5,12
+88,Tristan da Cunha,2009,0.34167,65.83300000000001,12
+88,Tristan da Cunha,2010,0.34167,65.83300000000001,12
+88,Tristan da Cunha,2011,0.34167,65.83300000000001,12
+88,Tristan da Cunha,2012,0.34167,65.83300000000001,12
+88,Tristan da Cunha,2013,0.325,67.5,12
+88,Tristan da Cunha,2014,0.325,67.5,12
+88,Tristan da Cunha,2015,0.325,67.5,12
+88,Tristan da Cunha,2016,0.34167,65.83300000000001,12
+88,Tristan da Cunha,2017,0.34167,65.83300000000001,12
+88,Tristan da Cunha,2018,0.325,67.5,12
+88,Tristan da Cunha,2019,0.375,62.5,12
+88,Tristan da Cunha,2020,0.375,62.5,12
+88,Tristan da Cunha,2021,0.375,62.5,12
+88,Tristan da Cunha,2022,0.375,62.5,12
 89,South Georgia and the South Sandwich Islands,1992,0.4,60,5
 89,South Georgia and the South Sandwich Islands,1993,0.4,60,5
 89,South Georgia and the South Sandwich Islands,1994,0.4,60,5

@@ -297,6 +297,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 13006,165,Extant,222,Sweden,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
 13006,165,Extant,208,Singapore,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
 13006,165,Extant,86,Saint Helena,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
+13006,165,Extant,85,Ascension,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
+13006,165,Extant,88,Tristan da Cunha,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
 13006,165,Extant,144,Jan Mayen,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
 13006,165,Extant,96,Sierra Leone,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
 13006,165,Extant,66,Senegal,Humpback Whale,Megaptera novaeangliae,TRUE,NA,NA,LC
@@ -507,6 +509,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 142121866,31,Extant,64,Mauritania,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
 142121866,31,Extant,121,Montserrat,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
 142121866,31,Extant,86,Saint Helena,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
+142121866,31,Extant,85,Ascension,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
+142121866,31,Extant,88,Tristan da Cunha,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
 142121866,31,Extant,168,Suriname,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
 142121866,31,Extant,103,Sao Tome and Principe,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
 142121866,31,Extant,126,Trinidad and Tobago,Green Turtle,Chelonia mydas,TRUE,NA,South Atlantic subpopulation,LC
@@ -954,6 +958,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 19488,127,Extant,7,Solomon Islands,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
 19488,127,Extant,49,Sudan,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
 19488,127,Extant,86,Saint Helena,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
+19488,127,Extant,85,Ascension,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
+19488,127,Extant,88,Tristan da Cunha,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
 19488,127,Extant,96,Sierra Leone,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
 19488,127,Extant,66,Senegal,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
 19488,127,Extant,44,Somalia,Whale Shark,Rhincodon typus,TRUE,NA,NA,EN
@@ -1056,6 +1062,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 198568,75,Extant,73,Russia,European Anchovy,Engraulis encrasicolus,FALSE,73,NA,LC
 198568,75,Extant,222,Sweden,European Anchovy,Engraulis encrasicolus,FALSE,222,NA,LC
 198568,75,Extant,86,Saint Helena,European Anchovy,Engraulis encrasicolus,FALSE,86,NA,LC
+198568,75,Extant,85,Ascension,European Anchovy,Engraulis encrasicolus,FALSE,85,NA,LC
+198568,75,Extant,88,Tristan da Cunha,European Anchovy,Engraulis encrasicolus,FALSE,88,NA,LC
 198568,75,Extant,188,Slovenia,European Anchovy,Engraulis encrasicolus,FALSE,188,NA,LC
 198568,75,Extant,75,Ukraine,European Anchovy,Engraulis encrasicolus,FALSE,75,NA,LC
 198583,41,Extant,176,Germany,Sprat,Sprattus sprattus,FALSE,176,NA,LC
@@ -1219,6 +1227,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 20738,138,Extant,31,Seychelles,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
 20738,138,Extant,208,Singapore,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
 20738,138,Extant,86,Saint Helena,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
+20738,138,Extant,85,Ascension,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
+20738,138,Extant,88,Tristan da Cunha,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
 20738,138,Extant,96,Sierra Leone,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
 20738,138,Extant,66,Senegal,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
 20738,138,Extant,44,Somalia,Rough Toothed Dolphin,Steno bredanensis,TRUE,NA,NA,LC
@@ -1447,6 +1457,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 2475,43,Extant,32,Reunion,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
 2475,43,Extant,73,Russia,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
 2475,43,Extant,86,Saint Helena,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
+2475,43,Extant,85,Ascension,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
+2475,43,Extant,88,Tristan da Cunha,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
 2475,43,Extant,111,Turks and Caicos Islands,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
 2475,43,Extant,30,Glorioso Islands,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
 2475,43,Extant,33,Juan de Nova Island,Sei whale,Balaenoptera borealis,TRUE,NA,NA,EN
@@ -1606,6 +1618,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 2478,68,Extant,31,Seychelles,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
 2478,68,Extant,222,Sweden,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
 2478,68,Extant,86,Saint Helena,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
+2478,68,Extant,85,Ascension,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
+2478,68,Extant,88,Tristan da Cunha,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
 2478,68,Extant,188,Slovenia,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
 2478,68,Extant,144,Jan Mayen,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
 2478,68,Extant,77,Syria,Fin whale,Balaenoptera physalus,TRUE,NA,NA,VU
@@ -2046,6 +2060,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 39341,157,Extant,49,Sudan,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
 39341,157,Extant,208,Singapore,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
 39341,157,Extant,86,Saint Helena,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
+39341,157,Extant,85,Ascension,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
+39341,157,Extant,88,Tristan da Cunha,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
 39341,157,Extant,96,Sierra Leone,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
 39341,157,Extant,66,Senegal,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
 39341,157,Extant,44,Somalia,Shortfin Mako,Isurus oxyrinchus,TRUE,NA,NA,EN
@@ -2474,6 +2490,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 39381,177,Extant,222,Sweden,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
 39381,177,Extant,208,Singapore,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
 39381,177,Extant,86,Saint Helena,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
+39381,177,Extant,85,Ascension,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
+39381,177,Extant,88,Tristan da Cunha,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
 39381,177,Extant,188,Slovenia,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
 39381,177,Extant,96,Sierra Leone,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
 39381,177,Extant,66,Senegal,Blue Shark,Prionace glauca,TRUE,NA,NA,NT
@@ -2742,6 +2760,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 4292,134,Extant,7,Solomon Islands,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
 4292,134,Extant,222,Sweden,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
 4292,134,Extant,86,Saint Helena,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
+4292,134,Extant,85,Ascension,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
+4292,134,Extant,88,Tristan da Cunha,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
 4292,134,Extant,188,Slovenia,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
 4292,134,Extant,96,Sierra Leone,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
 4292,134,Extant,66,Senegal,Basking Shark,Cetorhinus maximus,TRUE,NA,NA,EN
@@ -2916,6 +2936,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 4615,107,Extant,7,Solomon Islands,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
 4615,107,Extant,31,Seychelles,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
 4615,107,Extant,86,Saint Helena,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
+4615,107,Extant,85,Ascension,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
+4615,107,Extant,88,Tristan da Cunha,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
 4615,107,Extant,96,Sierra Leone,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
 4615,107,Extant,66,Senegal,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
 4615,107,Extant,44,Somalia,Green Turtle,Chelonia mydas,TRUE,NA,NA,EN
@@ -3086,6 +3108,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 46967838,23,Extant,101,Namibia,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
 46967838,23,Extant,196,Nigeria,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
 46967838,23,Extant,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
+46967838,23,Extant,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
+46967838,23,Extant,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
 46967838,23,Extant,96,Sierra Leone,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
 46967838,23,Extant,66,Senegal,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
 46967838,23,Extant,103,Sao Tome and Principe,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southwest Atlantic Ocean subpopulation,CR
@@ -3110,6 +3134,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 46967848,24,Extant,101,Namibia,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
 46967848,24,Extant,196,Nigeria,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
 46967848,24,Extant,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
+46967848,24,Extant,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
+46967848,24,Extant,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
 46967848,24,Extant,96,Sierra Leone,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
 46967848,24,Extant,66,Senegal,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
 46967848,24,Extant,103,Sao Tome and Principe,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,Southeast Atlantic Ocean subpopulation,DD
@@ -3285,6 +3311,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 60225,127,Extant,31,Seychelles,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
 60225,127,Extant,208,Singapore,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
 60225,127,Extant,86,Saint Helena,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
+60225,127,Extant,85,Ascension,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
+60225,127,Extant,88,Tristan da Cunha,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
 60225,127,Extant,96,Sierra Leone,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
 60225,127,Extant,66,Senegal,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
 60225,127,Extant,44,Somalia,Longfin Mako,Isurus paucus,TRUE,NA,NA,EN
@@ -3454,6 +3482,8 @@ iucn_sid,count,presence,rgn_id,rgn_name,comname,sciname,ico_gl,ico_rgn_id,subpop
 6494,134,Extant,7,Solomon Islands,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 6494,134,Extant,31,Seychelles,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 6494,134,Extant,86,Saint Helena,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
+6494,134,Extant,85,Ascension,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
+6494,134,Extant,88,Tristan da Cunha,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 6494,134,Extant,188,Slovenia,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 6494,134,Extant,96,Sierra Leone,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
 6494,134,Extant,66,Senegal,Leatherback Turtle,Dermochelys coriacea,TRUE,NA,NA,VU
