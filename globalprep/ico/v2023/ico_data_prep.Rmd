@@ -270,7 +270,8 @@ ico_spp_countries_final <- ico_spp_countries %>%
                                     "Bonaire, Saba, Sint Eustatius",
                               country == "French Southern Territories" ~ 
                                 "Glorioso Islands, Juan de Nova Island, Bassas da India, Ile Europa, Ile Tromelin, Crozet Islands, Amsterdam Island and Saint Paul Island, Kerguelen Islands",
-                              country ==  "United States Minor Outlying Islands" ~ "Wake Island, Jarvis Island, Palmyra Atoll, Howland Island and Baker Island, Johnston Atoll")) %>% 
+                              country ==  "United States Minor Outlying Islands" ~ "Wake Island, Jarvis Island, Palmyra Atoll, Howland Island and Baker Island, Johnston Atoll",
+                                country == ("Saint Helena, Ascension and Tristan da Cunha") ~ "Saint Helena, Ascension, Tristan da Cunha")) %>% 
   separate_longer_delim(cols = split_id, delim = ", ") %>% 
   mutate(country= case_when(is.na(split_id) ~ country,
                                    TRUE ~ split_id)) %>% 
@@ -312,6 +313,13 @@ check_full <- ico_spp_countries %>%
 check_split <- ico_spp_rgn_raw  %>% 
   dplyr::filter(rgn_name %in% c("Wake Island", "Jarvis Island", "Palmyra Atoll", "Howland Island and Baker Island", "Johnston Atoll")) 
 # 18 rows * 5 regions = 90
+
+check_full <- ico_spp_countries %>% 
+  dplyr::filter(country == "Saint Helena, Ascension and Tristan da Cunha") #33 rows
+
+check_split <- ico_spp_rgn_raw %>% 
+  dplyr::filter(rgn_name == "Saint Helena" | rgn_name == "Ascension" | rgn_name == "Tristan da Cunha") #99 rows
+
 
 # Check error message to make sure the unmatched countries don't have an OHI region match, that there are no duplicates, and that the unmatched regions make sense (not disputed, landlocked, not reported). If there are duplicates or unmatched regions that are reported in OHI, need to go back to fix and rerun the code.
 
@@ -791,7 +799,7 @@ plotly::ggplotly(trend_ts_plot)
 Plot the estimated status and trends for 2016 from assessments v2021 and v2022.
 
 ```{r fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
-ico_sum <- here::here(dir_here, 'summary', 'ico_summary.csv') %>% 
+ico_sum<- here::here(dir_here, 'summary', 'ico_summary.csv') %>% 
   readr::read_csv()
 
 status_trend <- ico_sum %>% # status and trend in this year's assessment

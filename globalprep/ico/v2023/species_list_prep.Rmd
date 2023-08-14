@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This script does not need to be run annually. It was used in 2023 to update the species list. New species were appended to the original iconic species list, using species from [Reyes-García et al. 2023.](https://www.pnas.org/doi/10.1073/pnas.2217303120)
+This script does not need to be run annually. It was used in v2023 to update the species list, and can be used to update the species included in future years if needed. New species were appended to the original iconic species list, using species from [Reyes-García et al. 2023.](https://www.pnas.org/doi/10.1073/pnas.2217303120)
 
 ```{r}
 #setup

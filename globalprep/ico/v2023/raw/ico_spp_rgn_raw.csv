@@ -128,6 +128,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 11047,154,Extant,31,Seychelles
 11047,154,Extant,208,Singapore
 11047,154,Extant,86,Saint Helena
+11047,154,Extant,85,Ascension
+11047,154,Extant,88,Tristan da Cunha
 11047,154,Extant,96,Sierra Leone
 11047,154,Extant,66,Senegal
 11047,154,Extant,44,Somalia
@@ -269,6 +271,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 11048,144,Extant,31,Seychelles
 11048,144,Extant,208,Singapore
 11048,144,Extant,86,Saint Helena
+11048,144,Extant,85,Ascension
+11048,144,Extant,88,Tristan da Cunha
 11048,144,Extant,96,Sierra Leone
 11048,144,Extant,66,Senegal
 11048,144,Extant,44,Somalia
@@ -379,6 +383,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 11146,11,Extant,162,New Zealand
 11146,11,Extant,138,Peru
 11146,11,Extant,86,Saint Helena
+11146,11,Extant,85,Ascension
+11146,11,Extant,88,Tristan da Cunha
 11146,11,Extant,30,Glorioso Islands
 11146,11,Extant,33,Juan de Nova Island
 11146,11,Extant,34,Bassas da India
@@ -556,6 +562,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 12126,15,Extant,162,New Zealand
 12126,15,Extant,138,Peru
 12126,15,Extant,86,Saint Helena
+12126,15,Extant,85,Ascension
+12126,15,Extant,88,Tristan da Cunha
 12126,15,Extant,30,Glorioso Islands
 12126,15,Extant,33,Juan de Nova Island
 12126,15,Extant,34,Bassas da India
@@ -770,6 +778,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 13006,165,Extant,222,Sweden
 13006,165,Extant,208,Singapore
 13006,165,Extant,86,Saint Helena
+13006,165,Extant,85,Ascension
+13006,165,Extant,88,Tristan da Cunha
 13006,165,Extant,144,Jan Mayen
 13006,165,Extant,96,Sierra Leone
 13006,165,Extant,66,Senegal
@@ -817,6 +827,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 13242,6,Extant,95,Falkland Islands
 13242,6,Extant,162,New Zealand
 13242,6,Extant,86,Saint Helena
+13242,6,Extant,85,Ascension
+13242,6,Extant,88,Tristan da Cunha
 13242,6,Extant,173,Uruguay
 13244,82,Extant,200,Angola
 13244,82,Extant,16,Australia
@@ -883,6 +895,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 13244,82,Extant,7,Solomon Islands
 13244,82,Extant,31,Seychelles
 13244,82,Extant,86,Saint Helena
+13244,82,Extant,85,Ascension
+13244,82,Extant,88,Tristan da Cunha
 13244,82,Extant,44,Somalia
 13244,82,Extant,103,Sao Tome and Principe
 13244,82,Extant,220,Sint Maarten
@@ -1329,6 +1343,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 142121866,31,Extant,64,Mauritania
 142121866,31,Extant,121,Montserrat
 142121866,31,Extant,86,Saint Helena
+142121866,31,Extant,85,Ascension
+142121866,31,Extant,88,Tristan da Cunha
 142121866,31,Extant,168,Suriname
 142121866,31,Extant,103,Sao Tome and Principe
 142121866,31,Extant,126,Trinidad and Tobago
@@ -1469,6 +1485,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 15421,151,Extant,7,Solomon Islands
 15421,151,Extant,208,Singapore
 15421,151,Extant,86,Saint Helena
+15421,151,Extant,85,Ascension
+15421,151,Extant,88,Tristan da Cunha
 15421,151,Extant,144,Jan Mayen
 15421,151,Extant,96,Sierra Leone
 15421,151,Extant,66,Senegal
@@ -2200,6 +2218,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 18596,153,Extant,49,Sudan
 18596,153,Extant,208,Singapore
 18596,153,Extant,86,Saint Helena
+18596,153,Extant,85,Ascension
+18596,153,Extant,88,Tristan da Cunha
 18596,153,Extant,96,Sierra Leone
 18596,153,Extant,66,Senegal
 18596,153,Extant,44,Somalia
@@ -2479,6 +2499,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 19488,127,Extant,7,Solomon Islands
 19488,127,Extant,49,Sudan
 19488,127,Extant,86,Saint Helena
+19488,127,Extant,85,Ascension
+19488,127,Extant,88,Tristan da Cunha
 19488,127,Extant,96,Sierra Leone
 19488,127,Extant,66,Senegal
 19488,127,Extant,44,Somalia
@@ -2632,6 +2654,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 198568,75,Extant,31,Seychelles
 198568,75,Extant,222,Sweden
 198568,75,Extant,86,Saint Helena
+198568,75,Extant,85,Ascension
+198568,75,Extant,88,Tristan da Cunha
 198568,75,Extant,188,Slovenia
 198568,75,Extant,96,Sierra Leone
 198568,75,Extant,66,Senegal
@@ -2839,6 +2863,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 20729,106,Extant,49,Sudan
 20729,106,Extant,208,Singapore
 20729,106,Extant,86,Saint Helena
+20729,106,Extant,85,Ascension
+20729,106,Extant,88,Tristan da Cunha
 20729,106,Extant,66,Senegal
 20729,106,Extant,44,Somalia
 20729,106,Extant,168,Suriname
@@ -2984,6 +3010,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 20731,151,Extant,7,Solomon Islands
 20731,151,Extant,208,Singapore
 20731,151,Extant,86,Saint Helena
+20731,151,Extant,85,Ascension
+20731,151,Extant,88,Tristan da Cunha
 20731,151,Extant,188,Slovenia
 20731,151,Extant,96,Sierra Leone
 20731,151,Extant,66,Senegal
@@ -3100,6 +3128,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 20733,115,Extant,49,Sudan
 20733,115,Extant,208,Singapore
 20733,115,Extant,86,Saint Helena
+20733,115,Extant,85,Ascension
+20733,115,Extant,88,Tristan da Cunha
 20733,115,Extant,66,Senegal
 20733,115,Extant,44,Somalia
 20733,115,Extant,168,Suriname
@@ -3239,6 +3269,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 20738,138,Extant,31,Seychelles
 20738,138,Extant,208,Singapore
 20738,138,Extant,86,Saint Helena
+20738,138,Extant,85,Ascension
+20738,138,Extant,88,Tristan da Cunha
 20738,138,Extant,96,Sierra Leone
 20738,138,Extant,66,Senegal
 20738,138,Extant,44,Somalia
@@ -3269,6 +3301,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 21500,6,Extant,224,Chile
 21500,6,Extant,162,New Zealand
 21500,6,Extant,86,Saint Helena
+21500,6,Extant,85,Ascension
+21500,6,Extant,88,Tristan da Cunha
 21500,6,Extant,102,South Africa
 218582754,1,Extant,5,New Caledonia
 218582764,4,Extant,43,Kenya
@@ -3410,6 +3444,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 22563,168,Extant,31,Seychelles
 22563,168,Extant,208,Singapore
 22563,168,Extant,86,Saint Helena
+22563,168,Extant,85,Ascension
+22563,168,Extant,88,Tristan da Cunha
 22563,168,Extant,188,Slovenia
 22563,168,Extant,66,Senegal
 22563,168,Extant,44,Somalia
@@ -3668,6 +3704,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 22698209,118,Extant,73,Russia
 22698209,118,Extant,7,Solomon Islands
 22698209,118,Extant,86,Saint Helena
+22698209,118,Extant,85,Ascension
+22698209,118,Extant,88,Tristan da Cunha
 22698209,118,Extant,144,Jan Mayen
 22698209,118,Extant,96,Sierra Leone
 22698209,118,Extant,66,Senegal
@@ -3827,6 +3865,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 23211,145,Extant,222,Sweden
 23211,145,Extant,208,Singapore
 23211,145,Extant,86,Saint Helena
+23211,145,Extant,85,Ascension
+23211,145,Extant,88,Tristan da Cunha
 23211,145,Extant,96,Sierra Leone
 23211,145,Extant,66,Senegal
 23211,145,Extant,44,Somalia
@@ -3967,6 +4007,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 2475,43,Extant,32,Reunion
 2475,43,Extant,73,Russia
 2475,43,Extant,86,Saint Helena
+2475,43,Extant,85,Ascension
+2475,43,Extant,88,Tristan da Cunha
 2475,43,Extant,111,Turks and Caicos Islands
 2475,43,Extant,30,Glorioso Islands
 2475,43,Extant,33,Juan de Nova Island
@@ -4258,6 +4300,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 2478,68,Extant,31,Seychelles
 2478,68,Extant,222,Sweden
 2478,68,Extant,86,Saint Helena
+2478,68,Extant,85,Ascension
+2478,68,Extant,88,Tristan da Cunha
 2478,68,Extant,188,Slovenia
 2478,68,Extant,144,Jan Mayen
 2478,68,Extant,77,Syria
@@ -4741,6 +4785,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 39341,157,Extant,49,Sudan
 39341,157,Extant,208,Singapore
 39341,157,Extant,86,Saint Helena
+39341,157,Extant,85,Ascension
+39341,157,Extant,88,Tristan da Cunha
 39341,157,Extant,96,Sierra Leone
 39341,157,Extant,66,Senegal
 39341,157,Extant,44,Somalia
@@ -5169,6 +5215,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 39381,177,Extant,222,Sweden
 39381,177,Extant,208,Singapore
 39381,177,Extant,86,Saint Helena
+39381,177,Extant,85,Ascension
+39381,177,Extant,88,Tristan da Cunha
 39381,177,Extant,188,Slovenia
 39381,177,Extant,96,Sierra Leone
 39381,177,Extant,66,Senegal
@@ -5498,6 +5546,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 41755,134,Extant,31,Seychelles
 41755,134,Extant,208,Singapore
 41755,134,Extant,86,Saint Helena
+41755,134,Extant,85,Ascension
+41755,134,Extant,88,Tristan da Cunha
 41755,134,Extant,188,Slovenia
 41755,134,Extant,96,Sierra Leone
 41755,134,Extant,66,Senegal
@@ -5685,6 +5735,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 4292,134,Extant,7,Solomon Islands
 4292,134,Extant,222,Sweden
 4292,134,Extant,86,Saint Helena
+4292,134,Extant,85,Ascension
+4292,134,Extant,88,Tristan da Cunha
 4292,134,Extant,188,Slovenia
 4292,134,Extant,96,Sierra Leone
 4292,134,Extant,66,Senegal
@@ -5859,6 +5911,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 4615,107,Extant,7,Solomon Islands
 4615,107,Extant,31,Seychelles
 4615,107,Extant,86,Saint Helena
+4615,107,Extant,85,Ascension
+4615,107,Extant,88,Tristan da Cunha
 4615,107,Extant,96,Sierra Leone
 4615,107,Extant,66,Senegal
 4615,107,Extant,44,Somalia
@@ -6029,6 +6083,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 46967838,23,Extant,101,Namibia
 46967838,23,Extant,196,Nigeria
 46967838,23,Extant,86,Saint Helena
+46967838,23,Extant,85,Ascension
+46967838,23,Extant,88,Tristan da Cunha
 46967838,23,Extant,96,Sierra Leone
 46967838,23,Extant,66,Senegal
 46967838,23,Extant,103,Sao Tome and Principe
@@ -6053,6 +6109,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 46967848,24,Extant,101,Namibia
 46967848,24,Extant,196,Nigeria
 46967848,24,Extant,86,Saint Helena
+46967848,24,Extant,85,Ascension
+46967848,24,Extant,88,Tristan da Cunha
 46967848,24,Extant,96,Sierra Leone
 46967848,24,Extant,66,Senegal
 46967848,24,Extant,103,Sao Tome and Principe
@@ -6236,6 +6294,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 60225,127,Extant,31,Seychelles
 60225,127,Extant,208,Singapore
 60225,127,Extant,86,Saint Helena
+60225,127,Extant,85,Ascension
+60225,127,Extant,88,Tristan da Cunha
 60225,127,Extant,96,Sierra Leone
 60225,127,Extant,66,Senegal
 60225,127,Extant,44,Somalia
@@ -6460,6 +6520,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 6494,134,Extant,7,Solomon Islands
 6494,134,Extant,31,Seychelles
 6494,134,Extant,86,Saint Helena
+6494,134,Extant,85,Ascension
+6494,134,Extant,88,Tristan da Cunha
 6494,134,Extant,188,Slovenia
 6494,134,Extant,96,Sierra Leone
 6494,134,Extant,66,Senegal
@@ -6659,6 +6721,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 8153,17,Extant,162,New Zealand
 8153,17,Extant,138,Peru
 8153,17,Extant,86,Saint Helena
+8153,17,Extant,85,Ascension
+8153,17,Extant,88,Tristan da Cunha
 8153,17,Extant,30,Glorioso Islands
 8153,17,Extant,33,Juan de Nova Island
 8153,17,Extant,34,Bassas da India
@@ -7032,6 +7096,8 @@ iucn_sid,count,presence,rgn_id,rgn_name
 9249,136,Extant,31,Seychelles
 9249,136,Extant,208,Singapore
 9249,136,Extant,86,Saint Helena
+9249,136,Extant,85,Ascension
+9249,136,Extant,88,Tristan da Cunha
 9249,136,Extant,96,Sierra Leone
 9249,136,Extant,66,Senegal
 9249,136,Extant,44,Somalia
