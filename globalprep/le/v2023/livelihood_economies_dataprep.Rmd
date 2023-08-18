@@ -1,0 +1,107 @@
+---
+title: "Livelihoods and Economies"
+output: html_document
+date: "2023-08-18"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This script is used to wrangle livelihoods and economies data. 
+
+Setup
+```{r}
+# load libraries, set directories
+library(ohicore)  #devtools::install_github('ohi-science/ohicore@dev')
+library(tidyverse)
+library(plotly)
+library(here)
+library(janitor)
+library(pdftools)
+source(here('workflow/R/common.R')) # directory locations
+
+version_year <- 2023
+```
+
+# Read in Data
+
+```{r}
+# OECD Data
+oecd_raw <- read_csv(file.path(dir_M, "/git-annex/globalprep/_raw_data/OECD/d2023/ocean_economy.csv")) %>% 
+  select(Country, Year, VARIABLE, Variable, Unit, Value) %>% 
+  mutate(Unit = "USD (1000000)")
+
+#ilostat data
+ilo_raw <- read_csv(file.path(dir_M, "/git-annex/globalprep/_raw_data/ILOSTAT/d2023/ILO_earnings_economic.csv"))
+#note to get fishing only filter to Economic activity (ISIC-Rev.3.1): B. Fishing for classif1.label
+
+
+#read in the fao commodities data 
+commodities_value <- readcsv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_commodities/d2023/FAO_raw_commodities_value_1976_2021.csv")) %>% 
+  janitor::clean_names()
+#values are in thousand us dollars
+#we likely only want exports?
+
+#FAO aquaculture value
+aquaculture_value <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mariculture/d2023/FAO_GlobalAquacultureProduction_Value_1950_2021.csv"))
+
+#fao yearbook pdf
+fao_pdf <- pdf_text(file.path(dir_M, "/git-annex/globalprep/_raw_data/FAO/d2023/fao_stats.pdf"))
+
+#oww
+oww <- read_csv(file.path(dir_M,"/git-annex/globalprep/_raw_data/OWW/d2023/oww3.csv"))
+
+#whale watching pdf
+whale_pdf <- pdf_text(file.path(dir_M, "/git-annex/globalprep/_raw_data/IFAW_MarineMammalWatching/whale_watching_worldwide.pdf"))
+
+#unwto -come back to tourism later when we know which data want to use
+
+```
+
+# Revenue Data Wrangling
+```{r}
+#get the ocean energy revenue
+offshore <- oecd_raw %>% 
+  filter(VARIABLE == "RD_TOTAL_OCEAN_OFFSHORE") %>% 
+  select(-VARIABLE) %>% 
+  mutate(sector = "Ocean Energy")
+
+#ornamental fishing revenue
+ornamental_value <- commodities_value %>%
+  filter(str_detect(commodity_name, "Ornamental")) # we only want ornamental fish
+
+#commercial fishing revenue:
+  #since it's revenue do we only want exports?
+  #would all other fish besides aquarium fish count for this?
+commercial_value <- commodities_value %>%
+  filter(str_detect(commodity_name, "Ornamental"))
+
+#mariculture revenue
+maricutlure_revenue <- aquaculture_value %>% dplyr::select(-`Unit (Name)`) %>%
+  rename(country = `Country (Name)`,
+         FAO_name = `ASFIS species (Name)`, 
+         fao = `FAO major fishing area (Name)`, 
+         environment = `Environment (Name)`) %>%
+  rename_at(vars(matches("\\[")), ~ str_remove(., "\\[")) %>%
+  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]")) %>% 
+  filter(environment %in% c("Brackishwater", "Marine")) %>% 
+  pivot_longer(cols = "1984":"2021",
+               names_to = "year",
+               values_to = "value") %>% 
+  fao_clean_data_new() 
+#do we keep all non-freshwater Mariculture for revenue?
+
+#apply the new split function when done, to split up:netherlands antilles, bonaire, and channel islands
+mar_rgn <- name_2_rgn(df_in = maricutlure_revenue, 
+                       fld_name='country') 
+
+#sum by region and year (we need total revenue)
+total_mar_rev <- mar_rgn %>%  group_by(rgn_id, rgn_name, year) %>% 
+  summarize(value = sum(value, na.rm = T), Unit = first(Unit))
+```
+
+
+
