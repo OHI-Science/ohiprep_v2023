@@ -1,0 +1,20 @@
+---
+title: "wages data cleaning"
+output: html_document
+date: "2023-08-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#ilostat data
+ilo_raw <- read_csv(file.path(dir_M, "/git-annex/globalprep/_raw_data/ILOSTAT/d2023/ILO_earnings_economic.csv"))
+
+
+#oww
+oww <- read_csv(file.path(dir_M,"/git-annex/globalprep/_raw_data/OWW/d2023/oww3.csv"))
+
+```
+
