@@ -277,7 +277,7 @@ tourism_props_rescaled <- tourism_props_downup_gf %>%
 # create df for unpopulated/low populated regions
 low_pop()
 low_pop <- low_pop %>%
-  filter(est_population < 3000 | is.na(est_population)) %>%  # filter out regions that have populations > 3000 and keep NA values 
+  filter(est_population < 3000 | is.na(est_population)) %>%  # filter out regions that have populations > or equal to 3000 and keep NA values 
   rename(rgn_label = rgn_nam)
 
 summary(tourism_props_rescaled)
@@ -361,8 +361,8 @@ compare_common_data <- new_data %>%
   left_join(old_data, by = c("rgn_id", "year")) %>%
   drop_na()
 
-plot(compare_common_data$Ap, compare_common_data$Ep,
-     xlab = "v2023 Arrivals Proportion", ylab = "v2022 Employment Proportion")
+plot(compare_common_data$Ep, compare_common_data$Ap,
+     xlab = "v2022 Employment Proportion", ylab = "v2023 Arrivals Proportion")
 abline(0, 1)
 
 
