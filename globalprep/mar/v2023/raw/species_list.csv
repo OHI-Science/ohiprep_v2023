@@ -1,4 +1,4 @@
-﻿FAO_name,exclude ,Taxon_code,family,notes,notes_2,,,
+FAO_name,exclude ,Taxon_code,family,notes,notes_2,,,
 [Chondracanthus chamissoi],0.8,AL,Algae,seaweed: human food/carageenan," - non-food use determined (some for food and carageenan): ""This species is of economic importance because it is edible and used for carrageenan production."" [source](https://www.researchgate.net/publication/251407321_Cultivation_of_the_red_alga_Chondracanthus_chamissoi_Sexual_reproduction_and_seedling_production_in_culture_under_controlled_conditions)
  - food use deteremined: ""In addition to its commercialization for the extraction of carrageenan, there is an increasing demand for human consumption in Asia"" [source](https://www.researchgate.net/publication/226813687_Chondracanthus_chamissoi_Rhodophyta_Gigartinales_in_northern_Chile_Ecological_aspects_for_management_of_wild_populations)
  - ""On the coasts of Peru, the red seaweed known as yuyo (Chondracanthus chamissoi) is dried and then sold in the inland regions where it is incorporated into soups."" [source](https://www.slowfood.com/the-world-ocean-day-vegetables-of-the-sea-and-their-role-in-saving-the-environment/)
@@ -599,8 +599,7 @@ Marine worms,1,GAST,Lineidae,,,,,
 Silver grunt,0,F,Haemulidae,,,,,
 Leister,1,OTHER,NA,,,,,
 [Scylla spp],0.9,GAST,Scyllaeidae,genus of nudibranchs, While some non-scientific sources mentioned that some people in the world [eat nudibranchs](https://atmosphereresorts.com/10-things-you-did-not-know-about-nudibranchs/#:~:text=Some%20humans%20actually%20eat%20nudibranchsas%20%E2%80%9Cchewing%20an%20eraser.%E2%80%9D) or sea slugs it doesn't seem like a prominent industry so I will estimate the exclusion value as 0.9,,,
-Skottsberg's gigartina,1,AL,Algae,seaweed: agar/carrageenan/human food," - non-food and food use determined using FAO (red algae in Indonesia and Portugal mostly agar-containing seaweeds) (The main uses of red seaweeds are as food and as sources of two hydrocolloids: agar and carrageenan): [source](http://www.fao.org/3/a-y4765e.pdf)
- - excluded because already present as Red seaweeds which is included as 0.75",,,
+Skottsberg's gigartina,0.75,AL,Algae,seaweed: agar/carrageenan/human food," - non-food and food use determined using FAO (red algae in Indonesia and Portugal mostly agar-containing seaweeds) (The main uses of red seaweeds are as food and as sources of two hydrocolloids: agar and carrageenan):",http://www.fao.org/3/a-y4765e.pdf,,
 [Mystus nigriceps],1,F,Bagridae,freshwater,,,,
 [Polymesoda spp],0,BI,Cyrenidae,,,,,
 Banded grouper,0,F,Serranidae,,,,,
@@ -652,7 +651,7 @@ Yellowspotted trevally,0,F,Carangidae,,,,,
 [Pomadasys spp],0,F,Haemulidae,,,,,
 Barcoo grunter,1,F,Terapontidae,freshwater,,,,
 Blacktip grouper,0,F,Serranidae,,,,,
-Commercial top,1,GAST,Tegulidae,"excluded because it is primarily harvested for its shell, though it can be eaten",,,,
+Commercial top,1,GAST,Tegulidae,"excluded because it is primarily harvested for its shell, though it can be eaten",https://en.wikipedia.org/wiki/Rochia_nilotica,,,
 Desert dace,1,F,Cyprinidae,freshwater,,,,
 SOLIERIACEAE,0.75,AL,Algae,used red seaweed include value,,,,
 BANGIACEAE,0.01,AL,Algae,wikipedia mentions wide food use,https://en.wikipedia.org/wiki/Bangiaceae,,,
