@@ -26,7 +26,7 @@ This analysis converts FAO commodities data into data layers used to calculate O
 # Updates from previous assessment
 - New 2 years of FAO data (1976-2021; new years 2020 and 2021)
 - Add/edit code for the Datacheck section
-- Add a tic/toc
+- Add a tic/toc for timing purposes
 - Add more programmatic year usage
 
 ***
@@ -34,11 +34,11 @@ This analysis converts FAO commodities data into data layers used to calculate O
 # Data Source
 
 **Reference**:
-    http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
+    https://www.fao.org/fishery/statistics-query/en/trade
     App release date: July 2023
 FAO raw commodities quantity 1976_2021
 FAO raw commodities value 1976_2021
-FAO metadata found [here](http://www.fao.org/fishery/statistics/global-commodities-production/en)
+FAO raw commodities metadata found [here](https://www.fao.org/fishery/en/collection/global_commodity_prod) and overall FAO data directory found [here](https://www.fao.org/fishery/en/fishstat)
 
 **Downloaded**: July 19, 2023
 
