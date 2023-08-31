@@ -90,7 +90,7 @@ rgn_syns <<- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep_v20
 
 low_pop <- function(){
 cat("uninhabited and low population regions")
-low_pop <<- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2017/output/rgn_uninhabited_islands.csv")
+low_pop <<- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep/master/globalprep/spatial/v2023/output/rgn_uninhabited_islands.csv")
 }
 
 
