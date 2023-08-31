@@ -55,16 +55,15 @@ library(here)
 library(tidyverse)
 library(plotly)
 
-
-## Load FAO-specific user-defined functions
-source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO files
-source(here('workflow/R/common.R')) # directory locations
-source(here('globalprep/np/v2022/R/np_fxn.R'))
-
 # Update scenario year, set up programmatic scenario year updating
 scen_year_number <- 2023
 scen_year <- as.character(scen_year_number)
 prev_scen_year <- as.character(scen_year_number - 1)
+
+## Load FAO-specific user-defined functions
+source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO files
+source(here('workflow/R/common.R')) # directory locations
+source(here(paste0("globalprep/np/v", scen_year,"/R/np_fxn.R")))
 
 ```
 
@@ -125,7 +124,7 @@ for (f in files){
   ##   commodities in data vs commodities in lookup table
   
   ## load lookup for converting commodities to products
-  com2prod <- read.csv(here('globalprep/np/v2022/raw/commodities2products_weighting.csv'), na.strings='')
+  com2prod <- read.csv(here(paste0('globalprep/np/v', scen_year, '/raw/commodities2products_weighting.csv')), na.strings='')
   
   ## version used in 2019:
   ##    read.csv(here('globalprep/np/v2019/raw/commodities2products.csv'), na.strings='')
@@ -148,7 +147,7 @@ for (f in files){
     
   ## Special case: user-defined function deals with 
   ##   breaking up Antilles into separate reported rgns
-  m <- np_split_antilles(m)
+  m <- ohicore::split_regions(m)
     
   ## Some changes to region names that aren't working in name_2_rgn()
   m <- m  %>%
@@ -192,10 +191,10 @@ Combining the quantity and value data and a bit of cleaning to remove data prior
 ```{r}
 
 ## Read in quant dataset from intermediate folder
-h_tonnes <- read.csv(here('globalprep/np/v2022/int/tonnes.csv'))
+h_tonnes <- read.csv(here(paste0('globalprep/np/v', scen_year, '/int/tonnes.csv')))
 
 ## Read in value dataset from intermediate folder
-h_usd <- read.csv(here('globalprep/np/v2022/int/usd.csv'))
+h_usd <- read.csv(here(paste0('globalprep/np/v', scen_year, '/int/usd.csv')))
 
 ## concatenates h_tonnes and h_usd data
 ## h includes rgn_name, rgn_id, commodity, product, year, tonnes, usd.

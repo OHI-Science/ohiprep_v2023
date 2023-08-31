@@ -11440,7 +11440,49 @@
 84,"Algeria","Other seaweeds and aquatic plants and products thereof","seaweeds",2021,NA,NA
 84,"Algeria","Miscellaneous corals and shells","shells",2021,0,0
 84,"Algeria","Natural sponges other than raw","sponges",2021,0.02,0
-86,"Saint Helena","Fish body oils, nei","fish_oil",2003,119,47
+85,"Ascension","Fish body oils, nei","fish_oil",2003,5.18679950186799,2.04856787048568
+85,"Ascension","Fish body oils, nei","fish_oil",2004,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2005,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2006,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2007,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2008,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2009,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2010,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2011,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2012,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2013,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2014,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2015,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2016,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2017,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2018,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2019,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2020,NA,NA
+85,"Ascension","Fish body oils, nei","fish_oil",2021,NA,NA
+85,"Ascension","Fish liver oils, nei","fish_oil",2020,0.00130759651307597,0.00784557907845579
+85,"Ascension","Fish liver oils, nei","fish_oil",2021,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2001,0.174346201743462,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2002,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2003,0.174346201743462,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2004,0.0435865504358655,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2005,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2006,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2007,0.39227895392279,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2008,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2009,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2010,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2011,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2012,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2013,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2014,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2015,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2016,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2017,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2018,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2019,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2020,NA,NA
+85,"Ascension","Ornamental fish nei","ornamentals",2021,NA,NA
+86,"Saint Helena","Fish body oils, nei","fish_oil",2003,5.18679950186799,2.04856787048568
 86,"Saint Helena","Fish body oils, nei","fish_oil",2004,NA,NA
 86,"Saint Helena","Fish body oils, nei","fish_oil",2005,NA,NA
 86,"Saint Helena","Fish body oils, nei","fish_oil",2006,NA,NA
@@ -11459,15 +11501,15 @@
 86,"Saint Helena","Fish body oils, nei","fish_oil",2019,NA,NA
 86,"Saint Helena","Fish body oils, nei","fish_oil",2020,NA,NA
 86,"Saint Helena","Fish body oils, nei","fish_oil",2021,NA,NA
-86,"Saint Helena","Fish liver oils, nei","fish_oil",2020,0.03,0.18
+86,"Saint Helena","Fish liver oils, nei","fish_oil",2020,0.00130759651307597,0.00784557907845579
 86,"Saint Helena","Fish liver oils, nei","fish_oil",2021,NA,NA
-86,"Saint Helena","Ornamental fish nei","ornamentals",2001,4,NA
+86,"Saint Helena","Ornamental fish nei","ornamentals",2001,0.174346201743462,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2002,NA,NA
-86,"Saint Helena","Ornamental fish nei","ornamentals",2003,4,NA
-86,"Saint Helena","Ornamental fish nei","ornamentals",2004,1,NA
+86,"Saint Helena","Ornamental fish nei","ornamentals",2003,0.174346201743462,NA
+86,"Saint Helena","Ornamental fish nei","ornamentals",2004,0.0435865504358655,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2005,NA,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2006,NA,NA
-86,"Saint Helena","Ornamental fish nei","ornamentals",2007,9,NA
+86,"Saint Helena","Ornamental fish nei","ornamentals",2007,0.39227895392279,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2008,NA,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2009,NA,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2010,NA,NA
@@ -11482,6 +11524,48 @@
 86,"Saint Helena","Ornamental fish nei","ornamentals",2019,NA,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2020,NA,NA
 86,"Saint Helena","Ornamental fish nei","ornamentals",2021,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2003,5.18679950186799,2.04856787048568
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2004,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2005,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2006,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2007,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2008,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2009,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2010,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2011,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2012,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2013,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2014,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2015,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2016,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2017,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2018,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2019,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2020,NA,NA
+88,"Tristan da Cunha","Fish body oils, nei","fish_oil",2021,NA,NA
+88,"Tristan da Cunha","Fish liver oils, nei","fish_oil",2020,0.00130759651307597,0.00784557907845579
+88,"Tristan da Cunha","Fish liver oils, nei","fish_oil",2021,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2001,0.174346201743462,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2002,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2003,0.174346201743462,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2004,0.0435865504358655,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2005,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2006,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2007,0.39227895392279,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2008,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2009,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2010,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2011,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2012,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2013,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2014,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2015,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2016,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2017,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2018,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2019,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2020,NA,NA
+88,"Tristan da Cunha","Ornamental fish nei","ornamentals",2021,NA,NA
 96,"Sierra Leone","Coral and the like","corals",2002,10,24
 96,"Sierra Leone","Coral and the like","corals",2003,NA,NA
 96,"Sierra Leone","Coral and the like","corals",2004,NA,NA
@@ -29942,10 +30026,10 @@
 219,"Saint Pierre and Miquelon","Other seaweeds and aquatic plants and products thereof","seaweeds",2019,NA,NA
 219,"Saint Pierre and Miquelon","Other seaweeds and aquatic plants and products thereof","seaweeds",2020,NA,NA
 219,"Saint Pierre and Miquelon","Other seaweeds and aquatic plants and products thereof","seaweeds",2021,NA,NA
-220,"Sint Maarten","Coral and the like","corals",2000,0.25,NA
-220,"Sint Maarten","Coral and the like","corals",2001,1,0.25
-220,"Sint Maarten","Coral and the like","corals",2002,1.75,0.5
-220,"Sint Maarten","Coral and the like","corals",2003,1.25,0.25
+220,"Sint Maarten","Coral and the like","corals",2000,0.127131721822974,NA
+220,"Sint Maarten","Coral and the like","corals",2001,0.508526887291897,0.127131721822974
+220,"Sint Maarten","Coral and the like","corals",2002,0.889922052760819,0.254263443645948
+220,"Sint Maarten","Coral and the like","corals",2003,0.635658609114871,0.127131721822974
 220,"Sint Maarten","Coral and the like","corals",2004,NA,NA
 220,"Sint Maarten","Coral and the like","corals",2005,NA,NA
 220,"Sint Maarten","Coral and the like","corals",2006,NA,NA
@@ -29964,8 +30048,8 @@
 220,"Sint Maarten","Coral and the like","corals",2019,NA,NA
 220,"Sint Maarten","Coral and the like","corals",2020,NA,NA
 220,"Sint Maarten","Coral and the like","corals",2021,NA,NA
-220,"Sint Maarten","Fish body oils, nei","fish_oil",2002,7.75,3.5
-220,"Sint Maarten","Fish body oils, nei","fish_oil",2003,85.5,26
+220,"Sint Maarten","Fish body oils, nei","fish_oil",2002,3.9410833765122,1.77984410552164
+220,"Sint Maarten","Fish body oils, nei","fish_oil",2003,43.4790488634572,13.2216990695893
 220,"Sint Maarten","Fish body oils, nei","fish_oil",2004,NA,NA
 220,"Sint Maarten","Fish body oils, nei","fish_oil",2005,NA,NA
 220,"Sint Maarten","Fish body oils, nei","fish_oil",2006,NA,NA
@@ -29984,7 +30068,7 @@
 220,"Sint Maarten","Fish body oils, nei","fish_oil",2019,NA,NA
 220,"Sint Maarten","Fish body oils, nei","fish_oil",2020,NA,NA
 220,"Sint Maarten","Fish body oils, nei","fish_oil",2021,NA,NA
-220,"Sint Maarten","Fish liver oils, nei","fish_oil",2004,210,84.25
+220,"Sint Maarten","Fish liver oils, nei","fish_oil",2004,106.790646331298,42.8433902543423
 220,"Sint Maarten","Fish liver oils, nei","fish_oil",2005,NA,NA
 220,"Sint Maarten","Fish liver oils, nei","fish_oil",2006,NA,NA
 220,"Sint Maarten","Fish liver oils, nei","fish_oil",2007,NA,NA
@@ -30002,21 +30086,21 @@
 220,"Sint Maarten","Fish liver oils, nei","fish_oil",2019,NA,NA
 220,"Sint Maarten","Fish liver oils, nei","fish_oil",2020,NA,NA
 220,"Sint Maarten","Fish liver oils, nei","fish_oil",2021,NA,NA
-220,"Sint Maarten","Ornamental fish nei","ornamentals",1996,12,NA
-220,"Sint Maarten","Ornamental fish nei","ornamentals",1997,18.25,0.75
-220,"Sint Maarten","Ornamental fish nei","ornamentals",1998,13.75,NA
-220,"Sint Maarten","Ornamental fish nei","ornamentals",1999,14,0.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2000,12.5,0.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2001,9.5,0.25
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2002,9.5,0.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2003,10.5,0.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2004,1.75,0
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2005,10.5,1.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2006,18,2
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2007,17.25,2.25
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2008,14.5,0.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2009,15,0.5
-220,"Sint Maarten","Ornamental fish nei","ornamentals",2010,0.25,NA
+220,"Sint Maarten","Ornamental fish nei","ornamentals",1996,6.10232264750276,NA
+220,"Sint Maarten","Ornamental fish nei","ornamentals",1997,9.28061569307711,0.381395165468922
+220,"Sint Maarten","Ornamental fish nei","ornamentals",1998,6.99224470026358,NA
+220,"Sint Maarten","Ornamental fish nei","ornamentals",1999,7.11937642208655,0.254263443645948
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2000,6.35658609114871,0.254263443645948
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2001,4.83100542927302,0.127131721822974
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2002,4.83100542927302,0.254263443645948
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2003,5.33953231656491,0.254263443645948
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2004,0.889922052760819,0
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2005,5.33953231656491,0.762790330937845
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2006,9.15348397125414,1.01705377458379
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2007,8.77208880578522,1.14418549640677
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2008,7.3736398657325,0.254263443645948
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2009,7.62790330937845,0.254263443645948
+220,"Sint Maarten","Ornamental fish nei","ornamentals",2010,0.127131721822974,NA
 220,"Sint Maarten","Ornamental fish nei","ornamentals",2011,NA,NA
 220,"Sint Maarten","Ornamental fish nei","ornamentals",2012,NA,NA
 220,"Sint Maarten","Ornamental fish nei","ornamentals",2013,NA,NA
@@ -30028,11 +30112,11 @@
 220,"Sint Maarten","Ornamental fish nei","ornamentals",2019,NA,NA
 220,"Sint Maarten","Ornamental fish nei","ornamentals",2020,NA,NA
 220,"Sint Maarten","Ornamental fish nei","ornamentals",2021,NA,NA
-220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2004,16.75,0.25
+220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2004,8.51782536213927,0.127131721822974
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2005,NA,NA
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2006,NA,NA
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2007,NA,NA
-220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2008,0.25,0
+220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2008,0.127131721822974,0
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2009,NA,NA
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2010,NA,NA
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2011,NA,NA
@@ -30046,7 +30130,7 @@
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2019,NA,NA
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2020,NA,NA
 220,"Sint Maarten","Ornamental saltwater fish","ornamentals",2021,NA,NA
-220,"Sint Maarten","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.25,NA
+220,"Sint Maarten","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.127131721822974,NA
 220,"Sint Maarten","Other seaweeds and aquatic plants and products thereof","seaweeds",2004,NA,NA
 220,"Sint Maarten","Other seaweeds and aquatic plants and products thereof","seaweeds",2005,NA,NA
 220,"Sint Maarten","Other seaweeds and aquatic plants and products thereof","seaweeds",2006,NA,NA
@@ -30067,7 +30151,7 @@
 220,"Sint Maarten","Other seaweeds and aquatic plants and products thereof","seaweeds",2021,NA,NA
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2004,0,0
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2005,NA,NA
-220,"Sint Maarten","Miscellaneous corals and shells","shells",2006,NA,0.25
+220,"Sint Maarten","Miscellaneous corals and shells","shells",2006,NA,0.127131721822974
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2007,NA,NA
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2008,NA,NA
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2009,NA,NA
@@ -30083,7 +30167,7 @@
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2019,NA,NA
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2020,NA,NA
 220,"Sint Maarten","Miscellaneous corals and shells","shells",2021,NA,NA
-220,"Sint Maarten","Natural sponges nei","sponges",2006,NA,0.025
+220,"Sint Maarten","Natural sponges nei","sponges",2006,NA,0.0127131721822974
 220,"Sint Maarten","Natural sponges nei","sponges",2007,NA,NA
 220,"Sint Maarten","Natural sponges nei","sponges",2008,NA,NA
 220,"Sint Maarten","Natural sponges nei","sponges",2009,NA,NA
@@ -31344,10 +31428,10 @@
 244,"Curacao","Miscellaneous corals and shells","shells",2019,NA,NA
 244,"Curacao","Miscellaneous corals and shells","shells",2020,NA,NA
 244,"Curacao","Miscellaneous corals and shells","shells",2021,NA,NA
-245,"Bonaire","Coral and the like","corals",2000,0.25,NA
-245,"Bonaire","Coral and the like","corals",2001,1,0.25
-245,"Bonaire","Coral and the like","corals",2002,1.75,0.5
-245,"Bonaire","Coral and the like","corals",2003,1.25,0.25
+245,"Bonaire","Coral and the like","corals",2000,0.127131721822974,NA
+245,"Bonaire","Coral and the like","corals",2001,0.508526887291897,0.127131721822974
+245,"Bonaire","Coral and the like","corals",2002,0.889922052760819,0.254263443645948
+245,"Bonaire","Coral and the like","corals",2003,0.635658609114871,0.127131721822974
 245,"Bonaire","Coral and the like","corals",2004,NA,NA
 245,"Bonaire","Coral and the like","corals",2005,NA,NA
 245,"Bonaire","Coral and the like","corals",2006,NA,NA
@@ -31366,8 +31450,8 @@
 245,"Bonaire","Coral and the like","corals",2019,NA,NA
 245,"Bonaire","Coral and the like","corals",2020,NA,NA
 245,"Bonaire","Coral and the like","corals",2021,NA,NA
-245,"Bonaire","Fish body oils, nei","fish_oil",2002,7.75,3.5
-245,"Bonaire","Fish body oils, nei","fish_oil",2003,85.5,26
+245,"Bonaire","Fish body oils, nei","fish_oil",2002,3.9410833765122,1.77984410552164
+245,"Bonaire","Fish body oils, nei","fish_oil",2003,43.4790488634572,13.2216990695893
 245,"Bonaire","Fish body oils, nei","fish_oil",2004,NA,NA
 245,"Bonaire","Fish body oils, nei","fish_oil",2005,NA,NA
 245,"Bonaire","Fish body oils, nei","fish_oil",2006,NA,NA
@@ -31386,7 +31470,7 @@
 245,"Bonaire","Fish body oils, nei","fish_oil",2019,NA,NA
 245,"Bonaire","Fish body oils, nei","fish_oil",2020,NA,NA
 245,"Bonaire","Fish body oils, nei","fish_oil",2021,NA,NA
-245,"Bonaire","Fish liver oils, nei","fish_oil",2004,210,84.25
+245,"Bonaire","Fish liver oils, nei","fish_oil",2004,106.790646331298,42.8433902543423
 245,"Bonaire","Fish liver oils, nei","fish_oil",2005,NA,NA
 245,"Bonaire","Fish liver oils, nei","fish_oil",2006,NA,NA
 245,"Bonaire","Fish liver oils, nei","fish_oil",2007,NA,NA
@@ -31404,21 +31488,21 @@
 245,"Bonaire","Fish liver oils, nei","fish_oil",2019,NA,NA
 245,"Bonaire","Fish liver oils, nei","fish_oil",2020,NA,NA
 245,"Bonaire","Fish liver oils, nei","fish_oil",2021,NA,NA
-245,"Bonaire","Ornamental fish nei","ornamentals",1996,12,NA
-245,"Bonaire","Ornamental fish nei","ornamentals",1997,18.25,0.75
-245,"Bonaire","Ornamental fish nei","ornamentals",1998,13.75,NA
-245,"Bonaire","Ornamental fish nei","ornamentals",1999,14,0.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2000,12.5,0.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2001,9.5,0.25
-245,"Bonaire","Ornamental fish nei","ornamentals",2002,9.5,0.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2003,10.5,0.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2004,1.75,0
-245,"Bonaire","Ornamental fish nei","ornamentals",2005,10.5,1.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2006,18,2
-245,"Bonaire","Ornamental fish nei","ornamentals",2007,17.25,2.25
-245,"Bonaire","Ornamental fish nei","ornamentals",2008,14.5,0.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2009,15,0.5
-245,"Bonaire","Ornamental fish nei","ornamentals",2010,0.25,NA
+245,"Bonaire","Ornamental fish nei","ornamentals",1996,6.10232264750276,NA
+245,"Bonaire","Ornamental fish nei","ornamentals",1997,9.28061569307711,0.381395165468922
+245,"Bonaire","Ornamental fish nei","ornamentals",1998,6.99224470026358,NA
+245,"Bonaire","Ornamental fish nei","ornamentals",1999,7.11937642208655,0.254263443645948
+245,"Bonaire","Ornamental fish nei","ornamentals",2000,6.35658609114871,0.254263443645948
+245,"Bonaire","Ornamental fish nei","ornamentals",2001,4.83100542927302,0.127131721822974
+245,"Bonaire","Ornamental fish nei","ornamentals",2002,4.83100542927302,0.254263443645948
+245,"Bonaire","Ornamental fish nei","ornamentals",2003,5.33953231656491,0.254263443645948
+245,"Bonaire","Ornamental fish nei","ornamentals",2004,0.889922052760819,0
+245,"Bonaire","Ornamental fish nei","ornamentals",2005,5.33953231656491,0.762790330937845
+245,"Bonaire","Ornamental fish nei","ornamentals",2006,9.15348397125414,1.01705377458379
+245,"Bonaire","Ornamental fish nei","ornamentals",2007,8.77208880578522,1.14418549640677
+245,"Bonaire","Ornamental fish nei","ornamentals",2008,7.3736398657325,0.254263443645948
+245,"Bonaire","Ornamental fish nei","ornamentals",2009,7.62790330937845,0.254263443645948
+245,"Bonaire","Ornamental fish nei","ornamentals",2010,0.127131721822974,NA
 245,"Bonaire","Ornamental fish nei","ornamentals",2011,NA,NA
 245,"Bonaire","Ornamental fish nei","ornamentals",2012,NA,NA
 245,"Bonaire","Ornamental fish nei","ornamentals",2013,NA,NA
@@ -31430,11 +31514,11 @@
 245,"Bonaire","Ornamental fish nei","ornamentals",2019,NA,NA
 245,"Bonaire","Ornamental fish nei","ornamentals",2020,NA,NA
 245,"Bonaire","Ornamental fish nei","ornamentals",2021,NA,NA
-245,"Bonaire","Ornamental saltwater fish","ornamentals",2004,16.75,0.25
+245,"Bonaire","Ornamental saltwater fish","ornamentals",2004,8.51782536213927,0.127131721822974
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2005,NA,NA
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2006,NA,NA
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2007,NA,NA
-245,"Bonaire","Ornamental saltwater fish","ornamentals",2008,0.25,0
+245,"Bonaire","Ornamental saltwater fish","ornamentals",2008,0.127131721822974,0
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2009,NA,NA
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2010,NA,NA
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2011,NA,NA
@@ -31448,7 +31532,7 @@
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2019,NA,NA
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2020,NA,NA
 245,"Bonaire","Ornamental saltwater fish","ornamentals",2021,NA,NA
-245,"Bonaire","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.25,NA
+245,"Bonaire","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.127131721822974,NA
 245,"Bonaire","Other seaweeds and aquatic plants and products thereof","seaweeds",2004,NA,NA
 245,"Bonaire","Other seaweeds and aquatic plants and products thereof","seaweeds",2005,NA,NA
 245,"Bonaire","Other seaweeds and aquatic plants and products thereof","seaweeds",2006,NA,NA
@@ -31469,7 +31553,7 @@
 245,"Bonaire","Other seaweeds and aquatic plants and products thereof","seaweeds",2021,NA,NA
 245,"Bonaire","Miscellaneous corals and shells","shells",2004,0,0
 245,"Bonaire","Miscellaneous corals and shells","shells",2005,NA,NA
-245,"Bonaire","Miscellaneous corals and shells","shells",2006,NA,0.25
+245,"Bonaire","Miscellaneous corals and shells","shells",2006,NA,0.127131721822974
 245,"Bonaire","Miscellaneous corals and shells","shells",2007,NA,NA
 245,"Bonaire","Miscellaneous corals and shells","shells",2008,NA,NA
 245,"Bonaire","Miscellaneous corals and shells","shells",2009,NA,NA
@@ -31485,7 +31569,7 @@
 245,"Bonaire","Miscellaneous corals and shells","shells",2019,NA,NA
 245,"Bonaire","Miscellaneous corals and shells","shells",2020,NA,NA
 245,"Bonaire","Miscellaneous corals and shells","shells",2021,NA,NA
-245,"Bonaire","Natural sponges nei","sponges",2006,NA,0.025
+245,"Bonaire","Natural sponges nei","sponges",2006,NA,0.0127131721822974
 245,"Bonaire","Natural sponges nei","sponges",2007,NA,NA
 245,"Bonaire","Natural sponges nei","sponges",2008,NA,NA
 245,"Bonaire","Natural sponges nei","sponges",2009,NA,NA
@@ -31619,10 +31703,10 @@
 247,"Brunei","Natural sponges nei","sponges",2019,0.36,0.75
 247,"Brunei","Natural sponges nei","sponges",2020,0.02,0
 247,"Brunei","Natural sponges nei","sponges",2021,0.09,0.01
-248,"Saba","Coral and the like","corals",2000,0.25,NA
-248,"Saba","Coral and the like","corals",2001,1,0.25
-248,"Saba","Coral and the like","corals",2002,1.75,0.5
-248,"Saba","Coral and the like","corals",2003,1.25,0.25
+248,"Saba","Coral and the like","corals",2000,0.127131721822974,NA
+248,"Saba","Coral and the like","corals",2001,0.508526887291897,0.127131721822974
+248,"Saba","Coral and the like","corals",2002,0.889922052760819,0.254263443645948
+248,"Saba","Coral and the like","corals",2003,0.635658609114871,0.127131721822974
 248,"Saba","Coral and the like","corals",2004,NA,NA
 248,"Saba","Coral and the like","corals",2005,NA,NA
 248,"Saba","Coral and the like","corals",2006,NA,NA
@@ -31641,8 +31725,8 @@
 248,"Saba","Coral and the like","corals",2019,NA,NA
 248,"Saba","Coral and the like","corals",2020,NA,NA
 248,"Saba","Coral and the like","corals",2021,NA,NA
-248,"Saba","Fish body oils, nei","fish_oil",2002,7.75,3.5
-248,"Saba","Fish body oils, nei","fish_oil",2003,85.5,26
+248,"Saba","Fish body oils, nei","fish_oil",2002,3.9410833765122,1.77984410552164
+248,"Saba","Fish body oils, nei","fish_oil",2003,43.4790488634572,13.2216990695893
 248,"Saba","Fish body oils, nei","fish_oil",2004,NA,NA
 248,"Saba","Fish body oils, nei","fish_oil",2005,NA,NA
 248,"Saba","Fish body oils, nei","fish_oil",2006,NA,NA
@@ -31661,7 +31745,7 @@
 248,"Saba","Fish body oils, nei","fish_oil",2019,NA,NA
 248,"Saba","Fish body oils, nei","fish_oil",2020,NA,NA
 248,"Saba","Fish body oils, nei","fish_oil",2021,NA,NA
-248,"Saba","Fish liver oils, nei","fish_oil",2004,210,84.25
+248,"Saba","Fish liver oils, nei","fish_oil",2004,106.790646331298,42.8433902543423
 248,"Saba","Fish liver oils, nei","fish_oil",2005,NA,NA
 248,"Saba","Fish liver oils, nei","fish_oil",2006,NA,NA
 248,"Saba","Fish liver oils, nei","fish_oil",2007,NA,NA
@@ -31679,21 +31763,21 @@
 248,"Saba","Fish liver oils, nei","fish_oil",2019,NA,NA
 248,"Saba","Fish liver oils, nei","fish_oil",2020,NA,NA
 248,"Saba","Fish liver oils, nei","fish_oil",2021,NA,NA
-248,"Saba","Ornamental fish nei","ornamentals",1996,12,NA
-248,"Saba","Ornamental fish nei","ornamentals",1997,18.25,0.75
-248,"Saba","Ornamental fish nei","ornamentals",1998,13.75,NA
-248,"Saba","Ornamental fish nei","ornamentals",1999,14,0.5
-248,"Saba","Ornamental fish nei","ornamentals",2000,12.5,0.5
-248,"Saba","Ornamental fish nei","ornamentals",2001,9.5,0.25
-248,"Saba","Ornamental fish nei","ornamentals",2002,9.5,0.5
-248,"Saba","Ornamental fish nei","ornamentals",2003,10.5,0.5
-248,"Saba","Ornamental fish nei","ornamentals",2004,1.75,0
-248,"Saba","Ornamental fish nei","ornamentals",2005,10.5,1.5
-248,"Saba","Ornamental fish nei","ornamentals",2006,18,2
-248,"Saba","Ornamental fish nei","ornamentals",2007,17.25,2.25
-248,"Saba","Ornamental fish nei","ornamentals",2008,14.5,0.5
-248,"Saba","Ornamental fish nei","ornamentals",2009,15,0.5
-248,"Saba","Ornamental fish nei","ornamentals",2010,0.25,NA
+248,"Saba","Ornamental fish nei","ornamentals",1996,6.10232264750276,NA
+248,"Saba","Ornamental fish nei","ornamentals",1997,9.28061569307711,0.381395165468922
+248,"Saba","Ornamental fish nei","ornamentals",1998,6.99224470026358,NA
+248,"Saba","Ornamental fish nei","ornamentals",1999,7.11937642208655,0.254263443645948
+248,"Saba","Ornamental fish nei","ornamentals",2000,6.35658609114871,0.254263443645948
+248,"Saba","Ornamental fish nei","ornamentals",2001,4.83100542927302,0.127131721822974
+248,"Saba","Ornamental fish nei","ornamentals",2002,4.83100542927302,0.254263443645948
+248,"Saba","Ornamental fish nei","ornamentals",2003,5.33953231656491,0.254263443645948
+248,"Saba","Ornamental fish nei","ornamentals",2004,0.889922052760819,0
+248,"Saba","Ornamental fish nei","ornamentals",2005,5.33953231656491,0.762790330937845
+248,"Saba","Ornamental fish nei","ornamentals",2006,9.15348397125414,1.01705377458379
+248,"Saba","Ornamental fish nei","ornamentals",2007,8.77208880578522,1.14418549640677
+248,"Saba","Ornamental fish nei","ornamentals",2008,7.3736398657325,0.254263443645948
+248,"Saba","Ornamental fish nei","ornamentals",2009,7.62790330937845,0.254263443645948
+248,"Saba","Ornamental fish nei","ornamentals",2010,0.127131721822974,NA
 248,"Saba","Ornamental fish nei","ornamentals",2011,NA,NA
 248,"Saba","Ornamental fish nei","ornamentals",2012,NA,NA
 248,"Saba","Ornamental fish nei","ornamentals",2013,NA,NA
@@ -31705,11 +31789,11 @@
 248,"Saba","Ornamental fish nei","ornamentals",2019,NA,NA
 248,"Saba","Ornamental fish nei","ornamentals",2020,NA,NA
 248,"Saba","Ornamental fish nei","ornamentals",2021,NA,NA
-248,"Saba","Ornamental saltwater fish","ornamentals",2004,16.75,0.25
+248,"Saba","Ornamental saltwater fish","ornamentals",2004,8.51782536213927,0.127131721822974
 248,"Saba","Ornamental saltwater fish","ornamentals",2005,NA,NA
 248,"Saba","Ornamental saltwater fish","ornamentals",2006,NA,NA
 248,"Saba","Ornamental saltwater fish","ornamentals",2007,NA,NA
-248,"Saba","Ornamental saltwater fish","ornamentals",2008,0.25,0
+248,"Saba","Ornamental saltwater fish","ornamentals",2008,0.127131721822974,0
 248,"Saba","Ornamental saltwater fish","ornamentals",2009,NA,NA
 248,"Saba","Ornamental saltwater fish","ornamentals",2010,NA,NA
 248,"Saba","Ornamental saltwater fish","ornamentals",2011,NA,NA
@@ -31723,7 +31807,7 @@
 248,"Saba","Ornamental saltwater fish","ornamentals",2019,NA,NA
 248,"Saba","Ornamental saltwater fish","ornamentals",2020,NA,NA
 248,"Saba","Ornamental saltwater fish","ornamentals",2021,NA,NA
-248,"Saba","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.25,NA
+248,"Saba","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.127131721822974,NA
 248,"Saba","Other seaweeds and aquatic plants and products thereof","seaweeds",2004,NA,NA
 248,"Saba","Other seaweeds and aquatic plants and products thereof","seaweeds",2005,NA,NA
 248,"Saba","Other seaweeds and aquatic plants and products thereof","seaweeds",2006,NA,NA
@@ -31744,7 +31828,7 @@
 248,"Saba","Other seaweeds and aquatic plants and products thereof","seaweeds",2021,NA,NA
 248,"Saba","Miscellaneous corals and shells","shells",2004,0,0
 248,"Saba","Miscellaneous corals and shells","shells",2005,NA,NA
-248,"Saba","Miscellaneous corals and shells","shells",2006,NA,0.25
+248,"Saba","Miscellaneous corals and shells","shells",2006,NA,0.127131721822974
 248,"Saba","Miscellaneous corals and shells","shells",2007,NA,NA
 248,"Saba","Miscellaneous corals and shells","shells",2008,NA,NA
 248,"Saba","Miscellaneous corals and shells","shells",2009,NA,NA
@@ -31760,7 +31844,7 @@
 248,"Saba","Miscellaneous corals and shells","shells",2019,NA,NA
 248,"Saba","Miscellaneous corals and shells","shells",2020,NA,NA
 248,"Saba","Miscellaneous corals and shells","shells",2021,NA,NA
-248,"Saba","Natural sponges nei","sponges",2006,NA,0.025
+248,"Saba","Natural sponges nei","sponges",2006,NA,0.0127131721822974
 248,"Saba","Natural sponges nei","sponges",2007,NA,NA
 248,"Saba","Natural sponges nei","sponges",2008,NA,NA
 248,"Saba","Natural sponges nei","sponges",2009,NA,NA
@@ -31776,10 +31860,10 @@
 248,"Saba","Natural sponges nei","sponges",2019,NA,NA
 248,"Saba","Natural sponges nei","sponges",2020,NA,NA
 248,"Saba","Natural sponges nei","sponges",2021,NA,NA
-249,"Sint Eustatius","Coral and the like","corals",2000,0.25,NA
-249,"Sint Eustatius","Coral and the like","corals",2001,1,0.25
-249,"Sint Eustatius","Coral and the like","corals",2002,1.75,0.5
-249,"Sint Eustatius","Coral and the like","corals",2003,1.25,0.25
+249,"Sint Eustatius","Coral and the like","corals",2000,0.127131721822974,NA
+249,"Sint Eustatius","Coral and the like","corals",2001,0.508526887291897,0.127131721822974
+249,"Sint Eustatius","Coral and the like","corals",2002,0.889922052760819,0.254263443645948
+249,"Sint Eustatius","Coral and the like","corals",2003,0.635658609114871,0.127131721822974
 249,"Sint Eustatius","Coral and the like","corals",2004,NA,NA
 249,"Sint Eustatius","Coral and the like","corals",2005,NA,NA
 249,"Sint Eustatius","Coral and the like","corals",2006,NA,NA
@@ -31798,8 +31882,8 @@
 249,"Sint Eustatius","Coral and the like","corals",2019,NA,NA
 249,"Sint Eustatius","Coral and the like","corals",2020,NA,NA
 249,"Sint Eustatius","Coral and the like","corals",2021,NA,NA
-249,"Sint Eustatius","Fish body oils, nei","fish_oil",2002,7.75,3.5
-249,"Sint Eustatius","Fish body oils, nei","fish_oil",2003,85.5,26
+249,"Sint Eustatius","Fish body oils, nei","fish_oil",2002,3.9410833765122,1.77984410552164
+249,"Sint Eustatius","Fish body oils, nei","fish_oil",2003,43.4790488634572,13.2216990695893
 249,"Sint Eustatius","Fish body oils, nei","fish_oil",2004,NA,NA
 249,"Sint Eustatius","Fish body oils, nei","fish_oil",2005,NA,NA
 249,"Sint Eustatius","Fish body oils, nei","fish_oil",2006,NA,NA
@@ -31818,7 +31902,7 @@
 249,"Sint Eustatius","Fish body oils, nei","fish_oil",2019,NA,NA
 249,"Sint Eustatius","Fish body oils, nei","fish_oil",2020,NA,NA
 249,"Sint Eustatius","Fish body oils, nei","fish_oil",2021,NA,NA
-249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2004,210,84.25
+249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2004,106.790646331298,42.8433902543423
 249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2005,NA,NA
 249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2006,NA,NA
 249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2007,NA,NA
@@ -31836,21 +31920,21 @@
 249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2019,NA,NA
 249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2020,NA,NA
 249,"Sint Eustatius","Fish liver oils, nei","fish_oil",2021,NA,NA
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",1996,12,NA
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",1997,18.25,0.75
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",1998,13.75,NA
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",1999,14,0.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2000,12.5,0.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2001,9.5,0.25
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2002,9.5,0.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2003,10.5,0.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2004,1.75,0
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2005,10.5,1.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2006,18,2
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2007,17.25,2.25
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2008,14.5,0.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2009,15,0.5
-249,"Sint Eustatius","Ornamental fish nei","ornamentals",2010,0.25,NA
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",1996,6.10232264750276,NA
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",1997,9.28061569307711,0.381395165468922
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",1998,6.99224470026358,NA
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",1999,7.11937642208655,0.254263443645948
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2000,6.35658609114871,0.254263443645948
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2001,4.83100542927302,0.127131721822974
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2002,4.83100542927302,0.254263443645948
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2003,5.33953231656491,0.254263443645948
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2004,0.889922052760819,0
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2005,5.33953231656491,0.762790330937845
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2006,9.15348397125414,1.01705377458379
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2007,8.77208880578522,1.14418549640677
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2008,7.3736398657325,0.254263443645948
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2009,7.62790330937845,0.254263443645948
+249,"Sint Eustatius","Ornamental fish nei","ornamentals",2010,0.127131721822974,NA
 249,"Sint Eustatius","Ornamental fish nei","ornamentals",2011,NA,NA
 249,"Sint Eustatius","Ornamental fish nei","ornamentals",2012,NA,NA
 249,"Sint Eustatius","Ornamental fish nei","ornamentals",2013,NA,NA
@@ -31862,11 +31946,11 @@
 249,"Sint Eustatius","Ornamental fish nei","ornamentals",2019,NA,NA
 249,"Sint Eustatius","Ornamental fish nei","ornamentals",2020,NA,NA
 249,"Sint Eustatius","Ornamental fish nei","ornamentals",2021,NA,NA
-249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2004,16.75,0.25
+249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2004,8.51782536213927,0.127131721822974
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2005,NA,NA
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2006,NA,NA
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2007,NA,NA
-249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2008,0.25,0
+249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2008,0.127131721822974,0
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2009,NA,NA
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2010,NA,NA
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2011,NA,NA
@@ -31880,7 +31964,7 @@
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2019,NA,NA
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2020,NA,NA
 249,"Sint Eustatius","Ornamental saltwater fish","ornamentals",2021,NA,NA
-249,"Sint Eustatius","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.25,NA
+249,"Sint Eustatius","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.127131721822974,NA
 249,"Sint Eustatius","Other seaweeds and aquatic plants and products thereof","seaweeds",2004,NA,NA
 249,"Sint Eustatius","Other seaweeds and aquatic plants and products thereof","seaweeds",2005,NA,NA
 249,"Sint Eustatius","Other seaweeds and aquatic plants and products thereof","seaweeds",2006,NA,NA
@@ -31901,7 +31985,7 @@
 249,"Sint Eustatius","Other seaweeds and aquatic plants and products thereof","seaweeds",2021,NA,NA
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2004,0,0
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2005,NA,NA
-249,"Sint Eustatius","Miscellaneous corals and shells","shells",2006,NA,0.25
+249,"Sint Eustatius","Miscellaneous corals and shells","shells",2006,NA,0.127131721822974
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2007,NA,NA
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2008,NA,NA
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2009,NA,NA
@@ -31917,7 +32001,7 @@
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2019,NA,NA
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2020,NA,NA
 249,"Sint Eustatius","Miscellaneous corals and shells","shells",2021,NA,NA
-249,"Sint Eustatius","Natural sponges nei","sponges",2006,NA,0.025
+249,"Sint Eustatius","Natural sponges nei","sponges",2006,NA,0.0127131721822974
 249,"Sint Eustatius","Natural sponges nei","sponges",2007,NA,NA
 249,"Sint Eustatius","Natural sponges nei","sponges",2008,NA,NA
 249,"Sint Eustatius","Natural sponges nei","sponges",2009,NA,NA
@@ -31933,6 +32017,56 @@
 249,"Sint Eustatius","Natural sponges nei","sponges",2019,NA,NA
 249,"Sint Eustatius","Natural sponges nei","sponges",2020,NA,NA
 249,"Sint Eustatius","Natural sponges nei","sponges",2021,NA,NA
+250,"Aruba","Coral and the like","corals",2000,0.127131721822974,NA
+250,"Aruba","Coral and the like","corals",2001,0.508526887291897,0.127131721822974
+250,"Aruba","Coral and the like","corals",2002,0.889922052760819,0.254263443645948
+250,"Aruba","Coral and the like","corals",2003,0.635658609114871,0.127131721822974
+250,"Aruba","Coral and the like","corals",2004,NA,NA
+250,"Aruba","Coral and the like","corals",2005,NA,NA
+250,"Aruba","Coral and the like","corals",2006,NA,NA
+250,"Aruba","Coral and the like","corals",2007,NA,NA
+250,"Aruba","Coral and the like","corals",2008,NA,NA
+250,"Aruba","Coral and the like","corals",2009,NA,NA
+250,"Aruba","Coral and the like","corals",2010,NA,NA
+250,"Aruba","Coral and the like","corals",2011,NA,NA
+250,"Aruba","Coral and the like","corals",2012,NA,NA
+250,"Aruba","Coral and the like","corals",2013,NA,NA
+250,"Aruba","Coral and the like","corals",2014,NA,NA
+250,"Aruba","Coral and the like","corals",2015,NA,NA
+250,"Aruba","Coral and the like","corals",2016,NA,NA
+250,"Aruba","Coral and the like","corals",2017,NA,NA
+250,"Aruba","Coral and the like","corals",2018,NA,NA
+250,"Aruba","Coral and the like","corals",2019,NA,NA
+250,"Aruba","Coral and the like","corals",2020,NA,NA
+250,"Aruba","Coral and the like","corals",2021,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2002,3.9410833765122,1.77984410552164
+250,"Aruba","Fish body oils, nei","fish_oil",2003,43.4790488634572,13.2216990695893
+250,"Aruba","Fish body oils, nei","fish_oil",2004,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2005,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2006,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2007,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2008,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2009,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2010,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2011,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2012,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2013,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2014,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2015,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2016,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2017,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2018,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2019,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2020,NA,NA
+250,"Aruba","Fish body oils, nei","fish_oil",2021,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2004,106.790646331298,42.8433902543423
+250,"Aruba","Fish liver oils, nei","fish_oil",2005,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2006,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2007,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2008,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2009,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2010,NA,NA
+250,"Aruba","Fish liver oils, nei","fish_oil",2011,NA,NA
 250,"Aruba","Fish liver oils, nei","fish_oil",2012,0.1,0.1
 250,"Aruba","Fish liver oils, nei","fish_oil",2013,NA,NA
 250,"Aruba","Fish liver oils, nei","fish_oil",2014,NA,NA
@@ -31943,6 +32077,23 @@
 250,"Aruba","Fish liver oils, nei","fish_oil",2019,NA,NA
 250,"Aruba","Fish liver oils, nei","fish_oil",2020,NA,NA
 250,"Aruba","Fish liver oils, nei","fish_oil",2021,NA,NA
+250,"Aruba","Ornamental fish nei","ornamentals",1996,6.10232264750276,NA
+250,"Aruba","Ornamental fish nei","ornamentals",1997,9.28061569307711,0.381395165468922
+250,"Aruba","Ornamental fish nei","ornamentals",1998,6.99224470026358,NA
+250,"Aruba","Ornamental fish nei","ornamentals",1999,7.11937642208655,0.254263443645948
+250,"Aruba","Ornamental fish nei","ornamentals",2000,6.35658609114871,0.254263443645948
+250,"Aruba","Ornamental fish nei","ornamentals",2001,4.83100542927302,0.127131721822974
+250,"Aruba","Ornamental fish nei","ornamentals",2002,4.83100542927302,0.254263443645948
+250,"Aruba","Ornamental fish nei","ornamentals",2003,5.33953231656491,0.254263443645948
+250,"Aruba","Ornamental fish nei","ornamentals",2004,0.889922052760819,0
+250,"Aruba","Ornamental fish nei","ornamentals",2005,5.33953231656491,0.762790330937845
+250,"Aruba","Ornamental fish nei","ornamentals",2006,9.15348397125414,1.01705377458379
+250,"Aruba","Ornamental fish nei","ornamentals",2007,8.77208880578522,1.14418549640677
+250,"Aruba","Ornamental fish nei","ornamentals",2008,7.3736398657325,0.254263443645948
+250,"Aruba","Ornamental fish nei","ornamentals",2009,7.62790330937845,0.254263443645948
+250,"Aruba","Ornamental fish nei","ornamentals",2010,0.127131721822974,NA
+250,"Aruba","Ornamental fish nei","ornamentals",2011,NA,NA
+250,"Aruba","Ornamental fish nei","ornamentals",2012,NA,NA
 250,"Aruba","Ornamental fish nei","ornamentals",2013,0.1,0.1
 250,"Aruba","Ornamental fish nei","ornamentals",2014,NA,NA
 250,"Aruba","Ornamental fish nei","ornamentals",2015,NA,NA
@@ -31952,12 +32103,32 @@
 250,"Aruba","Ornamental fish nei","ornamentals",2019,NA,NA
 250,"Aruba","Ornamental fish nei","ornamentals",2020,NA,NA
 250,"Aruba","Ornamental fish nei","ornamentals",2021,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2004,8.51782536213927,0.127131721822974
+250,"Aruba","Ornamental saltwater fish","ornamentals",2005,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2006,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2007,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2008,0.127131721822974,0
+250,"Aruba","Ornamental saltwater fish","ornamentals",2009,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2010,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2011,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2012,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2013,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2014,NA,NA
+250,"Aruba","Ornamental saltwater fish","ornamentals",2015,NA,NA
 250,"Aruba","Ornamental saltwater fish","ornamentals",2016,225,10
 250,"Aruba","Ornamental saltwater fish","ornamentals",2017,92,12
 250,"Aruba","Ornamental saltwater fish","ornamentals",2018,2,0.1
 250,"Aruba","Ornamental saltwater fish","ornamentals",2019,5.63,0.8
 250,"Aruba","Ornamental saltwater fish","ornamentals",2020,NA,NA
 250,"Aruba","Ornamental saltwater fish","ornamentals",2021,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2003,0.127131721822974,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2004,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2005,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2006,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2007,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2008,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2009,NA,NA
+250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2010,NA,NA
 250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2011,0.1,0.1
 250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2012,0.1,0.1
 250,"Aruba","Other seaweeds and aquatic plants and products thereof","seaweeds",2013,0.1,0.1
@@ -31972,5 +32143,37 @@
 250,"Aruba","Seaweeds and other algae, unfit for human consumption, nei","seaweeds",2019,0.48,0.11
 250,"Aruba","Seaweeds and other algae, unfit for human consumption, nei","seaweeds",2020,NA,NA
 250,"Aruba","Seaweeds and other algae, unfit for human consumption, nei","seaweeds",2021,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2004,0,0
+250,"Aruba","Miscellaneous corals and shells","shells",2005,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2006,NA,0.127131721822974
+250,"Aruba","Miscellaneous corals and shells","shells",2007,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2008,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2009,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2010,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2011,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2012,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2013,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2014,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2015,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2016,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2017,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2018,NA,NA
+250,"Aruba","Miscellaneous corals and shells","shells",2019,NA,NA
 250,"Aruba","Miscellaneous corals and shells","shells",2020,0.67,0.15
 250,"Aruba","Miscellaneous corals and shells","shells",2021,0.02,0
+250,"Aruba","Natural sponges nei","sponges",2006,NA,0.0127131721822974
+250,"Aruba","Natural sponges nei","sponges",2007,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2008,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2009,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2010,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2011,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2012,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2013,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2014,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2015,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2016,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2017,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2018,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2019,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2020,NA,NA
+250,"Aruba","Natural sponges nei","sponges",2021,NA,NA
