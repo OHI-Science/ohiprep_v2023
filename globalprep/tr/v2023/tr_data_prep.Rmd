@@ -89,7 +89,7 @@ The number of arrivals to area of coastline is used as a proxy for the value tha
 
 ### Source cleaned arrivals and area of coastline data sources
 
-```{r}
+```{r, eval=FALSE}
 # source in cleaned UNWTO data for current version year (make sure to download from website and put on Mazu in the UNWTO folder first)
 source(here(paste0("globalprep/tr/v", version_year, "/R/process_UNWTO_arrivals.R"))) # outputs unwto_dupe_fix
 # note: this script fills the total with values from Overnights or Same-day because it is not autofilled: Total originally is either a value on its own or the sum of Overnights and Same-day but must have both values, otherwise is NA
@@ -100,7 +100,7 @@ source(here(paste0("globalprep/tr/v", version_year, "/R/process_area_of_coastlin
 
 ### Divide tourist arrival count data by area of coastline
 
-```{r}
+```{r, eval=FALSE}
 # divide the number of tourist arrivals by area of coastline to get the proportion
 tourism_props <- unwto_dupe_fix %>% 
   left_join(inland_offshore, by = c("rgn_id", "year")) %>%
@@ -116,7 +116,7 @@ tourism_props <- tourism_props %>%
 
 ### Gapfill using previous/next years for same region
 
-```{r}
+```{r, eval=FALSE}
 # make year a factor for ordering with gapfilling
 tourism_props$year <- factor(tourism_props$year, levels = unique(tourism_props$year))
 
@@ -143,7 +143,7 @@ summary(tourism_props_downup_gf) # v2023: 135 NAs in Ap
 
 To round out the gapfilling, we could use georegions. This has a very low correlation with the data, but it was the simplest viable option discovered. We decided ultimately just to leave values that would have been gapfilled by georegion as NAs since it did not seem to be reliable enough.
 
-```{r}
+```{r, eval=FALSE}
 # # the below ended up not being used (v2023)
 # # gapfill missing data using UN georegion data
 # # prepare the georegion data
@@ -253,7 +253,7 @@ To round out the gapfilling, we could use georegions. This has a very low correl
 
 ### Rescale the proportions to be between 0 and 1
 
-```{r}
+```{r, eval=FALSE}
 # rescale to make highest Ap value 1
 quantile_marker <- quantile(tourism_props_downup_gf$Ap, probs = 0.90, na.rm = TRUE) # 90th quantile = 1
 tourism_props_downup_gf$Ap_rescaled <- tourism_props_downup_gf$Ap / quantile_marker # divide all values by this value
@@ -272,12 +272,12 @@ tourism_props_rescaled <- tourism_props_downup_gf %>%
 
 ### Removing low population / uninhabited regions
 
-```{r}
+```{r, eval=FALSE}
 ### after gap-filling, make sure low/uninhabited regions are NA
 # create df for unpopulated/low populated regions
 low_pop()
 low_pop <- low_pop %>%
-  filter(est_population < 3000 | is.na(est_population)) %>%  # filter out regions that have populations > 3000 and keep NA values 
+  filter(est_population < 3000 | is.na(est_population)) %>%  # filter out regions that have populations > or equal to 3000 and keep NA values 
   rename(rgn_label = rgn_nam)
 
 summary(tourism_props_rescaled)
@@ -314,7 +314,7 @@ summary(tourism_props_rescaled)
 
 ### Write output files
 
-```{r}
+```{r, eval=FALSE}
 # save gapfill info
 tourism_props_gf_to_write <- tourism_props_rescaled %>%
   select(rgn_id, year, gapfilled, method)
@@ -332,7 +332,7 @@ write_csv(tourism_props_to_write, here(paste0("globalprep/tr/v", version_year, "
 
 We would expect for tourism jobs to decrease across the board from 2019 and 2020 given the pandemic, and likely see a rebound to some extent between 2020 and 2021 — let's make sure that's reflected in our results.
 
-```{r}
+```{r, eval=FALSE}
 tourism_props_compare <- tourism_props_to_write %>%
   mutate(year = as.numeric(as.character(year))) %>%
   filter(year >= 2019) %>%
@@ -353,7 +353,7 @@ Everything looks reasonable.
 
 ### Look at changes vs. previous data source (v2023)
 
-```{r}
+```{r, eval=FALSE}
 new_data <- read_csv(paste0("globalprep/tr/v", version_year, "/output/tr_arrivals_props_tourism.csv"))
 old_data <- read_csv(paste0("globalprep/tr/v", prev_ver_yr, "/output/tr_jobs_pct_tourism.csv"))
 
@@ -361,8 +361,8 @@ compare_common_data <- new_data %>%
   left_join(old_data, by = c("rgn_id", "year")) %>%
   drop_na()
 
-plot(compare_common_data$Ap, compare_common_data$Ep,
-     xlab = "v2023 Arrivals Proportion", ylab = "v2022 Employment Proportion")
+plot(compare_common_data$Ep, compare_common_data$Ap,
+     xlab = "v2022 Employment Proportion", ylab = "v2023 Arrivals Proportion")
 abline(0, 1)
 
 
