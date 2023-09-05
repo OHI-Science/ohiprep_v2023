@@ -908,8 +908,6 @@ write_csv(tourism_revenue_clean, here(data_path, "int/tourism_jobs.csv"))
 ```
 
 
-(Placeholder)
-
 ## Jobs
 
 ### FAO yearbook Number of fishers
@@ -980,7 +978,7 @@ fao_farm_jobs <- fish_farm_table %>%
 #number of people employed in th fishing sector 
 
 
-#note that this is data for the same category as the FAO fishers data, one could potentially be used for gapfilling whichever is used as the main data set
+#note that this is data for the same category as the FAO fishers data, used for gapfilling OECD
 
 oecd_fisher_jobs <- oecd_raw %>% 
   filter(VARIABLE == "FISH_EMP_MARINE_FISH_TOT")  %>% 
