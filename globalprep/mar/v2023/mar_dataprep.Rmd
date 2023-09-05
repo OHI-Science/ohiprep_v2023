@@ -21,7 +21,7 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 
 # Updates from previous assessment
 
--   New year of FAO mariculture yield data for 2021. Downloaded the data online instead of using the fishstatj software. Updated instructions for downlaoding the data. Updated the script to work with minor changes in formatting in the new data.
+-   New year of FAO mariculture yield data for 2021. Downloaded the data online through Fishstat online query instead of using the fishstatj software. Updated instructions for downlaoding the data. Updated the script to work with minor changes in formatting in the new data.
 
 -   updated the species_list.csv so that any of the duplicate species that were relevant and had been excluded are now included. Also updated this file with any new species names in the fao data. Removed the alias column, as it was being inconsistently used, and instead grouped by family when removing species with less than four years of mariculture for a region. Reorganized code as needed to keep this from creating errors.
 
@@ -29,7 +29,7 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 
 -   fixed an issue in the mar_split function (mar_fxs.R) that was duplicating Netherlands Antilles data (Aruba, Bonaire, 'Curacao') by binding the same rows multiple times.
 
--   Fixed a problem that was removing data due to duplicates in the fao column (FAO major fishing area (Name)) for some species/region/environment/year combinations in the FAO data. See issue 246 for more information.
+-   Fixed a problem that was removing data due to duplicates in the fao column (FAO major fishing area (Name)) for some species/region/environment/year combinations in the FAO data. 
 
 -   updated outdated function gather to pivot_longer
 
@@ -40,9 +40,7 @@ This analysis converts FAO mariculture and seafood watch sustainability data int
 ## Production data
 
 **Reference**:\
-<https://www.fao.org/fishery/en/statistics/software/fishstatj> Release date: March 2023 FAO Global aquaculture production Quantity (1950 - 2021) Global aquaculture production (Value) (1950-2021)
-
-FAO metadata found [here](https://www.fao.org/fishery/en/collection/aquaculture?lang=en).
+<https://www.fao.org/fishery/en/collection/aquaculture?lang=en> Release date: March 2023 FAO Global aquaculture production Quantity (1950 - 2021) Global aquaculture production (Value) (1950-2021)
 
 **Downloaded**: July 5th, 2023
 
@@ -276,7 +274,7 @@ mar_rgn <- mar_rgn %>%
 
 ```
 
-**Take a look at the tidied data for a single year and region**
+Take a look at the tidied data for a single year and region
 
 ```{r see-tidy-data, eval = FALSE}
 test <- data.frame(filter(mar_rgn, rgn_id==207) %>%
@@ -443,7 +441,7 @@ setdiff(sw_sus_rgn$sw_species, old_sw_sus$CommonNames)
 setdiff(old_sw_sus$CommonNames, sw_sus_rgn$sw_species) 
 ```
 
-**Check that the non-matches between Seafood Watch sustainability data species (sw_sus_rgn) and the FAO mariculture species in the wrangled FAO Aquaculture Production data table (maric) are not due to spelling errors or slightly different names. We want to include as many species that have sustainability scores as possible**
+Check that the non-matches between Seafood Watch sustainability data species (sw_sus_rgn) and the FAO mariculture species in the wrangled FAO Aquaculture Production data table (maric) are not due to spelling errors or slightly different names. We want to include as many species that have sustainability scores as possible
 
 ```{r sw-sus_check-non-matches, eval = FALSE}
 maric <- read_csv("output/MAR_FP_data.csv")
@@ -458,7 +456,7 @@ sort(setdiff(maric$species, sw_sus_rgn$species)) # FAO species with no Seafood W
 ## The FAO list has far more species than the sustainability list. But, go over them to make sure that we are getting sustainability scores for as many species as we can.
 ```
 
-**Fix the non matches**
+Fix the non matches
 
 ```{r sw-sus_fix-non-matches, eval = FALSE}
 
@@ -535,7 +533,7 @@ table(sw_sus_rgn$match_type)
 #    144     114       1
 ```
 
-**Assign a Mediterranean bordering rgn id to each waterbody row**
+Assign a Mediterranean bordering rgn id to each waterbody row
 
 ```{r gf_sw_sp_w, eval = FALSE}
 ## Add a line for each country that borders each water body
@@ -649,7 +647,7 @@ mar_sw_sus <- mar_sw_sus %>%
 
 ```
 
-**Now look at a summary after appending all the Seafood Watch data**
+Now look at a summary after appending all the Seafood Watch data
 
 ```{r sw-sus-summary, eval = FALSE}
 summary(mar_sw_sus) 
@@ -789,7 +787,7 @@ filter(mar_sw_sus_final, gapfill_sus == "taxon_group_avg")
 
 ```
 
-**Now we need to prep the escapes pressure layer a bit more** Final formatting of the escapee data. This is used as a pressure layer.
+Now we need to prep the escapes pressure layer a bit more. Final formatting of the escapee data. This is used as a pressure layer.
 
 For each region/year: take a weighted average of the genetic escape probability for each taxa based on tonnes of mariculture.
 
