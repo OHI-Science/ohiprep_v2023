@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Wed Aug 30 09:41:38 2023 by egg" />
+<meta name="author" content="Compiled on Tue Sep 5 17:02:51 2023 by egg" />
 
 
 <title>OHI 2023: Coral Harvest Pressure</title>
@@ -1646,7 +1646,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">OHI 2023: Coral Harvest Pressure</h1>
-<h4 class="author"><em>Compiled on Wed Aug 30 09:41:38 2023 by
+<h4 class="author"><em>Compiled on Tue Sep 5 17:02:51 2023 by
 egg</em></h4>
 
 </div>
@@ -1665,6 +1665,9 @@ calculate OHI 2023 global coral harvest pressure.</p>
 <li>Add/edit code for the Datacheck section</li>
 <li>Add a tic/toc for timing purposes</li>
 <li>Add more programmatic year usage</li>
+<li>Swap np_split_antilles for split_regions (more generalized
+usage)</li>
+<li>Updates to name_2_rgn reduce the code length of the Rmd</li>
 </ul>
 <hr />
 </div>
@@ -1800,26 +1803,26 @@ data.</p>
 <span id="cb4-75"><a href="#cb4-75" tabindex="-1"></a>    </span>
 <span id="cb4-76"><a href="#cb4-76" tabindex="-1"></a>  <span class="do">## Special case: user-defined function deals with </span></span>
 <span id="cb4-77"><a href="#cb4-77" tabindex="-1"></a>  <span class="do">##   breaking up Antilles into separate reported rgns</span></span>
-<span id="cb4-78"><a href="#cb4-78" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">np_split_antilles</span>(m)</span>
+<span id="cb4-78"><a href="#cb4-78" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">split_regions</span>(m) <span class="co"># used to use np_split_antilles(); this incorporates more than just antilles</span></span>
 <span id="cb4-79"><a href="#cb4-79" tabindex="-1"></a>    </span>
 <span id="cb4-80"><a href="#cb4-80" tabindex="-1"></a>  <span class="do">## Some changes to region names that aren&#39;t working in name_2_rgn()</span></span>
-<span id="cb4-81"><a href="#cb4-81" tabindex="-1"></a>  m <span class="ot">&lt;-</span> m <span class="sc">%&gt;%</span></span>
-<span id="cb4-82"><a href="#cb4-82" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Côte d&#39;Ivoire&quot;</span>, <span class="st">&quot;Ivory Coast&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-83"><a href="#cb4-83" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;C&lt;f4&gt;te d&#39;Ivoire    &quot;</span>, <span class="st">&quot;Ivory Coast&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-84"><a href="#cb4-84" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;C</span><span class="sc">\xf4</span><span class="st">te d&#39;Ivoire&quot;</span>, <span class="st">&quot;Ivory Coast&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-85"><a href="#cb4-85" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Cura&lt;e7&gt;ao&quot;</span>,<span class="st">&quot;Curacao&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-86"><a href="#cb4-86" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Curaçao&quot;</span>,<span class="st">&quot;Curacao&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-87"><a href="#cb4-87" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Cura</span><span class="sc">\xe7a</span><span class="st">o&quot;</span>,<span class="st">&quot;Curacao&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-88"><a href="#cb4-88" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;R</span><span class="sc">\xe9</span><span class="st">union&quot;</span>, <span class="st">&quot;Reunion&quot;</span>, country)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-89"><a href="#cb4-89" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Réunion&quot;</span>, <span class="st">&quot;Reunion&quot;</span>, country)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-90"><a href="#cb4-90" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;R&lt;e9&gt;union&quot;</span>, <span class="st">&quot;Reunion&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-91"><a href="#cb4-91" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Micronesia (Fed. States)&quot;</span>, <span class="st">&quot;Micronesia&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-92"><a href="#cb4-92" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Saint Helena/Asc./Trist.&quot;</span>, <span class="st">&quot;Saint Helena&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-93"><a href="#cb4-93" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Türkiye&quot;</span>, <span class="st">&quot;Turkey&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-94"><a href="#cb4-94" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Venezuela (Boliv Rep of)&quot;</span>, <span class="st">&quot;Venezuela&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-95"><a href="#cb4-95" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(country <span class="sc">==</span> <span class="st">&quot;Netherlands (Kingdom of the)&quot;</span>, <span class="st">&quot;Netherlands&quot;</span>, country)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-96"><a href="#cb4-96" tabindex="-1"></a>    <span class="fu">filter</span>(country <span class="sc">!=</span> <span class="st">&quot;Azerbaijan&quot;</span>) <span class="co"># landlocked, but not being removed by name_2_rgn?</span></span>
-<span id="cb4-97"><a href="#cb4-97" tabindex="-1"></a></span>
+<span id="cb4-81"><a href="#cb4-81" tabindex="-1"></a>  <span class="co"># m &lt;- m %&gt;%</span></span>
+<span id="cb4-82"><a href="#cb4-82" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Côte d&#39;Ivoire&quot;, &quot;Ivory Coast&quot;, country)) %&gt;%</span></span>
+<span id="cb4-83"><a href="#cb4-83" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;C&lt;f4&gt;te d&#39;Ivoire  &quot;, &quot;Ivory Coast&quot;, country)) %&gt;%</span></span>
+<span id="cb4-84"><a href="#cb4-84" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;C\xf4te d&#39;Ivoire&quot;, &quot;Ivory Coast&quot;, country)) %&gt;%</span></span>
+<span id="cb4-85"><a href="#cb4-85" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Cura&lt;e7&gt;ao&quot;,&quot;Curacao&quot;, country)) %&gt;%</span></span>
+<span id="cb4-86"><a href="#cb4-86" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Curaçao&quot;,&quot;Curacao&quot;, country)) %&gt;%</span></span>
+<span id="cb4-87"><a href="#cb4-87" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Cura\xe7ao&quot;,&quot;Curacao&quot;, country)) %&gt;%</span></span>
+<span id="cb4-88"><a href="#cb4-88" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;R\xe9union&quot;, &quot;Reunion&quot;, country)) %&gt;% </span></span>
+<span id="cb4-89"><a href="#cb4-89" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Réunion&quot;, &quot;Reunion&quot;, country)) %&gt;% </span></span>
+<span id="cb4-90"><a href="#cb4-90" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;R&lt;e9&gt;union&quot;, &quot;Reunion&quot;, country)) %&gt;%</span></span>
+<span id="cb4-91"><a href="#cb4-91" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Micronesia (Fed. States)&quot;, &quot;Micronesia&quot;, country)) %&gt;%</span></span>
+<span id="cb4-92"><a href="#cb4-92" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Saint Helena/Asc./Trist.&quot;, &quot;Saint Helena&quot;, country)) %&gt;%</span></span>
+<span id="cb4-93"><a href="#cb4-93" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Türkiye&quot;, &quot;Turkey&quot;, country)) %&gt;%</span></span>
+<span id="cb4-94"><a href="#cb4-94" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Venezuela (Boliv Rep of)&quot;, &quot;Venezuela&quot;, country)) %&gt;%</span></span>
+<span id="cb4-95"><a href="#cb4-95" tabindex="-1"></a>  <span class="co">#   mutate(country = ifelse(country == &quot;Netherlands (Kingdom of the)&quot;, &quot;Netherlands&quot;, country)) %&gt;%</span></span>
+<span id="cb4-96"><a href="#cb4-96" tabindex="-1"></a>  <span class="co">#   filter(country != &quot;Azerbaijan&quot;) # landlocked, but not being removed by name_2_rgn?</span></span>
+<span id="cb4-97"><a href="#cb4-97" tabindex="-1"></a>  <span class="co"># the above shouldn&#39;t be needed anymore in v2023 onwards due to updates to name_2_rgn</span></span>
 <span id="cb4-98"><a href="#cb4-98" tabindex="-1"></a>    </span>
 <span id="cb4-99"><a href="#cb4-99" tabindex="-1"></a>  m_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> m,</span>
 <span id="cb4-100"><a href="#cb4-100" tabindex="-1"></a>                      <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>, </span>
@@ -1828,50 +1831,34 @@ data.</p>
 <span id="cb4-103"><a href="#cb4-103" tabindex="-1"></a><span class="co"># v2023 removed countries:</span></span>
 <span id="cb4-104"><a href="#cb4-104" tabindex="-1"></a><span class="co">#   These data were removed for not having any match in the lookup tables:</span></span>
 <span id="cb4-105"><a href="#cb4-105" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb4-106"><a href="#cb4-106" tabindex="-1"></a><span class="co">#                 Eswatini </span></span>
-<span id="cb4-107"><a href="#cb4-107" tabindex="-1"></a><span class="co">#                        1 (landlocked/not used)</span></span>
-<span id="cb4-108"><a href="#cb4-108" tabindex="-1"></a><span class="co"># Micronesia (Fed. States) </span></span>
-<span id="cb4-109"><a href="#cb4-109" tabindex="-1"></a><span class="co">#                        1 (added in above - Micronesia)</span></span>
-<span id="cb4-110"><a href="#cb4-110" tabindex="-1"></a><span class="co"># Netherlands (Kingdom of the) </span></span>
-<span id="cb4-111"><a href="#cb4-111" tabindex="-1"></a><span class="co">#                        1 (added in above - Netherlands)                           </span></span>
-<span id="cb4-112"><a href="#cb4-112" tabindex="-1"></a><span class="co">#          North Macedonia </span></span>
-<span id="cb4-113"><a href="#cb4-113" tabindex="-1"></a><span class="co">#                        1 (landlocked/not used)</span></span>
-<span id="cb4-114"><a href="#cb4-114" tabindex="-1"></a><span class="co">#                Palestine </span></span>
-<span id="cb4-115"><a href="#cb4-115" tabindex="-1"></a><span class="co">#                        1 (not used)</span></span>
-<span id="cb4-116"><a href="#cb4-116" tabindex="-1"></a><span class="co"># Saint Helena/Asc./Trist. </span></span>
-<span id="cb4-117"><a href="#cb4-117" tabindex="-1"></a><span class="co">#                        1 (added in above - Saint Helena)</span></span>
-<span id="cb4-118"><a href="#cb4-118" tabindex="-1"></a><span class="co">#                  Türkiye </span></span>
-<span id="cb4-119"><a href="#cb4-119" tabindex="-1"></a><span class="co">#                        1 (added in above - Turkey)</span></span>
-<span id="cb4-120"><a href="#cb4-120" tabindex="-1"></a><span class="co"># Venezuela (Boliv Rep of) </span></span>
-<span id="cb4-121"><a href="#cb4-121" tabindex="-1"></a><span class="co">#                        1 (added in above - Venezuela)</span></span>
-<span id="cb4-122"><a href="#cb4-122" tabindex="-1"></a><span class="co">#           Yugoslavia SFR </span></span>
-<span id="cb4-123"><a href="#cb4-123" tabindex="-1"></a><span class="co">#                        1 (not used and only has data in 1984-1988)</span></span>
-<span id="cb4-124"><a href="#cb4-124" tabindex="-1"></a>    </span>
-<span id="cb4-125"><a href="#cb4-125" tabindex="-1"></a><span class="co"># v2023 duplicates:  [1] &quot;China&quot;                 &quot;China, Hong Kong SAR&quot;  &quot;China, Macao SAR&quot;      &quot;Guadeloupe&quot;           </span></span>
-<span id="cb4-126"><a href="#cb4-126" tabindex="-1"></a><span class="co"># [5] &quot;Martinique&quot;            &quot;Montenegro&quot;            &quot;Russian Federation&quot;    &quot;Serbia and Montenegro&quot;</span></span>
-<span id="cb4-127"><a href="#cb4-127" tabindex="-1"></a><span class="co"># [9] &quot;Sudan&quot;                 &quot;Sudan (former)&quot;        &quot;Un. Sov. Soc. Rep.&quot;     - these are all fixed in the group by and summarise below  </span></span>
-<span id="cb4-128"><a href="#cb4-128" tabindex="-1"></a>  </span>
-<span id="cb4-129"><a href="#cb4-129" tabindex="-1"></a>  <span class="do">## combine composite regions</span></span>
-<span id="cb4-130"><a href="#cb4-130" tabindex="-1"></a>  <span class="do">## When summarizing the dataset, this function provides a modified way to sum the value column while maintaining NA values when both variables are NA (rather than turning to zero values). The function will sum non-NA values normally.</span></span>
-<span id="cb4-131"><a href="#cb4-131" tabindex="-1"></a>  sum_function <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb4-132"><a href="#cb4-132" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">sum</span>(<span class="fu">is.na</span>(x)) <span class="sc">==</span> <span class="fu">length</span>(x)) </span>
-<span id="cb4-133"><a href="#cb4-133" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">NA</span>)</span>
-<span id="cb4-134"><a href="#cb4-134" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">sum</span>(x, <span class="at">na.rm =</span> T))}</span>
-<span id="cb4-135"><a href="#cb4-135" tabindex="-1"></a>  </span>
-<span id="cb4-136"><a href="#cb4-136" tabindex="-1"></a>  m_rgn <span class="ot">&lt;-</span> m_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb4-137"><a href="#cb4-137" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id, rgn_name, commodity, product, year) <span class="sc">%&gt;%</span></span>
-<span id="cb4-138"><a href="#cb4-138" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">value =</span> <span class="fu">sum_function</span>(value)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-139"><a href="#cb4-139" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
-<span id="cb4-140"><a href="#cb4-140" tabindex="-1"></a></span>
-<span id="cb4-141"><a href="#cb4-141" tabindex="-1"></a>  <span class="do">## units: rename value field to units based on filename</span></span>
-<span id="cb4-142"><a href="#cb4-142" tabindex="-1"></a>  <span class="fu">names</span>(m_rgn)[<span class="fu">names</span>(m_rgn) <span class="sc">==</span> <span class="st">&#39;value&#39;</span>] <span class="ot">&lt;-</span> units  </span>
-<span id="cb4-143"><a href="#cb4-143" tabindex="-1"></a>  </span>
-<span id="cb4-144"><a href="#cb4-144" tabindex="-1"></a>  <span class="do">## output to .csv - should create two csvs (tonnes.csv and usd.csv)</span></span>
-<span id="cb4-145"><a href="#cb4-145" tabindex="-1"></a>  harvest_out <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&#39;globalprep/prs_coral_harvest/v&#39;</span>, scen_year, <span class="st">&#39;/int/%s.csv&#39;</span>)), units)</span>
-<span id="cb4-146"><a href="#cb4-146" tabindex="-1"></a>  <span class="fu">write.csv</span>(m_rgn, harvest_out, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">na =</span> <span class="st">&#39;&#39;</span>)</span>
-<span id="cb4-147"><a href="#cb4-147" tabindex="-1"></a>}</span>
-<span id="cb4-148"><a href="#cb4-148" tabindex="-1"></a><span class="fu">toc</span>()</span>
-<span id="cb4-149"><a href="#cb4-149" tabindex="-1"></a><span class="co"># v2023: 18.523 sec elapsed</span></span></code></pre></div>
+<span id="cb4-106"><a href="#cb4-106" tabindex="-1"></a><span class="co">#           yugoslavia sfr </span></span>
+<span id="cb4-107"><a href="#cb4-107" tabindex="-1"></a><span class="co">#                        1 (not used and only has data in 1984-1988)</span></span>
+<span id="cb4-108"><a href="#cb4-108" tabindex="-1"></a>    </span>
+<span id="cb4-109"><a href="#cb4-109" tabindex="-1"></a><span class="co"># v2023 duplicates:  [1] &quot;China&quot;                 &quot;China, Hong Kong SAR&quot;  &quot;China, Macao SAR&quot;      &quot;Guadeloupe&quot;           </span></span>
+<span id="cb4-110"><a href="#cb4-110" tabindex="-1"></a><span class="co"># [5] &quot;Martinique&quot;            &quot;Montenegro&quot;            &quot;Russian Federation&quot;    &quot;Serbia and Montenegro&quot;</span></span>
+<span id="cb4-111"><a href="#cb4-111" tabindex="-1"></a><span class="co"># [9] &quot;Sudan&quot;                 &quot;Sudan (former)&quot;        &quot;Un. Sov. Soc. Rep.&quot;     - these are all fixed in the group by and summarise below  </span></span>
+<span id="cb4-112"><a href="#cb4-112" tabindex="-1"></a>  </span>
+<span id="cb4-113"><a href="#cb4-113" tabindex="-1"></a>  <span class="do">## combine composite regions</span></span>
+<span id="cb4-114"><a href="#cb4-114" tabindex="-1"></a>  <span class="do">## When summarizing the dataset, this function provides a modified way to sum the value column while maintaining NA values when both variables are NA (rather than turning to zero values). The function will sum non-NA values normally.</span></span>
+<span id="cb4-115"><a href="#cb4-115" tabindex="-1"></a>  sum_function <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb4-116"><a href="#cb4-116" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">sum</span>(<span class="fu">is.na</span>(x)) <span class="sc">==</span> <span class="fu">length</span>(x)) </span>
+<span id="cb4-117"><a href="#cb4-117" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb4-118"><a href="#cb4-118" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">sum</span>(x, <span class="at">na.rm =</span> T))}</span>
+<span id="cb4-119"><a href="#cb4-119" tabindex="-1"></a>  </span>
+<span id="cb4-120"><a href="#cb4-120" tabindex="-1"></a>  m_rgn <span class="ot">&lt;-</span> m_rgn <span class="sc">%&gt;%</span></span>
+<span id="cb4-121"><a href="#cb4-121" tabindex="-1"></a>    <span class="fu">group_by</span>(rgn_id, rgn_name, commodity, product, year) <span class="sc">%&gt;%</span></span>
+<span id="cb4-122"><a href="#cb4-122" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">value =</span> <span class="fu">sum_function</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-123"><a href="#cb4-123" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb4-124"><a href="#cb4-124" tabindex="-1"></a></span>
+<span id="cb4-125"><a href="#cb4-125" tabindex="-1"></a>  <span class="do">## units: rename value field to units based on filename</span></span>
+<span id="cb4-126"><a href="#cb4-126" tabindex="-1"></a>  <span class="fu">names</span>(m_rgn)[<span class="fu">names</span>(m_rgn) <span class="sc">==</span> <span class="st">&#39;value&#39;</span>] <span class="ot">&lt;-</span> units  </span>
+<span id="cb4-127"><a href="#cb4-127" tabindex="-1"></a>  </span>
+<span id="cb4-128"><a href="#cb4-128" tabindex="-1"></a>  <span class="do">## output to .csv - should create two csvs (tonnes.csv and usd.csv)</span></span>
+<span id="cb4-129"><a href="#cb4-129" tabindex="-1"></a>  harvest_out <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&#39;globalprep/prs_coral_harvest/v&#39;</span>, scen_year, <span class="st">&#39;/int/%s.csv&#39;</span>)), units)</span>
+<span id="cb4-130"><a href="#cb4-130" tabindex="-1"></a>  <span class="fu">write.csv</span>(m_rgn, harvest_out, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">na =</span> <span class="st">&#39;&#39;</span>)</span>
+<span id="cb4-131"><a href="#cb4-131" tabindex="-1"></a>}</span>
+<span id="cb4-132"><a href="#cb4-132" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb4-133"><a href="#cb4-133" tabindex="-1"></a><span class="co"># v2023: 152.934 sec elapsed</span></span></code></pre></div>
 </div>
 <div id="data-wrangle" class="section level1">
 <h1>Data Wrangle</h1>
