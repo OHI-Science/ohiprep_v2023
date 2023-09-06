@@ -1,6 +1,6 @@
 ## Ocean Health Index: Mariculture Sub-goal and pressure data (MAR)
 
-The following data layers were generated (here)[http://ohi-science.github.io/ohiprep_v2022/globalprep/mar/v2022/mar_dataprep.html].
+The following data layers were generated (here)[http://ohi-science.github.io/ohiprep_v2023/globalprep/mar/v2023/mar_dataprep.html].
 
 If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
 
@@ -19,4 +19,4 @@ And, the following pressure:
 
 ### Additional information
 
-FAO metadata for this source can be found [here](http://www.fao.org/fishery/statistics/global-aquaculture-production/en)
+FAO metadata for this source can be found [here](https://www.fao.org/fishery/en/collection/aquaculture?lang=en)

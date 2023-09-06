@@ -76,7 +76,7 @@ for (species_name in query_list) {
   # Make the API request and parse the JSON response
   species_data <-jsonlite::fromJSON(spp_page_url) %>% as_tibble()
   
-  #addd back to the list
+  #add back to the list
   results_list[[species_name]] <- species_data
    }
   

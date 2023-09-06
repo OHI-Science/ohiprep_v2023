@@ -24,11 +24,15 @@ library(plotly)
 library(here)
 library(janitor)
 library(pdftools)
+library(modelr)
 source(here('workflow/R/common.R')) # directory locations
 
 source(here('workflow/R/fao_fxn.R')) # function for cleaning FAO data
 
-version_year <- 2023
+current_year <- 2023
+version_year <- paste0("v",current_year)
+
+data_path <- paste0("globalprep/le/",version_year)
 ```
 
 # Read in Data
@@ -44,9 +48,6 @@ Included these fields: ASFIS species name, FAO major fishing area name, ASFIS sp
 oecd_raw <- read_csv(file.path(dir_M, "/git-annex/globalprep/_raw_data/OECD/d2023/ocean_economy.csv")) %>% 
   select(Country, Year, VARIABLE, Variable, Unit, Value, PowerCode) 
 
-#ilostat data
-ilo_raw <- read_csv(file.path(dir_M, "/git-annex/globalprep/_raw_data/ILOSTAT/d2023/ILO_earnings_economic.csv"))
-
 #fao commodities data 
 #used for aquarium fish
 commodities_value <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_commodities/d2023/FAO_raw_commodities_value_1976_2021.csv")) %>% 
@@ -59,13 +60,10 @@ fao_capture <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_cap
 exvessel_prices <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/ex-vessel-price-database-updated/price-db-results/exvessel_price_database_1976_2019.csv"))
 
 #FAO aquaculture value
-aquaculture_value <- read.csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mariculture/d2023/FAO_GlobalAquacultureProduction_Value_1950_2021.csv"))
+aquaculture_value <- read_csv(file.path(dir_M, "git-annex/globalprep/_raw_data/FAO_mariculture/d2023/FAO_GlobalAquacultureProduction_Value_1950_2021.csv"))
 
 #fao yearbook pdf tables
 fao_pdf <- pdf_text(file.path(dir_M, "/git-annex/globalprep/_raw_data/FAO/d2023/fao_fishers_table.pdf"))
-
-#oww
-oww <- read_csv(file.path(dir_M,"/git-annex/globalprep/_raw_data/OWW/d2023/oww3.csv"))
 
 #whale watching pdf
 whale_pdf <- pdf_text(file.path(dir_M, "/git-annex/globalprep/_raw_data/IFAW_MarineMammalWatching/whale_watching_worldwide.pdf"))
@@ -76,125 +74,311 @@ whale_pdf <- pdf_text(file.path(dir_M, "/git-annex/globalprep/_raw_data/IFAW_Mar
 
 # Data Cleaning and prep
 
-## Jobs
+## Revenue
 
-### Turn number of fishers table from FAO yearbook into data frame and clean.
+### OECD Revenue Data Wrangling
+All values for revenue are formatted to US dollars. 
 
 ```{r}
-#turn the fao pdf into a format we can use
-fishers_table <- fao_pdf[[3]] %>% #page number of the pdf
-  as.data.frame()
+#get the ocean energy revenue 
+offshore <- oecd_raw %>% 
+  filter(VARIABLE == "RD_TOTAL_OCEAN_OFFSHORE") %>% 
+  select(-VARIABLE) %>% 
+    clean_names() %>% 
+  mutate(sector = "ocean energy",
+         unit = "USD (1)",
+         component = "ocean and offshore energy",
+         data_source = "oecd sustainable ocean economy",
+         value = (value * 1000000)
+         ) %>% 
+  select(-c(power_code)) %>% 
+  filter(!country %in% c("OECD - Total",
+         "European Union – 27 countries (from 01/02/2020)")) %>%
+  select(country, year, value, unit, component, sector, data_source) 
 
-#specify columns 
-columns <- c("country", "1995", "2000", "2005", "2010", "2014", "2015", "2016", "2017", "2018", "2019")
 
-fao_fisher_jobs <- fishers_table %>%
-  separate_rows('.', sep = "\n") %>% #separate rows based on line breaks
-  rename(main_column = ".") %>%
-  mutate(main_column = str_remove_all(main_column, "\\*")) %>% #remove the * 
-  mutate(main_column = str_replace_all(main_column, "F(?!\\p{L})", " ")) %>% #replace all the Fs not followed by letters (used to indicate estimate)
-  slice(7:69) %>% #remove all rows not in the table
-  separate(main_column, into = columns, sep = " {2,}", extra = "merge") %>% #separate into columns based on double spaces
-  pivot_longer(cols = -c("country"), names_to = "year") %>% 
-  mutate(value = str_squish(value)) %>% #remove extra spaces
-  mutate(value = str_remove_all(value, " ")) %>% 
-  mutate(value = if_else(value == "…" , NA, value)) %>% 
-  mutate(value = as.numeric(value)) %>% 
-  mutate(Unit = "persons (1)",
-         sector = "commerical fishing",
-         component = "jobs",
-         data_source = "FAO Number of Fishers") %>% 
-  clean_names() %>% 
+write_csv(offshore, here(data_path, "int/offshore_energy_revenue.csv"))
+```
+
+### FAO Raw commodities data wrangling
+
+The [FAO global fish Trade Data (Value)](https://www.fao.org/fishery/statistics-query/en/trade/trade_value) is used to estimate revenue from aquarium fishing. This is the original data source used, but it has been updated since the livelihoods and economies goal was originally calculated.
+
+From the methods:
+
+-   approximate revenue from aquarium fishing we used **export** data from the FAO Global Commodities database for 'Ornamental fish' for all available years.
+
+-   used data from two of the four subcategories listed, excluding the subcategory 'Fish for culture including ova, fingerlings, etc.' because it is not specific to ornamental fish, and the subcategory 'Ornamental freshwater fish' because it is not from marine systems.
+
+```{r}
+#clean up data for ornamental fishing revenue
+ornamental_value <- commodities_value %>%
+  filter(str_detect(commodity_name, "Ornamental")) %>% 
+   rename(country = reporting_country_name,
+          commodity = commodity_name,
+           trade = trade_flow_name) %>% 
+  pivot_longer(cols = -c(country, commodity, trade, unit, unit_name),
+                   names_to = "year", values_to = "value") %>% 
+  mutate(year = str_remove(year, "x")) %>% 
+    filter(trade == "Exports" & commodity != "Ornamental freshwater fish") %>% 
+  fao_clean_data_new() %>% 
+  mutate(value = (value * 1000), #convert to single dollar 
+         unit = "USD (1)")
+
+#sum for each country 
+ornamental_revenue <-
+  ornamental_value %>% 
+  group_by(country, year) %>% 
+  summarize(value = sum(value, na.rm = TRUE), unit = first(unit)) %>% 
+  mutate(component = "revenue",
+         sector = "aquarium fishing",
+         data_source = "FAO Global Trade") %>% 
   select(country, year, value, unit, component, sector, data_source)
+
+#write as intermediate file
+write_csv(ornamental_revenue, here(data_path, "int/aquarium_revenue.csv"))
 ```
 
-### Turn number of fish farmers table from FAO yearbook into data frame and clean.
+### FAO capture production quantity and exvessel price data
+
+FAO capture data is combined with ex-vessel price data to estimate total revenue from fishing for each country.
+
+Here we do some basic cleanup of the global capture production database.
 
 ```{r}
-#turn the fao pdf into a format we can use
-fish_farm_table <- fao_pdf[[5]] %>% #page number of the pdf
-  as.data.frame()
+fao_latest_data_year <- 2021
 
-#specify columns
-columns <- c("country", "1995", "2000", "2005", "2010", "2014", "2015", "2016", "2017", "2018", "2019")
+fao_capture_clean <- fao_capture %>% 
+   dplyr::rename(country = "Country Name En",
+                asfis_species = "ASFIS species Name En",
+                area = "FAO major fishing area Name En",
+                area_type = "Inland/Marine areas Name En",
+                isscaap_group = "ISSCAAP group Name En",
+                family_scientific = "Family Scientific name")
 
-fao_farm_jobs <- fish_farm_table %>%
-  separate_rows('.', sep = "\n") %>% #separate into rows based on line breaks
-  rename(main_column = ".") %>%
-  mutate(main_column = str_remove_all(main_column, "\\*")) %>% #remove the * 
-  mutate(main_column = str_replace_all(main_column, "F(?!\\p{L})", " "))  %>% 
-  slice(7:36) %>% #select the part of the page with the table
-  separate(main_column, into = columns, sep = " {2,}", extra = "merge") %>%  #split into columns if there is more than two spaces
-  pivot_longer(cols = -c("country"), names_to = "year") %>% 
-  mutate(value = str_squish(value)) %>% 
-  mutate(value = str_remove_all(value, " ")) %>% 
-  mutate(value = if_else(value == "…" , NA, value)) %>% 
-  mutate(value = as.numeric(value)) %>% 
-  mutate(unit = "persons (1)",
-         sector = "mariculture",
-         component = "jobs",
-         data_source = "FAO Number of Fish Farmers") %>% 
+fao_capture_clean <- fao_capture_clean %>% 
+  mutate(row_id = row_number())
+
+#N is a flag used by FAO to indicate a minimal amount
+#we replace this with 0.1
+sub_N = 0.1
+
+#pivot all of the year/value columns 
+capture_values <- fao_capture_clean %>% 
+  select(-c(paste("1950":fao_latest_data_year, "Flag"))) %>% 
+  pivot_longer(cols = paste0("1950":fao_latest_data_year),
+               names_to = "year",
+               values_to = "value")
+
+#pivot all of the flag columns   
+capture_flags <- fao_capture_clean %>%
+  select(-paste0("1950":fao_latest_data_year)) %>% 
+  pivot_longer(cols = paste("1950":fao_latest_data_year, "Flag"),
+               names_to = "flag_year",
+               values_to = "flag") %>% 
+  mutate(year = str_remove(flag_year, " Flag")) %>% 
+  select(year, flag, row_id) 
+  
+#combine flag and row id 
+fao_capture_new <- capture_values %>%
+  left_join(capture_flags, by = c("row_id", "year"))
+
+#replace 
+fao_capture_new <- fao_capture_new %>% 
+  mutate(value = case_when((str_detect(flag, "N") & value == 0) ~ sub_N,
+                               TRUE ~value)) %>%
+  select(-row_id) %>% 
+  mutate(FAO_name = ifelse(!is.na(asfis_species), asfis_species, family_scientific)) %>% 
+  filter(area_type == "Marine areas") %>% 
+  mutate(year = as.numeric(year)) %>% 
+  filter(year >= 1976 & year <= 2019) %>% #filter to years in the price database
+  filter(!is.na(value) & value > 0) # we do not need the nas or 0, only what ones with value for tonnes
+```
+
+Next we'll clean up and gapfill the exvessel price data. This has exvessel price in usd/metric tonne. 
+
+```{r}
+exvessel_prices_clean <- exvessel_prices %>% 
   clean_names() %>% 
-   select(country, year, value, unit, component, sector, data_source)
+  mutate(year = as.numeric(year)) %>% 
+  group_by(asfis_species, scientific_name, pooled_commodity, isscaap_group, isscaap_division, year) %>% 
+  summarize(exvessel = mean(exvessel, na.rm = TRUE)) %>% 
+   filter(!(is.na(year) & is.na(exvessel))) %>% 
+   #there are some duplicate prices for a species- average when this is the case
+  dplyr::group_by(asfis_species) %>%
+  #counts the numbers of non-missing values for each country (logical TRUEs regarded as one)
+  dplyr::mutate(value_num = sum(!is.na(exvessel))) %>% 
+  filter(value_num > 0) #the minimum we have is 8 years
+
+#look at the data to see how price and year are related overall
+model <- lm(exvessel~year, data = exvessel_prices_clean)
+summary(model)
+#very significant though does not explain a high % of the variation 
+
+#look at linear model by individual species
+
+#define all of the unique species 
+species <- unique(exvessel_prices_clean$asfis_species)
+
+#take a look at it at the individual species level
+model_list <- list()
+
+#loop through all of the unique species and run the model, store the results in a list
+for (i in seq_along(species)) {
+  
+  species_current <- species[i]
+   
+  new <- exvessel_prices_clean %>% 
+    filter(asfis_species == species_current)
+  
+  model <- lm(exvessel~year, data = new)
+  summary <-summary(model)
+  coefficients <- summary$coefficients %>% 
+    as.data.frame()
+  model_list[[i]] <-coefficients
+}
+
+model_test <- bind_rows(model_list)
+
+# Filter rows based on row names containing "year", only want significance of year
+filtered_data <- model_test[grep("year", rownames(model_test)), ] %>% 
+  clean_names() 
+not_sig <- filtered_data %>% filter(pr_t > 0.05) 
+
+#roughly 85% of these have a significant relationship
+
+#use lm to predict the value for years which are missing data 
+#based on code from ao_need data prep
+price_model <- function(df) {lm(exvessel~year, data = df)}
+
+exvessel_prices_gapfilled <- exvessel_prices_clean %>% 
+  dplyr::group_by(asfis_species) %>% 
+  tidyr::nest() %>% 
+  dplyr::mutate(
+    ### Apply the model to all country groupings
+    model = purrr::map(data, price_model),
+    #Use the trained model to get predicted values
+    predictions = purrr::map2(data, model, add_predictions)) %>% 
+  tidyr::unnest(cols = c(predictions)) %>% 
+  dplyr::select(-data, -model, prediction = pred) %>%
+  dplyr::mutate(
+    gapfilled = dplyr::case_when(is.na(exvessel) | value_num == 1 ~ 1, T ~ 0),
+    exvessel = dplyr::case_when(is.na(exvessel) ~ prediction, T ~ exvessel),
+    method = dplyr::case_when(
+      value_num == 1 ~ "gapfilled using one year of data",
+      gapfilled == 1 & value_num > 1 ~ paste0("lm based on N years data: ", value_num),
+      T ~ as.character(NA))) %>% 
+  dplyr::ungroup() %>% 
+  filter(exvessel > 0) #remove price less than 0. This doesn't make sense and never occurs after 1998 anyway so would not be used to calculate any scores. 
 ```
 
-### OECD Jobs Data
-
 ```{r}
-#number of people employed in th fishing sector 
-#note that this is data for the same category as the FAO fishers data, one could potentially be used for gapfilling whichever is used as the main data set
+fao_capture_price <- fao_capture_new %>% 
+  left_join(exvessel_prices_gapfilled, by = c("asfis_species", "year", "isscaap_group")) %>% 
+  select(-prediction)
 
-oecd_fisher_jobs <- oecd_raw %>% 
-  filter(VARIABLE == "FISH_EMP_MARINE_FISH_TOT") %>% 
-  mutate(Unit = ("persons (1000)")) %>% 
-  select(- c(PowerCode, VARIABLE))
 
-#number of people employed in aquaculture
-#note that this is not specifically marine
-#note that this is data for the same category as the FAO fish farmers data, one could potentially be used for gapfilling the main data set
-oecd_fishproc_jobs <- oecd_raw %>% 
-  filter(VARIABLE == "FISH_EMP_PROCESSING_TOT") %>% 
-  mutate(Unit = ("persons (1000)")) %>% 
-  select(- c(PowerCode, VARIABLE))
+#8% of observations still have NAS
+summary(fao_capture_price)
+
+#if still NA fill with average price for species group for that year
+
+#find the average price for each group/year
+group_average_price_year <- exvessel_prices_gapfilled %>% 
+  group_by(isscaap_group,year) %>% 
+  summarize(mean_group_price = mean(exvessel)) 
+
+
+fao_capture_price_final <- 
+  fao_capture_price %>% 
+  left_join(group_average_price_year, by = c("isscaap_group", "year")) %>% 
+  mutate(final_price = ifelse(!is.na(exvessel), exvessel, mean_group_price)) %>%   mutate(gapfilled = ifelse((is.na(exvessel) & !is.na(final_price)), 1, gapfilled)) %>% 
+  mutate(method = ifelse((is.na(exvessel) & !is.na(final_price)), "filled based on iscaap group average", method)) 
+
+summary(fao_capture_price_final)
+#there are still some NAS here, 3% 
+nas <- fao_capture_price_final %>% 
+  filter(is.na(final_price))
+unique(nas$isscaap_group)
+
+#we can either just leave this as no money-or we could do an average species price for that year
+fao_capture_price_final <- fao_capture_price_final %>% 
+  select(country, year, value, asfis_species, final_price, gapfilled, method) %>% mutate(revenue = final_price * value) # multiply price per tonne by number of tonnes
+
+summary(fao_capture_price_final)
+
+#sum prices by country for each year
+fishing_revenue <- fao_capture_price_final %>% 
+  group_by(country, year) %>% 
+  summarize(value = sum(revenue, na.rm = TRUE)) %>% 
+  mutate(unit = "USD (1)",
+         component = "revenue",
+         sector = "fishing",
+         data = "FAO capture production and ex-vessel prices")
+
+write_csv(fishing_revenue, here(data_path, "int/fishing_revenue.csv"))
 ```
 
-### Marine Mammal Watching Jobs
-
-Key takeaways from methods:
-
--   Jobs based on number of whale watchers in a country and a regional average number of whale watchers per employee. Includes all marine mammal watching.
-
--   Because some of the whale watching in O'Connor et al. focused on freshwater cetacean viewing, we categorized the target species listed for each country as freshwater or marine. For countries with both marine and freshwater species, we categorized the whale watching in those countries as either 50% or 90% marine, based on the number of marine versus freshwater target species and information provided in the report narrative. For Colombia and Indonesia, more detailed information in the report narrative allowed for a more precise determination of the percentage of marine-based whale watching. We applied these marine proportions to data on the number of whale watchers before converting these estimates into employment estimates.
-
--   When IFAW reported "minimal" numbers of whale watchers, we converted this description to a 0 for lack of additional information.
+### FAO aquaculture data wrangling
 
 ```{r}
+#clean the aquaculture value data
+#this will also be used in the mariculture jobs data section, so need to keep in all environments in the first step
+aquaculture_value_clean <- aquaculture_value %>% 
+   dplyr::rename(country = "Country (Name)",
+                species = "ASFIS species (Name)",
+                area = "FAO major fishing area (Name)",
+                environment = "Environment (Name)") %>%
+  dplyr::select(-c("Unit (Name)")) %>% #added removing Unit also
+  dplyr::rename_with(~ base::gsub("\\[", "", .)) %>% 
+  dplyr::rename_with(~ base::gsub("\\]", "", .)) %>% 
+  pivot_longer(cols = "1984":"2021", names_to = "year", values_to = "value") %>%
+  fao_clean_data_new() 
 
-#get table with regional average number of whale watchers per employee out of pdf
+ mariculture_revenue <- aquaculture_value_clean %>% 
+   filter(environment %in% c("Brackishwater", "Marine")) %>% 
+   mutate(unit = "USD(1)",
+          value = value *1000) #multiply value times 1000 to get dollars
 
-columns <- c("region", "job_number", "watch_per_employee")
+#sum by region and year (we need total revenue)
+total_mar_rev <- mariculture_revenue %>%
+  group_by(country, year) %>% 
+  summarize(value = sum(value, na.rm = T), unit = first(Unit)) %>% 
+  mutate(sector = "mariculture", component = "revenue", data_source = "FAO aquaculture value") %>% 
+  select(country, year, unit, component, sector, data_source)
 
-regional_whale_employee <- whale_pdf[26] %>% #page number
-  as.data.frame() %>% 
-  separate_rows('.', sep = "\n") %>% #separate into rows based on page break
-  rename(main_column = ".") %>% 
-  slice(23:31) %>% #select rows with table
-  slice(1,2,3,4, 6,7,9) %>% #remove rows that get split into two
-  mutate(main_column = str_trim(main_column)) %>% 
-  separate(main_column, into = columns, sep = " {2,}", extra = "merge") %>% #separate into columns if there is a double or more space
-  mutate(region = case_when(str_detect(region, "Oceania") ~ "Oceania and the Pacific
-Islands",
-str_detect(region, "Central America") ~  "Central America and Caribbean",
-T ~ region)) %>% #fix a few regions that were split up 
-  mutate(watch_per_employee = as.numeric(str_remove(watch_per_employee, ","))) %>% #remove commas from numbers
-  select(-job_number)
+write_csv(total_mar_rev, here(data_path, "int/mariculture_revenue.csv"))
+```
 
+### Marine Mammal Watching revenue
+
+The whale watching revenue is stored in a separate table for each country throughout the paper. We will create function to extract each of the tables and then combine them.
+
+Key takeaways from the OHI methods (7.19.0.4 Marine mammal watching and 7.61.1.3 Marine mammal watching) to guide cleaning
+
+-   total expenditures are used as a close proxy for total revenue.
+
+-   We used total expenditure data (direct and indirect expenditures) to avoid using a literature derived multiplier effect.
+
+-   When IFAW reported "minimal" revenue from whale watching, we converted this description to a 0 for lack of additional information.
+
+-   For countries with both marine and freshwater cetacean viewing, we adjusted by the proportion of marine revenue as described for the jobs dataset.
+
+    -   Jobs Dataset description: For countries with both marine and freshwater cetacean viewing, we adjusted by the proportion of marine revenue accordingly. Because some of the whale watching in O'Connor et al. focused on freshwater cetacean viewing, we categorized the target species listed for each country as freshwater or marine. For countries with both marine and freshwater species, we categorized the whale watching in those countries as either 50% or 90% marine, based on the number of marine versus freshwater target species and information provided in the report narrative. For Colombia and Indonesia, more detailed information in the report narrative allowed for a more precise determination of the percentage of marine-based whale watching. We applied these marine proportions to data on the number of whale watchers before converting these estimates into employment estimates.
+
+First we will extract all the tables with summary of country results. This will mainly be used for the total number of whale watchers-which is part of the jobs calculation, but we will extract it now to get the list of countries included in the paper.
+
+```{r}
 #number of whale watchers per country
 
 # there are 7 different tables (one per larger region) in the paper with this information, need to extract all of them and combine
 
+page <- 199
+slice_set <-  7:10
+region <- "North America"
+new_name <- "na_data"
 #make a function to extract each one 
-whale_pdf_convert <- function(page, slice_set, region, new_name){
+whale_pdf_convert_1 <- function(page, slice_set, region, new_name){
   
   columns <- c("country", "1998", "2008", "growth") #create columns
   
@@ -220,259 +404,60 @@ whale_pdf_convert <- function(page, slice_set, region, new_name){
 }
 
 #africa and middle east
-whale_pdf_convert(42, 5:26, "Africa and Middle East", "africa_data")
+whale_pdf_convert_1(42, 5:26, "Africa and Middle East", "africa_data")
 
 #europe
-whale_pdf_convert(82, 5:26, "Europe", "europe_data")
+whale_pdf_convert_1(82, 5:26, "Europe", "europe_data")
 
 #asia
-whale_pdf_convert(121, 7:25, "Asia", "asia_data")
+whale_pdf_convert_1(121, 7:25, "Asia", "asia_data")
 
 #oceania
-whale_pdf_convert(157, 5:22, "Oceania, Pacific Islands and Antarctica", "oceania_data")
+whale_pdf_convert_1(157, 5:22, "Oceania, Pacific Islands and Antarctica", "oceania_data")
   
-oceania_data <- oceania_data %>% filter(country != "Micronesia") %>% 
+oceania_data <- oceania_data %>%
+  filter(country != "Micronesia") %>% 
   mutate(country = str_replace(country, "Federated States of", "Federated States of Micronesia"))
 
 #north america
-whale_pdf_convert(199, 7:10, "North America", "na_data")
+whale_pdf_convert_1(199, 7:10, "North America", "na_data")
+
+#mexico had a subscript that got combined with value, replace manually
+na_data <- na_data %>% 
+  mutate(value = ifelse(country == "México" & year == "2008", 190184, value))
 
 #north america
-whale_pdf_convert(238, 5:27, "Central America and Caribbean", "ca_data")
+whale_pdf_convert_1(238, 5:27, "Central America and Caribbean", "ca_data")
 
 #north america
-whale_pdf_convert(269, 17:27, "South America", "sa_data")
+whale_pdf_convert_1(269, 17:27, "South America", "sa_data")
 
 #now that we have all of the available countries, combine into one data frame
 whale_watching_numbers <- rbind(africa_data, europe_data, asia_data, oceania_data, na_data, ca_data, sa_data)
-
-
-#now we need to identify the target species for each country
-
-#use the function we made earlier to find the country:
-page <- 45
-
-key_species_country <- function(page, country){
-  
-  #subset the whale pdf to the page and the one below
- pages_search <-whale_pdf[page:page+1]
- 
- whale_data <- pages_search %>% 
-   as.data.frame() %>% #turn into data frame
-   separate_rows('.', sep = "\n") %>% 
-  rename(main_column = ".") 
- 
- index <- which(data$Year == country)
-if(length(index) == 0){
-  index <- 1
-}
- 
-  
-}
-  #once we find that look for the next instance of main species
-#grab that-we'll format it later 
-#remove below the row starting with tourists 
-
-
-
-#convert whale watching numbers into number of jobs
-#divide the total number of whale watchers by the number of whale watchers per employee
-whale_jobs <- whale_watching_numbers %>% 
-  left_join(regional_whale_employee, by = c("region")) %>% 
-  mutate(jobs = value/watch_per_employee,
-         unit = "Persons(1)",
-         sector = "marine mammal watching", 
-         component = "jobs",
-         data_source = "Connor Whale Watching") %>% 
-  select(country, year,value = jobs, unit, component, sector, data_source)
 ```
 
-## Revenue
-
-### OECD Revenue Data Wrangling
+For whale watching revenue each of the countries included in the table have their own report. We'll use the list of countries from the previous step to locate and convert all of these tables.
 
 ```{r}
-#get the ocean energy revenue 
-offshore <- oecd_raw %>% filter(VARIABLE == "RD_TOTAL_OCEAN_OFFSHORE") %>% 
-  select(-VARIABLE) %>% 
-  mutate(sector = "Ocean Energy") %>% 
-  mutate(Unit = "USD (1000000)") %>% 
-  select(-c(PowerCode)) %>% 
-  clean_names()
-```
+#country <- country_list[15] # for testing
+#region <- region_list[15]
 
-### FAO Raw commodities data wrangling
-
-```{r}
-#ornamental fishing revenue 
-ornamental_value <- commodities_value %>%
-  filter(str_detect(commodity_name, "Ornamental")) # we only want ornamental fish
-```
-
-### FAO capture production quantity
-
-FAO capture data is combined with ex-vessel price data to estimate revenue from fishing.
-
-```{r}
-fao_latest_data_year <- 2021
-
-fao_capture_clean <- fao_capture %>% 
-   dplyr::rename(country = "Country Name En",
-                asfis_species = "ASFIS species Name En",
-                area = "FAO major fishing area Name En",
-                area_type = "Inland/Marine areas Name En",
-                isscaap_group = "ISSCAAP group Name En",
-                family_scientific = "Family Scientific name")
-
-fao_capture_clean <- fao_capture_clean %>% 
-  mutate(row_id = row_number())
-
-#however we should still replace columns where the flag is N w/.1
-sub_N = 0.1
-
-#pivot all of the year/value columns 
-capture_values <- fao_capture_clean %>% 
-  select(-c(paste("1950":fao_latest_data_year, "Flag"))) %>% 
-  pivot_longer(cols = paste0("1950":fao_latest_data_year),
-               names_to = "year",
-               values_to = "value")
-
-#pivot all of the flag columns   
-capture_flags <- fao_capture_clean %>% select(-paste0("1950":fao_latest_data_year)) %>% 
-  pivot_longer(cols = paste("1950":fao_latest_data_year, "Flag"),
-               names_to = "flag_year",
-               values_to = "flag") %>% 
-  mutate(year = str_remove(flag_year, " Flag")) %>% 
-  select(year, flag, row_id) 
-  
-#combine flag and row id 
-fao_capture_new <- capture_values %>%
-  left_join(capture_flags, by = c("row_id", "year"))
-
-
-fao_capture_new <- fao_capture_new %>% 
-  mutate(value = case_when(str_detect(flag, "N") ~ sub_N,
-                               TRUE ~value)) %>%
-  select(-row_id) %>% 
-  mutate(FAO_name = ifelse(!is.na(asfis_species), asfis_species, family_scientific)) %>% 
-  filter(area_type == "Marine areas") %>% 
-  mutate(year = as.numeric(year)) %>% 
-  filter(year >= 1976 & year <= 2019) #filter to years in the price database
-
-exvessel_prices_clean <- exvessel_prices %>% 
-  clean_names() %>% 
-  mutate(year = as.numeric(year)) %>% 
-  group_by(asfis_species, scientific_name, pooled_commodity, isscaap_group, isscaap_division, year) %>% 
-  summarize(exvessel = mean(exvessel, na.rm = TRUE)) %>% 
-   filter(!(is.na(year) & is.na(exvessel))) %>% 
-   #there are some duplicate prices for a species- average when this is the case
-  dplyr::group_by(asfis_species) %>%
-  #counts the numbers of non-missing values for each country (logical TRUEs regarded as one)
-  dplyr::mutate(value_num = sum(!is.na(exvessel))) %>% 
-  filter(value_num > 0) %>% 
-  dplyr::mutate(exvessel = ifelse(value_num==1, mean(exvessel, na.rm=TRUE), exvessel))
-
-#use lm to predict the value for years when there is species data
-#based on code from ao_need data prep
-price_model <- function(df) {lm(exvessel~year, data = df)}
-
-exvessel_prices_gapfilled <- exvessel_prices_clean %>% 
-  dplyr::group_by(asfis_species) %>% 
-  tidyr::nest() %>% 
-  dplyr::mutate(
-    ### Apply the model to all country groupings
-    model = purrr::map(data, price_model),
-    #Use the trained model to get predicted values
-    predictions = purrr::map2(data, model, add_predictions)) %>% 
-  tidyr::unnest(cols = c(predictions)) %>% 
-  dplyr::select(-data, -model, prediction = pred) %>%
-  dplyr::mutate(
-    gapfilled = dplyr::case_when(is.na(exvessel) | value_num == 1 ~ 1, T ~ 0),
-    exvessel = dplyr::case_when(is.na(exvessel) ~ prediction, T ~ exvessel),
-    method = dplyr::case_when(
-      value_num == 1 ~ "gapfilled using one year of data",
-      gapfilled == 1 & value_num > 1 ~ paste0("lm based on N years data: ", value_num),
-      T ~ as.character(NA))) %>% 
-  dplyr::ungroup() %>% 
-  filter(exvessel > 0) #remove less than 0-doesn't make sense
-
-fao_capture_price <- fao_capture_new %>% 
-  left_join(exvessel_prices_gapfilled, by = c("asfis_species", "year", "isscaap_group")) %>% select(-prediction)
-
-#still 17% have NAS
-summary(fao_capture_price)
-
-#if still NA fill with average price for species group for that year
-group_average_price <- exvessel_prices_gapfilled %>% 
-  group_by(isscaap_group,year) %>% 
-  summarize(mean_group_price = mean(exvessel)) 
-
-fao_capture_price_final <- 
-  fao_capture_price %>% 
-  left_join(group_average_price, by = c("isscaap_group", "year")) %>% 
-  mutate(final_price = ifelse(!is.na(exvessel), exvessel, mean_group_price)) %>%   mutate(gapfilled = ifelse((is.na(exvessel) & !is.na(final_price)), 1, gapfilled)) %>% 
-  mutate(method = ifelse((is.na(exvessel) & !is.na(final_price)), "filled based on iscaap group average", method)) #there are still some NAS here 
-#we can either just leave this as no money-or we could do an average species price for that year. 
-
-summary(fao_capture_price_final)
-
-
-```
-
-### FAO aquaculture data wrangling
-
-```{r}
-#mariculture revenue 
-maricutlure_revenue <- aquaculture_value %>% 
-   dplyr::rename(country = "Country (Name)",
-                species = "ASFIS species (Name)",
-                area = "FAO major fishing area (Name)",
-                environment = "Environment (Name)") %>%
-  dplyr::select(-c("Unit (Name)")) %>% #added removing Unit also
-  dplyr::rename_with(~ base::gsub("\\[", "", .)) %>% 
-  dplyr::rename_with(~ base::gsub("\\]", "", .)) %>% 
-  filter(environment %in% c("Brackishwater", "Marine")) %>% 
-  pivot_longer(cols = "1984":"2021", names_to = "year", values_to = "value") %>% 
-  fao_clean_data_new() #do we keep all non-freshwater mariculture for revenue?
-
-
-#apply the new split function when done, to split up:netherlands antilles, bonaire, and channel islands 
-
-mar_rgn <- name_2_rgn(df_in = maricutlure_revenue, fld_name='country')
-
-#sum by region and year (we need total revenue)
-total_mar_rev <- mar_rgn %>%
-  group_by(rgn_id, rgn_name, year) %>% 
-  summarize(value = sum(value, na.rm = T), Unit = first(Unit))
-```
-
-### Whale Watching revenue
-
-The whale watching revenue is stored in a separate table for each country throughout the paper. We will create function to extract each of the tables and then combine them.
-
-Key takeaways from the OHI methods (7.19.0.4 Marine mammal watching and 7.61.1.3 Marine mammal watching) to guide cleaning
-
--   total expenditures are used as a close proxy for total revenue.
-
--   We used total expenditure data (direct and indirect expenditures) to avoid using a literature derived multiplier effect.
-
--   When IFAW reported "minimal" revenue from whale watching, we converted this description to a 0 for lack of additional information.
-
--   For countries with both marine and freshwater cetacean viewing, we adjusted by the proportion of marine revenue accordingly. Because some of the whale watching in O'Connor et al. focused on freshwater cetacean viewing, we categorized the target species listed for each country as freshwater or marine. For countries with both marine and freshwater species, we categorized the whale watching in those countries as either 50% or 90% marine, based on the number of marine versus freshwater target species and information provided in the report narrative. For Colombia and Indonesia, more detailed information in the report narrative allowed for a more precise determination of the percentage of marine-based whale watching. We applied these marine proportions to data on the number of whale watchers before converting these estimates into employment estimates.
-
-```{r}
-#country <- country_list[74] # for testing
-
-#test <- whale_extract(country)
+#test <- whale_extract(country,region)
 
 #create a function to find all of the country tables with revenue and extract
-whale_extract <- function(country){
+whale_extract <- function(country, region){
 
-#the tables don't match the way all of the countries are written 
-#this replaces them with the way they are written in the pdf when needed
+#the summary table has some of the countries written a bit differently 
+#this replaces them with the way they are written in the separate tables when needed
 replacements <- c("The Gambia" = "Gambia, The",
-                  "Portugal – Madeira Archipegalo" = "Portugal ‐ Madeira Archipelago", "China ‐ Mainland" = "China (Mainland)", "Myanmar" = "Myanmar (Burma)", "Guadeloupe and islands" = "Guadeloupe and islands (including St. Martin and St. Barthélemy)", "Falkland Islands" = "Falkland Islands (Las Malvinas)", 
-"Georgia, Ukraine – Black Sea" = "Georgia, Ukraine and Russia – Black Sea", "St. Vincent and the Grenadines" = "St Vincent and the Grenadines", "Netherlands Antilles" = "Netherlands Antilles – Aruba, Bonaire, Curaçao and St. Maarten")
+                  "Portugal – Madeira Archipegalo" = "Portugal ‐ Madeira Archipelago",
+                  "China ‐ Mainland" = "China (Mainland)",
+                  "Myanmar" = "Myanmar (Burma)",
+                  "Guadeloupe and islands" = "Guadeloupe and islands (including St. Martin and St. Barthélemy)",
+                  "Falkland Islands" = "Falkland Islands (Las Malvinas)", 
+                  "Georgia, Ukraine – Black Sea" = "Georgia, Ukraine and Russia – Black Sea",
+                  "St. Vincent and the Grenadines" = "St Vincent and the Grenadines",
+                  "Netherlands Antilles" = "Netherlands Antilles – Aruba, Bonaire, Curaçao and St. Maarten")
 
 country_new <- str_replace_all(country, replacements)
 
@@ -507,10 +492,10 @@ page_number_new <- which(matches_good)
 #update the page number to just the correct one
 page_number_original <- page_number_original[page_number_new]
 
-#if it is still greater than one then hand select which one we want
+#if it is still giving us more than one possible page, select the one we want by page (based on looking at the pdf)
 if (length(page_number_original) > 1){
   
-  page_number_original <- subset(page_number_original, page_number_original %in% c("118", "114", "160", "162", "194"))
+page_number_original <- subset(page_number_original, page_number_original %in% c("118", "114", "160", "162", "194"))
   
 }
 
@@ -539,43 +524,645 @@ if(length(index) == 0){
 #filter the page to just the table 
 data_clean <- data %>%
   slice((index + 1):n()) %>% #remove any other tables above 
-  filter(Year %in% c("1991", "1994", "1998", "2004", "2005", "2006", "2007", "2008")) %>% 
+  filter(Year %in% c("1991", "1994", "1998", "2003", "2004", "2005", "2006", "2007", "2008")) %>% 
   mutate(first_2008_index = min(which(Year == 2008, arr.ind = TRUE))) %>%
   filter(ifelse(is.na(first_2008_index), TRUE, row_number() <= first_2008_index)) %>%
   select(-first_2008_index) %>% 
   clean_names() %>% 
   mutate_all(~ str_replace_all(., ",", "")) %>% 
   mutate_all(~ str_replace_all(., "\\$", "")) %>% 
-  mutate_all(~ str_replace_all(., "None", "0")) %>% 
-  mutate_all(~ str_replace_all(., "Minimal", "0")) %>% 
+  mutate_all(~ str_replace_all(., "None", "0")) %>% #set none to zero 
+  mutate_all(~ str_replace_all(., "Minimal", "0")) %>% #set minimal to zero based on methods 
   mutate(country = country, 
-         page = page_number_original) #add a column with the country and one with page number to use for extracting other info
+         region = region,
+         page = page_number_original) 
+#add a column with the country and one with page number (used to get other tables later on)
 return(data_clean)
 }
 
 #identify the countries based on data we created earlier
-country_list <- unique(whale_jobs$country)
+#118 countries
+country_regions <- whale_watching_numbers %>% 
+  group_by(country, region) %>% 
+  summarize(n=n())
+
+country_list <- country_regions$country
+region_list <- country_regions$region
 
 
 whale_list <- list()
 for (i in seq_along(country_list)) {
   
   country <- country_list[i]
-  data <- whale_extract(country)
+  region <- region_list[i]
+  data <- whale_extract(country,region)
   
   whale_list[[i]] <- data 
   
 }
 
+#combine all of the individual tables into one and clean 
 whale_revenue_data <- bind_rows(whale_list) %>% 
   mutate_all(~ str_replace_all(., "N/A", NA_character_)) %>% 
+   mutate(number_of_whale_watchers = as.numeric(str_extract(number_of_whale_watchers, "^[0-9]+")),
+          aagr = str_extract(aagr, "[-‐]?[0-9]+\\.*[0-9]*"),
+          total_expenditure = as.numeric(str_extract(total_expenditure, "^[0-9]+"))) %>% 
   mutate(direct_expenditure = as.numeric(direct_expenditure),
+         total_expenditure = as.numeric(total_expenditure),
          indirect_expenditure = as.numeric(indirect_expenditure),
-         total_expenditure = as.numeric(total_expenditure)) %>% 
+         number_of_whale_watchers = as.numeric(number_of_whale_watchers)) %>% 
   mutate(page = as.numeric(page))
-  #mutate(unit =, value = , sector = ) 
+```
+
+We now need to subset the revenue to only revenue related to freshwater species. The first step is identifying all of the main species used for each country. These are also stored in various tables scattered throughout the pdf.
+
+```{r}
+
+#testing 
+page <- 135
+country <- 	"Japan"
+
+key_species_country <- function(page, country){
+  #the first few countries were split into multiple regions and had to be processed separately
+  if (country %in% c("New Zealand")){
+    filtered_data <- data.frame(species = c("Bryde’s whale",
+                                            "bottlenose dolphin",
+                                            "short‐beaked common dolphin",
+                                            "orca",
+                                            "sperm whale",
+                                            "bottlenose dolphin",
+                                            "dusky dolphin",
+                                            "Hector’s dolphin")) %>% 
+      mutate(country = country)
+  } else if (country %in% c("Japan", "Canada", "Australia", "USA")){
+   
+    start_page <- page
+    list <- sort(species_country$page)
+    
+    end_page <- which(list == page)
+    
+    end_page <- list[end_page+1]
+    
+    next_country <- species_country %>% filter(page == end_page)
+    next_country <- next_country$country
+    
+   pages_search <- whale_pdf[start_page:end_page]
+    
+  whale_data <- pages_search %>% 
+   as.data.frame() %>% #turn into data frame
+   separate_rows('.', sep = "\n") %>% 
+  rename(main_column = ".") 
+  
+  end_row <- which(whale_data$main_column == next_country) -1
+  
+  whale_data <- whale_data %>% 
+    slice(1:end_row) %>% mutate(country = country)
+  
+  #filter to just rows that have main speicies
+ index <- which(str_detect(whale_data$main_column, "Main species"))
+
+  temp_list <- list()
+ for (i in seq_along(index)){
+   start_row <- index[i] + 1
+   data_subset <- whale_data[(start_row):nrow(whale_data), ]
+   end_row <- which(str_detect(data_subset$main_column,"Tourists:"))[1] -1
+   # Filtering the data frame to include rows between 'start_row + 1' and 'end_row'
+filtered_data <- data_subset %>% 
+  slice(1:end_row)
+
+filtered_data <- filtered_data %>% 
+  filter(!str_detect(main_column, "Small cetaceans:")) %>% 
+  mutate(main_column = str_squish(main_column)) %>% 
+  rename(species = main_column) %>% 
+  mutate(country = country) %>% 
+  separate_rows(species, sep = ",") %>% 
+  mutate(species = str_squish(species)) %>% 
+  filter(!(species == ""))
+   temp_list[[i]] <-filtered_data   
+ }
+  filtered_data <- bind_rows(temp_list) %>% 
+     mutate(
+    species = ifelse(species == "false", paste("false", lead(species)), species)
+  ) %>%
+  filter(species != "false" | lead(species) != "false") %>% 
+    filter(species!= "Small Cetaceans:")
+  } else if (country %in% c("Kenya")){
+    filtered_data <- data.frame(species = "Indo‐Pacific bottlenose dolphin",
+                                   country = country)
+    #these countries are included but don't have formal whale watching
+  } else if (country %in% c("Morocco", "Senegal", "Seychelles", "Turkey")){
+    filtered_data <- data.frame(species = NA,
+                                   country = country)
+  } else{ # the rest of the countries can be processed in the same manner
+  #subset the whale pdf to the page and the two below
+ pages_search <-whale_pdf[page:(page+2)]
+ 
+ whale_data <- pages_search %>% 
+   as.data.frame() %>% #turn into data frame
+   separate_rows('.', sep = "\n") %>% 
+  rename(main_column = ".") 
+ 
+  #filter to just rows below where the country name is
+ index <- which(whale_data$main_column == country)
+ if (length(index) <1) {
+   index <-1
+ }
+
+ filtered_data <- whale_data[(index):nrow(whale_data), ]
+ 
+ #Find the row index where the condition is met
+start_row <- which(str_detect(filtered_data$main_column,"Main species:"))[1] +1
+
+# Calculate the ending row index
+end_row <- which(str_detect(filtered_data$main_column,"Tourists:"))[1] -1
+
+# Filtering the data frame to include rows between 'start_row + 1' and 'end_row'
+filtered_data <- filtered_data[(start_row):end_row, ]
+
+filtered_data <- filtered_data %>% 
+  filter(!str_detect(main_column, "Small cetaceans:")) %>% 
+  mutate(main_column = str_squish(main_column)) %>% 
+  rename(species = main_column) %>% 
+  mutate(country = country) %>% 
+  separate_rows(species, sep = ",") %>% 
+  mutate(species = str_squish(species)) %>% 
+  filter(!(species == "")) 
+
+}
+
+return(filtered_data)
+
+  
+}
+
+#make a data frame of unique country and page number combos
+species_country <- whale_revenue_data %>% 
+  group_by(country,page) %>% 
+  summarize(n =n())
+
+#loop through all of the countries and the page numbers we located earlier
+species_list <- list()
+for (i in seq_along(species_country$country)) {
+  
+  country <- species_country$country[i]
+  page <- species_country$page[i]
+  data <- key_species_country(page, country)
+  
+  species_list[[i]] <- data 
+  
+}
+
+#in the description instead of table, need to add separataly
+pakistan <- data.frame(country = "Pakistan", species = "Indus River dolphin")
+
+species_final <- bind_rows(species_list) %>%
+  mutate(
+    species = case_when(
+      lead(species) == "dolphin" ~ paste(species, "dolphin"),
+      lead(species) == "headed" ~ paste(species, "headed"),
+      lead(species) == "whale" ~ paste(species, "whale"),
+      lead(species) == "whale)" ~ paste(species, "whale)"),
+      lag(species) == "southern" ~ paste("southern", species),
+      lag(species) == "short‐" ~ paste0("short‐", species),
+      lag(species) == "beaked" ~ paste0("beaked", species),
+      lag(species) == "false" ~ paste0("false", species),
+      lag(species) == "gray" ~ paste("gray", species),
+      lag(species) == "Atlantic" ~ paste("Atlantic", species),
+      lag(species) == "melon-" ~ paste("melon-", species),
+      lag(species) == "long‐finned" ~ paste("long‐finned", species),
+      lag(species) == "Indo‐Pacific" ~ paste("Indo‐Pacific", species),
+      lag(species) == "short‐beaked" ~ paste("short‐beaked", species),
+      lag(species) == "short‐finned" ~ paste("short‐finned", species),
+      lag(species) == "harbour" ~ paste("harbour", species),
+      lag(species) == "various" ~ paste("various", species),
+      lag(species) == "Pacific" ~ paste("pacific", species),
+      lag(species) == "Dall’s" ~ paste("dall’s", species),
+      TRUE ~ species
+    )) %>% 
+  filter(!species %in% c("dolphin", "southern", "short‐", "beaked", "short‐beaked", "false", "gray", "whale", "Atlantic", "melon‐", "species", "others occasionally sighted", "as the Chinese white dolphin)",
+"None", "101", "long‐finned", "headed whale", "Indo‐Pacific", "Small cetaceans","harbour",
+"short‐finned", "various", "Pacific", "Dall’s",
+"whale)")) %>% 
+  filter(country != "Pakistan") %>% 
+  bind_rows(pakistan) %>% 
+  mutate(species = str_remove(species, "known locally")) %>% 
+  mutate(species = str_to_lower(species)) %>% 
+  mutate(species = case_when(species == "risso’s dolphin dolphin" ~ "risso's dolphin",
+                             T~species))
+```
+
+Now that we have a list of all the main species for each country, we'll match as many of these species to the IUCN red-list and query the IUCN api for habitat information.
+
+```{r}
+#check the iucn redlist for species matches 
+
+#convert some species to match the iucn redlist 
+species_final <- species_final %>% 
+  mutate(species = str_remove(species, "‐")) %>% 
+   mutate(species = str_remove(species, "[-’']")) %>% 
+         mutate(species = str_remove(species, "’")) %>% 
+  mutate(species = str_remove(species, "'")) %>% 
+   mutate(species = str_remove_all(species, "[()]"))%>% 
+  mutate(species = str_remove(species, "–")) %>% 
+  mutate(species = str_squish(species)) %>% 
+  mutate(species = str_replace(species, "dolphins", "dolphin")) %>% 
+  mutate(species = case_when(species == "orca"~ "killer whale",
+                             species == "bottlenose dolphin" ~ "common bottlenose dolphin",
+                             species == "pantropical spotted dolphins" ~ "pantropical spotted dolphins",
+                             species == "sperm whale (north west of crete)"  ~ "sperm whale",
+                             species == "falsekiller whale" ~ "false killer whale",
+                             species %in%  c("rissos dophin", "rissos dolphin dolphin") ~ "rissos dolphin",
+                             species %in% c("longbeaked common dolphin",
+                                           "shortbeaked common dolphin") ~ "common dolphin",
+                             species == "dwarf or pygmy sperm whale"  ~ "pygmy sperm whale",
+                             species == "beakedwhales especially blainvilles." ~ "blainvilles beaked whale",
+                             species %in% c("minke whale", "minke whales",
+                                            "dwarf minke whale subspecies of minke whale" )  ~ "common minke whale",
+                             species == "sperm whale north west of crete"~ "sperm whale",
+                             species == "amazon bolivian river dolphin" ~ "amazon river dolphin",                    species == "beluga" ~ "beluga whale",
+                             species == "humpback" ~ "humpback whale",
+                             (species == "finless porpoise" & country == "Bangladesh")~ "indopacific finless porpoise",
+                             (species == "finless porpoise" & country == "Japan")~ "narrowridged finless porpoise",
+                             species == "sperm whale occasional" ~ "sperm whale",
+                             
+                             TRUE ~species))
+
+#read in the list of all the species IUCN has
+iucn_available <- read_csv(here("globalprep/ico/v2023/raw/spp_list_from_api.csv")) %>% 
+  filter(class == "MAMMALIA") 
+
+#create a new column join_name, where we modify the list to match our species
+iucn_available <- iucn_available %>% 
+  filter(!is.na(main_common)) %>% 
+  distinct(sciname, main_common) %>% 
+  mutate(join_name = str_remove(main_common, "-")) %>% 
+  mutate(join_name = str_to_lower(join_name)) %>% 
+  mutate(join_name = str_remove(join_name, "'")) %>% 
+  mutate(join_name = str_remove(join_name, "’")) %>% 
+  mutate(join_name = str_remove_all(join_name, "[()]")) %>% 
+  distinct(sciname, join_name, .keep_all = T)
+
+
+#check which species we can't get from iucn
+setdiff(species_final$species, iucn_available$join_name)
+
+#according to the paper, all the species with no match are associated with marine watching
+#various dolphin- marine
+#tucuxi marine & marine tucuxi -marine
+#various tropical dolphin -marine
+#dolphin various species - marine
+
+
+#add the iucn data to the final species list 
+species_iucn <- species_final %>% 
+  left_join(iucn_available, by = c("species" = "join_name")) %>% 
+  filter(!is.na(species) & !is.na(sciname))
+
+query_list <- unique(species_iucn$sciname)
+
+#query the iucn redlist for habitat information
+
+# Loop through each species and query the API for the habitats for these species
+
+results_list <- list()
+api_file <- "/home/shares/ohi/git-annex/globalprep/ico/api_key_gc.csv"
+api_key <- scan(api_file, what = 'character') 
+for (species_name in query_list) {
+  # Construct the API endpoint URL for the current species
+  spp_page_url <- paste0('https://apiv3.iucnredlist.org/api/v3/habitats/species/name/', 
+                         URLencode(species_name), '?token=', api_key)
+  
+  # Make the API request and parse the JSON response
+  species_data <-jsonlite::fromJSON(spp_page_url) %>% as_tibble()
+  
+  #add back to the list
+  results_list[[species_name]] <- species_data
+   }
+
+
+#turn into a single dataframe
+species_results <- bind_rows(results_list) %>%
+  unnest(col = result)
+
+#check if any of them are found in freshwater habitats
+
+potentially_freshwater <- species_results %>% 
+  filter(str_detect(habitat,"Wetlands")| str_detect(habitat, "Artificial/Aquatic"))
+
+freshwater_species <- species_iucn %>% 
+  left_join(potentially_freshwater, by = c("sciname" = "name")) %>% 
+  filter(!is.na(habitat)) %>% 
+  filter(!suitability == "Marginal") #assume they're not common, so unlikely to be tourists watching for them in marginal habitat
+
+#make a list of all the freshwater species 
+freshwater_list <- unique(freshwater_species$species)
+
+species_final_hab <- species_final %>% 
+  filter(!is.na(species)) %>% #remove countries with no species
+  mutate(habitat = case_when(species %in% freshwater_list ~"Freshwater",
+         TRUE ~ "Marine")) %>% 
+  group_by(country, habitat) %>% 
+  summarize(count = n()) %>% #count the total number of species in each habitat
+  ungroup() %>% 
+  pivot_wider(names_from = habitat, values_from = count) %>% 
+  replace_na(list(Freshwater = 0, Marine = 0)) %>% 
+  mutate(percent_marine = Marine/(Marine + Freshwater))
+
+species_final_hab <- species_final_hab %>% 
+  select(country, percent_marine)
+```
+
+Now that we have percent marine mammal watching we can calculate the final marine mammal watching revenue.
+
+```{r}
+whale_revenue_final <- whale_revenue_data %>% 
+  left_join(species_final_hab, by = "country") %>% 
+  mutate(value = percent_marine * total_expenditure) %>%
+  mutate(value = ifelse(is.na(value), 0, value)) %>% #nas are 0, countries with 0 documented revenue
+  mutate(unit ="USD (1)",
+         component = "revenue",
+         sector = "marine mammal watching",
+         data_source = "O’Connor et al 2009") %>% 
+  select(country, year, value, unit, component, sector, data_source)
+
+write_csv(whale_revenue_final,  here(data_path, "int/marine_mammal_revenue.csv"))
 ```
 
 ### Tourism Revenue Data Wrangling
+We will prep two sources to provide future options. The UNWTO data was available with projections through 2030, and is the same data source used in the livelihoods and economies goal. 
+Real data is available throug x, with future years of data not available for free from this source. However this is the most complete data set and would still be a major update from the last calculation of the livelihoods and economies goal, even if projections were not used. This data was already cleaned in the v2022 tourism data prep. We will use this cleaned file and modify slightly. 
 
-(Placeholder)
+```{r}
+tourism_revenue <- read_csv("~/OHI_repositories/ohiprep_v2023/globalprep/tr/v2022/intermediate/wttc_empd_rgn.csv")
+
+tourism_revenue_clean <- tourism_revenue %>% 
+  mutate(unit = "USD (1)",
+         value = jobs_ct,
+         sector = "tourism",
+         component = "revenue",
+         data_source = "UNWTO"
+         ) %>% 
+  select(rgn_id, rgn_name, year, value, unit, component, sector, data_source)
+
+write_csv(tourism_revenue_clean, here(data_path, "int/tourism_jobs.csv"))
+```
+
+
+## Jobs
+
+### FAO yearbook Number of fishers
+
+Turn the number of fishers table from the FAO yearbook into a data frame and clean.
+
+```{r}
+#turn the fao pdf into a format we can use
+fishers_table <- fao_pdf[[3]] %>% #page number of the pdf
+  as.data.frame()
+
+#specify columns 
+columns <- c("country", "1995", "2000", "2005", "2010", "2014", "2015", "2016", "2017", "2018", "2019")
+
+fao_fisher_jobs <- fishers_table %>%
+  separate_rows('.', sep = "\n") %>% #separate rows based on line breaks
+  rename(main_column = ".") %>%
+  mutate(main_column = str_remove_all(main_column, "\\*")) %>% #remove the * 
+  mutate(main_column = str_replace_all(main_column, "F(?!\\p{L})", " ")) %>% #replace all the Fs not followed by letters (used to indicate estimate)
+  slice(7:69) %>% #remove all rows not in the table
+  separate(main_column, into = columns, sep = " {2,}", extra = "merge") %>% #separate into columns based on double spaces
+  pivot_longer(cols = -c("country"), names_to = "year") %>% 
+  mutate(value = str_squish(value)) %>% #remove extra spaces
+  mutate(value = str_remove_all(value, " ")) %>% 
+  mutate(value = if_else(value == "…" , NA, value)) %>% 
+  mutate(value = as.numeric(value)) %>% 
+  mutate(Unit = "persons (1)",
+         sector = "fishing",
+         component = "jobs",
+         data_source = "FAO Number of Fishers") %>% 
+  clean_names() %>% 
+  select(country, year, value, unit, component, sector, data_source)
+```
+
+### Fao Yearbook Fish Farmers
+
+```{r}
+#turn the fao pdf into a format we can use
+fish_farm_table <- fao_pdf[[5]] %>% #page number of the pdf
+  as.data.frame()
+
+#specify columns
+columns <- c("country", "1995", "2000", "2005", "2010", "2014", "2015", "2016", "2017", "2018", "2019")
+
+fao_farm_jobs <- fish_farm_table %>%
+  separate_rows('.', sep = "\n") %>% #separate into rows based on line breaks
+  rename(main_column = ".") %>%
+  mutate(main_column = str_remove_all(main_column, "\\*")) %>% #remove the * 
+  mutate(main_column = str_replace_all(main_column, "F(?!\\p{L})", " "))  %>% 
+  slice(7:36) %>% #select the part of the page with the table
+  separate(main_column, into = columns, sep = " {2,}", extra = "merge") %>%  #split into columns if there is more than two spaces
+  pivot_longer(cols = -c("country"), names_to = "year") %>% 
+  mutate(value = str_squish(value)) %>% 
+  mutate(value = str_remove_all(value, " ")) %>% 
+  mutate(value = if_else(value == "…" , NA, value)) %>% 
+  mutate(value = as.numeric(value)) %>% 
+  mutate(unit = "persons (1)",
+         sector = "mariculture",
+         component = "jobs",
+         data_source = "FAO Number of Fish Farmers") %>% 
+  clean_names() %>% 
+   select(country, year, value, unit, component, sector, data_source)
+```
+
+### OECD Jobs Data
+
+```{r}
+#number of people employed in th fishing sector 
+
+
+#note that this is data for the same category as the FAO fishers data, used for gapfilling OECD
+
+oecd_fisher_jobs <- oecd_raw %>% 
+  filter(VARIABLE == "FISH_EMP_MARINE_FISH_TOT")  %>% 
+  select(- c(PowerCode, VARIABLE)) %>% 
+  filter(!Country == "OECD - Total") %>% 
+  clean_names() %>% 
+  mutate(unit = ("persons (1)"),
+         value = (value * 1000),
+         component = "jobs",
+         sector = "fishing",
+         data_source = "oecd sustainable economies") %>% 
+  select(country, year, value, unit, component, sector,  data_source)
+
+#number of people employed in aquaculture, both marine and inland
+
+#note that this is data for the same category as the FAO fish farmers data, one could potentially be used for gapfilling the main data set
+oecd_aqua_jobs <- oecd_raw %>% 
+  filter(VARIABLE == "FISH_EMP_AQUACULTURE_TOT")  %>% 
+  select(- c(PowerCode, VARIABLE)) %>% 
+  filter(!Country == "OECD - Total")  %>% 
+  clean_names() %>% 
+  mutate(Unit = ("persons (1)"),
+         value = (value * 1000),
+         component = "jobs",
+         sector = "mariculture",
+         data_source = "oecd sustainable economies") %>% 
+  select(country, year, value, unit, component, sector,  data_source)
+
+
+oecd_fishproc_jobs <- oecd_raw %>% 
+  filter(VARIABLE == "FISH_EMP_PROCESSING_TOT") %>% 
+    select(- c(PowerCode, VARIABLE)) %>% 
+    clean_names() %>% 
+  mutate(unit = ("persons (1)"),
+         value = (value * 1000))
+
+```
+
+Gapfill and save files.
+
+For the fishers jobs data we will use the OECD data set as the primary data source and gapfill using data from FAO. To update this data in future years, we will need to consider gapfilling OECD data using another method, as FAO no longer publishes disaggregated data on the number of people employed in fishing. Another possibility is contacting FAO or ILOSTAT to see if they are able to provide disaggregated data for this sector.
+
+```{r}
+oecd_fisher_jobs <-oecd_fisher_jobs %>% 
+  mutate(country = ifelse(country == "Korea", "South Korea", country)) #south korea is an oecd member
+
+fao_fisher_jobs <- fao_fisher_jobs %>% 
+  mutate(country = case_when(country == "USA" ~ "United States",
+                   country == "Turkey" ~ "Türkiye",
+                   country == "China" ~ "China (People's Republic of)",
+                   country == "China,Taiwan" ~  "Chinese Taipei",
+                    country == "UK" ~ "United Kingdom",
+                   country == "Korea Rep" ~ "South Korea",
+                   country == "Korea D P Rp" ~ "North Korea",
+                   T~ country))
+
+#look at the difference to see if we need to rename any other countries
+setdiff(oecd_fisher_jobs$country, fao_fisher_jobs$country)
+
+missing_oecd <- setdiff(fao_fisher_jobs$country, oecd_fisher_jobs$country)
+missing_oecd
+fao_missing_oecd <- fao_fisher_jobs %>% 
+  filter(country %in% c(missing_oecd))
+
+fishing_jobs_final <- oecd_fisher_jobs %>% 
+  rbind(fao_missing_oecd)
+
+write_csv(fishing_jobs_final, here(data_path, "int/fishing_jobs.csv"))
+```
+
+For the mariculture jobs data we will use the OECD data set as the primary data source and gapfill using data from FAO. To update this data in future years, we will need to consider gapfilling OECD data using another method, as FAO no longer publishes disaggregated data on the number of people employed in aquacutlure. Another possibility is contacting FAO or ILOSTAT to see if they are able to provide disaggregated data for this sector.
+
+```{r}
+oecd_aqua_jobs <- oecd_aqua_jobs %>% 
+  mutate(country = ifelse(country == "Korea", "South Korea", country)) #south korea is an oecd member
+
+fao_farm_jobs <- fao_farm_jobs %>% 
+  mutate(country = case_when(country == "USA" ~ "United States",
+                   country == "Turkey" ~ "Türkiye",
+                   country == "China" ~ "China (People's Republic of)",
+                   country == "China, Taiwan" ~  "Chinese Taipei",
+                    country == "UK" ~ "United Kingdom",
+                   country == "Korea Rep" ~ "South Korea",
+                   T~ country))
+
+setdiff(oecd_aqua_jobs$country, fao_farm_jobs$country)
+
+#countries in fao data not in oecd
+oecd_missing <- setdiff(fao_farm_jobs$country, oecd_aqua_jobs$country)
+
+fao_farm_oecd_missing <- fao_farm_jobs %>% 
+  filter(country %in% c(oecd_missing))
+
+#combine the two datasets
+aqua_jobs_combined <- oecd_aqua_jobs %>% 
+  rbind(fao_farm_oecd_missing) %>% 
+  mutate(year = as.numeric(year))
+```
+
+Both data-sets combine mariculture and other aquaculture. Because of this we need to subset the aquaculture jobs to just those related to marine and brackish mariculture.
+
+In the methods document it states: "In order to estimate the proportion of total aquaculture jobs that can
+be attributed to marine and brackish aquaculture, we used country-specific proportions of marine and brackish aquaculture revenues (compared to total revenues) calculated from FAO aquaculture production
+data, assuming that numbers of jobs approximately scale with production in terms of revenue. For country-years with no data for the proportion of marine/brackish production because of gaps in the FAO production data, we used the proportion from the most recent year for which data were available. For countries without proportion estimates from any years, we used the average proportion from the country\'s geographic region (e.g., Caribbean, Polynesia, Eastern Asia), with the exception of American Samoa, for which we used the proportion value from Guam."
+
+To replicate these methods we will use the fao global aquaculture production value database. We will find then find the proportion of revenue for each country that is associated with marine/brackish species.
+
+```{r}
+#classify brackish as marine for summing 
+ aquaculture_value_proportions <- aquaculture_value_clean %>% 
+   filter(!is.na(environment)) %>% 
+   mutate(environment = ifelse(environment == "Brackishwater", "Marine", environment)) %>% 
+  group_by(country, year, environment) %>% 
+  summarize(value = sum(value, na.rm = T)) %>% 
+   pivot_wider(names_from = environment, values_from = value) %>% 
+   mutate(Marine = ifelse((is.na(Marine) & !is.na(Freshwater)), 0, Marine)) %>% 
+   mutate( Freshwater = ifelse((is.na(Freshwater) & !is.na(Marine)), 0, Freshwater)) %>% 
+   mutate(prop_marine = (Marine/sum(Freshwater,Marine))) %>% 
+   mutate(prop_marine = ifelse(Marine == 0 & Freshwater == 0, NA, prop_marine)) #if both are 0, we don't know the proportions
+ 
+ aquaculture_value_proportions <- aquaculture_value_proportions %>% 
+   select(country, year, prop_marine)
+ 
+#combine prop_marine with the jobs data set
+mariculture_jobs_final <- aqua_jobs_combined %>% 
+   left_join(aquaculture_value_proportions, by = c("year", "country")) %>% 
+  mutate(jobs = round(prop_marine * value)) %>% 
+  select(country, year, value= jobs, unit, component, sector, data_source)
+ 
+
+write_csv(mariculture_jobs_final, here(data_path, "int/mariculture_jobs.csv"))
+```
+
+
+### Marine Mammal Watching Jobs
+
+Key takeaways from methods:
+
+-   Jobs based on number of whale watchers in a country and a regional average number of whale watchers per employee. Includes all marine mammal watching.
+
+-   When IFAW reported "minimal" numbers of whale watchers, we converted this description to a 0 for lack of additional information.
+
+-   For countries with both marine and freshwater cetacean viewing, we adjusted by the proportion of marine revenue accordingly. Because some of the whale watching in O'Connor et al. focused on freshwater cetacean viewing, we categorized the target species listed for each country as freshwater or marine. For countries with both marine and freshwater species, we categorized the whale watching in those countries as either 50% or 90% marine, based on the number of marine versus freshwater target species and information provided in the report narrative. For Colombia and Indonesia, more detailed information in the report narrative allowed for a more precise determination of the percentage of marine-based whale watching. We applied these marine proportions to data on the number of whale watchers before converting these estimates into employment estimates.
+
+```{r}
+#get table with regional average number of whale watchers per employee out of pdf
+columns <- c("region", "job_number", "watch_per_employee")
+
+regional_whale_employee <- whale_pdf[26] %>% #page number
+  as.data.frame() %>% 
+  separate_rows('.', sep = "\n") %>% #separate into rows based on page break
+  rename(main_column = ".") %>% 
+  slice(23:31) %>% #select rows with table
+  slice(1,2,3,4, 6,7,9) %>% #remove rows that get split into two
+  mutate(main_column = str_trim(main_column)) %>% 
+  separate(main_column, into = columns, sep = " {2,}", extra = "merge") %>% #separate into columns if there is a double or more space
+  mutate(region = case_when(str_detect(region, "Oceania") ~ "Oceania and the Pacific
+Islands",
+str_detect(region, "Central America") ~  "Central America and Caribbean",
+T ~ region)) %>% #fix a few regions that were split up 
+  mutate(watch_per_employee = as.numeric(str_remove(watch_per_employee, ","))) %>% #remove commas from numbers
+  select(-job_number)
+```
+
+Apply proportion Marine to the number of whale watchers.
+
+```{r}
+whale_watching_marine <- whale_watching_numbers %>% 
+  left_join(species_final_hab, by = "country") %>% 
+  mutate(watcher = value * percent_marine) %>% 
+  select(watcher,country, region, year)
+```
+
+```{r}
+whale_jobs <- whale_watching_marine %>% 
+  left_join(regional_whale_employee, by = c("region")) %>% 
+  mutate(jobs = round(watcher/watch_per_employee,0)) %>% 
+  mutate(value = ifelse(is.na(jobs), 0, jobs)) %>%  #nas are 0s in this case
+  mutate(unit ="persons (1)",
+         component = "jobs",
+         sector = "marine mammal watching",
+         data_source = "O’Connor et al 2009") %>% 
+  select(country, year,value, unit, component, sector, data_source)
+
+write_csv(whale_jobs, here(data_path, "int/whale_jobs.csv"))
+
+```

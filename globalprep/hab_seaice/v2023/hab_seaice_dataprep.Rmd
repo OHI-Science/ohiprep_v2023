@@ -30,7 +30,7 @@ for more information.
 
 # Updates from previous assessment
 
-[Version 1](https://doi.org/10.5067/8GQ8LZQVL0VL.) of the data set which
+[Version 1](https://doi.org/10.5067/8GQ8LZQVL0VL) of the data set which
 had been used previously was retired. The version 2 data available was
 in netcdf format, while the data was previously stored in .bin files.
 The workflow was updated to accommodate the new file type and file
@@ -46,7 +46,7 @@ DiGirolamo, N., C. L. Parkinson, D. J. Cavalieri, P. Gloersen, and H. J.
 Zwally. (2022). Sea Ice Concentrations from Nimbus-7 SMMR and DMSP
 SSM/I-SSMIS Passive Microwave Data, Version 2 [Data Set]. Boulder,
 Colorado USA. NASA National Snow and Ice Data Center Distributed Active
-Archive Center. <https://doi.org/10.5067/MPYG15WAA4WX.> Date Accessed
+Archive Center. <https://doi.org/10.5067/MPYG15WAA4WX> Date Accessed
 06-05-2023.
 
 **Downloaded**: June 5th 2023
