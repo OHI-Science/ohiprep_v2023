@@ -28,6 +28,8 @@ This analysis converts FAO commodities data into data layers used to calculate O
 - Add/edit code for the Datacheck section
 - Add a tic/toc for timing purposes
 - Add more programmatic year usage
+- Swap np_split_antilles for split_regions (more generalized usage)
+- Updates to name_2_rgn reduce the code length of the Rmd
 
 ***
 
@@ -155,26 +157,26 @@ for (f in files){ # f = files[2]
     
   ## Special case: user-defined function deals with 
   ##   breaking up Antilles into separate reported rgns
-  m <- np_split_antilles(m)
+  m <- split_regions(m) # used to use np_split_antilles(); this incorporates more than just antilles
     
   ## Some changes to region names that aren't working in name_2_rgn()
-  m <- m %>%
-    mutate(country = ifelse(country == "Côte d'Ivoire", "Ivory Coast", country)) %>%
-    mutate(country = ifelse(country == "C<f4>te d'Ivoire	", "Ivory Coast", country)) %>%
-    mutate(country = ifelse(country == "C\xf4te d'Ivoire", "Ivory Coast", country)) %>%
-    mutate(country = ifelse(country == "Cura<e7>ao","Curacao", country)) %>%
-    mutate(country = ifelse(country == "Curaçao","Curacao", country)) %>%
-    mutate(country = ifelse(country == "Cura\xe7ao","Curacao", country)) %>%
-    mutate(country = ifelse(country == "R\xe9union", "Reunion", country)) %>% 
-    mutate(country = ifelse(country == "Réunion", "Reunion", country)) %>% 
-    mutate(country = ifelse(country == "R<e9>union", "Reunion", country)) %>%
-    mutate(country = ifelse(country == "Micronesia (Fed. States)", "Micronesia", country)) %>%
-    mutate(country = ifelse(country == "Saint Helena/Asc./Trist.", "Saint Helena", country)) %>%
-    mutate(country = ifelse(country == "Türkiye", "Turkey", country)) %>%
-    mutate(country = ifelse(country == "Venezuela (Boliv Rep of)", "Venezuela", country)) %>%
-    mutate(country = ifelse(country == "Netherlands (Kingdom of the)", "Netherlands", country)) %>%
-    filter(country != "Azerbaijan") # landlocked, but not being removed by name_2_rgn?
-
+  # m <- m %>%
+  #   mutate(country = ifelse(country == "Côte d'Ivoire", "Ivory Coast", country)) %>%
+  #   mutate(country = ifelse(country == "C<f4>te d'Ivoire	", "Ivory Coast", country)) %>%
+  #   mutate(country = ifelse(country == "C\xf4te d'Ivoire", "Ivory Coast", country)) %>%
+  #   mutate(country = ifelse(country == "Cura<e7>ao","Curacao", country)) %>%
+  #   mutate(country = ifelse(country == "Curaçao","Curacao", country)) %>%
+  #   mutate(country = ifelse(country == "Cura\xe7ao","Curacao", country)) %>%
+  #   mutate(country = ifelse(country == "R\xe9union", "Reunion", country)) %>% 
+  #   mutate(country = ifelse(country == "Réunion", "Reunion", country)) %>% 
+  #   mutate(country = ifelse(country == "R<e9>union", "Reunion", country)) %>%
+  #   mutate(country = ifelse(country == "Micronesia (Fed. States)", "Micronesia", country)) %>%
+  #   mutate(country = ifelse(country == "Saint Helena/Asc./Trist.", "Saint Helena", country)) %>%
+  #   mutate(country = ifelse(country == "Türkiye", "Turkey", country)) %>%
+  #   mutate(country = ifelse(country == "Venezuela (Boliv Rep of)", "Venezuela", country)) %>%
+  #   mutate(country = ifelse(country == "Netherlands (Kingdom of the)", "Netherlands", country)) %>%
+  #   filter(country != "Azerbaijan") # landlocked, but not being removed by name_2_rgn?
+  # the above shouldn't be needed anymore in v2023 onwards due to updates to name_2_rgn
     
   m_rgn <- name_2_rgn(df_in = m,
                       fld_name='country', 
@@ -183,23 +185,7 @@ for (f in files){ # f = files[2]
 # v2023 removed countries:
 #   These data were removed for not having any match in the lookup tables:
 # 
-#                 Eswatini 
-#                        1 (landlocked/not used)
-# Micronesia (Fed. States) 
-#                        1 (added in above - Micronesia)
-# Netherlands (Kingdom of the) 
-#                        1 (added in above - Netherlands)                           
-#          North Macedonia 
-#                        1 (landlocked/not used)
-#                Palestine 
-#                        1 (not used)
-# Saint Helena/Asc./Trist. 
-#                        1 (added in above - Saint Helena)
-#                  Türkiye 
-#                        1 (added in above - Turkey)
-# Venezuela (Boliv Rep of) 
-#                        1 (added in above - Venezuela)
-#           Yugoslavia SFR 
+#           yugoslavia sfr 
 #                        1 (not used and only has data in 1984-1988)
     
 # v2023 duplicates:  [1] "China"                 "China, Hong Kong SAR"  "China, Macao SAR"      "Guadeloupe"           
@@ -226,7 +212,7 @@ for (f in files){ # f = files[2]
   write.csv(m_rgn, harvest_out, row.names = FALSE, na = '')
 }
 toc()
-# v2023: 18.523 sec elapsed
+# v2023: 152.934 sec elapsed
 ```
 
 # Data Wrangle
