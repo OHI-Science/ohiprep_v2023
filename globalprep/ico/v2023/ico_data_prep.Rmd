@@ -27,9 +27,9 @@ The Iconic Species sub-goal model calculates a region's status based upon an unw
 
 From Halpern et al (2012):
 
-> Iconic species are those that are relevant to local cultural identity through a species' relationship to one or more of the following: 1) traditional activities such as fishing, hunting or commerce; 2) local ethnic or religious practices; 3) existence value; and 4) locally-recognized aesthetic value (e.g., touristic attractions/common subjects for art such as whales). Habitat-forming species are not included in this definition of iconic species, nor are species that are harvested solely for economic or utilitarian purposes (even though they may be iconic to a sector or individual). ...
+> Iconic species are those that are relevant to local cultural identity through a species' relationship to one or more of the following: 1) traditional activities such as fishing, hunting or commerce; 2) local ethnic or religious practices; 3) existence value; and 4) locally-recognized aesthetic value (e.g., touristic attractions/common subjects for art such as whales). Habitat-forming species are not included in this definition of iconic species, nor are species that are harvested solely for economic or utilitarian purposes (even though they may be iconic to a sector or individual).
 
-> Ultimately, almost any species can be iconic to someone, and so the intent with this goal was to focus on those species widely seen as iconic within a country, and iconic from a cultural or existence value (rather than for a livelihoods or extractive reason). ...
+> Ultimately, almost any species can be iconic to someone, and so the intent with this goal was to focus on those species widely seen as iconic within a country, and iconic from a cultural or existence value (rather than for a livelihoods or extractive reason). 
 
 > The reference point is to have the risk status of all assessed species as Least Concern (i.e., a goal score = 1.0)
 
@@ -54,6 +54,9 @@ The iconic species list was updated by adding species from [Reyes-García et al.
 # Data Sources
 
 **List of iconic species:**
+Original List created in initial 2012 OHI assessment. Additional marine species are added from [Reyes-García et al. 2023] (https://www.pnas.org/doi/10.1073/pnas.2217303120). 
+
+-   **Reference** Reyes-García, Victoria, Rodrigo Cámara-Leret, Benjamin S. Halpern, Casey O’Hara, Delphine Renard, Noelia Zafra-Calvo, and Sandra Díaz. 2023. “Biocultural Vulnerability Exposes Threats of Culturally Important Species.” Proceedings of the National Academy of Sciences 120 (2): e2217303120. https://doi.org/10.1073/pnas.2217303120.
 
 **Species native country information:**
 
