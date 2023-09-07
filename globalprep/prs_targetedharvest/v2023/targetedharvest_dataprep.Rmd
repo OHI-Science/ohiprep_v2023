@@ -218,6 +218,9 @@ sum <- sum %>%
   dplyr::mutate(country = as.character(country)) %>%
   dplyr::mutate(country = ifelse(stringr::str_detect(country, "C.*te d'Ivoire"), "Ivory Coast", country))
 
+sum <- sum %>% 
+  ohicore::split_regions()
+
 ### Function to convert to OHI region ID
 m_sum_rgn <- name_2_rgn(df_in = sum, 
                        fld_name='country', 

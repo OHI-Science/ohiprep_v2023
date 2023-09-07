@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Wed Sep 6 15:26:16 2023 by arobinson" />
+<meta name="author" content="Compiled on Wed Sep 6 16:29:43 2023 by arobinson" />
 
 
 <title>OHI 2023 - Iconic species subgoal</title>
@@ -1549,7 +1549,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">OHI 2023 - Iconic species subgoal</h1>
-<h4 class="author"><em>Compiled on Wed Sep 6 15:26:16 2023 by
+<h4 class="author"><em>Compiled on Wed Sep 6 16:29:43 2023 by
 arobinson</em></h4>
 
 </div>
@@ -1622,8 +1622,8 @@ al. 2023</a>.</p>
 <div id="data-sources" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Data Sources</h1>
 <p><strong>List of iconic species:</strong> Original List created in
-initial 2012 OHI assessment. Additional marine species are added from
-[Reyes-García et al. 2023] (<a href="https://www.pnas.org/doi/10.1073/pnas.2217303120" class="uri">https://www.pnas.org/doi/10.1073/pnas.2217303120</a>).</p>
+initial 2012 OHI assessment. Additional marine species are added from <a href="https://www.pnas.org/doi/10.1073/pnas.2217303120">Reyes-García et
+al. 2023</a>.</p>
 <ul>
 <li><strong>Reference</strong> Reyes-García, Victoria, Rodrigo
 Cámara-Leret, Benjamin S. Halpern, Casey O’Hara, Delphine Renard, Noelia
@@ -1631,7 +1631,7 @@ Zafra-Calvo, and Sandra Díaz. 2023. “Biocultural Vulnerability Exposes
 Threats of Culturally Important Species.” Proceedings of the National
 Academy of Sciences 120 (2): e2217303120. <a href="https://doi.org/10.1073/pnas.2217303120" class="uri">https://doi.org/10.1073/pnas.2217303120</a>.</li>
 </ul>
-<p><strong>Species native country information:</strong></p>
+<p><strong>Species native country and status information:</strong></p>
 <ul>
 <li><strong>Reference</strong>: IUCN 2022. IUCN Red List of Threatened
 Species. Version 2022-2 &lt;www.iucnredlist.org&gt;</li>
@@ -2315,22 +2315,22 @@ and trend over time.</p>
 <span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(trend_ts_plot)</span></code></pre></div>
 <hr />
 </div>
-<div id="compare-ohi-2022-vs-ohi-2021-assessment-results" class="section level2" number="4.10">
-<h2><span class="header-section-number">4.10</span> Compare OHI 2022 vs
-OHI 2021 assessment results</h2>
-<p>Plot the estimated status and trends for 2016 from assessments v2021
-and v2022.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>ico_sum<span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;summary&#39;</span>, <span class="st">&#39;ico_summary.csv&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<div id="compare-ohi-2023-vs-ohi-2022-assessment-results" class="section level2" number="4.10">
+<h2><span class="header-section-number">4.10</span> Compare OHI 2023 vs
+OHI 2022 assessment results</h2>
+<p>Plot the estimated status and trends for 2016 from assessments v2022
+and v2023. For v2023 this was the same final year of data.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>ico_sum <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;summary&#39;</span>, <span class="st">&#39;ico_summary.csv&#39;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
 <span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a></span>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>status_trend <span class="ot">&lt;-</span> ico_sum <span class="sc">%&gt;%</span> <span class="co"># status and trend in this year&#39;s assessment</span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span>  <span class="co"># max year of ico_sum is 2019; want to compare the most recent shared year (also 2019 in v2019)</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span>  </span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, ico_status, ico_trend, n_spp) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>() <span class="co"># because removing iucn_sid, cat, cat_score, and species name, results in duplicates</span></span>
 <span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a></span>
 <span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>ico_compare <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(goal, previous_scen, <span class="st">&#39;summary&#39;</span>, <span class="st">&#39;ico_summary.csv&#39;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span> <span class="co"># 2019 data is max of last year&#39;s data</span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, ico_status, ico_trend, n_spp) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">previous_status =</span> ico_status, <span class="at">previous_trend =</span> ico_trend, <span class="at">previous_nspp =</span> n_spp) <span class="sc">%&gt;%</span> </span>

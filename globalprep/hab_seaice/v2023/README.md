@@ -9,4 +9,4 @@ See full data prep details [here](https://ohi-science.org/ohiprep_v2023/globalpr
 * hab_seaice_extent
 
 
-If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
+If using these data, please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/).

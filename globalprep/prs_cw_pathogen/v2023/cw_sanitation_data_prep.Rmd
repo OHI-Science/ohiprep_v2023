@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 1
     toc_float: yes
-    number_sections: false
+    number_sections: true
     theme: cerulean
     highlight: haddock
     includes: 
@@ -25,7 +25,7 @@ This document describes the steps for preparing the pathogen pollution and patho
 The percentage of the population with access to improved sanitation facilities (World Health Organization and United Nations Children's Fund, Joint Monitoring Programme, 2011) was used in combination with measurements of coastal population as a proxy for pathogens in coastal waters. Access to improved sanitation facilities is defined as the percentage of the population in a country with at least adequate access to disposal facilities that can effectively prevent human, animal, and insect contact with excreta. These data are a country-wide average (not specific to the coastal region).
 
 # Updates from previous assessment
-1. Updated data download through the SDMX REST API to programmatically access data, instead of downloading an Excel file. We are using the wash_households data flow. This resulted in small changes to the data: for example in the previous data some values for the at least basic sanitation proportion were denoted as >99, which we previously set as 99.5. The total at least basic indicator for these countries (and some others) were often not available from the API, but we were able to calculate the at least basic indicator by summing the limited, unimproved, and open defecation proportions for a given country and subtracting them from 100. The values were previously rounded to the nearest whole percentage, use of the api resulted in more precise values.The previous data set included a population column, which was not available from the API. We instead accessed the total population for each region from the WDI package (World Bank World Development Indicators). Other changes involved updating data wrangling to get the data from the api into the same format. 
+1. Updated data download through the SDMX REST API to programmatically access data, instead of downloading an Excel file. We are using the wash_households data flow. This resulted in small changes to the data: for example in the previous data some values for the at least basic sanitation proportion were denoted as >99, which we previously set as 99.5. The total at least basic indicator for these countries (and some others) were often not available from the API, but we were able to calculate the at least basic indicator by summing the limited, unimproved, and open defecation proportions for a given country and subtracting them from 100. The values were previously rounded to the nearest whole percentage, use of the API resulted in more precise values.The previous data set included a population column, which was not available from the API. We instead accessed the total population for each region from the WDI package (World Bank World Development Indicators). Other changes involved updating data wrangling to get the data from the API into the same format as the previous data. 
 
 **Consider for future assessments:** make the "Safely managed" data more complete, and reconsider whether these data would be better to use.
 
@@ -37,11 +37,14 @@ Definition of each variable according to the data source: "At least basic": Use 
 
 # Data Source
 
-**Reference**: As of v2023 the data is now downloaded through the SDMX REST API which allows programmatic access to data that is available in UNICEF's Data Warehouse Explorer. The api can be found at: <https://sdmx.data.unicef.org/webservice/data.html>
+**Reference**: 
+WHO-UNICEF. 2023. “Joint Monitoring Programme (JMP) for Water Supply and Sanitation - Household Data.” Joint Monitoring Programme (JMP) for Water Supply and Sanitation - Household Data. 2023. https://washdata.org/data/household#!/.
+
+**Data Download** As of v2023 the data is now downloaded through the SDMX REST API which allows programmatic access to data that is available in UNICEF's Data Warehouse Explorer. The API can be found at: <https://sdmx.data.unicef.org/webservice/data.html>
 
 For information on querying the api visit: <https://data.unicef.org/sdmx-api-documentation/#understanding>. To download data manually in Excel format use this site: <https://washdata.org/data>.
 
-**Downloaded**: Downloaded 7/18/2023
+**Download Date**: Downloaded 7/18/2023
 
 **Description**: Percentage of the national population that has access to at improved sanitation facilities that are not shared with other households.
 
@@ -57,9 +60,7 @@ Further information: <https://washdata.org/monitoring/sanitation>
 
 ------------------------------------------------------------------------
 
-# Methods
 
-Percentage of people without sanitation was multiplied by the coastal population (within 25 miles of the coast) to estimate the number of people located along the coast without sanitation. This value was rescaled between 0 and 1 by dividing by the 99th quantile across all regions from years 2000 to 2009. 
 
 # Setup
 
@@ -83,6 +84,8 @@ data_end <- 2022
 ```
 
 # Methods
+
+Percentage of people without sanitation was multiplied by the coastal population (within 25 miles of the coast) to estimate the number of people located along the coast without sanitation. This value was rescaled between 0 and 1 by dividing by the 99th quantile across all regions from years 2000 to 2009. 
 
 ## Download the data
 
@@ -158,16 +161,9 @@ If after running 'name_2\_rgn' (see next r chunk), there are some coastal region
 #manually clean country names 
 sanitation_clean <- sanitation_clean %>%
    mutate(country = str_replace(country, "&", "and")) %>% 
-  mutate(country = case_when(str_detect(country,"Hong Kong") ~ "Hong Kong",
-                            str_detect(country,"Macao") ~ "Macao",
-                           str_detect(country, "Saint Martin") ~ "Northern Saint-Martin",
+  mutate(country = case_when(
                            str_detect(country, "Helena") ~"Saint Helena",
                            str_detect(country, "São Tomé and Príncipe")~ "Sao Tome and Principe",
-                           str_detect(country, "St. Vincent and Grenadines") ~ "Saint Vincent and the Grenadines",
-                           str_detect(country, "U.S. Virgin Islands")~ "Virgin Islands (U.S.)",
-                           str_detect(country, "Congo - Kinshasa") ~ "Democratic Republic of the Congo",
-                           str_detect(country, "Congo - Brazzaville") ~"Republique du Congo",
-                           str_detect(country, "Myanmar") ~ "Myanmar",
                           TRUE ~ country
                            )) 
 
@@ -202,7 +198,7 @@ sanitation_clean <- sanitation_clean %>%
 
 Add rgn_id and merge duplicate regions using a mean weighted by population.
 
-```{r rgn_id, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
+```{r regions, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 rgn_sani <- name_2_rgn(sanitation_clean, 
                         fld_name     = 'country',
                         flds_unique  = c('year'))
@@ -239,7 +235,7 @@ year_check <- sani_final %>%
 unique(year_check$n)
 ```
 
-# Gapfilling
+## Gapfilling
 
 First step is to get an idea of what needs to be gapfilled.
 
@@ -271,7 +267,7 @@ sani_gf <- sani_gf %>%
 
 ```
 
-## Gapfilling 1: Linear model
+### Gapfilling 1: Linear model
 
 Use a linear model within country data to estimate missing years.
 
@@ -294,7 +290,7 @@ sani_gf_lm <- sani_gf_lm %>%
 
 ```
 
-## Gapfilling 2: Georegional averages
+### Gapfilling 2: Georegional averages
 
 Georegional gapfilling for regions that do not have data.
 
@@ -339,7 +335,7 @@ dplyr::filter(sani_georgn_gf, is.na(basic_sani_prop)) %>%
 
 ```
 
-## Gapfilling 3: Replace scores for uninhabited regions
+### Gapfilling 3: Replace scores for uninhabited regions
 
 Uninhabited regions get a perfect score.
 
@@ -366,7 +362,7 @@ table(sani_complete$gapfill, sani_complete$method) # no pop is not considered ga
 
 ```
 
-# Save gapfilled data records
+### Save gapfilled data records
 
 ```{r, results="hide", message = FALSE, warning = FALSE, eval=FALSE}
 
@@ -405,7 +401,7 @@ write_csv(gf_data, here("globalprep/prs_cw_pathogen", version_year, "output/po_p
 
 ```
 
-# Standarizing sanitation data by population density
+## Standarizing sanitation data by population density
 
 First calculate coastal population density (people/km^2^) is calculated by dividing the population within 25 miles of the coast by km^2^ within the 25 mile inland coastal area (yes! This is confusing because area is in km\^2, despite the boundary being 25 miles inland).
 
@@ -469,7 +465,7 @@ hist(unsani_pop$propWO_x_pop_log, main = "log of people without access")
 
 ```
 
-# Pressure Score
+## Pressure Score
 
 The reference point is the 99th quantile across all countries and years 2000-2009 as a reference point.
 
@@ -526,7 +522,7 @@ filter(unsani_prs_old, rgn_id %in% c(185, 208))
 
 ```
 
-# Model Trend
+## Model Trend
 
 Using `CalculateTrend` function form the `ohicore`, trend is calculated by applying a linear regression model to the pressuere scores using a window of 5 years of data. The slope of the linear regression (annual change in pressure) is then divided by the earliest year to get proportional change and then multiplied by 5 to get estimate trend on pressure in the next five years.
 
@@ -567,7 +563,7 @@ write_csv(trend_data, here("globalprep/prs_cw_pathogen", version_year, "output/p
 
 ```
 
-# Compare to previous years
+## Compare to previous years
 
 ### Trend data
 

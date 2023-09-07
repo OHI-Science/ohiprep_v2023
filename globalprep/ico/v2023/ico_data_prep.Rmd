@@ -54,11 +54,11 @@ The iconic species list was updated by adding species from [Reyes-García et al.
 # Data Sources
 
 **List of iconic species:**
-Original List created in initial 2012 OHI assessment. Additional marine species are added from [Reyes-García et al. 2023] (https://www.pnas.org/doi/10.1073/pnas.2217303120). 
+Original List created in initial 2012 OHI assessment. Additional marine species are added from [Reyes-García et al. 2023](https://www.pnas.org/doi/10.1073/pnas.2217303120). 
 
 -   **Reference** Reyes-García, Victoria, Rodrigo Cámara-Leret, Benjamin S. Halpern, Casey O’Hara, Delphine Renard, Noelia Zafra-Calvo, and Sandra Díaz. 2023. “Biocultural Vulnerability Exposes Threats of Culturally Important Species.” Proceedings of the National Academy of Sciences 120 (2): e2217303120. https://doi.org/10.1073/pnas.2217303120.
 
-**Species native country information:**
+**Species native country and status information:**
 
 -   **Reference**: IUCN 2022. IUCN Red List of Threatened Species. Version 2022-2 \<www.iucnredlist.org\>
 -   **Accessed**: Aug 10, 2023
@@ -797,22 +797,22 @@ plotly::ggplotly(trend_ts_plot)
 
 ------------------------------------------------------------------------
 
-## Compare OHI 2022 vs OHI 2021 assessment results
+## Compare OHI 2023 vs OHI 2022 assessment results
 
-Plot the estimated status and trends for 2016 from assessments v2021 and v2022.
+Plot the estimated status and trends for 2016 from assessments v2022 and v2023. For v2023 this was the same final year of data. 
 
 ```{r fig.height = 4, fig.width = 6, fig.align = 'center', eval=FALSE}
-ico_sum<- here::here(dir_here, 'summary', 'ico_summary.csv') %>% 
+ico_sum <- here::here(dir_here, 'summary', 'ico_summary.csv') %>% 
   readr::read_csv()
 
 status_trend <- ico_sum %>% # status and trend in this year's assessment
-  dplyr::filter(year == max(year)) %>%  # max year of ico_sum is 2019; want to compare the most recent shared year (also 2019 in v2019)
+  dplyr::filter(year == max(year)) %>%  
   dplyr::select(rgn_id, ico_status, ico_trend, n_spp) %>% 
   dplyr::distinct() # because removing iucn_sid, cat, cat_score, and species name, results in duplicates
 
 ico_compare <- here::here(goal, previous_scen, 'summary', 'ico_summary.csv') %>% 
   readr::read_csv() %>% 
-  dplyr::filter(year == max(year)) %>% # 2019 data is max of last year's data
+  dplyr::filter(year == max(year)) %>% 
   dplyr::select(rgn_id, rgn_name, ico_status, ico_trend, n_spp) %>% 
   dplyr::distinct() %>% 
   dplyr::rename(previous_status = ico_status, previous_trend = ico_trend, previous_nspp = n_spp) %>% 
