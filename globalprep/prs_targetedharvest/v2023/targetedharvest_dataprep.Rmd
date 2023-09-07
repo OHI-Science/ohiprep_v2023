@@ -213,8 +213,8 @@ sum <- long %>%
 ## Assign country names to OHI regions
 
 ```{r, eval=FALSE}
-
 sum <- sum %>%
+  ohicore::split_regions() %>%
   dplyr::mutate(country = as.character(country)) %>%
   dplyr::mutate(country = ifelse(stringr::str_detect(country, "C.*te d'Ivoire"), "Ivory Coast", country))
 
