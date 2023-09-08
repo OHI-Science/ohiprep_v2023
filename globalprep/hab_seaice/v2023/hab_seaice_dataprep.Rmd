@@ -17,15 +17,13 @@ editor_options:
   chunk_output_type: console
 ---
 
-[REFERENCE RMD
-FILE:](https://cdn.rawgit.com/OHI-Science/ohiprep/master/globalprep/hab_seaice/v2021/hab_seaice_dataprep.html)
 
 # Summary
 
 This data prep markdown calls a series of scripts to download and
 analyze sea ice data for the habitat subgoal and coastal protection
 goal. See [data layers
-documentation](http://ohi-science.org/ohi-global/layers#hab_seaice_extent)
+documentation](https://oceanhealthindex.org/images/htmls/Supplement.html#621_Habitat_(subgoal_of_biodiversity))
 for more information.
 
 # Updates from previous assessment

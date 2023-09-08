@@ -661,12 +661,12 @@ CORBICULIDAE,0,BI,Corbiculiade,NA,NA
 SARGASSACEAE,0.9,AL,Algae,NA,- used sargassum spp value
 MUGILIDAE,0,F,Mugilidae,NA,NA
 OPLEGNATHIDAE,0,F,Oplegnathidae,NA,NA
-ULOTRICHACEAE,0.15,AL,Algae,NA,used overall seaweed exclude value due to lack of available information on the species
+ULOTRICHACEAE,0.15,AL,Algae,NA,- used overall seaweed exclude value due to lack of available information on the species
 HAEMULIDAE,0,F,Haemulidae,NA,NA
 GIGARTINACEAE,0.75,AL,Algae,NA,- used red seaweed include value
 LESSONIACEAE,0.5,AL,Algae,NA,- used same exclude value as kelp nei
 SOLEIDAE,0,F,Soleidae,NA,NA
-OSCILLATORIACEAE,1,AL,Algae,NA,excluded as is typically freshwater https://en.wikipedia.org/wiki/Oscillatoria
+OSCILLATORIACEAE,1,AL,Algae,NA,- excluded as is typically freshwater https://en.wikipedia.org/wiki/Oscillatoria
 DUNALIELLACEAE,0.15,AL,Algae,NA,- used overall seaweed exclude value due to lack of more information
 PORTUNIDAE,0,CRUST,Portunidae,NA,NA
 CHORDARIACEAE,0.5,AL,Algae,seaweed: human food/alginate,- used brown seaweed include value
