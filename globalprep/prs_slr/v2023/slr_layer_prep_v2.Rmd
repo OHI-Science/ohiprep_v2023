@@ -33,7 +33,7 @@ This process is completed entirely within this script. The raw data is downloade
 - One additional year of data, 2021, was added 
 - Add in code to automatically create folders when applicable
 - Add in some more tic/tocs
-- Had to change `terra` code back to `raster` for one chunk (making the histograms) to get it to work: commented out this code and added a version of histograms that works with `terra`
+- Had to change `terra` code back to `raster` for one chunk (making the histograms) to get it to work; later, commented out this code and added a version of histograms that works with `terra`
 
 ***
 
@@ -532,7 +532,7 @@ plotData <- regions_stats_clean %>%
   dplyr::arrange(rgn_name, year) %>%
   data.frame()
 
-# This does not work at the moment, probably due to lack of Flash support
+# this does not work at the moment, probably due to lack of Flash support
 # Motion <- gvisMotionChart(plotData, idvar = "rgn_name", timevar = "year")
 # plot(Motion)
 # print(Motion, file = "slr.html")

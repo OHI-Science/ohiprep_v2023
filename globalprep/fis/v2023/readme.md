@@ -1,15 +1,15 @@
 ## Ocean Health Index: Fisheries Sub-goal (FIS)
 
-See full details for how the SAUP catch data was prepped [here](http://ohi-science.github.io/ohiprep_v2021/globalprep/fis/v2021/STEP2a_saup_catch_prep.html).
+See full details for how the SAUP catch data was prepped [here](http://ohi-science.github.io/ohiprep_v2023/globalprep/fis/v2023/STEP2a_saup_catch_prep.html).
 
-See full details for how BBmsy was calculated [here](http://ohi-science.github.io/ohiprep_v2021/globalprep/fis/v2021/STEP3_calculate_bbmsy.html).
+See full details for how BBmsy was calculated [here](http://ohi-science.github.io/ohiprep_v2023/globalprep/fis/v2023/STEP3_calculate_bbmsy.html).
 
 See full details for how RAM data was prepped
-[here RAM dataprep](http://ohi-science.github.io/ohiprep_v2021/globalprep/fis/v2021/STEP4a_RAM_data_prep.html)
-[here RAM_CMSY](http://ohi-science.github.io/ohiprep_v2021/globalprep/fis/v2021/STEP5_RAM_CMSY_combine.html)
+[here RAM dataprep](http://ohi-science.github.io/ohiprep_v2023/globalprep/fis/v2023/STEP4a_RAM_data_prep.html)
+[here RAM_CMSY](http://ohi-science.github.io/ohiprep_v2023/globalprep/fis/v2023/STEP5_RAM_CMSY_combine.html)
 
 
-If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
+If using these data, please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/).
 
 ### Layers Created
 
@@ -23,8 +23,8 @@ A description of files:
 
 * STEP2a_saup_catch_prep.Rmd: Preps the spatialized catch data (at half degree cells) for use in goal weighting and stock status calculations. Auxiliary prep file, **STEP2b_species_resilience_lookup_table.Rmd**: Uses FishBase to find the Resilience for each of the species in the SAUP database. The Resilience information is needed for running catch-MSY to estimate B/Bmsy. Outputs:
   
-   - `git-annex/globalprep/fis/v2021/int/stock_catch_by_rgn.csv`
-   - `int/taxon_key_v2021.csv`
+   - `git-annex/globalprep/fis/v2022/int/stock_catch_by_rgn.csv`
+   - `int/taxon_key_v2022.csv`
    - `output/stock_catch.csv`
    - `output/mean_catch.csv`
    - `output/FP_fis_catch.csv`

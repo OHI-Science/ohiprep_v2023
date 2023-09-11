@@ -25,7 +25,7 @@ This script combines the fisheries catch data with the mariculture production da
 
 # Methods
 
-```{r}
+```{r, eval = FALSE}
 ## load libraries
 library(dplyr)
 library(tidyr)
@@ -44,20 +44,20 @@ source('http://ohi-science.org/ohiprep_v2021/workflow/R/common.R')
 # Import Output Data: Mariculture data
 
 Mariculture production in tonnes.
-```{r}
-mar <- read.csv(file.path("..", "..", "mar", paste0("v", scen_year), "output", "MAR_FP_data.csv"))
+```{r, eval = FALSE}
+mar <- read.csv(file.path("..", "..", "mar", paste0("v", scen_year), "output", "MAR_FP_data.csv")) # see metadata in its prep
 ```
 
 Fisheries data.
-```{r}
+```{r, eval = FALSE}
 fis <- read.csv(file.path("..", "..", "fis", paste0("v", scen_year), "output", "FP_fis_catch.csv")) %>%
-  dplyr::select(rgn_id, year, fis_t = fis_catch)
+  dplyr::select(rgn_id, year, fis_t = fis_catch) # see metadata in its prep
 ```
 
 # Wrangle 
 
 ## Tidy MAR data
-```{r}
+```{r, eval = FALSE}
 mar_tidy <- mar %>%
   group_by(rgn_id, year) %>%
   summarize(mar_t = sum(value, na.rm=TRUE)) %>%
@@ -70,7 +70,7 @@ filter(mar_tidy, rgn_id == 95) # ok, this makes sense
 
 ## Tidy FIS data
 
-```{r}
+```{r, eval = FALSE}
 fis_tidy <- fis %>%
   mutate(fis_t = ifelse(fis_t == 0, NA, fis_t)) %>%  # 11 NA values is correct (there were 0 in v2023)
   group_by(rgn_id) %>%
@@ -82,7 +82,7 @@ fis_tidy <- fis %>%
 ## Combine MAR and FIS
 
 Adjust years so they are equivalent.
-```{r}
+```{r, eval = FALSE}
 adjust <- max(mar_tidy$year) - max(fis_tidy$year)
 
 mar_adjust <- mar_tidy %>%
@@ -107,7 +107,7 @@ hist(tmp_weights$w_fis,
 # Data check
 
 Compare to previous year data
-```{r}
+```{r, eval = FALSE}
 compare <- read.csv(paste0("../../fp/v", prev_scen_year, "/output/wildcaught_weight.csv")) %>%
   rename(w_fis_old = w_fis) %>%
   left_join(tmp_weights, by = c('rgn_id', 'year'))
@@ -119,7 +119,7 @@ abline(0, 1, col="red")
 
 # Save data
 
-```{r}
+```{r, eval = FALSE}
 write.csv(tmp_weights, 'output/wildcaught_weight.csv', row.names=FALSE)
 
 ## add gf file (no gapfilling)

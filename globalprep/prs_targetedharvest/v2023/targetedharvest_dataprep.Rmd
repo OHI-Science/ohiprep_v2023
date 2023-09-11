@@ -22,33 +22,33 @@ editor_options:
 
 # Summary
 
-This analysis converts FAO capture production data into the OHI 2022 targeted harvest pressure data.  
+This analysis converts FAO capture production data into the OHI 2022 targeted harvest pressure data.
 
 # Updates from previous assessment
 
-2023 - One more year of data, 2021
-Small fixes to how N data is handled in fao_fxn.R
-Delete unused/not relevant code
+2023 - One more year of data, 2021 Small fixes to how N data is handled in fao_fxn.R Delete unused/not relevant code
 
-***
+------------------------------------------------------------------------
 
-# Data Source 
+# Data Source
 
-    http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
-     Release date: March 2021  
-FAO Global Capture Production Quantity 1950_2019  
-Information: http://www.fao.org/fishery/statistics/global-capture-production/en  
+```         
+http://www.fao.org/fishery/statistics/software/fishstatj/en#downlApp
+ Release date: March 2021  
+```
 
-**Reference**: United Nations, 2021. FAO Fisheries & Aquaculture - Fishery Statistical Collections - Global Capture Production [WWW Document]. URL http://www.fao.org/fishery/statistics/global-capture-production/en (accessed 4.29.21).
+FAO Global Capture Production Quantity 1950_2019\
+Information: <http://www.fao.org/fishery/statistics/global-capture-production/en>
 
+**Reference**: United Nations, 2021. FAO Fisheries & Aquaculture - Fishery Statistical Collections - Global Capture Production [WWW Document]. URL <http://www.fao.org/fishery/statistics/global-capture-production/en> (accessed 4.29.21).
 
-**Downloaded**: April 25, 2022
+**Downloaded**: June 1, 2023
 
-**Description**:  Quantity (tonnes) of fisheries capture for each county, species, year.
+**Description**: Quantity (tonnes) of fisheries capture for each county, species, year.
 
 **Time range**: 1950-2020
 
-***
+------------------------------------------------------------------------
 
 # Methods
 
@@ -126,7 +126,7 @@ fao_clean <- fao_clean %>%
 
 ## Identify the target species
 
-This analysis only includes target species.  The warning messages need to be checked and, if necessary, changes should be made to the raw/species2group.csv  
+This analysis only includes target species. The warning messages need to be checked and, if necessary, changes should be made to the raw/species2group.csv
 
 ```{r, eval=FALSE}
 
@@ -217,9 +217,6 @@ sum <- sum %>%
   ohicore::split_regions() %>%
   dplyr::mutate(country = as.character(country)) %>%
   dplyr::mutate(country = ifelse(stringr::str_detect(country, "C.*te d'Ivoire"), "Ivory Coast", country))
-
-sum <- sum %>% 
-  ohicore::split_regions()
 
 ### Function to convert to OHI region ID
 m_sum_rgn <- name_2_rgn(df_in = sum, 
