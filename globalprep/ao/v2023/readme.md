@@ -1,14 +1,12 @@
 ## Ocean Health Index: Artisanal opportunities goal
 
-Information about calculation of [need component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_need_data_prep.html).
+Information about calculation of [need component](http://ohi-science.github.io/ohiprep_v2023/globalprep/ao/v2023/ao_need_data_prep.html).
 
-Information about [opportunity component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_access_data_prep.html).
+Information about [opportunity component](http://ohi-science.github.io/ohiprep_v2023/globalprep/ao/v2023/ao_access_data_prep.html).
 
-Information about [stock status component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_stock_status_saup.html).
+Information about [stock status component](http://ohi-science.github.io/ohiprep_v2023/globalprep/ao/v2023/ao_stock_status_saup.html).
 
-Information about [stock status (catch) component](http://ohi-science.github.io/ohiprep_v2022/globalprep/ao/v2022/ao_catch_prep_saup.html).
-
-http://ohi-science.github.io/ohiprep_v2022/globalprep/prs_uv/v2022/uv_dataprep.html
+Information about [stock status (catch) component](http://ohi-science.github.io/ohiprep_v2023/globalprep/ao/v2023/ao_catch_prep_saup.html).
 
 ### Layers Created
 
@@ -41,7 +39,7 @@ A description of files (1 and 2 need to be done in order, the rest it does not m
 
 
 
-If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
+If using these data, please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/).
 
 
 

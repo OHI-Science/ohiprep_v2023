@@ -63,7 +63,7 @@ cetacean,Strap-toothed whale,include
 cetacean,Striped dolphin,include
 cetacean,Toothed whales nei,include
 cetacean,Vaquita,include
-cetacean,Walrus,include
+pinniped,Walrus,exclude
 cetacean,White-beaked dolphin,include
 cetacean,White whale,include
 turtle,Green turtle,include

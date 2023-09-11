@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Fri Aug 11 15:20:26 2023 by arobinson" />
+<meta name="author" content="Compiled on Wed Sep 6 16:29:43 2023 by arobinson" />
 
 
 <title>OHI 2023 - Iconic species subgoal</title>
@@ -1549,7 +1549,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">OHI 2023 - Iconic species subgoal</h1>
-<h4 class="author"><em>Compiled on Fri Aug 11 15:20:26 2023 by
+<h4 class="author"><em>Compiled on Wed Sep 6 16:29:43 2023 by
 arobinson</em></h4>
 
 </div>
@@ -1581,13 +1581,13 @@ locally-recognized aesthetic value (e.g., touristic attractions/common
 subjects for art such as whales). Habitat-forming species are not
 included in this definition of iconic species, nor are species that are
 harvested solely for economic or utilitarian purposes (even though they
-may be iconic to a sector or individual). …</p>
+may be iconic to a sector or individual).</p>
 </blockquote>
 <blockquote>
 <p>Ultimately, almost any species can be iconic to someone, and so the
 intent with this goal was to focus on those species widely seen as
 iconic within a country, and iconic from a cultural or existence value
-(rather than for a livelihoods or extractive reason). …</p>
+(rather than for a livelihoods or extractive reason).</p>
 </blockquote>
 <blockquote>
 <p>The reference point is to have the risk status of all assessed
@@ -1621,8 +1621,17 @@ al. 2023</a>.</p>
 </div>
 <div id="data-sources" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Data Sources</h1>
-<p><strong>List of iconic species:</strong></p>
-<p><strong>Species native country information:</strong></p>
+<p><strong>List of iconic species:</strong> Original List created in
+initial 2012 OHI assessment. Additional marine species are added from <a href="https://www.pnas.org/doi/10.1073/pnas.2217303120">Reyes-García et
+al. 2023</a>.</p>
+<ul>
+<li><strong>Reference</strong> Reyes-García, Victoria, Rodrigo
+Cámara-Leret, Benjamin S. Halpern, Casey O’Hara, Delphine Renard, Noelia
+Zafra-Calvo, and Sandra Díaz. 2023. “Biocultural Vulnerability Exposes
+Threats of Culturally Important Species.” Proceedings of the National
+Academy of Sciences 120 (2): e2217303120. <a href="https://doi.org/10.1073/pnas.2217303120" class="uri">https://doi.org/10.1073/pnas.2217303120</a>.</li>
+</ul>
+<p><strong>Species native country and status information:</strong></p>
 <ul>
 <li><strong>Reference</strong>: IUCN 2022. IUCN Red List of Threatened
 Species. Version 2022-2 &lt;www.iucnredlist.org&gt;</li>
@@ -1808,66 +1817,74 @@ error message.</p>
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>                                    <span class="st">&quot;Bonaire, Saba, Sint Eustatius&quot;</span>,</span>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>                              country <span class="sc">==</span> <span class="st">&quot;French Southern Territories&quot;</span> <span class="sc">~</span> </span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>                                <span class="st">&quot;Glorioso Islands, Juan de Nova Island, Bassas da India, Ile Europa, Ile Tromelin, Crozet Islands, Amsterdam Island and Saint Paul Island, Kerguelen Islands&quot;</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>                              country <span class="sc">==</span>  <span class="st">&quot;United States Minor Outlying Islands&quot;</span> <span class="sc">~</span> <span class="st">&quot;Wake Island, Jarvis Island, Palmyra Atoll, Howland Island and Baker Island, Johnston Atoll&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="fu">separate_longer_delim</span>(<span class="at">cols =</span> split_id, <span class="at">delim =</span> <span class="st">&quot;, &quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country=</span> <span class="fu">case_when</span>(<span class="fu">is.na</span>(split_id) <span class="sc">~</span> country,</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>                                   <span class="cn">TRUE</span> <span class="sc">~</span> split_id)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>split_id)</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>                              country <span class="sc">==</span>  <span class="st">&quot;United States Minor Outlying Islands&quot;</span> <span class="sc">~</span> <span class="st">&quot;Wake Island, Jarvis Island, Palmyra Atoll, Howland Island and Baker Island, Johnston Atoll&quot;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>                                country <span class="sc">==</span> (<span class="st">&quot;Saint Helena, Ascension and Tristan da Cunha&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Saint Helena, Ascension, Tristan da Cunha&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="fu">separate_longer_delim</span>(<span class="at">cols =</span> split_id, <span class="at">delim =</span> <span class="st">&quot;, &quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country=</span> <span class="fu">case_when</span>(<span class="fu">is.na</span>(split_id) <span class="sc">~</span> country,</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>                                   <span class="cn">TRUE</span> <span class="sc">~</span> split_id)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>split_id)</span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a></span>
 <span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>ico_spp_countries_final <span class="ot">&lt;-</span> ico_spp_countries_final  <span class="sc">%&gt;%</span> </span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">iucn_sid =</span> name) <span class="co"># changed this back to align with ico_list for next step</span></span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>ico_spp_rgn_raw <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(</span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  <span class="at">df_in =</span> ico_spp_countries_final, </span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>  <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>,</span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>  <span class="at">flds_unique =</span> <span class="st">&#39;iucn_sid&#39;</span></span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>) </span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co"># v2023 - No match for Isle of Man (not reported in OHI), Saint Barthélemy (not reported in OHI), disputed territory, can&#39;t be matched to a country</span></span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>ico_spp_countries_final <span class="ot">&lt;-</span> ico_spp_countries_final  <span class="sc">%&gt;%</span> </span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">iucn_sid =</span> name) <span class="co"># changed this back to align with ico_list for next step</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>ico_spp_rgn_raw <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>  <span class="at">df_in =</span> ico_spp_countries_final, </span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>  <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>  <span class="at">flds_unique =</span> <span class="st">&#39;iucn_sid&#39;</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>) </span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co"># v2023 - No match for Isle of Man (not reported in OHI), Saint Barthélemy (not reported in OHI), disputed territory, can&#39;t be matched to a country</span></span>
 <span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a></span>
-<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co"># Check that the country_split_data captures all the data from the longer country strings that were removed </span></span>
-<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span> </span>
-<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;Bonaire, Sint Eustatius and Saba&quot;</span>) <span class="co">#34 rows</span></span>
-<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a></span>
-<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">==</span> <span class="st">&quot;Bonaire&quot;</span> <span class="sc">|</span> rgn_name <span class="sc">==</span> <span class="st">&quot;Saba&quot;</span> <span class="sc">|</span> rgn_name <span class="sc">==</span> <span class="st">&quot;Sint Eustatius&quot;</span>) <span class="co">#102 rows</span></span>
-<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a></span>
-<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="co"># 102 entries makes sense each of the 34 rows is listed three times, one for each country</span></span>
-<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a></span>
-<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span></span>
-<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;French Southern Territories&quot;</span>) <span class="co">#23</span></span>
-<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a></span>
-<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Glorioso Islands&quot;</span>, <span class="st">&quot;Juan de Nova Island&quot;</span>, <span class="st">&quot;Bassas da India&quot;</span>, <span class="st">&quot;Ile Europa&quot;</span>, <span class="st">&quot;Ile Tromelin&quot;</span>, <span class="st">&quot;Crozet Islands&quot;</span>, <span class="st">&quot;Amsterdam Island and Saint Paul Island&quot;</span>, <span class="st">&quot;Kerguelen Islands&quot;</span>)) <span class="co">#184</span></span>
-<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="co"># 23(rows) * 8(regions) = 184 </span></span>
-<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a></span>
-<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span></span>
-<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;United States Minor Outlying Islands&quot;</span>)</span>
-<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a></span>
-<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw  <span class="sc">%&gt;%</span> </span>
-<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Wake Island&quot;</span>, <span class="st">&quot;Jarvis Island&quot;</span>, <span class="st">&quot;Palmyra Atoll&quot;</span>, <span class="st">&quot;Howland Island and Baker Island&quot;</span>, <span class="st">&quot;Johnston Atoll&quot;</span>)) </span>
-<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a><span class="co"># 18 rows * 5 regions = 90</span></span>
-<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a><span class="co"># Check error message to make sure the unmatched countries don&#39;t have an OHI region match, that there are no duplicates, and that the unmatched regions make sense (not disputed, landlocked, not reported). If there are duplicates or unmatched regions that are reported in OHI, need to go back to fix and rerun the code.</span></span>
-<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a></span>
-<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a></span>
-<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a><span class="co"># v2023 - returned the &quot;duplicates found&quot; message</span></span>
-<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a><span class="co"># check for duplicates</span></span>
-<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a></span>
-<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a>duplicates <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(rgn_id, iucn_sid) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n <span class="sc">&gt;</span><span class="dv">1</span>)</span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co"># Check that the country_split_data captures all the data from the longer country strings that were removed </span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span> </span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;Bonaire, Sint Eustatius and Saba&quot;</span>) <span class="co">#34 rows</span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">==</span> <span class="st">&quot;Bonaire&quot;</span> <span class="sc">|</span> rgn_name <span class="sc">==</span> <span class="st">&quot;Saba&quot;</span> <span class="sc">|</span> rgn_name <span class="sc">==</span> <span class="st">&quot;Sint Eustatius&quot;</span>) <span class="co">#102 rows</span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co"># 102 entries makes sense each of the 34 rows is listed three times, one for each country</span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;French Southern Territories&quot;</span>) <span class="co">#23</span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Glorioso Islands&quot;</span>, <span class="st">&quot;Juan de Nova Island&quot;</span>, <span class="st">&quot;Bassas da India&quot;</span>, <span class="st">&quot;Ile Europa&quot;</span>, <span class="st">&quot;Ile Tromelin&quot;</span>, <span class="st">&quot;Crozet Islands&quot;</span>, <span class="st">&quot;Amsterdam Island and Saint Paul Island&quot;</span>, <span class="st">&quot;Kerguelen Islands&quot;</span>)) <span class="co">#184</span></span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="co"># 23(rows) * 8(regions) = 184 </span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span></span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;United States Minor Outlying Islands&quot;</span>)</span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw  <span class="sc">%&gt;%</span> </span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Wake Island&quot;</span>, <span class="st">&quot;Jarvis Island&quot;</span>, <span class="st">&quot;Palmyra Atoll&quot;</span>, <span class="st">&quot;Howland Island and Baker Island&quot;</span>, <span class="st">&quot;Johnston Atoll&quot;</span>)) </span>
+<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a><span class="co"># 18 rows * 5 regions = 90</span></span>
+<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a></span>
+<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a>check_full <span class="ot">&lt;-</span> ico_spp_countries <span class="sc">%&gt;%</span> </span>
+<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;Saint Helena, Ascension and Tristan da Cunha&quot;</span>) <span class="co">#33 rows</span></span>
+<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a>check_split <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rgn_name <span class="sc">==</span> <span class="st">&quot;Saint Helena&quot;</span> <span class="sc">|</span> rgn_name <span class="sc">==</span> <span class="st">&quot;Ascension&quot;</span> <span class="sc">|</span> rgn_name <span class="sc">==</span> <span class="st">&quot;Tristan da Cunha&quot;</span>) <span class="co">#99 rows</span></span>
+<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a></span>
 <span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a></span>
-<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a><span class="co">#remove duplicates that are not related to presence</span></span>
-<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a><span class="co">#duplicates that have different presence status will get averaged later on</span></span>
-<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a>ico_spp_rgn_raw <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(distribution_code,origin, code, country)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
-<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a></span>
-<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a><span class="do">############</span></span>
-<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a></span>
-<span id="cb6-69"><a href="#cb6-69" tabindex="-1"></a><span class="fu">summary</span>(ico_spp_rgn_raw) <span class="co"># Make sure there are no NAs!</span></span>
-<span id="cb6-70"><a href="#cb6-70" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(ico_spp_rgn_raw, here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;raw&#39;</span>, <span class="st">&#39;ico_spp_rgn_raw.csv&#39;</span>))</span></code></pre></div>
+<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a><span class="co"># Check error message to make sure the unmatched countries don&#39;t have an OHI region match, that there are no duplicates, and that the unmatched regions make sense (not disputed, landlocked, not reported). If there are duplicates or unmatched regions that are reported in OHI, need to go back to fix and rerun the code.</span></span>
+<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a></span>
+<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a></span>
+<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a><span class="co"># v2023 - returned the &quot;duplicates found&quot; message</span></span>
+<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a><span class="co"># check for duplicates</span></span>
+<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a>duplicates <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(rgn_id, iucn_sid) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n <span class="sc">&gt;</span><span class="dv">1</span>)</span>
+<span id="cb6-69"><a href="#cb6-69" tabindex="-1"></a></span>
+<span id="cb6-70"><a href="#cb6-70" tabindex="-1"></a><span class="co">#remove duplicates that are not related to presence</span></span>
+<span id="cb6-71"><a href="#cb6-71" tabindex="-1"></a><span class="co">#duplicates that have different presence status will get averaged later on</span></span>
+<span id="cb6-72"><a href="#cb6-72" tabindex="-1"></a>ico_spp_rgn_raw <span class="ot">&lt;-</span> ico_spp_rgn_raw <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(distribution_code,origin, code, country)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-73"><a href="#cb6-73" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb6-74"><a href="#cb6-74" tabindex="-1"></a></span>
+<span id="cb6-75"><a href="#cb6-75" tabindex="-1"></a><span class="do">############</span></span>
+<span id="cb6-76"><a href="#cb6-76" tabindex="-1"></a></span>
+<span id="cb6-77"><a href="#cb6-77" tabindex="-1"></a><span class="fu">summary</span>(ico_spp_rgn_raw) <span class="co"># Make sure there are no NAs!</span></span>
+<span id="cb6-78"><a href="#cb6-78" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(ico_spp_rgn_raw, here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;raw&#39;</span>, <span class="st">&#39;ico_spp_rgn_raw.csv&#39;</span>))</span></code></pre></div>
 <p>Filter for globally iconic species</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>ico_spp_rgn_raw <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;raw&#39;</span>, <span class="st">&#39;ico_spp_rgn_raw.csv&#39;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
@@ -2298,22 +2315,22 @@ and trend over time.</p>
 <span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(trend_ts_plot)</span></code></pre></div>
 <hr />
 </div>
-<div id="compare-ohi-2022-vs-ohi-2021-assessment-results" class="section level2" number="4.10">
-<h2><span class="header-section-number">4.10</span> Compare OHI 2022 vs
-OHI 2021 assessment results</h2>
-<p>Plot the estimated status and trends for 2016 from assessments v2021
-and v2022.</p>
+<div id="compare-ohi-2023-vs-ohi-2022-assessment-results" class="section level2" number="4.10">
+<h2><span class="header-section-number">4.10</span> Compare OHI 2023 vs
+OHI 2022 assessment results</h2>
+<p>Plot the estimated status and trends for 2016 from assessments v2022
+and v2023. For v2023 this was the same final year of data.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>ico_sum <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(dir_here, <span class="st">&#39;summary&#39;</span>, <span class="st">&#39;ico_summary.csv&#39;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>()</span>
 <span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a></span>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>status_trend <span class="ot">&lt;-</span> ico_sum <span class="sc">%&gt;%</span> <span class="co"># status and trend in this year&#39;s assessment</span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span>  <span class="co"># max year of ico_sum is 2019; want to compare the most recent shared year (also 2019 in v2019)</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span>  </span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, ico_status, ico_trend, n_spp) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>() <span class="co"># because removing iucn_sid, cat, cat_score, and species name, results in duplicates</span></span>
 <span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a></span>
 <span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>ico_compare <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(goal, previous_scen, <span class="st">&#39;summary&#39;</span>, <span class="st">&#39;ico_summary.csv&#39;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span> <span class="co"># 2019 data is max of last year&#39;s data</span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, rgn_name, ico_status, ico_trend, n_spp) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">previous_status =</span> ico_status, <span class="at">previous_trend =</span> ico_trend, <span class="at">previous_nspp =</span> n_spp) <span class="sc">%&gt;%</span> </span>

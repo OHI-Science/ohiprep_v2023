@@ -592,7 +592,7 @@ Purple dye murex,0,GAST,Muricidae,NA,NA
 Southern red snapper,0,F,Lutjanidae,NA,NA
 Atl.jackknife(=Atl.razor clam),0,BI,Pharidae,NA,NA
 [Cladosiphon okamuranus],0.1,AL,Algae,seaweed: human food/medicine,- food use determined https://en.wikipedia.org/wiki/Cladosiphon_okamuranus - sometimes used to treat cancer
-[Eucheuma isiforme],0.8,AL,Solieriaceae,seaweed: human food/cosmetics/food processing,non-food use determined using Wikipedia
+[Eucheuma isiforme],0.8,AL,Solieriaceae,seaweed: human food/cosmetics/food processing,- non-food use determined using Wikipedia
 Spotted scat,0,F,Scatophagidae,NA,NA
 Red cusk-eel,1,F,Ophidiidae,NA,NA
 Marine worms,1,GAST,Lineidae,NA,NA
@@ -622,7 +622,7 @@ Deepwater longtail red snapper,0,F,Lutjanidae,NA,NA
 Duskytail grouper,0,F,Serranidae,NA,NA
 Foursaddle grouper,0,F,Serranidae,NA,NA
 Giant gourami,1,F,Osphronemidae,freshwater,NA
-Green sea feather,0.2,AL,Caulerpaceae,used as food and medicine,"f""- food use determined https://sealifebase.nrm.se/summary/Caulerpa-sertularioides.html"
+Green sea feather,0.2,AL,Caulerpaceae,used as food and medicine,"- food use determined https://sealifebase.nrm.se/summary/Caulerpa-sertularioides.html"
 Greenback mullet,0,F,Mugilidae,NA,NA
 Harry hotlips,0,F,Haemulidae,NA,NA
 Hawaiian ladyfish,0,F,Elopidae,NA,NA
@@ -654,19 +654,19 @@ Blacktip grouper,0,F,Serranidae,NA,NA
 Commercial top,1,GAST,Tegulidae,NA,"excluded because it is primarily harvested for its shell, though it can be eaten https://en.wikipedia.org/wiki/Rochia_nilotica"
 Desert dace,1,F,Cyprinidae,freshwater,NA
 SOLIERIACEAE,0.75,AL,Algae,NA,- used red seaweed include value
-BANGIACEAE,0.01,AL,Algae,NA,"- food and non food use determined, wikipedia mentions wide food use https://en.wikipedia.org/wiki/Bangiaceae"
+BANGIACEAE,0.01,AL,Algae,NA,"- food use determined, wikipedia mentions wide food use https://en.wikipedia.org/wiki/Bangiaceae"
 RHIZOSTOMIDAE,0,NS-INV,Rhizostomatidae,NA,NA
 BAGRIDAE,1,F,Bagridae,primarily freshwater,NA
 CORBICULIDAE,0,BI,Corbiculiade,NA,NA
 SARGASSACEAE,0.9,AL,Algae,NA,- used sargassum spp value
 MUGILIDAE,0,F,Mugilidae,NA,NA
 OPLEGNATHIDAE,0,F,Oplegnathidae,NA,NA
-ULOTRICHACEAE,0.15,AL,Algae,NA,NA
+ULOTRICHACEAE,0.15,AL,Algae,NA,- used overall seaweed exclude value due to lack of available information on the species
 HAEMULIDAE,0,F,Haemulidae,NA,NA
 GIGARTINACEAE,0.75,AL,Algae,NA,- used red seaweed include value
 LESSONIACEAE,0.5,AL,Algae,NA,- used same exclude value as kelp nei
 SOLEIDAE,0,F,Soleidae,NA,NA
-OSCILLATORIACEAE,1,AL,Algae,NA,excluded as is typically freshwater https://en.wikipedia.org/wiki/Oscillatoria
+OSCILLATORIACEAE,1,AL,Algae,NA,- excluded as is typically freshwater https://en.wikipedia.org/wiki/Oscillatoria
 DUNALIELLACEAE,0.15,AL,Algae,NA,- used overall seaweed exclude value due to lack of more information
 PORTUNIDAE,0,CRUST,Portunidae,NA,NA
 CHORDARIACEAE,0.5,AL,Algae,seaweed: human food/alginate,- used brown seaweed include value

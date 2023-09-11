@@ -1,21 +1,19 @@
 ## Ocean Health Index: Mariculture Sub-goal and pressure data (MAR)
 
-The following data layers were generated (here)[http://ohi-science.github.io/ohiprep_v2023/globalprep/mar/v2023/mar_dataprep.html].
+The following data layers were generated [here](https://ohi-science.github.io/ohiprep_v2023/globalprep/mar/v2023/mar_dataprep.html).
 
-If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
+If using these data, please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/).
 
 ### Layers Created
 
-* mariculture harvest (mar_harvest_tonnes)
-* mariculture sustainability score (mar_sustainability_score)
+-   mariculture harvest (mar_harvest_tonnes)
+-   mariculture sustainability score (mar_sustainability_score)
 
-And, the following pressure:
-* Genetic escapes (sp_genetic)
-
+And, the following pressure: \* Genetic escapes (sp_genetic)
 
 ### Prep Files
 
-* `mar_dataprep.Rmd` is a script to prepare Mariculture data
+-   `mar_dataprep.Rmd` is a script to prepare Mariculture data
 
 ### Additional information
 

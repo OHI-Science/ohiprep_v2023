@@ -45,13 +45,13 @@ For 2023 the Sea Around us Project (SAUP) data used in the ao_catch_prep_saup ha
 
 **Reference**: [RAM Legacy Stock Assessment Database](http://ramlegacy.org) v4.495
 
-**Downloaded**: 06/03/2021
+**Downloaded**: 07/06/2023
 
 **Description**: B/Bmsy value by stock and year (other data, which we do not use, are also available in the database)
 
 **Native data resolution**: stock (fish stock, species and region specific)
 
-**Time range**: 1950 - 2024
+**Time range**: 1800 - 2022 (we only use the year which matches our fisheries catch data (2019 for v2023))
 
 **Format**: CSV format 
 
@@ -259,7 +259,7 @@ write.csv(score_data, here("globalprep/ao/", version_year, "output/ao_nind_score
 
 ```
 
-Data check
+## Data check
 
 ```{r, eval = FALSE}
 region_data()
