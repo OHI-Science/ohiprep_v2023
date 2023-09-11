@@ -10,5 +10,5 @@ Information about [calculating pressure](http://ohi-science.github.io/ohiprep_v2
 
 ### Additional information
 
-If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
+If using these data, please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/).
 

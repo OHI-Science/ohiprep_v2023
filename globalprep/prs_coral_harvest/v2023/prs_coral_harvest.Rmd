@@ -44,7 +44,7 @@ FAO raw commodities metadata found [here](https://www.fao.org/fishery/en/collect
 
 **Downloaded**: July 19, 2023
 
-**Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year.  The FAO data is subset to include commodities in these categories: shells, corals, ornamental fish, fish oil, seaweed and plants, sponges (see: raw/commodities2products.csv for details).
+**Description**:  Quantity (tonnes) and value (USD) of raw commodities (Exports only) for each country, taxa, year. The FAO data is subset to include commodities in these categories: shells, corals, ornamental fish, fish oil, seaweed and plants, sponges (see: raw/commodities2products.csv for details).
 
 **Time range**: 1976-2021
 
