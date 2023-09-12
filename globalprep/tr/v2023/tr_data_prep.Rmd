@@ -30,14 +30,15 @@ tr = Ap * Sr
 and
 Xtr = tr/90th quantile across regions
 
-* Ap = Proportion of arrivals to area of coastline (formerly Ep when it represented employment)
+* Ap = Proportion of arrivals to area of coastline to population (formerly Ep when it represented employment)
 * Sr = (S-1)/5; Sustainability of tourism
 
 
 ## The following data are used:
 
-* Numbers of tourist arrivals: obtained through the [UNWTO](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (in the form of thousands of people). Range: 1995-2021
-* Area of coastline, used to calculate proportion of arrivals to area of coastline: calculated in the [LSP goal](https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023). Range: Static
+* Numbers of tourist arrivals, used in the calculation of the proportion of arrivals to area of coastline to population: obtained through the [UNWTO](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (in the form of thousands of people). Range: 1995-2021 (only 2008-2021 is used)
+* Area of coastline, used in the calculation of the proportion of arrivals to area of coastline to population: calculated in the [LSP goal](https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023). Range: Static
+* Population, used in the calculation of the proportion of arrivals to area of coastline to population: primarily uses [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL) data obtained through the WDI() function. Combines [Our World in Data](https://ourworldindata.org/grapher/population) and Statista data ([1](https://www.statista.com/statistics/706807/population-of-saba-in-the-caribbean-netherlands/), [2](https://www.statista.com/statistics/706806/population-of-sint-eustatius-in-the-caribbean-netherlands/), and [3](https://www.statista.com/statistics/706799/population-of-bonaire-in-the-caribbean-netherlands/)) (obtained on their respective websites) with this to get population data for all OHI regions with arrivals and area of coastline data. Range: World Bank - 1960-2022 (2008-2021 is selected and used); Our World in Data - 10,000 BCE-2021 (2008-2021 is used); Statista - 2011-2023 (2011-2021 is used; as of v2023, 3 OHI regions use this data).
 * Tourism sustainability: World Economic Forum. The Travel & Tourism Development Index 2021 dataset (version 24 May 2022). 2022. [TTDI](https://www.weforum.org/reports/travel-and-tourism-development-index-2021/downloads-510eb47e12#report-nav)
 * Per capita GDP: (World Bank with gaps filled using CIA data), used to gapfill missing values in Tourism sustainability
 
@@ -53,7 +54,7 @@ The data for this layer has been paywalled. Because of this, we have replaced th
 
 **We were able to update the following data:**
 
-* Proportion of tourist arrivals to area of coastline - UNWTO data on thousands of tourist arrivals, reported until 2021 (downloaded [here](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (dataset: "Total arrivals" under Inbound Tourism) on 8/10/2023, used in combination with area of coastline calculated in the [LSP goal](https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023), update completed on 6/26/2023)
+* Proportion of tourist arrivals to area of coastline to population - UNWTO data on thousands of tourist arrivals, reported until 2021 (downloaded [here](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (dataset: "Total arrivals" under Inbound Tourism; we use the "Overnights visitors (tourists)" categorization as arrivals) on 8/10/2023, used in combination with area of coastline calculated in the [LSP goal](https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023), update completed on 6/26/2023, and population data primarily from [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL) using the WDI() function, downloaded each time the function is run (most recently used data pulled 9/11/2023), gapfilled with population data, downloaded on 9/7/2023, from [Our World in Data](https://ourworldindata.org/grapher/population) and Statista ([1](https://www.statista.com/statistics/706807/population-of-saba-in-the-caribbean-netherlands/), [2](https://www.statista.com/statistics/706806/population-of-sint-eustatius-in-the-caribbean-netherlands/), and [3](https://www.statista.com/statistics/706799/population-of-bonaire-in-the-caribbean-netherlands/))
 
 ## Initial set-up code
 
@@ -74,198 +75,69 @@ version_year <- "2023"
 prev_ver_yr <- as.character(as.numeric(version_year) - 1)
 
 source(paste0("http://ohi-science.org/ohiprep_v", version_year, "/workflow/R/common.R"))
+region_data()
+regions_shape()
 #source(here(paste0("globalprep/tr/v", version_year, "/R/tr_fxns.R"))) # not used presently
 ```
 
 
-# Ap: Proportion of tourist arrivals to area of coastline
+# Ap: Proportion of tourist arrivals to area of coastline to population
 
-We use tourist arrival data from the [United Nations World Tourism Organization (UNWTO) ](https://www.unwto.org/). Up until the current assessment, we accessed data from the [WTTC](http://www.wttc.org/), but this is no longer a viable option. This is in the form of thousands of people arriving, which we divide by area of coastline for each country. Missing values in this data are gapfilled by upfilling or downfilling years of data based on if the previous or later year has information; we were not able to further gapfill with other methods at this time.
+We use tourist arrival data from the [United Nations World Tourism Organization (UNWTO) ](https://www.unwto.org/). Up until the current assessment, we accessed data from the [World Travel & Tourism Council (WTTC)](http://www.wttc.org/), but this is no longer a viable option. This is in the form of thousands of people arriving, which we divide by area of coastline for each country and further by population for each country. Missing values in arrivals (for our purposes, "Overnights visitors (tourists)") are gapfilled using "Total arrivals" minus "Same-day visitors (excursionists)" (if available) or, secondarily, by upfilling or downfilling (prioritizing downfilling) years of data based on if the previous or later year has information. Missing values in the primarily-used population data source are gapfilled using two other data sources, and one data source's years are gapfilled by upfilling. We were not able to further gapfill with other methods at this time.
 
 
-### Calculating the proportion of tourist arrivals to area of coastline
+### Calculating the proportion of tourist arrivals to area of coastline to population
 
-The number of arrivals to area of coastline is used as a proxy for the value that people have for experiencing and enjoying coastal areas. We gather tourist arrivals and make it a proportion by dividing them by the area of coastline for the associated OHI region.
+The number of arrivals to area of coastline is used as a proxy for the value that people have for experiencing and enjoying coastal areas. We gather tourist arrivals and make it a proportion by dividing them by the area of coastline and by the population for the associated OHI region.
 
-### Source cleaned arrivals and area of coastline data sources
+### Source cleaned and gapfilled arrivals, area of coastline, and population data sources
 
 ```{r, eval=FALSE}
 # source in cleaned UNWTO data for current version year (make sure to download from website and put on Mazu in the UNWTO folder first)
-source(here(paste0("globalprep/tr/v", version_year, "/R/process_UNWTO_arrivals.R"))) # outputs unwto_dupe_fix
-# note: this script fills the total with values from Overnights or Same-day because it is not autofilled: Total originally is either a value on its own or the sum of Overnights and Same-day but must have both values, otherwise is NA
+source(here(paste0("globalprep/tr/v", version_year, "/R/process_UNWTO_arrivals.R"))) # outputs unwto_dupe_fix_downup_gf
 
-# source in prepared area of coastline data: uses current version year for these files by default
+# source in prepared area of coastline data: uses current version year for these files by default (acquire up-to-date LSP data if applicable)
 source(here(paste0("globalprep/tr/v", version_year, "/R/process_area_of_coastline.R"))) # outputs inland_offshore
+
+# source in prepared populations data by ohi region: uses current version year for these files by default (download up-to-date data if applicable)
+source(here(paste0("globalprep/tr/v", version_year, "/R/process_populations.R"))) # outputs combined_pops_filled
+
+# check outputs of everything!
 ```
 
-### Divide tourist arrival count data by area of coastline
+### Divide tourist arrival count data by area of coastline and divide again by population
 
 ```{r, eval=FALSE}
-# divide the number of tourist arrivals by area of coastline to get the proportion
-tourism_props <- unwto_dupe_fix %>% 
+# divide the number of tourist arrivals by area of coastline and population to get the proportion
+tourism_props <- unwto_dupe_fix_downup_gf %>%
   left_join(inland_offshore, by = c("rgn_id", "year")) %>%
-  mutate(Ap = (tourism_arrivals_ct/total_inland_offshore_area))
+  left_join(combined_pops_filled, by = c("rgn_id", "year")) %>%
+  mutate(Ap = (tourism_arrivals_ct/total_inland_offshore_area/population)) %>%
+  filter(year >= 2008) # filter to the years we are interested in for any data that isn't filtered yet
 
 # check out things so far
-summary(tourism_props) # v2023: 435 NAs in Ap
+summary(tourism_props) # should be 0 NAs for Ap if gapfilling worked
 
 # remove unnecessary columns after checking summary
 tourism_props <- tourism_props %>%
-  select(-tourism_arrivals_ct, -total_inland_offshore_area)
-```
-
-### Gapfill using previous/next years for same region
-
-```{r, eval=FALSE}
-# make year a factor for ordering with gapfilling
-tourism_props$year <- factor(tourism_props$year, levels = unique(tourism_props$year))
-
-# prepare a "gapfilled" column to indicate "gapfilled" or NA
-tourism_props_for_gf <- tourism_props %>%
-    mutate(gapfilled = NA)
-
-# downfill then upfill missing values
-# use 2019 if available to fill 2021, then 2020 if not, to account for COVID-19
-# v2023: check rgn_id 114, for example, for if choosing 2019 vs. 2020 worked
-tourism_props_downup_gf <- tourism_props_for_gf %>%
-  group_by(rgn_id) %>%
-  arrange(rgn_id, year) %>%
-  mutate(Ap = ifelse(year == 2021 & is.na(Ap), lag(Ap, n = 2), Ap)) %>%
-  fill(Ap, .direction = "downup") %>%
-  mutate(method = ifelse(is.na(method) & !is.na(Ap), "nearby year", method)) %>%
-  mutate(gapfilled = ifelse(method == "nearby year", "gapfilled", gapfilled))
-
-# check out things so far
-summary(tourism_props_downup_gf) # v2023: 135 NAs in Ap
-```
-
-### Gapfilling using UN georegions (not used v2023)
-
-To round out the gapfilling, we could use georegions. This has a very low correlation with the data, but it was the simplest viable option discovered. We decided ultimately just to leave values that would have been gapfilled by georegion as NAs since it did not seem to be reliable enough.
-
-```{r, eval=FALSE}
-# # the below ended up not being used (v2023)
-# # gapfill missing data using UN georegion data
-# # prepare the georegion data
-# georegions <- georegions
-# georegion_labels <- georegion_labels
-# 
-# tourism_props_geo_gf <- tourism_props_downup_gf %>%
-#   left_join(georegions, by = 'rgn_id') %>%
-#   left_join(georegion_labels, by = 'rgn_id') %>%
-#   select(-r0)
-# 
-# # the below shows the low R-squared with georegions
-# summary(lm(Ap ~ r1_label + r2_label, data = tourism_props_geo_gf))
-# # 
-# # Call:
-# # lm(formula = Ap ~ r1_label + r2_label, data = tourism_props_geo_gf)
-# # 
-# # Residuals:
-# #    Min     1Q Median     3Q    Max 
-# # -23100   -745   -101      5 463002 
-# # 
-# # Coefficients: (5 not defined because of singularities)
-# #                                         Estimate Std. Error t value Pr(>|t|)
-# # (Intercept)                               215.60    1187.25   0.182  0.85590
-# # r1_labelAmericas                          -29.46    3141.16  -0.009  0.99252
-# # r1_labelAsia                             3660.65    1592.86   2.298  0.02160
-# # r1_labelEurope                           6786.93    2189.17   3.100  0.00195
-# # r1_labelLatin America and the Caribbean  -113.48    1716.76  -0.066  0.94730
-# # r1_labelOceania                          -187.87    3141.16  -0.060  0.95231
-# # r2_labelCaribbean                         746.66    1471.11   0.508  0.61179
-# # r2_labelCentral America                   218.51    1911.03   0.114  0.90897
-# # r2_labelEastern Africa                   -120.19    1760.97  -0.068  0.94559
-# # r2_labelEastern Asia                    -3347.02    2314.37  -1.446  0.14819
-# # r2_labelEastern Europe                  -2168.00    2601.13  -0.833  0.40462
-# # r2_labelMelanesia                         -18.69    3440.97  -0.005  0.99567
-# # r2_labelMicronesia                         51.47    3440.97   0.015  0.98807
-# # r2_labelMiddle Africa                    -110.76    2056.37  -0.054  0.95705
-# # r2_labelNorthern Africa                    95.93    2056.37   0.047  0.96279
-# # r2_labelNorthern America                      NA         NA      NA       NA
-# # r2_labelNorthern Europe                 -6240.07    2252.64  -2.770  0.00563
-# # r2_labelPolynesia                         -12.61    3297.53  -0.004  0.99695
-# # r2_labelSouth America                         NA         NA      NA       NA
-# # r2_labelSouth-Eastern Asia              -2272.44    1679.02  -1.353  0.17598
-# # r2_labelSouthern Africa                    60.55    3141.16   0.019  0.98462
-# # r2_labelSouthern Asia                   -3792.93    1986.64  -1.909  0.05630
-# # r2_labelSouthern Europe                 16141.80    2252.64   7.166 8.99e-13
-# # r2_labelWestern Africa                        NA         NA      NA       NA
-# # r2_labelWestern Asia                          NA         NA      NA       NA
-# # r2_labelWestern Europe                        NA         NA      NA       NA
-# #                                            
-# # (Intercept)                                
-# # r1_labelAmericas                           
-# # r1_labelAsia                            *  
-# # r1_labelEurope                          ** 
-# # r1_labelLatin America and the Caribbean    
-# # r1_labelOceania                            
-# # r2_labelCaribbean                          
-# # r2_labelCentral America                    
-# # r2_labelEastern Africa                     
-# # r2_labelEastern Asia                       
-# # r2_labelEastern Europe                     
-# # r2_labelMelanesia                          
-# # r2_labelMicronesia                         
-# # r2_labelMiddle Africa                      
-# # r2_labelNorthern Africa                    
-# # r2_labelNorthern America                   
-# # r2_labelNorthern Europe                 ** 
-# # r2_labelPolynesia                          
-# # r2_labelSouth America                      
-# # r2_labelSouth-Eastern Asia                 
-# # r2_labelSouthern Africa                    
-# # r2_labelSouthern Asia                   .  
-# # r2_labelSouthern Europe                 ***
-# # r2_labelWestern Africa                     
-# # r2_labelWestern Asia                       
-# # r2_labelWestern Europe                     
-# # ---
-# # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# # 
-# # Residual standard error: 21370 on 4515 degrees of freedom
-# #   (135 observations deleted due to missingness)
-# # Multiple R-squared:  0.06147,	Adjusted R-squared:  0.05731 
-# # F-statistic: 14.79 on 20 and 4515 DF,  p-value: < 2.2e-16
-# 
-#
-#
-#
-# # calculate two different gapfill columns using r2 and r1
-# tourism_props_geo_gf <- tourism_props_geo_gf %>%
-#   group_by(year, r2) %>%
-#   mutate(Ep_pred_r2 = mean(Ep, na.rm=TRUE)) %>%
-#   ungroup() %>%
-#   group_by(year, r1) %>%
-#   mutate(Ep_pred_r1 = mean(Ep, na.rm=TRUE)) %>%
-#   ungroup()
-# 
-# # first gapfill with r2, if no value available use r1; create column indicating whether value was gapfilled and if so, by what method.
-# tourism_props_geo_gf <- tourism_props_geo_gf %>%
-#   mutate(Ap_all = ifelse(is.na(Ap), Ap_pred_r2, Ap)) %>%
-#   mutate(Ap_all = ifelse(is.na(Ap_all), Ap_pred_r1, Ap_all)) %>% 
-#   mutate(gapfilled = case_when(is.na(Ap) & !is.na(Ap_all) ~ "gapfilled",
-#          TRUE ~ gapfilled)) %>%
-#   mutate(method = case_when(is.na(Ap) & !is.na(Ap_pred_r2) ~ "UN georegion (r2)",
-#                             is.na(Ap) & is.na(Ap_pred_r2) & !is.na(Ap_pred_r1) ~ "UN georegion (r1)",
-#                             TRUE ~ method))
+  select(-tourism_arrivals_ct, -total_inland_offshore_area, -population)
 ```
 
 ### Rescale the proportions to be between 0 and 1
 
 ```{r, eval=FALSE}
 # rescale to make highest Ap value 1
-quantile_marker <- quantile(tourism_props_downup_gf$Ap, probs = 0.90, na.rm = TRUE) # 90th quantile = 1
-tourism_props_downup_gf$Ap_rescaled <- tourism_props_downup_gf$Ap / quantile_marker # divide all values by this value
-tourism_props_downup_gf$Ap_rescaled <- pmin(tourism_props_downup_gf$Ap_rescaled, 1) # any above 1 still rescale to 1
+quantile_marker <- quantile(tourism_props$Ap, probs = 0.90, na.rm = TRUE) # 90th quantile = 1
+tourism_props$Ap_rescaled <- tourism_props$Ap / quantile_marker # divide all values by this value
+tourism_props$Ap_rescaled <- pmin(tourism_props$Ap_rescaled, 1) # any above 1 still rescale to 1
 
 # exploratory checks
-hist(tourism_props_downup_gf$Ap_rescaled, main = "Distribution of Rescaled Ap Values") # check out the distribution
-perfect_scores <- tourism_props_downup_gf %>% filter(Ap_rescaled == 1) # get the times the Ap = 1
+hist(tourism_props$Ap_rescaled, main = "Distribution of Rescaled Ap Values") # check out the distribution
+perfect_scores <- tourism_props %>% filter(Ap_rescaled == 1) # get the times the Ap = 1
 unique(perfect_scores$rgn_id) # which countries have at least one Ap value = 1?
 
 # make rescaled column the actual value column
-tourism_props_rescaled <- tourism_props_downup_gf %>%
+tourism_props_rescaled <- tourism_props %>%
   select(-Ap) %>%
   rename(Ap = Ap_rescaled)
 ```
@@ -283,7 +155,7 @@ low_pop <- low_pop %>%
 summary(tourism_props_rescaled)
 # v2020 371 NAs
 # v2022 114 NAs
-# v2023 135 NAs
+# v2023 0 NAs (because of gapfilling)
 
 # make sure all the NAs are uninhabited regions
 tourism_props_nas <- tourism_props_rescaled %>% 
@@ -297,11 +169,9 @@ tourism_props_nas %>%
 
 max(tourism_props_nas$est_population, na.rm=TRUE) < 3000 # should be true
 
-# make sure all the uninhabited regions are NA (along with gapfill and method if they were gapfilled above)
+# make sure all the uninhabited regions are NA and then drop them (all NA regions get added back as a last step just in case its relevant)
 tourism_props_rescaled <- tourism_props_rescaled %>% 
-  mutate(Ap = ifelse(rgn_id %in% low_pop$rgn_id, NA, Ap)) %>% 
-  mutate(gapfilled = ifelse(is.na(Ap), NA, gapfilled)) %>% 
-  mutate(method = ifelse(is.na(Ap), NA, method))
+  mutate(Ap = ifelse(rgn_id %in% low_pop$rgn_id, NA, Ap)) 
 
 
 # check NAs once more 
@@ -309,21 +179,49 @@ summary(tourism_props_rescaled)
 # v2019: Adding the low pop df identifies 13 additional regions that should be NA instead of gapfilled, taking the total number of NAs in the data set from 245 to 700
 # v2020: Adding the low pop df takes the total number of NAs in the data set from 371 to 832
 # v2022: Adding the low pop df takes the total number of NAs in the data set from 14 to 40
-# v2023: NAs do not change
+# v2023: Adding the low pop df takes the total number of NAs in the data set from 0 to 14
+
+# after checking NAs, get rid of them
+tourism_props_rescaled <- tourism_props_rescaled %>% 
+  drop_na(Ap)
 ```
 
 ### Write output files
 
 ```{r, eval=FALSE}
+# we want to make sure all OHI regions are present in the data, even if could not calculate Ap (this will add back in what we removed above as well as any region not present in the data)
+year_range <- unique(tourism_props_rescaled$year) # get the year range of Ap
+year_range_df <- data.frame(year = year_range) # make it a dataframe
+
+eez_to_combine <- rgns_eez %>%
+  select(rgn_id) %>% # get all OHI regions
+  crossing(., year_range_df) # expand OHI regions so theres one entry for each applicable year
+
+# we did not maintain info on regions with population data but no arrivals data since we joined population to regions with arrivals data, so let's get that back just to have complete info on our data
+countries_w_pop_data_no_arrivals <- setdiff(combined_pops_filled$rgn_id, unwto_dupe_fix_downup_gf$rgn_id) # find regions this is the case for
+countries_w_pop_data_no_arrivals_df <- combined_pops_filled %>%
+  filter(rgn_id %in% countries_w_pop_data_no_arrivals) %>%
+  select(rgn_id, year, population) # get population data for the regions with no arrivals data but yes population data, that way later these will be the only regions with that data and we can use that to set population_method
+  
+  
+tourism_props_rescaled_eez <- eez_to_combine %>%
+  left_join(countries_w_pop_data_no_arrivals_df, by = c("rgn_id", "year")) %>% # add in the population data to later create new column
+  left_join(tourism_props_rescaled, by = c("rgn_id", "year")) %>% # add this to all regions, so we get Ap values for regions that have them and NAs for ones that don't
+  mutate(population_method = ifelse(!is.na(population), "WDI-WB", population_method)) %>% # set method based on having population data (this will be the regions with no arrivals data but yes population data)
+  select(-population) %>% # don't need this anymore
+  mutate(coastline_method = "LSP",
+         coastline_gapfilled = NA) # adding gf columns for coastline data for consistency but we have data for all OHI regions, so it's all the same
+  
+
 # save gapfill info
-tourism_props_gf_to_write <- tourism_props_rescaled %>%
-  select(rgn_id, year, gapfilled, method)
+tourism_props_gf_to_write <- tourism_props_rescaled_eez %>%
+  select(-Ap) # don't need actual values for the gapfill information
 
 write_csv(tourism_props_gf_to_write, here(paste0("globalprep/tr/v", version_year, "/output/tr_arrivals_props_tourism_gf.csv")))
 
 # save gap-filled data
-tourism_props_to_write <- tourism_props_rescaled %>%
-  select(rgn_id, year, Ap) 
+tourism_props_to_write <- tourism_props_rescaled_eez %>%
+  select(rgn_id, year, Ap) # don't need gf info here, just the values
 
 write_csv(tourism_props_to_write, here(paste0("globalprep/tr/v", version_year, "/output/tr_arrivals_props_tourism.csv")))
 ```
@@ -341,12 +239,12 @@ tourism_props_compare <- tourism_props_to_write %>%
 # compare 2019 and 2020
 plot(tourism_props_compare$"2019", tourism_props_compare$"2020",
      xlab = "v2023 2019 Arrivals Proportion", ylab = "v2023 2020 Arrivals Proportion")
-abline(0, 1)
+abline(0, 1) # more data below the line
 
 # compare 2020 and 2021
 plot(tourism_props_compare$"2020", tourism_props_compare$"2021",
      xlab = "v2023 2020 Arrivals Proportion", ylab = "v2023 2021 Arrivals Proportion")
-abline(0, 1)
+abline(0, 1) # more dara above the line
 ```
 
 Everything looks reasonable.
@@ -403,6 +301,138 @@ compare_common_data_2015 <- new_data %>%
 plot(compare_common_data_2015$Ap, compare_common_data_2015$Ep,
      xlab = "v2023 Arrivals Proportion", ylab = "v2022 Employment Proportion")
 abline(0, 1)
+```
+
+### Check out some specific countries (v2023) -- this was for exploring changes in methodology, can skip or use/edit parts in future years
+
+```{r}
+# check some countries that changed a lot in v2023's first push to global
+check_countries_graph <- tourism_props %>% 
+  filter(rgn_id == 24 | rgn_id == 51 | rgn_id == 189 | rgn_id == 118 | rgn_id == 31) %>%
+  mutate(rgn_id_plot = as.factor(rgn_id),
+         year_plot = as.Date(year, "%Y"))
+
+Ap_graph <- ggplot(check_countries_graph, aes(x = year_plot, y = Ap, color = rgn_id_plot)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "",
+       color = "Region ID")
+
+Ap_rescaled_graph <- ggplot(check_countries_graph, aes(x = year_plot, y = Ap_rescaled, color = rgn_id_plot)) +
+  geom_line() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(x = "Year",
+       y = "Rescaled Ap")
+
+library(patchwork)
+Ap_graph / Ap_rescaled_graph
+
+countries_in_2021 <- check_countries_graph %>%
+  filter(year == "2021") %>%
+  left_join(rgns_eez, by = "rgn_id") %>%
+  select(-year_plot, -admin_rgn_id, -admin_country_name, -Notes, -rgn_id_plot, -eez_iso3, -territory)
+
+library(kableExtra)
+kable(countries_in_2021) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# check what countries have really large Ap before rescaling and check the inland + offshore area of those (to see if a small area is skewing things)
+top_Ap_values <- tourism_props %>%
+  left_join(inland_offshore, by = c("rgn_id", "year")) %>%
+  group_by(rgn_id) %>%
+  summarize(max_Ap = max(Ap),
+            total_inland_offshore_area = mean(total_inland_offshore_area)) %>%
+  arrange(desc(max_Ap)) %>%
+  left_join(rgns_eez, by = "rgn_id") %>%
+  select(rgn_name, max_Ap, total_inland_offshore_area)
+
+kable(top_Ap_values, digits = 2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# prepare total area (land + 3 nm offshore) of each ohi region
+library(sf)
+regions_no_geom <- regions %>%
+  st_drop_geometry() %>%
+  filter(rgn_type == "land") %>%
+  select(rgn_id, area_km2) %>%
+  left_join(offshore_data, by = "rgn_id", relationship = "many-to-many") %>%
+  select(-a_prot_km2, -rgn_name) %>%
+  mutate(area_tot = area_km2 + a_tot_km2,
+         year = as.character(year)) %>%
+  select(-area_km2, -a_tot_km2)
+
+# combine inland + offshore data, population, total area, arrivals, original Ap (arrivals/coastline), and some tests of other Ap calculations
+top_Ap_values_2021 <- tourism_props %>% # can adapt this code to find countries to manually add population data for
+  ungroup() %>%
+  left_join(combined_pops_filled, by = c("rgn_id", "year")) %>%
+  select(rgn_id, year, population, Ap) %>%
+  left_join(unwto_dupe_fix_downup_gf, by = c("rgn_id", "year")) %>%
+  select(-arrivals_method) %>%
+  left_join(rgns_eez, by = c("rgn_id")) %>%
+  select(rgn_id, rgn_name, tourism_arrivals_ct, Ap, year) %>%
+  left_join(inland_offshore, by = c("rgn_id", "year")) %>%
+  left_join(combined_pops_filled, by = c("rgn_id", "year")) %>%
+  left_join(regions_no_geom, by = c("rgn_id", "year"), relationship = "many-to-many") %>%
+  select(rgn_id, rgn_name, Ap, year, area_tot, population, total_inland_offshore_area, tourism_arrivals_ct) %>%
+  group_by(rgn_id) %>%
+  arrange(rgn_id, year) %>%
+  mutate(tourism_arrivals_ct = ifelse(year == 2021 & is.na(tourism_arrivals_ct), lag(tourism_arrivals_ct, n = 2), tourism_arrivals_ct)) %>%
+  fill(tourism_arrivals_ct, .direction = "downup") %>%
+  ungroup() %>%
+  filter(year == 2021) %>%
+  group_by(rgn_id) %>%
+  mutate(Ap_w_pop_and_tot_area = (tourism_arrivals_ct/total_inland_offshore_area/population/area_tot),
+         Ap_w_pop = (tourism_arrivals_ct/total_inland_offshore_area/population), # will be slightly different than the Ap value because this code gapfills arrivals (before dividing anything), while the Ap values gapfilled Ap values after dividing everything; can alter the code if you want a different comparison
+         Ap_w_tot_area = (tourism_arrivals_ct/total_inland_offshore_area/area_tot)) %>%
+  ungroup() %>%
+  select(rgn_name, Ap, Ap_w_pop, Ap_w_tot_area, Ap_w_pop_and_tot_area, area_tot, population, total_inland_offshore_area, tourism_arrivals_ct) %>%
+  arrange(desc(Ap)) # decide what to arrange by highest to lowest
+
+# create table that has everything
+kable(top_Ap_values_2021, digits = 5) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# create histogram of Ap
+hist(top_Ap_values_2021$Ap, breaks = 100, main = "Distribution of Ap", xlab = "Ap")
+
+# check where Ap values fall for these countries (should hopefully not be too low but may be unavoidable)
+which(top_Ap_values_2021$rgn_name == "United States")
+which(top_Ap_values_2021$rgn_name == "China")
+which(top_Ap_values_2021$rgn_name == "India")
+which(top_Ap_values_2021$rgn_name == "Russia")
+which(top_Ap_values_2021$rgn_name == "Philippines")
+
+# table of final (rescaled) Ap values for current version year
+new_data_for_table_2021 <- new_data %>%
+  left_join(rgns_eez, by = "rgn_id") %>%
+  select(rgn_id, rgn_name, year, Ap) %>%
+  arrange(desc(Ap)) %>%
+  rename(Ap_rescaled = Ap) %>%
+  filter(year == 2021) %>% 
+  select(-year)
+
+kable(new_data_for_table_2021, digits = 5) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# create histogram of Ap (rescaled)
+hist(new_data_for_table_2021$Ap_rescaled, breaks = 100, main = "Distribution of Ap (rescaled)", xlab = "Ap (rescaled)")
+
+# check where Ap (rescaled) values fall for these countries (should hopefully not be too low but may be unavoidable)
+which(new_data_for_table_2021$rgn_name == "United States")
+which(new_data_for_table_2021$rgn_name == "China")
+which(new_data_for_table_2021$rgn_name == "India")
+which(new_data_for_table_2021$rgn_name == "Russia")
+which(new_data_for_table_2021$rgn_name == "Philippines")
+
+# check some more countries (rescaled)
+new_data_for_table_2021 %>%
+  filter(rgn_id == 80 | rgn_id == 110 | rgn_id == 18 | rgn_id == 162)
+
+which(new_data_for_table_2021$rgn_name == "Greece")
+which(new_data_for_table_2021$rgn_name == "Bahamas")
+which(new_data_for_table_2021$rgn_name == "Fiji")
+which(new_data_for_table_2021$rgn_name == "New Zealand")
 ```
 
 

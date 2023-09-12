@@ -11,6 +11,6 @@ More information about the Tourism and Recreation Goal [here](http://ohi-science
 
 Our [data managment SOP](https://rawgit.com/OHI-Science/ohiprep/master/src/dataOrganization_SOP.html) describes how we manage OHI global data, including a description of the file structure.
 
-Please see our [citation policy](http://ohi-science.org/citation-policy/) if you use OHI data or methods.
+Please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/) if you use OHI data or methods.
 
 Thank you!
