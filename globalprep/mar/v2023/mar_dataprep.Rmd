@@ -89,7 +89,8 @@ library(plotly)
 
 ## Load FAO-specific user-defined functions
 source('mar_fxs.R') # functions specific to mariculture dealing with compound countries
-source('../../../workflow/R/fao_fxn.R') # function for cleaning FAO files
+source('../../../workflow/R/fao_fxn.R') # old function for cleaning fao data
+source('../../../workflow/R/fao_online_portal_clean.R') #new fao cleaning function
 source('../../../workflow/R/common.R') # directory locations
 ```
 
@@ -128,9 +129,8 @@ mar <- mar %>%
          FAO_name = `ASFIS species Name En`, 
          fao = `FAO major fishing area Name En`, 
          environment = `Environment Name En`,
-         family_scientific = `Family Scientific name`) %>%
-  rename_at(vars(matches("\\[")), ~ str_remove(., "\\[")) %>%
-  rename_at(vars(matches("\\]")), ~ str_remove(., "\\]"))
+         family_scientific = `Family Scientific name`) %>% 
+    mutate(FAO_name = ifelse(!is.na(FAO_name), FAO_name, family_scientific)) #if species name is NA then use the family name
 
 
 table(mar$environment) 
@@ -143,35 +143,9 @@ filter(environment %in% c("Brackishwater", "Marine"))
 #As of 2023 we no longer need to run the fao_clean_data_new function
 # NAs are no longer saved as ... and the flags are in a separate column
 #however we should still replace columns where the flag is N w/.1
-sub_N = 0.1
-
-mar <- mar %>% mutate(row_id = row_number())
 
 
-#pivot all of the year/value columns 
-mar_values <- mar %>% 
-  select(-c(paste("1950":latest_data_year, "Flag"))) %>% 
-  pivot_longer(cols = paste0("1950":latest_data_year),
-               names_to = "year",
-               values_to = "value")
-
-#pivot all of the flag columns   
-mar_flags <- mar %>% select(-paste0("1950":latest_data_year)) %>% 
-  pivot_longer(cols = paste("1950":latest_data_year, "Flag"),
-               names_to = "flag_year",
-               values_to = "flag") %>% 
-  mutate(year = str_remove(flag_year, " Flag")) %>% 
-  select(year, flag, row_id)
-  
-#combine flag and row id 
-mar <- mar_values %>% left_join(mar_flags, by = c("row_id", "year"))
-
-mar <- mar %>% 
-  mutate(value = case_when(str_detect(flag, "N") ~ sub_N,
-                               TRUE ~value)) %>%
-  select(-row_id) %>% 
-  mutate(FAO_name = ifelse(!is.na(FAO_name), FAO_name, family_scientific)) 
-
+mar <- mar %>% fao_online_portal_clean(initial_data_year = 1950, last_data_year = latest_data_year)
 ```
 
 ## Update species names
