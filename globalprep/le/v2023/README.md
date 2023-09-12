@@ -6,19 +6,21 @@ More detailed methods and explanations are available in the livelihoods_economie
 
 For all datasets, except tourism revenue, the current format has one value for each country and year included in the dataset. Tourism uses a pre-cleaned version of the revenue data, so countries have already been converted to regions. We did not do any gapfilling to fill in countries missing from the cleaned data sets, so this will likely need to be done for most of the included data.
 
-Acronyms for sectors used in the original output layers are used for simplicity of incorporating into the finalized OHI model. A new sector FP was added in this analysis, and will need to be incorporated into the model.
+Acronyms for sectors used in the original output layers are used for simplicity of incorporating into the finalized OHI model. A new sector fish processing FP was added in this analysis, and will need to be incorporated into the model.
 
-| Sector                      | Acronym |
-|-----------------------------|---------|
-| Fishing                     | cf      |
-| Mariculture                 | mar     |
-| Tourism                     | tour    |
-| Ports and Harbors           | ph      |
-| Ship and Boat Building      | sb      |
-| Aquarium Fishing            | aqf     |
-| Transportation and Shipping | tran    |
-| Marine Mammal Watching      | mmw     |
-| Wave and Renewable Energy   | og      |
+| Sector                                                   | Acronym |
+|----------------------------------------------------------|---------|
+| Fishing (formerly commercial fishing)                    | cf      |
+| Mariculture                                              | mar     |
+| Tourism                                                  | tour    |
+| Ports and Harbors                                        | ph      |
+| Ship and Boat Building                                   | sb      |
+| Aquarium Fishing                                         | aqf     |
+| Transportation and Shipping                              | tran    |
+| Marine Mammal Watching                                   | mmw     |
+| Ocean Energy (formerly wave and tidal energy)            |  wte    |
+| fish processing (not formerly included)                  | fp      |
+| ? (unclear what this is, only in original revenue files) | og      |
 
 # Revenue:
 
@@ -70,20 +72,22 @@ Methods Description:
     -   It was unclear how this process was implemented in the previous methods, this was replaced with simply filtering out species that were listed as freshwater in the environment column.
 -   [Metadata](https://www.fao.org/fishery/en/collection/aquaculture?lang=en)
 
-### Ocean and Offshore Energy (originally Wave and Renewable Energy)
+### Ocean Energy (originally Wave and Renewable Energy)
 
 -   A new data source from OECD was used
 -   we used the indicator "All ocean and offshore energy (offshore wind + ocean energy) RD&D, million USD 2021 PPP"
--   The Ocean energy data from OECD is actually the amount country and state governments budget for Ocean energy, and is not specifically revenue. However, it is included as this was the only comprehensive data set available with monetary amounts related to Ocean energy, it will likely need to be modified before using as a proxy for revenue.
--   This data set only contains 32 countries, so gap filling will be needed.
+-   The Ocean energy data from OECD is actually the amount country and state governments budget for Ocean energy, and is not specifically revenue. However, it is included as this was the only comprehensive data set available with monetary amounts related to Ocean energy, it will likely need to be modified before being used as a proxy for revenue.
+-   This dataset only contains 32 countries, so gap filling will be needed.
 
 # Jobs:
 
 ### Fishing
 
--   We used People employed in fishing sectors excluding inland fisheries, total by occupation rate, thousands from OECD as the primary data set. Additional countries were filled in using the number of fishers data from the FAO 2019 statistical report.
+-   We used People employed in fishing sectors excluding inland fisheries, total by occupation rate, thousands from [OECD Sustainable Economies Data](#0) as the primary data set.
+-   Additional countries were filled in using the number of fishers data from the [FAO 2019 statistical report](https://www.fao.org/fishery/static/Yearbook/YB2019_USBcard/navigation/index_intro_e.htm).
+-   We were not able to separate subsistence fishing from other fishing jobs, as the data only includes totals for people employed in fishing. For this reason the sector has been renamed from commercial fishing to fishing.
 -   It is worth noting that using a value of 1 job for all employment is different from the original methods. Previously these methods were used: "Employment is disaggregated into full-time, parttime, occasional, and unspecified statuses. These categories are defined as full time workers having \> 90% of their time or livelihood from fishing/aquaculture, part time workers are between 30-90% time (or 30-90% of their livelihood) and occasional workers are \< 30% time. Unspecified status workers could fall anywhere from 0-100% time. Taking the midpoints of those ranges, we assume that 1 part time worker = 0.6 full time workers, 1 occasional worker = 0.15 full time workers, and 1 unspecified worker = 0.5 full time workers, which we used as a weighting scheme for determining total numbers of jobs."
--   A disaggregation version of the OECD data can be found in OECD's [Employment in fisheries, aquaculture and processing Database](#0) if needed. We did not use the dis-aggregated data when preparing this data, as the disaggregated numbers were not available for the FAO data which was used to gapfill.
+-   A disaggregation version of the OECD data can be found in OECD's [Employment in fisheries, aquaculture and processing Database](#0) if needed. We did not use the dis-aggregated data, as the disaggregated numbers were not available for the FAO data which was used to gapfill.
 
 ### Mariculture
 

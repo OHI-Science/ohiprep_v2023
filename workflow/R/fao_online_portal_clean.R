@@ -1,12 +1,20 @@
-fao_online_portal_clean <- function(fao, sub_N = 0.1, initial_data_year, last_data_year) {
+#function for cleaning the fao data in the format available from the online query portal (2023)
 
-#function for cleaning the fao data in the format available from the online query portal
+#' fao_online_portal_clean
+#'
+#' @param fao FAO dataset downloaded from online query portal 
+#' @param initial_data_year initial year available in the dataset
+#' @param last_data_year latest year available in the dataset
+#' @param sub_N value to substitute for rows that have the flaf of N
+#'
+#' @return returns a cleaned version of the fao data
+fao_online_portal_clean <- function(fao,initial_data_year, last_data_year, sub_N = 0.1) {
+
 fao <- fao %>% 
   mutate(row_id = row_number())
 
-
-#N is a flag used by FAO to indicate a minimal amount
-#we replace this with 0.1
+#N is a flag used by FAO to indicate not significant (negligible)
+#we replace this with 0.1, both for tonnes and value in thousands
 
 #pivot all of the year/value columns 
 fao_values <- fao %>% 

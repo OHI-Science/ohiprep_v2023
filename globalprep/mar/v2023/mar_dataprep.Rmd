@@ -139,7 +139,6 @@ table(mar$environment)
 mar <- mar %>%
 filter(environment %in% c("Brackishwater", "Marine")) 
 
-
 #As of 2023 we no longer need to run the fao_clean_data_new function
 # NAs are no longer saved as ... and the flags are in a separate column
 #however we should still replace columns where the flag is N w/.1
