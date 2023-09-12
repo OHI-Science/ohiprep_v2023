@@ -10,7 +10,7 @@ fao <- fao %>%
 
 #pivot all of the year/value columns 
 fao_values <- fao %>% 
-  select(-c(paste(initial_data_year:last_data_year, "Flag"))) %>% 
+  dplyr::select(-c(paste(initial_data_year:last_data_year, "Flag"))) %>% 
   pivot_longer(cols = paste0(initial_data_year:last_data_year),
                names_to = "year",
                values_to = "value")
