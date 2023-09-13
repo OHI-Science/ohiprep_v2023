@@ -4,6 +4,6 @@ See full data prep details [here](https://ohi-science.github.io/ohiprep_v2023/gl
 
 This serves as a pressure for CP, CS, ECO, HAB, LIV, LSP, MAR, NP, & TR.
 
-If using these data, please see our [citation policy](http://ohi-science.org/citation-policy/).
+If using these data, please see our [citation policy](https://oceanhealthindex.org/global-scores/data-download/).
 
   

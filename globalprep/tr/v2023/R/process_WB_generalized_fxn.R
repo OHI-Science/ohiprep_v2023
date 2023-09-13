@@ -1,4 +1,5 @@
 # v2023: THIS ENDED UP NOT BEING USED OTHER THAN IN EXPLORATION, BUT WAS LEFT HERE IN CASE CODE BECOMES RELEVANT IN THE FUTURE
+# the WDI function that we use functions similarly to this
 
 process_wb_data <- function(file_path, value_name, df_name) {
   # read in the csv needing processing

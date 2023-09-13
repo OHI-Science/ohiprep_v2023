@@ -9,6 +9,6 @@ inland_offshore <- inland_data %>%
   left_join(offshore_data, by = join_by(rgn_id, year, rgn_name)) %>%
   select(rgn_id, year, a_tot_km2.x, a_tot_km2.y) %>%
   group_by(rgn_id, year) %>%
-  mutate(total_inland_offshore_area = sum(a_tot_km2.x + a_tot_km2.y),
+  mutate(total_inland_offshore_area = a_tot_km2.x + a_tot_km2.y,
          year = as.character(year)) %>%
   select(rgn_id, year, total_inland_offshore_area)
