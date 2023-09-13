@@ -57,7 +57,7 @@ pop_countries_to_add <- all_arrivals_countries %>%
 combined_pops <- pop_dupe_fix %>%
   rbind(pop_countries_to_add) %>%
   left_join(gf_pop_dupe_fix, by = c("rgn_id", "rgn_name", "year"), relationship =
-              "many-to-many") %>% # check at this point that the data sources have similar enough data for countries in both dataset; can be visual; v2023 looks good
+              "many-to-many") %>%
   group_by(rgn_id, rgn_name, year, population_method) %>%
   summarize(population_gf = ifelse(is.na(population.x), population.y, population.x)) %>%
   mutate(population_method = ifelse(is.na(population_method) & !is.na(population_gf), "OurWorldinData", population_method)) %>%
