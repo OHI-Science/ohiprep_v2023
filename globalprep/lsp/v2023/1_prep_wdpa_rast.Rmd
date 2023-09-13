@@ -58,7 +58,7 @@ This process is all done in the script: `1_prep_wdpa_rast.Rmd`. After that is co
 
 # Updates from previous assessment
 
-2021 Changed data source to 2021 The source data has now been split into 3 different files, so we will need to merge all three shapefiles together, before we can work with the data.
+Changed data source to 2023. The source data has now been split into 3 different files, so we will need to merge all three shapefiles together, before we can work with the data.
 
 We updated the script to save 3 separate files for the reordering and transforming, for ease of use and reproducibility.
 
