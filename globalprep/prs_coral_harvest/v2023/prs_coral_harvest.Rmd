@@ -25,10 +25,10 @@ This analysis converts FAO commodities data into data layers used to calculate O
 
 # Updates from previous assessment
 - New 2 years of FAO data (1976-2021; new years 2020 and 2021)
-- Add/edit code for the Datacheck section
-- Add a tic/toc for timing purposes
-- Add more programmatic year usage
-- Swap np_split_antilles for split_regions (more generalized usage)
+- Added/edited code for the Datacheck section
+- Added a tic/toc for timing purposes
+- Added more programmatic year usage
+- Swapped np_split_antilles for split_regions (more generalized usage)
 - Updates to name_2_rgn reduce the code length of the Rmd
 
 ***

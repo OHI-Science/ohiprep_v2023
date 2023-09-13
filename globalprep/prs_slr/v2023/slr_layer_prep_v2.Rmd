@@ -31,8 +31,8 @@ This process is completed entirely within this script. The raw data is downloade
 # Updates from previous assessment
 
 - One additional year of data, 2021, was added 
-- Add in code to automatically create folders when applicable
-- Add in some more tic/tocs
+- Added in code to automatically create folders when applicable
+- Added in some more tic/tocs
 - Had to change `terra` code back to `raster` for one chunk (making the histograms) to get it to work; later, commented out this code and added a version of histograms that works with `terra`
 
 ***

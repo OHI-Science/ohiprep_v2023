@@ -21,12 +21,12 @@ This script generates the pressure incurred from invasive species for each OHI r
 
 # Updates from previous assessment
 
-- Adding updated data
+- Added updated data
 - Changed downloading method
 - Accounted for more is_invasive and habitat possibilities
 - Added a tic/toc
 - Added ensuring Congo - Brazzaville is converted to Republique du Congo
-- Add code to bind previous year's data to current year
+- Added code to bind previous year's data to current year
 - Added graph comparison to previous version year
 
 
