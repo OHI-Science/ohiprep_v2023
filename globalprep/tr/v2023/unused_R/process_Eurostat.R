@@ -1,4 +1,4 @@
-file_path_euro <- file.path(dir_M, "git-annex", "globalprep", "_raw_data", "EUROSTAT", paste0("d", version_year), "tour_lfs1r2_linear.csv")
+file_path_euro <- file.path(dir_M, "git-annex", "globalprep", "_raw_data", "Eurostat", paste0("d", version_year), "tour_lfs1r2_linear.csv")
 
 # GET THE DATA WE NEED
 euro_data <- read_csv(file_path_euro) %>%
@@ -11,7 +11,7 @@ euro_data <- read_csv(file_path_euro) %>%
   ungroup()
 
 # CONVERT EURO CODES TO NAMES
-file_path_euro_codes <- file.path(dir_M, "git-annex", "globalprep", "_raw_data", "EUROSTAT", paste0("d", version_year), "Country_Codes_and_Names.xlsx.xls")
+file_path_euro_codes <- file.path(dir_M, "git-annex", "globalprep", "_raw_data", "Eurostat", paste0("d", version_year), "Country_Codes_and_Names.xlsx.xls")
 euro_codes <- readxl::read_xlsx(file_path_euro_codes) %>%
   select(country = CODE, country_name = `COUNTRY NAME`)
 
