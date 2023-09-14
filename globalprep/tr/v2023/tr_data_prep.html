@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Compiled on Tue Aug 29 12:12:48 2023 by egg" />
+<meta name="author" content="Compiled on Thu Sep 14 16:05:16 2023 by egg" />
 
 
 <title>OHI 2023 - Tourism and Recreation</title>
@@ -1646,7 +1646,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">OHI 2023 - Tourism and Recreation</h1>
-<h4 class="author"><em>Compiled on Tue Aug 29 12:12:48 2023 by
+<h4 class="author"><em>Compiled on Thu Sep 14 16:05:16 2023 by
 egg</em></h4>
 
 </div>
@@ -1662,19 +1662,33 @@ assessment.</p>
 <p>The general calculation is: tr = Ap * Sr and Xtr = tr/90th quantile
 across regions</p>
 <ul>
-<li>Ap = Proportion of arrivals to area of coastline (formerly Ep when
-it represented employment)</li>
+<li>Ap = Proportion of arrivals to area of coastline to population
+(formerly Ep when it represented employment)</li>
 <li>Sr = (S-1)/5; Sustainability of tourism</li>
 </ul>
 <div id="the-following-data-are-used" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> The following data
 are used:</h2>
 <ul>
-<li>Numbers of tourist arrivals: obtained through the <a href="https://www.unwto.org/tourism-statistics/key-tourism-statistics">UNWTO</a>
-(in the form of thousands of people). Range: 1995-2021</li>
-<li>Area of coastline, used to calculate proportion of arrivals to area
-of coastline: calculated in the <a href="https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023">LSP
+<li>Numbers of tourist arrivals, used in the calculation of the
+proportion of arrivals to area of coastline to population: obtained
+through the <a href="https://www.unwto.org/tourism-statistics/key-tourism-statistics">UNWTO</a>
+(in the form of thousands of people). More info on tourism terms <a href="https://www.unwto.org/glossary-tourism-terms">here</a>. Range:
+1995-2021 (only 2008-2021 is used)</li>
+<li>Area of coastline, used in the calculation of the proportion of
+arrivals to area of coastline to population: calculated in the <a href="https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023">LSP
 goal</a>. Range: Static</li>
+<li>Population, used in the calculation of the proportion of arrivals to
+area of coastline to population: primarily uses <a href="https://data.worldbank.org/indicator/SP.POP.TOTL">World Bank</a>
+data obtained through the WDI() function. Combines <a href="https://ourworldindata.org/grapher/population">Our World in
+Data</a> and Statista data (<a href="https://www.statista.com/statistics/706807/population-of-saba-in-the-caribbean-netherlands/">1</a>,
+<a href="https://www.statista.com/statistics/706806/population-of-sint-eustatius-in-the-caribbean-netherlands/">2</a>,
+and <a href="https://www.statista.com/statistics/706799/population-of-bonaire-in-the-caribbean-netherlands/">3</a>)
+(obtained on their respective websites) with this to get population data
+for all OHI regions with arrivals and area of coastline data. Range:
+World Bank - 1960-2022 (2008-2021 is selected and used); Our World in
+Data - 10,000 BCE-2021 (2008-2021 is used); Statista - 2011-2023
+(2011-2021 is used; as of v2023, 3 OHI regions use this data).</li>
 <li>Tourism sustainability: World Economic Forum. The Travel &amp;
 Tourism Development Index 2021 dataset (version 24 May 2022). 2022. <a href="https://www.weforum.org/reports/travel-and-tourism-development-index-2021/downloads-510eb47e12#report-nav">TTDI</a></li>
 <li>Per capita GDP: (World Bank with gaps filled using CIA data), used
@@ -1702,11 +1716,21 @@ containing a significant amount of missing data and there being a lack
 of sufficient gapfilling methods.</p>
 <p><strong>We were able to update the following data:</strong></p>
 <ul>
-<li>Proportion of tourist arrivals to area of coastline - UNWTO data on
-thousands of tourist arrivals, reported until 2021 (downloaded <a href="https://www.unwto.org/tourism-statistics/key-tourism-statistics">here</a>
-(dataset: “Total arrivals” under Inbound Tourism) on 8/10/2023, used in
-combination with area of coastline calculated in the <a href="https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023">LSP
-goal</a>, update completed on 6/26/2023)</li>
+<li>Proportion of tourist arrivals to area of coastline to population -
+UNWTO data on thousands of tourist arrivals, reported until 2021
+(downloaded <a href="https://www.unwto.org/tourism-statistics/key-tourism-statistics">here</a>
+(dataset: “Total arrivals” under Inbound Tourism; we use the “Overnights
+visitors (tourists)” categorization as arrivals where possible) on
+8/10/2023, used in combination with area of coastline calculated in the
+<a href="https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023">LSP
+goal</a>, update completed on 6/26/2023, and population data primarily
+from <a href="https://data.worldbank.org/indicator/SP.POP.TOTL">World
+Bank</a> using the WDI() function, downloaded each time the function is
+run (most recently used data pulled 9/12/2023), gapfilled with
+population data, downloaded on 9/7/2023, from <a href="https://ourworldindata.org/grapher/population">Our World in
+Data</a> and Statista (<a href="https://www.statista.com/statistics/706807/population-of-saba-in-the-caribbean-netherlands/">1</a>,
+<a href="https://www.statista.com/statistics/706806/population-of-sint-eustatius-in-the-caribbean-netherlands/">2</a>,
+and <a href="https://www.statista.com/statistics/706799/population-of-bonaire-in-the-caribbean-netherlands/">3</a>)</li>
 </ul>
 </div>
 <div id="initial-set-up-code" class="section level2" number="2.3">
@@ -1728,340 +1752,376 @@ code</h2>
 <span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>prev_ver_yr <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">as.numeric</span>(version_year) <span class="sc">-</span> <span class="dv">1</span>)</span>
 <span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">paste0</span>(<span class="st">&quot;http://ohi-science.org/ohiprep_v&quot;</span>, version_year, <span class="st">&quot;/workflow/R/common.R&quot;</span>))</span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#source(here(paste0(&quot;globalprep/tr/v&quot;, version_year, &quot;/R/tr_fxns.R&quot;))) # not used presently</span></span></code></pre></div>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="fu">region_data</span>()</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="fu">regions_shape</span>()</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#source(here(paste0(&quot;globalprep/tr/v&quot;, version_year, &quot;/R/tr_fxns.R&quot;))) # not used presently</span></span></code></pre></div>
 </div>
 </div>
-<div id="ap-proportion-of-tourist-arrivals-to-area-of-coastline" class="section level1" number="3">
+<div id="ap-proportion-of-tourist-arrivals-to-area-of-coastline-to-population" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Ap: Proportion of
-tourist arrivals to area of coastline</h1>
-<p>We use tourist arrival data from the <a href="https://www.unwto.org/">United Nations World Tourism Organization
+tourist arrivals to area of coastline to population</h1>
+<p>We use international arrivals data from the <a href="https://www.unwto.org/">United Nations World Tourism Organization
 (UNWTO)</a>. Up until the current assessment, we accessed data from the
-<a href="http://www.wttc.org/">WTTC</a>, but this is no longer a viable
-option. This is in the form of thousands of people arriving, which we
-divide by area of coastline for each country. Missing values in this
-data are gapfilled by upfilling or downfilling years of data based on if
-the previous or later year has information; we were not able to further
-gapfill with other methods at this time.</p>
-<div id="calculating-the-proportion-of-tourist-arrivals-to-area-of-coastline" class="section level3" number="3.0.1">
+<a href="http://www.wttc.org/">World Travel &amp; Tourism Council
+(WTTC)</a>, but this is no longer a viable option. This is provided in
+the form of thousands of people arriving, which we divide by area of
+coastline for each country and further by population for each country.
+Missing values in arrivals (for our purposes, “Overnights visitors
+(tourists)”) are gapfilled using “Total arrivals” minus “Same-day
+visitors (excursionists)” (if available) or, secondarily, by upfilling
+or downfilling (prioritizing downfilling) years of data based on if the
+previous or later year has information. Missing values in the
+primarily-used population data source are gapfilled using two other data
+sources, and one data source’s years are gapfilled by upfilling. We were
+not able to further gapfill with other methods at this time.</p>
+<div id="calculating-the-proportion-of-tourist-arrivals-to-area-of-coastline-to-population" class="section level3" number="3.0.1">
 <h3><span class="header-section-number">3.0.1</span> Calculating the
-proportion of tourist arrivals to area of coastline</h3>
+proportion of tourist arrivals to area of coastline to population</h3>
 <p>The number of arrivals to area of coastline is used as a proxy for
 the value that people have for experiencing and enjoying coastal areas.
 We gather tourist arrivals and make it a proportion by dividing them by
-the area of coastline for the associated OHI region.</p>
+the area of coastline and by the population for the associated OHI
+region.</p>
 </div>
-<div id="source-cleaned-arrivals-and-area-of-coastline-data-sources" class="section level3" number="3.0.2">
-<h3><span class="header-section-number">3.0.2</span> Source cleaned
-arrivals and area of coastline data sources</h3>
+<div id="source-cleaned-and-gapfilled-arrivals-area-of-coastline-and-population-data-sources" class="section level3" number="3.0.2">
+<h3><span class="header-section-number">3.0.2</span> Source cleaned and
+gapfilled arrivals, area of coastline, and population data sources</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># source in cleaned UNWTO data for current version year (make sure to download from website and put on Mazu in the UNWTO folder first)</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/R/process_UNWTO_arrivals.R&quot;</span>))) <span class="co"># outputs unwto_dupe_fix</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># note: this script fills the total with values from Overnights or Same-day because it is not autofilled: Total originally is either a value on its own or the sum of Overnights and Same-day but must have both values, otherwise is NA</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># source in prepared area of coastline data: uses current version year for these files by default</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/R/process_area_of_coastline.R&quot;</span>))) <span class="co"># outputs inland_offshore</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/R/process_UNWTO_arrivals.R&quot;</span>))) <span class="co"># outputs unwto_dupe_fix_downup_gf</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># source in prepared area of coastline data: uses current version year for these files by default (acquire up-to-date LSP data if applicable)</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/R/process_area_of_coastline.R&quot;</span>))) <span class="co"># outputs inland_offshore</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># source in prepared populations data by ohi region: uses current version year for these files by default (download up-to-date data if applicable)</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/R/process_populations.R&quot;</span>))) <span class="co"># outputs combined_pops_filled</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># check outputs of everything!</span></span></code></pre></div>
 </div>
-<div id="divide-tourist-arrival-count-data-by-area-of-coastline" class="section level3" number="3.0.3">
+<div id="divide-tourist-arrival-count-data-by-area-of-coastline-and-divide-again-by-population" class="section level3" number="3.0.3">
 <h3><span class="header-section-number">3.0.3</span> Divide tourist
-arrival count data by area of coastline</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># divide the number of tourist arrivals by area of coastline to get the proportion</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>tourism_props <span class="ot">&lt;-</span> unwto_dupe_fix <span class="sc">%&gt;%</span> </span>
+arrival count data by area of coastline and divide again by
+population</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># divide the number of tourist arrivals by area of coastline and population to get the proportion</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>tourism_props <span class="ot">&lt;-</span> unwto_dupe_fix_downup_gf <span class="sc">%&gt;%</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">left_join</span>(inland_offshore, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ap =</span> (tourism_arrivals_ct<span class="sc">/</span>total_inland_offshore_area))</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># check out things so far</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">summary</span>(tourism_props) <span class="co"># v2023: 435 NAs in Ap</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co"># remove unnecessary columns after checking summary</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>tourism_props <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>tourism_arrivals_ct, <span class="sc">-</span>total_inland_offshore_area)</span></code></pre></div>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">left_join</span>(combined_pops_filled, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ap =</span> (tourism_arrivals_ct<span class="sc">/</span>total_inland_offshore_area<span class="sc">/</span>population)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2008</span>) <span class="co"># filter to the years we are interested in for any data that isn&#39;t filtered yet</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co"># check out things so far</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">summary</span>(tourism_props) <span class="co"># should be 0 NAs for Ap if gapfilling worked</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># remove unnecessary columns after checking summary</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>tourism_props <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>tourism_arrivals_ct, <span class="sc">-</span>total_inland_offshore_area, <span class="sc">-</span>population)</span></code></pre></div>
 </div>
-<div id="gapfill-using-previousnext-years-for-same-region" class="section level3" number="3.0.4">
-<h3><span class="header-section-number">3.0.4</span> Gapfill using
-previous/next years for same region</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># make year a factor for ordering with gapfilling</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>tourism_props<span class="sc">$</span>year <span class="ot">&lt;-</span> <span class="fu">factor</span>(tourism_props<span class="sc">$</span>year, <span class="at">levels =</span> <span class="fu">unique</span>(tourism_props<span class="sc">$</span>year))</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># prepare a &quot;gapfilled&quot; column to indicate &quot;gapfilled&quot; or NA</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>tourism_props_for_gf <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="cn">NA</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co"># downfill then upfill missing values</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co"># use 2019 if available to fill 2021, then 2020 if not, to account for COVID-19</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co"># v2023: check rgn_id 114, for example, for if choosing 2019 vs. 2020 worked</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>tourism_props_downup_gf <span class="ot">&lt;-</span> tourism_props_for_gf <span class="sc">%&gt;%</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="fu">arrange</span>(rgn_id, year) <span class="sc">%&gt;%</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ap =</span> <span class="fu">ifelse</span>(year <span class="sc">==</span> <span class="dv">2021</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(Ap), <span class="fu">lag</span>(Ap, <span class="at">n =</span> <span class="dv">2</span>), Ap)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="fu">fill</span>(Ap, <span class="at">.direction =</span> <span class="st">&quot;downup&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(method) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap), <span class="st">&quot;nearby year&quot;</span>, method)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="fu">ifelse</span>(method <span class="sc">==</span> <span class="st">&quot;nearby year&quot;</span>, <span class="st">&quot;gapfilled&quot;</span>, gapfilled))</span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co"># check out things so far</span></span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="fu">summary</span>(tourism_props_downup_gf) <span class="co"># v2023: 135 NAs in Ap</span></span></code></pre></div>
-</div>
-<div id="gapfilling-using-un-georegions-not-used-v2023" class="section level3" number="3.0.5">
-<h3><span class="header-section-number">3.0.5</span> Gapfilling using UN
-georegions (not used v2023)</h3>
-<p>To round out the gapfilling, we could use georegions. This has a very
-low correlation with the data, but it was the simplest viable option
-discovered. We decided ultimately just to leave values that would have
-been gapfilled by georegion as NAs since it did not seem to be reliable
-enough.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># # the below ended up not being used (v2023)</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># # gapfill missing data using UN georegion data</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co"># # prepare the georegion data</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># georegions &lt;- georegions</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># georegion_labels &lt;- georegion_labels</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># tourism_props_geo_gf &lt;- tourism_props_downup_gf %&gt;%</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#   left_join(georegions, by = &#39;rgn_id&#39;) %&gt;%</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#   left_join(georegion_labels, by = &#39;rgn_id&#39;) %&gt;%</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#   select(-r0)</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co"># # the below shows the low R-squared with georegions</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># summary(lm(Ap ~ r1_label + r2_label, data = tourism_props_geo_gf))</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co"># # </span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co"># # Call:</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co"># # lm(formula = Ap ~ r1_label + r2_label, data = tourism_props_geo_gf)</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co"># # </span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co"># # Residuals:</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co"># #    Min     1Q Median     3Q    Max </span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co"># # -23100   -745   -101      5 463002 </span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co"># # </span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co"># # Coefficients: (5 not defined because of singularities)</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co"># #                                         Estimate Std. Error t value Pr(&gt;|t|)</span></span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co"># # (Intercept)                               215.60    1187.25   0.182  0.85590</span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co"># # r1_labelAmericas                          -29.46    3141.16  -0.009  0.99252</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co"># # r1_labelAsia                             3660.65    1592.86   2.298  0.02160</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co"># # r1_labelEurope                           6786.93    2189.17   3.100  0.00195</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co"># # r1_labelLatin America and the Caribbean  -113.48    1716.76  -0.066  0.94730</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co"># # r1_labelOceania                          -187.87    3141.16  -0.060  0.95231</span></span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co"># # r2_labelCaribbean                         746.66    1471.11   0.508  0.61179</span></span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co"># # r2_labelCentral America                   218.51    1911.03   0.114  0.90897</span></span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co"># # r2_labelEastern Africa                   -120.19    1760.97  -0.068  0.94559</span></span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co"># # r2_labelEastern Asia                    -3347.02    2314.37  -1.446  0.14819</span></span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co"># # r2_labelEastern Europe                  -2168.00    2601.13  -0.833  0.40462</span></span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co"># # r2_labelMelanesia                         -18.69    3440.97  -0.005  0.99567</span></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co"># # r2_labelMicronesia                         51.47    3440.97   0.015  0.98807</span></span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co"># # r2_labelMiddle Africa                    -110.76    2056.37  -0.054  0.95705</span></span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co"># # r2_labelNorthern Africa                    95.93    2056.37   0.047  0.96279</span></span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a><span class="co"># # r2_labelNorthern America                      NA         NA      NA       NA</span></span>
-<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co"># # r2_labelNorthern Europe                 -6240.07    2252.64  -2.770  0.00563</span></span>
-<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co"># # r2_labelPolynesia                         -12.61    3297.53  -0.004  0.99695</span></span>
-<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="co"># # r2_labelSouth America                         NA         NA      NA       NA</span></span>
-<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co"># # r2_labelSouth-Eastern Asia              -2272.44    1679.02  -1.353  0.17598</span></span>
-<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a><span class="co"># # r2_labelSouthern Africa                    60.55    3141.16   0.019  0.98462</span></span>
-<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a><span class="co"># # r2_labelSouthern Asia                   -3792.93    1986.64  -1.909  0.05630</span></span>
-<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co"># # r2_labelSouthern Europe                 16141.80    2252.64   7.166 8.99e-13</span></span>
-<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="co"># # r2_labelWestern Africa                        NA         NA      NA       NA</span></span>
-<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a><span class="co"># # r2_labelWestern Asia                          NA         NA      NA       NA</span></span>
-<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co"># # r2_labelWestern Europe                        NA         NA      NA       NA</span></span>
-<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="co"># #                                            </span></span>
-<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co"># # (Intercept)                                </span></span>
-<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co"># # r1_labelAmericas                           </span></span>
-<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="co"># # r1_labelAsia                            *  </span></span>
-<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="co"># # r1_labelEurope                          ** </span></span>
-<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a><span class="co"># # r1_labelLatin America and the Caribbean    </span></span>
-<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="co"># # r1_labelOceania                            </span></span>
-<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a><span class="co"># # r2_labelCaribbean                          </span></span>
-<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co"># # r2_labelCentral America                    </span></span>
-<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a><span class="co"># # r2_labelEastern Africa                     </span></span>
-<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a><span class="co"># # r2_labelEastern Asia                       </span></span>
-<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="co"># # r2_labelEastern Europe                     </span></span>
-<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a><span class="co"># # r2_labelMelanesia                          </span></span>
-<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co"># # r2_labelMicronesia                         </span></span>
-<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co"># # r2_labelMiddle Africa                      </span></span>
-<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a><span class="co"># # r2_labelNorthern Africa                    </span></span>
-<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a><span class="co"># # r2_labelNorthern America                   </span></span>
-<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a><span class="co"># # r2_labelNorthern Europe                 ** </span></span>
-<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a><span class="co"># # r2_labelPolynesia                          </span></span>
-<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a><span class="co"># # r2_labelSouth America                      </span></span>
-<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a><span class="co"># # r2_labelSouth-Eastern Asia                 </span></span>
-<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a><span class="co"># # r2_labelSouthern Africa                    </span></span>
-<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a><span class="co"># # r2_labelSouthern Asia                   .  </span></span>
-<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="co"># # r2_labelSouthern Europe                 ***</span></span>
-<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a><span class="co"># # r2_labelWestern Africa                     </span></span>
-<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a><span class="co"># # r2_labelWestern Asia                       </span></span>
-<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a><span class="co"># # r2_labelWestern Europe                     </span></span>
-<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a><span class="co"># # ---</span></span>
-<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a><span class="co"># # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span></span>
-<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a><span class="co"># # </span></span>
-<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a><span class="co"># # Residual standard error: 21370 on 4515 degrees of freedom</span></span>
-<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a><span class="co"># #   (135 observations deleted due to missingness)</span></span>
-<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a><span class="co"># # Multiple R-squared:  0.06147,   Adjusted R-squared:  0.05731 </span></span>
-<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a><span class="co"># # F-statistic: 14.79 on 20 and 4515 DF,  p-value: &lt; 2.2e-16</span></span>
-<span id="cb5-84"><a href="#cb5-84" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-85"><a href="#cb5-85" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb5-86"><a href="#cb5-86" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb5-87"><a href="#cb5-87" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb5-88"><a href="#cb5-88" tabindex="-1"></a><span class="co"># # calculate two different gapfill columns using r2 and r1</span></span>
-<span id="cb5-89"><a href="#cb5-89" tabindex="-1"></a><span class="co"># tourism_props_geo_gf &lt;- tourism_props_geo_gf %&gt;%</span></span>
-<span id="cb5-90"><a href="#cb5-90" tabindex="-1"></a><span class="co">#   group_by(year, r2) %&gt;%</span></span>
-<span id="cb5-91"><a href="#cb5-91" tabindex="-1"></a><span class="co">#   mutate(Ep_pred_r2 = mean(Ep, na.rm=TRUE)) %&gt;%</span></span>
-<span id="cb5-92"><a href="#cb5-92" tabindex="-1"></a><span class="co">#   ungroup() %&gt;%</span></span>
-<span id="cb5-93"><a href="#cb5-93" tabindex="-1"></a><span class="co">#   group_by(year, r1) %&gt;%</span></span>
-<span id="cb5-94"><a href="#cb5-94" tabindex="-1"></a><span class="co">#   mutate(Ep_pred_r1 = mean(Ep, na.rm=TRUE)) %&gt;%</span></span>
-<span id="cb5-95"><a href="#cb5-95" tabindex="-1"></a><span class="co">#   ungroup()</span></span>
-<span id="cb5-96"><a href="#cb5-96" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-97"><a href="#cb5-97" tabindex="-1"></a><span class="co"># # first gapfill with r2, if no value available use r1; create column indicating whether value was gapfilled and if so, by what method.</span></span>
-<span id="cb5-98"><a href="#cb5-98" tabindex="-1"></a><span class="co"># tourism_props_geo_gf &lt;- tourism_props_geo_gf %&gt;%</span></span>
-<span id="cb5-99"><a href="#cb5-99" tabindex="-1"></a><span class="co">#   mutate(Ap_all = ifelse(is.na(Ap), Ap_pred_r2, Ap)) %&gt;%</span></span>
-<span id="cb5-100"><a href="#cb5-100" tabindex="-1"></a><span class="co">#   mutate(Ap_all = ifelse(is.na(Ap_all), Ap_pred_r1, Ap_all)) %&gt;% </span></span>
-<span id="cb5-101"><a href="#cb5-101" tabindex="-1"></a><span class="co">#   mutate(gapfilled = case_when(is.na(Ap) &amp; !is.na(Ap_all) ~ &quot;gapfilled&quot;,</span></span>
-<span id="cb5-102"><a href="#cb5-102" tabindex="-1"></a><span class="co">#          TRUE ~ gapfilled)) %&gt;%</span></span>
-<span id="cb5-103"><a href="#cb5-103" tabindex="-1"></a><span class="co">#   mutate(method = case_when(is.na(Ap) &amp; !is.na(Ap_pred_r2) ~ &quot;UN georegion (r2)&quot;,</span></span>
-<span id="cb5-104"><a href="#cb5-104" tabindex="-1"></a><span class="co">#                             is.na(Ap) &amp; is.na(Ap_pred_r2) &amp; !is.na(Ap_pred_r1) ~ &quot;UN georegion (r1)&quot;,</span></span>
-<span id="cb5-105"><a href="#cb5-105" tabindex="-1"></a><span class="co">#                             TRUE ~ method))</span></span></code></pre></div>
-</div>
-<div id="rescale-the-proportions-to-be-between-0-and-1" class="section level3" number="3.0.6">
-<h3><span class="header-section-number">3.0.6</span> Rescale the
+<div id="rescale-the-proportions-to-be-between-0-and-1" class="section level3" number="3.0.4">
+<h3><span class="header-section-number">3.0.4</span> Rescale the
 proportions to be between 0 and 1</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># rescale to make highest Ap value 1</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>quantile_marker <span class="ot">&lt;-</span> <span class="fu">quantile</span>(tourism_props_downup_gf<span class="sc">$</span>Ap, <span class="at">probs =</span> <span class="fl">0.90</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># 90th quantile = 1</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>tourism_props_downup_gf<span class="sc">$</span>Ap_rescaled <span class="ot">&lt;-</span> tourism_props_downup_gf<span class="sc">$</span>Ap <span class="sc">/</span> quantile_marker <span class="co"># divide all values by this value</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>tourism_props_downup_gf<span class="sc">$</span>Ap_rescaled <span class="ot">&lt;-</span> <span class="fu">pmin</span>(tourism_props_downup_gf<span class="sc">$</span>Ap_rescaled, <span class="dv">1</span>) <span class="co"># any above 1 still rescale to 1</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co"># exploratory checks</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">hist</span>(tourism_props_downup_gf<span class="sc">$</span>Ap_rescaled, <span class="at">main =</span> <span class="st">&quot;Distribution of Rescaled Ap Values&quot;</span>) <span class="co"># check out the distribution</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>perfect_scores <span class="ot">&lt;-</span> tourism_props_downup_gf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Ap_rescaled <span class="sc">==</span> <span class="dv">1</span>) <span class="co"># get the times the Ap = 1</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="fu">unique</span>(perfect_scores<span class="sc">$</span>rgn_id) <span class="co"># which countries have at least one Ap value = 1?</span></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co"># make rescaled column the actual value column</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>tourism_props_rescaled <span class="ot">&lt;-</span> tourism_props_downup_gf <span class="sc">%&gt;%</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Ap) <span class="sc">%&gt;%</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Ap =</span> Ap_rescaled)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># rescale to make highest Ap value 1</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>quantile_marker <span class="ot">&lt;-</span> <span class="fu">quantile</span>(tourism_props<span class="sc">$</span>Ap, <span class="at">probs =</span> <span class="fl">0.90</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># 90th quantile = 1</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>tourism_props<span class="sc">$</span>Ap_rescaled <span class="ot">&lt;-</span> tourism_props<span class="sc">$</span>Ap <span class="sc">/</span> quantile_marker <span class="co"># divide all values by this value</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>tourism_props<span class="sc">$</span>Ap_rescaled <span class="ot">&lt;-</span> <span class="fu">pmin</span>(tourism_props<span class="sc">$</span>Ap_rescaled, <span class="dv">1</span>) <span class="co"># any above 1 still rescale to 1</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co"># exploratory checks</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">hist</span>(tourism_props<span class="sc">$</span>Ap_rescaled, <span class="at">main =</span> <span class="st">&quot;Distribution of Rescaled Ap Values&quot;</span>) <span class="co"># check out the distribution</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>perfect_scores <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Ap_rescaled <span class="sc">==</span> <span class="dv">1</span>) <span class="co"># get the times the Ap = 1</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="fu">unique</span>(perfect_scores<span class="sc">$</span>rgn_id) <span class="co"># which countries have at least one Ap value = 1?</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co"># make rescaled column the actual value column</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>tourism_props_rescaled <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Ap) <span class="sc">%&gt;%</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Ap =</span> Ap_rescaled)</span></code></pre></div>
 </div>
-<div id="removing-low-population-uninhabited-regions" class="section level3" number="3.0.7">
-<h3><span class="header-section-number">3.0.7</span> Removing low
+<div id="removing-low-population-uninhabited-regions" class="section level3" number="3.0.5">
+<h3><span class="header-section-number">3.0.5</span> Removing low
 population / uninhabited regions</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="do">### after gap-filling, make sure low/uninhabited regions are NA</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co"># create df for unpopulated/low populated regions</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">low_pop</span>()</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>low_pop <span class="ot">&lt;-</span> low_pop <span class="sc">%&gt;%</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">filter</span>(est_population <span class="sc">&lt;</span> <span class="dv">3000</span> <span class="sc">|</span> <span class="fu">is.na</span>(est_population)) <span class="sc">%&gt;%</span>  <span class="co"># filter out regions that have populations &gt; or equal to 3000 and keep NA values </span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">rgn_label =</span> rgn_nam)</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">summary</span>(tourism_props_rescaled)</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co"># v2020 371 NAs</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co"># v2022 114 NAs</span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co"># v2023 135 NAs</span></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co"># make sure all the NAs are uninhabited regions</span></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>tourism_props_nas <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span> </span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(Ap)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year) <span class="sc">%&gt;%</span> <span class="co"># v2023: was rgn_id, year, r1_label, r2_label, rgn_label but we did not gapfill by georegion so did not have the last 3</span></span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="fu">left_join</span>(low_pop, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="co"># v2023: was by = c(&quot;rgn_id&quot;, &quot;rgn_label&quot;) but we did not gapfill by georegion so did not have rgn_label</span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>tourism_props_nas <span class="sc">%&gt;%</span> </span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="fu">filter</span>(Inhabited <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(est_population)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="fu">nrow</span>() <span class="co"># 0 ✓</span></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="fu">max</span>(tourism_props_nas<span class="sc">$</span>est_population, <span class="at">na.rm=</span><span class="cn">TRUE</span>) <span class="sc">&lt;</span> <span class="dv">3000</span> <span class="co"># should be true</span></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a></span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co"># make sure all the uninhabited regions are NA (along with gapfill and method if they were gapfilled above)</span></span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>tourism_props_rescaled <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span> </span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ap =</span> <span class="fu">ifelse</span>(rgn_id <span class="sc">%in%</span> low_pop<span class="sc">$</span>rgn_id, <span class="cn">NA</span>, Ap)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Ap), <span class="cn">NA</span>, gapfilled)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Ap), <span class="cn">NA</span>, method))</span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a></span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co"># check NAs once more </span></span>
-<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="fu">summary</span>(tourism_props_rescaled)</span>
-<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co"># v2019: Adding the low pop df identifies 13 additional regions that should be NA instead of gapfilled, taking the total number of NAs in the data set from 245 to 700</span></span>
-<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co"># v2020: Adding the low pop df takes the total number of NAs in the data set from 371 to 832</span></span>
-<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co"># v2022: Adding the low pop df takes the total number of NAs in the data set from 14 to 40</span></span>
-<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co"># v2023: NAs do not change</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">### after gap-filling, make sure low/uninhabited regions are NA</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># create df for unpopulated/low populated regions</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">low_pop</span>()</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>low_pop <span class="ot">&lt;-</span> low_pop <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="fu">filter</span>(est_population <span class="sc">&lt;</span> <span class="dv">3000</span> <span class="sc">|</span> <span class="fu">is.na</span>(est_population)) <span class="sc">%&gt;%</span>  <span class="co"># filter out regions that have populations &gt; or equal to 3000 and keep NA values </span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">rgn_label =</span> rgn_nam)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">summary</span>(tourism_props_rescaled)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co"># v2020 371 NAs</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co"># v2022 114 NAs</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co"># v2023 0 NAs (because of gapfilling)</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># make sure all the NAs are uninhabited regions</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>tourism_props_nas <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span> </span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(Ap)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year) <span class="sc">%&gt;%</span> <span class="co"># v2023: was rgn_id, year, r1_label, r2_label, rgn_label but we did not gapfill by georegion so did not have the last 3</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="fu">left_join</span>(low_pop, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="co"># v2023: was by = c(&quot;rgn_id&quot;, &quot;rgn_label&quot;) but we did not gapfill by georegion so did not have rgn_label</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>tourism_props_nas <span class="sc">%&gt;%</span> </span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>  <span class="fu">filter</span>(Inhabited <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(est_population)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>  <span class="fu">nrow</span>() <span class="co"># 0 ✓</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">max</span>(tourism_props_nas<span class="sc">$</span>est_population, <span class="at">na.rm=</span><span class="cn">TRUE</span>) <span class="sc">&lt;</span> <span class="dv">3000</span> <span class="co"># should be true</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co"># make sure all the uninhabited regions are NA and then drop them (all NA regions get added back as a last step just in case its relevant)</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>tourism_props_rescaled <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span> </span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ap =</span> <span class="fu">ifelse</span>(rgn_id <span class="sc">%in%</span> low_pop<span class="sc">$</span>rgn_id, <span class="cn">NA</span>, Ap)) </span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co"># check NAs once more </span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="fu">summary</span>(tourism_props_rescaled)</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co"># v2019: Adding the low pop df identifies 13 additional regions that should be NA instead of gapfilled, taking the total number of NAs in the data set from 245 to 700</span></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co"># v2020: Adding the low pop df takes the total number of NAs in the data set from 371 to 832</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co"># v2022: Adding the low pop df takes the total number of NAs in the data set from 14 to 40</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co"># v2023: Adding the low pop df takes the total number of NAs in the data set from 0 to 14</span></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co"># after checking NAs, get rid of them</span></span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>tourism_props_rescaled <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span> </span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>  <span class="fu">drop_na</span>(Ap)</span></code></pre></div>
 </div>
-<div id="write-output-files" class="section level3" number="3.0.8">
-<h3><span class="header-section-number">3.0.8</span> Write output
+<div id="write-output-files" class="section level3" number="3.0.6">
+<h3><span class="header-section-number">3.0.6</span> Write output
 files</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># save gapfill info</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>tourism_props_gf_to_write <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, gapfilled, method)</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">write_csv</span>(tourism_props_gf_to_write, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism_gf.csv&quot;</span>)))</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># save gap-filled data</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>tourism_props_to_write <span class="ot">&lt;-</span> tourism_props_rescaled <span class="sc">%&gt;%</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, Ap) </span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="fu">write_csv</span>(tourism_props_to_write, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism.csv&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># we want to make sure all OHI regions are present in the data, even if could not calculate Ap (this will add back in what we removed above as well as any region not present in the data)</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>year_range <span class="ot">&lt;-</span> <span class="fu">unique</span>(tourism_props_rescaled<span class="sc">$</span>year) <span class="co"># get the year range of Ap</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>year_range_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year =</span> year_range) <span class="co"># make it a dataframe</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>eez_to_combine <span class="ot">&lt;-</span> rgns_eez <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id) <span class="sc">%&gt;%</span> <span class="co"># get all OHI regions</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="fu">crossing</span>(., year_range_df) <span class="co"># expand OHI regions so theres one entry for each applicable year</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co"># we did not maintain info on regions with population data but no arrivals data since we joined population to regions with arrivals data, so let&#39;s get that back just to have complete info on our data</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>countries_w_pop_data_no_arrivals <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(combined_pops_filled<span class="sc">$</span>rgn_id, unwto_dupe_fix_downup_gf<span class="sc">$</span>rgn_id) <span class="co"># find regions this is the case for</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>countries_w_pop_data_no_arrivals_df <span class="ot">&lt;-</span> combined_pops_filled <span class="sc">%&gt;%</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">%in%</span> countries_w_pop_data_no_arrivals) <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, population) <span class="co"># get population data for the regions with no arrivals data but yes population data, that way later these will be the only regions with that data and we can use that to set population_method</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  </span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  </span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>tourism_props_rescaled_eez <span class="ot">&lt;-</span> eez_to_combine <span class="sc">%&gt;%</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  <span class="fu">left_join</span>(countries_w_pop_data_no_arrivals_df, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span> <span class="co"># add in the population data to later create new column</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  <span class="fu">left_join</span>(tourism_props_rescaled, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span> <span class="co"># add this to all regions, so we get Ap values for regions that have them and NAs for ones that don&#39;t</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population_method =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(population), <span class="st">&quot;WDI-WB&quot;</span>, population_method)) <span class="sc">%&gt;%</span> <span class="co"># set method based on having population data (this will be the regions with no arrivals data but yes population data)</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>population) <span class="sc">%&gt;%</span> <span class="co"># don&#39;t need this anymore</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">coastline_method =</span> <span class="st">&quot;LSP&quot;</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>         <span class="at">coastline_gapfilled =</span> <span class="cn">NA</span>) <span class="co"># adding gf columns for coastline data for consistency but we have data for all OHI regions, so it&#39;s all the same</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  </span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co"># save gapfill info</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>tourism_props_gf_to_write <span class="ot">&lt;-</span> tourism_props_rescaled_eez <span class="sc">%&gt;%</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Ap) <span class="co"># don&#39;t need actual values for the gapfill information</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="fu">write_csv</span>(tourism_props_gf_to_write, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism_gf.csv&quot;</span>)))</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co"># save gap-filled data</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>tourism_props_to_write <span class="ot">&lt;-</span> tourism_props_rescaled_eez <span class="sc">%&gt;%</span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, Ap) <span class="co"># don&#39;t need gf info here, just the values</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="fu">write_csv</span>(tourism_props_to_write, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism.csv&quot;</span>)))</span></code></pre></div>
 </div>
-<div id="look-at-changes-in-recent-years" class="section level3" number="3.0.9">
-<h3><span class="header-section-number">3.0.9</span> Look at changes in
+<div id="look-at-changes-in-recent-years" class="section level3" number="3.0.7">
+<h3><span class="header-section-number">3.0.7</span> Look at changes in
 recent years</h3>
 <p>We would expect for tourism jobs to decrease across the board from
 2019 and 2020 given the pandemic, and likely see a rebound to some
 extent between 2020 and 2021 — let’s make sure that’s reflected in our
 results.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>tourism_props_compare <span class="ot">&lt;-</span> tourism_props_to_write <span class="sc">%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(year))) <span class="sc">%&gt;%</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> Ap)</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co"># compare 2019 and 2020</span></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="fu">plot</span>(tourism_props_compare<span class="sc">$</span><span class="st">&quot;2019&quot;</span>, tourism_props_compare<span class="sc">$</span><span class="st">&quot;2020&quot;</span>,</span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 2019 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2023 2020 Arrivals Proportion&quot;</span>)</span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co"># compare 2020 and 2021</span></span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">plot</span>(tourism_props_compare<span class="sc">$</span><span class="st">&quot;2020&quot;</span>, tourism_props_compare<span class="sc">$</span><span class="st">&quot;2021&quot;</span>,</span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 2020 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2023 2021 Arrivals Proportion&quot;</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>tourism_props_compare <span class="ot">&lt;-</span> tourism_props_to_write <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(year))) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> Ap)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co"># compare 2019 and 2020</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">plot</span>(tourism_props_compare<span class="sc">$</span><span class="st">&quot;2019&quot;</span>, tourism_props_compare<span class="sc">$</span><span class="st">&quot;2020&quot;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 2019 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2023 2020 Arrivals Proportion&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>) <span class="co"># more data below the line</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co"># compare 2020 and 2021</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="fu">plot</span>(tourism_props_compare<span class="sc">$</span><span class="st">&quot;2020&quot;</span>, tourism_props_compare<span class="sc">$</span><span class="st">&quot;2021&quot;</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 2020 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2023 2021 Arrivals Proportion&quot;</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>) <span class="co"># more dara above the line</span></span></code></pre></div>
 <p>Everything looks reasonable.</p>
 </div>
-<div id="look-at-changes-vs.-previous-data-source-v2023" class="section level3" number="3.0.10">
-<h3><span class="header-section-number">3.0.10</span> Look at changes
+<div id="look-at-changes-vs.-previous-data-source-v2023" class="section level3" number="3.0.8">
+<h3><span class="header-section-number">3.0.8</span> Look at changes
 vs. previous data source (v2023)</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism.csv&quot;</span>))</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>old_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, prev_ver_yr, <span class="st">&quot;/output/tr_jobs_pct_tourism.csv&quot;</span>))</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>compare_common_data <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data<span class="sc">$</span>Ep, compare_common_data<span class="sc">$</span>Ap,</span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a></span>
-<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>compare_common_data_2021 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2021</span>)</span>
-<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a></span>
-<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2021<span class="sc">$</span>Ap, compare_common_data_2021<span class="sc">$</span>Ep,</span>
-<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
-<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a></span>
-<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>compare_common_data_2020 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>)</span>
-<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a></span>
-<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2020<span class="sc">$</span>Ap, compare_common_data_2020<span class="sc">$</span>Ep,</span>
-<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
-<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a></span>
-<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a>compare_common_data_2019 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-35"><a href="#cb10-35" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-36"><a href="#cb10-36" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>)</span>
-<span id="cb10-37"><a href="#cb10-37" tabindex="-1"></a></span>
-<span id="cb10-38"><a href="#cb10-38" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2019<span class="sc">$</span>Ap, compare_common_data_2019<span class="sc">$</span>Ep,</span>
-<span id="cb10-39"><a href="#cb10-39" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
-<span id="cb10-40"><a href="#cb10-40" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb10-41"><a href="#cb10-41" tabindex="-1"></a></span>
-<span id="cb10-42"><a href="#cb10-42" tabindex="-1"></a>compare_common_data_2015 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb10-43"><a href="#cb10-43" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-44"><a href="#cb10-44" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-45"><a href="#cb10-45" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2015</span>)</span>
-<span id="cb10-46"><a href="#cb10-46" tabindex="-1"></a></span>
-<span id="cb10-47"><a href="#cb10-47" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2015<span class="sc">$</span>Ap, compare_common_data_2015<span class="sc">$</span>Ep,</span>
-<span id="cb10-48"><a href="#cb10-48" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
-<span id="cb10-49"><a href="#cb10-49" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism.csv&quot;</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>old_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, prev_ver_yr, <span class="st">&quot;/output/tr_jobs_pct_tourism.csv&quot;</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>compare_common_data <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data<span class="sc">$</span>Ep, compare_common_data<span class="sc">$</span>Ap,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>compare_common_data_2021 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2021</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2021<span class="sc">$</span>Ap, compare_common_data_2021<span class="sc">$</span>Ep,</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>compare_common_data_2020 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2020<span class="sc">$</span>Ap, compare_common_data_2020<span class="sc">$</span>Ep,</span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>compare_common_data_2019 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2019</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2019<span class="sc">$</span>Ap, compare_common_data_2019<span class="sc">$</span>Ep,</span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a>compare_common_data_2015 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a>  <span class="fu">left_join</span>(old_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2015</span>)</span>
+<span id="cb8-46"><a href="#cb8-46" tabindex="-1"></a></span>
+<span id="cb8-47"><a href="#cb8-47" tabindex="-1"></a><span class="fu">plot</span>(compare_common_data_2015<span class="sc">$</span>Ap, compare_common_data_2015<span class="sc">$</span>Ep,</span>
+<span id="cb8-48"><a href="#cb8-48" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;v2023 Arrivals Proportion&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;v2022 Employment Proportion&quot;</span>)</span>
+<span id="cb8-49"><a href="#cb8-49" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+</div>
+<div id="check-out-some-specific-countries-v2023-this-was-for-exploring-changes-in-methodology-can-skip-or-useedit-parts-in-future-years" class="section level3" number="3.0.9">
+<h3><span class="header-section-number">3.0.9</span> Check out some
+specific countries (v2023) – this was for exploring changes in
+methodology, can skip or use/edit parts in future years</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># check some countries that changed a lot in v2023&#39;s first push to global</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>check_countries_graph <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">24</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">51</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">189</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">118</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">31</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rgn_id_plot =</span> <span class="fu">as.factor</span>(rgn_id),</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>         <span class="at">year_plot =</span> <span class="fu">as.Date</span>(year, <span class="st">&quot;%Y&quot;</span>))</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>Ap_graph <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(check_countries_graph, <span class="fu">aes</span>(<span class="at">x =</span> year_plot, <span class="at">y =</span> Ap, <span class="at">color =</span> rgn_id_plot)) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">&quot;Region ID&quot;</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>Ap_rescaled_graph <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(check_countries_graph, <span class="fu">aes</span>(<span class="at">x =</span> year_plot, <span class="at">y =</span> Ap_rescaled, <span class="at">color =</span> rgn_id_plot)) <span class="sc">+</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Rescaled Ap&quot;</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>Ap_graph <span class="sc">/</span> Ap_rescaled_graph</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>countries_in_2021 <span class="ot">&lt;-</span> check_countries_graph <span class="sc">%&gt;%</span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="st">&quot;2021&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year_plot, <span class="sc">-</span>admin_rgn_id, <span class="sc">-</span>admin_country_name, <span class="sc">-</span>Notes, <span class="sc">-</span>rgn_id_plot, <span class="sc">-</span>eez_iso3, <span class="sc">-</span>territory)</span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="fu">kable</span>(countries_in_2021) <span class="sc">%&gt;%</span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>))</span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="co"># check what countries have really large Ap before rescaling and check the inland + offshore area of those (to see if a small area is skewing things)</span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a>top_Ap_values <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>  <span class="fu">left_join</span>(inland_offshore, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_Ap =</span> <span class="fu">max</span>(Ap),</span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a>            <span class="at">total_inland_offshore_area =</span> <span class="fu">mean</span>(total_inland_offshore_area)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(max_Ap)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>  <span class="fu">select</span>(rgn_name, max_Ap, total_inland_offshore_area)</span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a><span class="fu">kable</span>(top_Ap_values, <span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>))</span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a><span class="co"># prepare total area (land + 3 nm offshore) of each ohi region</span></span>
+<span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb9-47"><a href="#cb9-47" tabindex="-1"></a>regions_no_geom <span class="ot">&lt;-</span> regions <span class="sc">%&gt;%</span></span>
+<span id="cb9-48"><a href="#cb9-48" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-49"><a href="#cb9-49" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_type <span class="sc">==</span> <span class="st">&quot;land&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, area_km2) <span class="sc">%&gt;%</span></span>
+<span id="cb9-51"><a href="#cb9-51" tabindex="-1"></a>  <span class="fu">left_join</span>(offshore_data, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>, <span class="at">relationship =</span> <span class="st">&quot;many-to-many&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-52"><a href="#cb9-52" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>a_prot_km2, <span class="sc">-</span>rgn_name) <span class="sc">%&gt;%</span></span>
+<span id="cb9-53"><a href="#cb9-53" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area_tot =</span> area_km2 <span class="sc">+</span> a_tot_km2,</span>
+<span id="cb9-54"><a href="#cb9-54" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.character</span>(year)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-55"><a href="#cb9-55" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>area_km2, <span class="sc">-</span>a_tot_km2)</span>
+<span id="cb9-56"><a href="#cb9-56" tabindex="-1"></a></span>
+<span id="cb9-57"><a href="#cb9-57" tabindex="-1"></a><span class="co"># combine inland + offshore data, population, total area, arrivals, original Ap (arrivals/coastline), and some tests of other Ap calculations</span></span>
+<span id="cb9-58"><a href="#cb9-58" tabindex="-1"></a>top_Ap_values_2021 <span class="ot">&lt;-</span> tourism_props <span class="sc">%&gt;%</span> <span class="co"># can adapt this code to find countries to manually add population data for</span></span>
+<span id="cb9-59"><a href="#cb9-59" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-60"><a href="#cb9-60" tabindex="-1"></a>  <span class="fu">left_join</span>(combined_pops_filled, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-61"><a href="#cb9-61" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, population, Ap) <span class="sc">%&gt;%</span></span>
+<span id="cb9-62"><a href="#cb9-62" tabindex="-1"></a>  <span class="fu">left_join</span>(unwto_dupe_fix_downup_gf, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-63"><a href="#cb9-63" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>arrivals_method) <span class="sc">%&gt;%</span></span>
+<span id="cb9-64"><a href="#cb9-64" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-65"><a href="#cb9-65" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, rgn_name, tourism_arrivals_ct, Ap, year) <span class="sc">%&gt;%</span></span>
+<span id="cb9-66"><a href="#cb9-66" tabindex="-1"></a>  <span class="fu">left_join</span>(inland_offshore, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-67"><a href="#cb9-67" tabindex="-1"></a>  <span class="fu">left_join</span>(combined_pops_filled, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-68"><a href="#cb9-68" tabindex="-1"></a>  <span class="fu">left_join</span>(regions_no_geom, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>), <span class="at">relationship =</span> <span class="st">&quot;many-to-many&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-69"><a href="#cb9-69" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, rgn_name, Ap, year, area_tot, population, total_inland_offshore_area, tourism_arrivals_ct) <span class="sc">%&gt;%</span></span>
+<span id="cb9-70"><a href="#cb9-70" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb9-71"><a href="#cb9-71" tabindex="-1"></a>  <span class="fu">arrange</span>(rgn_id, year) <span class="sc">%&gt;%</span></span>
+<span id="cb9-72"><a href="#cb9-72" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tourism_arrivals_ct =</span> <span class="fu">ifelse</span>(year <span class="sc">==</span> <span class="dv">2021</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(tourism_arrivals_ct), <span class="fu">lag</span>(tourism_arrivals_ct, <span class="at">n =</span> <span class="dv">2</span>), tourism_arrivals_ct)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-73"><a href="#cb9-73" tabindex="-1"></a>  <span class="fu">fill</span>(tourism_arrivals_ct, <span class="at">.direction =</span> <span class="st">&quot;downup&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-74"><a href="#cb9-74" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-75"><a href="#cb9-75" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2021</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-76"><a href="#cb9-76" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb9-77"><a href="#cb9-77" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ap_w_pop_and_tot_area =</span> (tourism_arrivals_ct<span class="sc">/</span>total_inland_offshore_area<span class="sc">/</span>population<span class="sc">/</span>area_tot),</span>
+<span id="cb9-78"><a href="#cb9-78" tabindex="-1"></a>         <span class="at">Ap_w_pop =</span> (tourism_arrivals_ct<span class="sc">/</span>total_inland_offshore_area<span class="sc">/</span>population), <span class="co"># will be slightly different than the Ap value because this code gapfills arrivals (before dividing anything), while the Ap values gapfilled Ap values after dividing everything; can alter the code if you want a different comparison</span></span>
+<span id="cb9-79"><a href="#cb9-79" tabindex="-1"></a>         <span class="at">Ap_w_tot_area =</span> (tourism_arrivals_ct<span class="sc">/</span>total_inland_offshore_area<span class="sc">/</span>area_tot)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-80"><a href="#cb9-80" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-81"><a href="#cb9-81" tabindex="-1"></a>  <span class="fu">select</span>(rgn_name, Ap, Ap_w_pop, Ap_w_tot_area, Ap_w_pop_and_tot_area, area_tot, population, total_inland_offshore_area, tourism_arrivals_ct) <span class="sc">%&gt;%</span></span>
+<span id="cb9-82"><a href="#cb9-82" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Ap)) <span class="co"># decide what to arrange by highest to lowest</span></span>
+<span id="cb9-83"><a href="#cb9-83" tabindex="-1"></a></span>
+<span id="cb9-84"><a href="#cb9-84" tabindex="-1"></a><span class="co"># create table that has everything</span></span>
+<span id="cb9-85"><a href="#cb9-85" tabindex="-1"></a><span class="fu">kable</span>(top_Ap_values_2021, <span class="at">digits =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-86"><a href="#cb9-86" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>))</span>
+<span id="cb9-87"><a href="#cb9-87" tabindex="-1"></a></span>
+<span id="cb9-88"><a href="#cb9-88" tabindex="-1"></a><span class="co"># create histogram of Ap</span></span>
+<span id="cb9-89"><a href="#cb9-89" tabindex="-1"></a><span class="fu">hist</span>(top_Ap_values_2021<span class="sc">$</span>Ap, <span class="at">breaks =</span> <span class="dv">100</span>, <span class="at">main =</span> <span class="st">&quot;Distribution of Ap&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Ap&quot;</span>)</span>
+<span id="cb9-90"><a href="#cb9-90" tabindex="-1"></a></span>
+<span id="cb9-91"><a href="#cb9-91" tabindex="-1"></a><span class="co"># check where Ap values fall for these countries (should hopefully not be too low but may be unavoidable)</span></span>
+<span id="cb9-92"><a href="#cb9-92" tabindex="-1"></a><span class="fu">which</span>(top_Ap_values_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;United States&quot;</span>)</span>
+<span id="cb9-93"><a href="#cb9-93" tabindex="-1"></a><span class="fu">which</span>(top_Ap_values_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;China&quot;</span>)</span>
+<span id="cb9-94"><a href="#cb9-94" tabindex="-1"></a><span class="fu">which</span>(top_Ap_values_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;India&quot;</span>)</span>
+<span id="cb9-95"><a href="#cb9-95" tabindex="-1"></a><span class="fu">which</span>(top_Ap_values_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Russia&quot;</span>)</span>
+<span id="cb9-96"><a href="#cb9-96" tabindex="-1"></a><span class="fu">which</span>(top_Ap_values_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Philippines&quot;</span>)</span>
+<span id="cb9-97"><a href="#cb9-97" tabindex="-1"></a></span>
+<span id="cb9-98"><a href="#cb9-98" tabindex="-1"></a><span class="co"># table of final (rescaled) Ap values for current version year</span></span>
+<span id="cb9-99"><a href="#cb9-99" tabindex="-1"></a>new_data_for_table_2021 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb9-100"><a href="#cb9-100" tabindex="-1"></a>  <span class="fu">left_join</span>(rgns_eez, <span class="at">by =</span> <span class="st">&quot;rgn_id&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-101"><a href="#cb9-101" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, rgn_name, year, Ap) <span class="sc">%&gt;%</span></span>
+<span id="cb9-102"><a href="#cb9-102" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Ap)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-103"><a href="#cb9-103" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Ap_rescaled =</span> Ap) <span class="sc">%&gt;%</span></span>
+<span id="cb9-104"><a href="#cb9-104" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2021</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-105"><a href="#cb9-105" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year)</span>
+<span id="cb9-106"><a href="#cb9-106" tabindex="-1"></a></span>
+<span id="cb9-107"><a href="#cb9-107" tabindex="-1"></a><span class="fu">kable</span>(new_data_for_table_2021, <span class="at">digits =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-108"><a href="#cb9-108" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>))</span>
+<span id="cb9-109"><a href="#cb9-109" tabindex="-1"></a></span>
+<span id="cb9-110"><a href="#cb9-110" tabindex="-1"></a><span class="co"># create histogram of Ap (rescaled)</span></span>
+<span id="cb9-111"><a href="#cb9-111" tabindex="-1"></a><span class="fu">hist</span>(new_data_for_table_2021<span class="sc">$</span>Ap_rescaled, <span class="at">breaks =</span> <span class="dv">100</span>, <span class="at">main =</span> <span class="st">&quot;Distribution of Ap (rescaled)&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Ap (rescaled)&quot;</span>)</span>
+<span id="cb9-112"><a href="#cb9-112" tabindex="-1"></a></span>
+<span id="cb9-113"><a href="#cb9-113" tabindex="-1"></a><span class="co"># check where Ap (rescaled) values fall for these countries (should hopefully not be too low but may be unavoidable)</span></span>
+<span id="cb9-114"><a href="#cb9-114" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;United States&quot;</span>)</span>
+<span id="cb9-115"><a href="#cb9-115" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;China&quot;</span>)</span>
+<span id="cb9-116"><a href="#cb9-116" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;India&quot;</span>)</span>
+<span id="cb9-117"><a href="#cb9-117" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Russia&quot;</span>)</span>
+<span id="cb9-118"><a href="#cb9-118" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Philippines&quot;</span>)</span>
+<span id="cb9-119"><a href="#cb9-119" tabindex="-1"></a></span>
+<span id="cb9-120"><a href="#cb9-120" tabindex="-1"></a><span class="co"># check some more countries (rescaled)</span></span>
+<span id="cb9-121"><a href="#cb9-121" tabindex="-1"></a>new_data_for_table_2021 <span class="sc">%&gt;%</span></span>
+<span id="cb9-122"><a href="#cb9-122" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">==</span> <span class="dv">80</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">110</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">18</span> <span class="sc">|</span> rgn_id <span class="sc">==</span> <span class="dv">162</span>)</span>
+<span id="cb9-123"><a href="#cb9-123" tabindex="-1"></a></span>
+<span id="cb9-124"><a href="#cb9-124" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Greece&quot;</span>)</span>
+<span id="cb9-125"><a href="#cb9-125" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Bahamas&quot;</span>)</span>
+<span id="cb9-126"><a href="#cb9-126" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;Fiji&quot;</span>)</span>
+<span id="cb9-127"><a href="#cb9-127" tabindex="-1"></a><span class="fu">which</span>(new_data_for_table_2021<span class="sc">$</span>rgn_name <span class="sc">==</span> <span class="st">&quot;New Zealand&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="ts-tourism-sustainability" class="section level1" number="4">
@@ -2075,54 +2135,54 @@ data.</p>
 unfortunately not comparable. The TTDI only extends back to 2019.</p>
 <p>These data are gapfilled using gdppcppp and UN georegion information
 (see next section for obtaining and preparing these data).</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># update to latest file name</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>ttdi_file <span class="ot">&lt;-</span> <span class="st">&quot;WEF_TTDI_2021_data_for_download.xlsx&quot;</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>ttdi_raw <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/_raw_data/WEF-Economics/d&quot;</span>, version_year, <span class="st">&quot;/&quot;</span>, ttdi_file),</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>                 <span class="at">skip =</span> <span class="dv">2</span>) </span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co"># move up column names from first row while keeping the full country names as columns too</span></span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="fu">names</span>(ttdi_raw)[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>] <span class="ot">&lt;-</span> <span class="fu">as.character</span>(ttdi_raw[<span class="dv">1</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>])</span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co"># filtering for sustainability scores, selecting needed columns, and pivoting to tidy format</span></span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>ttdi <span class="ot">&lt;-</span> ttdi_raw <span class="sc">%&gt;%</span></span>
-<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>  <span class="fu">filter</span>(Title <span class="sc">==</span> <span class="st">&quot;T&amp;T Sustainability subindex, 1-7 (best)&quot;</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>         Attribute <span class="sc">==</span> <span class="st">&quot;Score&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">year =</span> Edition, Albania<span class="sc">:</span>Zambia) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>  <span class="co"># currently Zambia is the last country column</span></span>
-<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> Albania<span class="sc">:</span>Zambia, <span class="at">names_to =</span> <span class="st">&quot;country&quot;</span>,</span>
-<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;score&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">score =</span> <span class="fu">as.numeric</span>(score))</span>
-<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a></span>
-<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a></span>
-<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co"># Changing names that are not recognized by ohicore</span></span>
-<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a>ttdi <span class="ot">&lt;-</span> ttdi <span class="sc">%&gt;%</span></span>
-<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(<span class="fu">str_detect</span>(country, <span class="st">&quot;Ivoire&quot;</span>), <span class="st">&quot;Ivory Coast&quot;</span>, country))</span>
-<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a>  </span>
-<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a>  </span>
-<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a>ttdi_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> ttdi, </span>
-<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a>                       <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>)</span>
-<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a></span>
-<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a><span class="do">## Duplicated regions weighted mean</span></span>
-<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a>weight_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="fu">c</span>(<span class="st">&quot;China&quot;</span>, <span class="st">&quot;Hong Kong SAR&quot;</span>),</span>
-<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a>                          <span class="co"># pop values from World Bank 2021 estimates - updated v2022</span></span>
-<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a>                          <span class="at">population =</span> <span class="fu">c</span>(<span class="dv">1412360000</span>, <span class="dv">7413100</span>))</span>
-<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a></span>
-<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a></span>
-<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a>ttdi_rgn <span class="ot">&lt;-</span> ttdi_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a>  <span class="fu">arrange</span>(country) <span class="sc">%&gt;%</span></span>
-<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a>  <span class="fu">left_join</span>(weight_data, <span class="at">by =</span> <span class="st">&quot;country&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(population), <span class="dv">1</span>, population)) <span class="sc">%&gt;%</span></span>
-<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, rgn_name, year) <span class="sc">%&gt;%</span></span>
-<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">score =</span> <span class="fu">weighted.mean</span>(score, population)) <span class="sc">%&gt;%</span></span>
-<span id="cb11-41"><a href="#cb11-41" tabindex="-1"></a>  <span class="fu">select</span>(year, rgn_id, rgn_name, score)</span>
-<span id="cb11-42"><a href="#cb11-42" tabindex="-1"></a></span>
-<span id="cb11-43"><a href="#cb11-43" tabindex="-1"></a><span class="co"># compare with old dataframe to make sure only the duplicated region scores changed </span></span>
-<span id="cb11-44"><a href="#cb11-44" tabindex="-1"></a></span>
-<span id="cb11-45"><a href="#cb11-45" tabindex="-1"></a><span class="fu">head</span>(ttdi_rgn, <span class="dv">10</span>)</span>
-<span id="cb11-46"><a href="#cb11-46" tabindex="-1"></a></span>
-<span id="cb11-47"><a href="#cb11-47" tabindex="-1"></a><span class="do">### Save TTDI data file</span></span>
-<span id="cb11-48"><a href="#cb11-48" tabindex="-1"></a><span class="fu">write.csv</span>(ttdi_rgn, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wef_ttdi.csv&quot;</span>)), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># update to latest file name</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>ttdi_file <span class="ot">&lt;-</span> <span class="st">&quot;WEF_TTDI_2021_data_for_download.xlsx&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>ttdi_raw <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">paste0</span>(dir_M, <span class="st">&quot;/git-annex/globalprep/_raw_data/WEF-Economics/d&quot;</span>, version_year, <span class="st">&quot;/&quot;</span>, ttdi_file),</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>                 <span class="at">skip =</span> <span class="dv">2</span>) </span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co"># move up column names from first row while keeping the full country names as columns too</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">names</span>(ttdi_raw)[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>] <span class="ot">&lt;-</span> <span class="fu">as.character</span>(ttdi_raw[<span class="dv">1</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>])</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co"># filtering for sustainability scores, selecting needed columns, and pivoting to tidy format</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>ttdi <span class="ot">&lt;-</span> ttdi_raw <span class="sc">%&gt;%</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="fu">filter</span>(Title <span class="sc">==</span> <span class="st">&quot;T&amp;T Sustainability subindex, 1-7 (best)&quot;</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>         Attribute <span class="sc">==</span> <span class="st">&quot;Score&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">year =</span> Edition, Albania<span class="sc">:</span>Zambia) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="co"># currently Zambia is the last country column</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> Albania<span class="sc">:</span>Zambia, <span class="at">names_to =</span> <span class="st">&quot;country&quot;</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;score&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">score =</span> <span class="fu">as.numeric</span>(score))</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="co"># Changing names that are not recognized by ohicore</span></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>ttdi <span class="ot">&lt;-</span> ttdi <span class="sc">%&gt;%</span></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">ifelse</span>(<span class="fu">str_detect</span>(country, <span class="st">&quot;Ivoire&quot;</span>), <span class="st">&quot;Ivory Coast&quot;</span>, country))</span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>  </span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>  </span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a>ttdi_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> ttdi, </span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a>                       <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>)</span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="do">## Duplicated regions weighted mean</span></span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a>weight_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="fu">c</span>(<span class="st">&quot;China&quot;</span>, <span class="st">&quot;Hong Kong SAR&quot;</span>),</span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a>                          <span class="co"># pop values from World Bank 2021 estimates - updated v2022</span></span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a>                          <span class="at">population =</span> <span class="fu">c</span>(<span class="dv">1412360000</span>, <span class="dv">7413100</span>))</span>
+<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a></span>
+<span id="cb10-35"><a href="#cb10-35" tabindex="-1"></a>ttdi_rgn <span class="ot">&lt;-</span> ttdi_rgn <span class="sc">%&gt;%</span></span>
+<span id="cb10-36"><a href="#cb10-36" tabindex="-1"></a>  <span class="fu">arrange</span>(country) <span class="sc">%&gt;%</span></span>
+<span id="cb10-37"><a href="#cb10-37" tabindex="-1"></a>  <span class="fu">left_join</span>(weight_data, <span class="at">by =</span> <span class="st">&quot;country&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-38"><a href="#cb10-38" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(population), <span class="dv">1</span>, population)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-39"><a href="#cb10-39" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id, rgn_name, year) <span class="sc">%&gt;%</span></span>
+<span id="cb10-40"><a href="#cb10-40" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">score =</span> <span class="fu">weighted.mean</span>(score, population)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-41"><a href="#cb10-41" tabindex="-1"></a>  <span class="fu">select</span>(year, rgn_id, rgn_name, score)</span>
+<span id="cb10-42"><a href="#cb10-42" tabindex="-1"></a></span>
+<span id="cb10-43"><a href="#cb10-43" tabindex="-1"></a><span class="co"># compare with old dataframe to make sure only the duplicated region scores changed </span></span>
+<span id="cb10-44"><a href="#cb10-44" tabindex="-1"></a></span>
+<span id="cb10-45"><a href="#cb10-45" tabindex="-1"></a><span class="fu">head</span>(ttdi_rgn, <span class="dv">10</span>)</span>
+<span id="cb10-46"><a href="#cb10-46" tabindex="-1"></a></span>
+<span id="cb10-47"><a href="#cb10-47" tabindex="-1"></a><span class="do">### Save TTDI data file</span></span>
+<span id="cb10-48"><a href="#cb10-48" tabindex="-1"></a><span class="fu">write.csv</span>(ttdi_rgn, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wef_ttdi.csv&quot;</span>)), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <div id="preparing-the-gdppcppp-data" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Preparing the
 gdppcppp data:</h2>
@@ -2132,50 +2192,50 @@ fill some gaps (CIA data is available for only the most recent
 year).</p>
 <p>The Artisanal Opportunities goal uses gdppcppp data, so we will get
 the data that was processed for that goal.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>wb <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/ao/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdppcppp_ohi.csv&quot;</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, value)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>wb <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/ao/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdppcppp_ohi.csv&quot;</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(rgn_id, year, value)</span></code></pre></div>
 <p>CIA data are used to fill in missing gaps in the gdppcppp data (<a href="https://www.cia.gov/the-world-factbook/field/real-gdp-per-capita/country-comparison" class="uri">https://www.cia.gov/the-world-factbook/field/real-gdp-per-capita/country-comparison</a>)</p>
 <p>Downloaded: 07/05/2022</p>
 <p>See README on the raw folder for instructions on how to download this
 data.</p>
 <p>The following code is used to prepare these data for OHI:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>cia_gdp <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/raw/cia_gdp_pc_ppp.csv&quot;</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="co"># remove dollar signs and commas and convert to numeric</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">&quot;[$,]&quot;</span>, <span class="st">&quot;&quot;</span>, value))) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="fu">select</span>(name, value) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">country =</span> name, <span class="at">pcgdp_cia =</span> value)</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a> <span class="do">## Data reported in a lower resolution than OHI regions</span></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>splits <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="st">&quot;Saint Helena, Ascension, and Tristan da Cunha&quot;</span>, </span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>                     <span class="at">country2 =</span> <span class="fu">c</span>(<span class="st">&quot;Saint Helena&quot;</span>, <span class="st">&quot;Ascension&quot;</span>,<span class="st">&quot;Tristan da Cunha&quot;</span>))</span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>cia_gdp <span class="ot">&lt;-</span> cia_gdp <span class="sc">%&gt;%</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>  <span class="fu">left_join</span>(splits, <span class="at">by=</span><span class="st">&#39;country&#39;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(country2), country, country2)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">country =</span> country2, pcgdp_cia)</span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a></span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>cia_gdp_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> cia_gdp, </span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>                       <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>)</span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a></span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="do">### Duplicated regions: Collapse regions after weighting by population (regions we include as a single region) - </span></span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>population_weights <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="fu">c</span>(<span class="st">&quot;Virgin Islands&quot;</span>, <span class="st">&quot;Puerto Rico&quot;</span>,</span>
-<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>                                             <span class="st">&quot;China&quot;</span>, <span class="st">&quot;Hong Kong&quot;</span>, <span class="st">&quot;Macau&quot;</span>,</span>
-<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>                                             <span class="st">&quot;Guam&quot;</span>, <span class="st">&quot;Northern Mariana Islands&quot;</span>),</span>
-<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a>                                 <span class="co"># from world bank - updated v2022</span></span>
-<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a>                                 <span class="at">population =</span> <span class="fu">c</span>(<span class="dv">105870</span>, <span class="dv">3263584</span>, <span class="dv">1412360000</span>,</span>
-<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a>                                                <span class="dv">7413100</span>, <span class="dv">658391</span>, <span class="dv">170184</span>, <span class="dv">57910</span>))</span>
-<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a></span>
-<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a>cia_gdp_rgn <span class="ot">&lt;-</span> cia_gdp_rgn <span class="sc">%&gt;%</span></span>
-<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a>  <span class="fu">left_join</span>(population_weights, <span class="at">by=</span><span class="st">&quot;country&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(population), <span class="dv">1</span>, population)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
-<span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">pcgdp_cia =</span> <span class="fu">weighted.mean</span>(pcgdp_cia, population)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-34"><a href="#cb13-34" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-35"><a href="#cb13-35" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, pcgdp_cia)</span>
-<span id="cb13-36"><a href="#cb13-36" tabindex="-1"></a></span>
-<span id="cb13-37"><a href="#cb13-37" tabindex="-1"></a><span class="fu">write.csv</span>(cia_gdp_rgn, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wb_rgn_cia_GDPPCPPP.csv&quot;</span>)), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>cia_gdp <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/raw/cia_gdp_pc_ppp.csv&quot;</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="co"># remove dollar signs and commas and convert to numeric</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">&quot;[$,]&quot;</span>, <span class="st">&quot;&quot;</span>, value))) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="fu">select</span>(name, value) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">country =</span> name, <span class="at">pcgdp_cia =</span> value)</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a> <span class="do">## Data reported in a lower resolution than OHI regions</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>splits <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="st">&quot;Saint Helena, Ascension, and Tristan da Cunha&quot;</span>, </span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>                     <span class="at">country2 =</span> <span class="fu">c</span>(<span class="st">&quot;Saint Helena&quot;</span>, <span class="st">&quot;Ascension&quot;</span>,<span class="st">&quot;Tristan da Cunha&quot;</span>))</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>cia_gdp <span class="ot">&lt;-</span> cia_gdp <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="fu">left_join</span>(splits, <span class="at">by=</span><span class="st">&#39;country&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(country2), country, country2)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">country =</span> country2, pcgdp_cia)</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>cia_gdp_rgn <span class="ot">&lt;-</span> <span class="fu">name_2_rgn</span>(<span class="at">df_in =</span> cia_gdp, </span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>                       <span class="at">fld_name=</span><span class="st">&#39;country&#39;</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="do">### Duplicated regions: Collapse regions after weighting by population (regions we include as a single region) - </span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a>population_weights <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="fu">c</span>(<span class="st">&quot;Virgin Islands&quot;</span>, <span class="st">&quot;Puerto Rico&quot;</span>,</span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a>                                             <span class="st">&quot;China&quot;</span>, <span class="st">&quot;Hong Kong&quot;</span>, <span class="st">&quot;Macau&quot;</span>,</span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a>                                             <span class="st">&quot;Guam&quot;</span>, <span class="st">&quot;Northern Mariana Islands&quot;</span>),</span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a>                                 <span class="co"># from world bank - updated v2022</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a>                                 <span class="at">population =</span> <span class="fu">c</span>(<span class="dv">105870</span>, <span class="dv">3263584</span>, <span class="dv">1412360000</span>,</span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a>                                                <span class="dv">7413100</span>, <span class="dv">658391</span>, <span class="dv">170184</span>, <span class="dv">57910</span>))</span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a>cia_gdp_rgn <span class="ot">&lt;-</span> cia_gdp_rgn <span class="sc">%&gt;%</span></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a>  <span class="fu">left_join</span>(population_weights, <span class="at">by=</span><span class="st">&quot;country&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(population), <span class="dv">1</span>, population)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a>  <span class="fu">group_by</span>(rgn_id) <span class="sc">%&gt;%</span></span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">pcgdp_cia =</span> <span class="fu">weighted.mean</span>(pcgdp_cia, population)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a>  <span class="fu">filter</span>(rgn_id <span class="sc">&lt;=</span> <span class="dv">250</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, pcgdp_cia)</span>
+<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a></span>
+<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a><span class="fu">write.csv</span>(cia_gdp_rgn, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wb_rgn_cia_GDPPCPPP.csv&quot;</span>)), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <p>The following code combines the two gdp datasets and gapfills missing
 regions using UN georegions.</p>
 <p>If there is no World Bank gdppcppp data (pcgdp), the CIA data is used
@@ -2189,188 +2249,188 @@ regions with data at the r2 scale, the average at the r1 scale was used
 following heirarchy: World Bank -&gt; CIA -&gt; estimated using mean
 from r2 UN geopolitical regions -&gt; estimated using mean from r1 UN
 geopolitical regions.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="do">### world bank gdp data</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>gdppcppp <span class="ot">&lt;-</span> wb <span class="sc">%&gt;%</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">pcgdp =</span> value)</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="do">### cia gdp data</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>gdppcppp2 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wb_rgn_cia_GDPPCPPP.csv&quot;</span>)))</span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="do">### Use WB data, but if missing, use pcgdp_cia.</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="do">### combine with UN georegion data</span></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year =</span> <span class="fu">min</span>(gdppcppp<span class="sc">$</span>year)<span class="sc">:</span><span class="fu">max</span>(gdppcppp<span class="sc">$</span>year))</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a></span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>georegions <span class="ot">&lt;-</span> ohicore<span class="sc">::</span>georegions</span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>regions <span class="ot">&lt;-</span> georegions <span class="sc">%&gt;%</span></span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>  <span class="fu">left_join</span>(georegion_labels, <span class="at">by =</span> <span class="st">&#39;rgn_id&#39;</span>)</span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a></span>
-<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>gdp_raw <span class="ot">&lt;-</span> <span class="fu">merge</span>(years, regions, <span class="at">by=</span><span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>   <span class="fu">left_join</span>(gdppcppp, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;rgn_id&#39;</span>, <span class="st">&#39;year&#39;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>  <span class="fu">left_join</span>(gdppcppp2, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>)) </span>
-<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a></span>
-<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a><span class="do">## quick compare to make sure the CIA and World Bank data are compatible</span></span>
-<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="fu">plot</span>(gdp_raw<span class="sc">$</span>pcgdp[gdp_raw<span class="sc">$</span>year<span class="sc">==</span><span class="dv">2021</span>], gdp_raw<span class="sc">$</span>pcgdp_cia[gdp_raw<span class="sc">$</span>year<span class="sc">==</span><span class="dv">2021</span>])</span>
-<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
-<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="co"># a few minor outliers but overall looks good</span></span>
-<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a></span>
-<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a>gdp_raw <span class="ot">&lt;-</span> gdp_raw <span class="sc">%&gt;%</span></span>
-<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pcgdp2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp), pcgdp_cia, pcgdp))</span>
-<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a></span>
-<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="do">## Calculating the means across different geopolitical levels (e.g. r2, r1)</span></span>
-<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a>gdp_raw <span class="ot">&lt;-</span> gdp_raw <span class="sc">%&gt;%</span></span>
-<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a>  <span class="fu">group_by</span>(r2, year) <span class="sc">%&gt;%</span></span>
-<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_pred_r2 =</span> <span class="fu">mean</span>(pcgdp2, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb14-35"><a href="#cb14-35" tabindex="-1"></a>  <span class="fu">group_by</span>(r1, year) <span class="sc">%&gt;%</span></span>
-<span id="cb14-36"><a href="#cb14-36" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_pred_r1 =</span> <span class="fu">mean</span>(pcgdp2, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-37"><a href="#cb14-37" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span>
-<span id="cb14-38"><a href="#cb14-38" tabindex="-1"></a></span>
-<span id="cb14-39"><a href="#cb14-39" tabindex="-1"></a>gdp_raw_gf <span class="ot">&lt;-</span> gdp_raw <span class="sc">%&gt;%</span></span>
-<span id="cb14-40"><a href="#cb14-40" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_all =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2), gdp_pred_r2, pcgdp2)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-41"><a href="#cb14-41" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_all =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gdp_all), gdp_pred_r1, gdp_all)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-42"><a href="#cb14-42" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(gdp_all), <span class="st">&quot;gapfilled&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-43"><a href="#cb14-43" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(gdp_pred_r2), <span class="st">&quot;UN georegion (r2)&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb14-44"><a href="#cb14-44" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2) <span class="sc">&amp;</span> <span class="fu">is.na</span>(gdp_pred_r2) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(gdp_pred_r1), <span class="st">&quot;UN georegion (r1)&quot;</span>, method)) </span>
-<span id="cb14-45"><a href="#cb14-45" tabindex="-1"></a></span>
-<span id="cb14-46"><a href="#cb14-46" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_raw_gf, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp_raw_gf.csv&quot;</span>)))</span>
-<span id="cb14-47"><a href="#cb14-47" tabindex="-1"></a></span>
-<span id="cb14-48"><a href="#cb14-48" tabindex="-1"></a>gdp_data_gf <span class="ot">&lt;-</span> gdp_raw_gf <span class="sc">%&gt;%</span></span>
-<span id="cb14-49"><a href="#cb14-49" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, gapfilled, method) </span>
-<span id="cb14-50"><a href="#cb14-50" tabindex="-1"></a></span>
-<span id="cb14-51"><a href="#cb14-51" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_data_gf, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp_gf.csv&quot;</span>)))</span>
-<span id="cb14-52"><a href="#cb14-52" tabindex="-1"></a></span>
-<span id="cb14-53"><a href="#cb14-53" tabindex="-1"></a>gdp_data <span class="ot">&lt;-</span> gdp_raw_gf <span class="sc">%&gt;%</span></span>
-<span id="cb14-54"><a href="#cb14-54" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">pcgdp =</span> gdp_all)</span>
-<span id="cb14-55"><a href="#cb14-55" tabindex="-1"></a></span>
-<span id="cb14-56"><a href="#cb14-56" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_data, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp.csv&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="do">### world bank gdp data</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>gdppcppp <span class="ot">&lt;-</span> wb <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">pcgdp =</span> value)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="do">### cia gdp data</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>gdppcppp2 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wb_rgn_cia_GDPPCPPP.csv&quot;</span>)))</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="do">### Use WB data, but if missing, use pcgdp_cia.</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="do">### combine with UN georegion data</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year =</span> <span class="fu">min</span>(gdppcppp<span class="sc">$</span>year)<span class="sc">:</span><span class="fu">max</span>(gdppcppp<span class="sc">$</span>year))</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>georegions <span class="ot">&lt;-</span> ohicore<span class="sc">::</span>georegions</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>regions <span class="ot">&lt;-</span> georegions <span class="sc">%&gt;%</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>  <span class="fu">left_join</span>(georegion_labels, <span class="at">by =</span> <span class="st">&#39;rgn_id&#39;</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>gdp_raw <span class="ot">&lt;-</span> <span class="fu">merge</span>(years, regions, <span class="at">by=</span><span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>   <span class="fu">left_join</span>(gdppcppp, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;rgn_id&#39;</span>, <span class="st">&#39;year&#39;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>  <span class="fu">left_join</span>(gdppcppp2, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>)) </span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="do">## quick compare to make sure the CIA and World Bank data are compatible</span></span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="fu">plot</span>(gdp_raw<span class="sc">$</span>pcgdp[gdp_raw<span class="sc">$</span>year<span class="sc">==</span><span class="dv">2021</span>], gdp_raw<span class="sc">$</span>pcgdp_cia[gdp_raw<span class="sc">$</span>year<span class="sc">==</span><span class="dv">2021</span>])</span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a><span class="co"># a few minor outliers but overall looks good</span></span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a></span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a>gdp_raw <span class="ot">&lt;-</span> gdp_raw <span class="sc">%&gt;%</span></span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pcgdp2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp), pcgdp_cia, pcgdp))</span>
+<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a></span>
+<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="do">## Calculating the means across different geopolitical levels (e.g. r2, r1)</span></span>
+<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a>gdp_raw <span class="ot">&lt;-</span> gdp_raw <span class="sc">%&gt;%</span></span>
+<span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a>  <span class="fu">group_by</span>(r2, year) <span class="sc">%&gt;%</span></span>
+<span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_pred_r2 =</span> <span class="fu">mean</span>(pcgdp2, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-34"><a href="#cb13-34" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-35"><a href="#cb13-35" tabindex="-1"></a>  <span class="fu">group_by</span>(r1, year) <span class="sc">%&gt;%</span></span>
+<span id="cb13-36"><a href="#cb13-36" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_pred_r1 =</span> <span class="fu">mean</span>(pcgdp2, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-37"><a href="#cb13-37" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span>
+<span id="cb13-38"><a href="#cb13-38" tabindex="-1"></a></span>
+<span id="cb13-39"><a href="#cb13-39" tabindex="-1"></a>gdp_raw_gf <span class="ot">&lt;-</span> gdp_raw <span class="sc">%&gt;%</span></span>
+<span id="cb13-40"><a href="#cb13-40" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_all =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2), gdp_pred_r2, pcgdp2)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-41"><a href="#cb13-41" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gdp_all =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(gdp_all), gdp_pred_r1, gdp_all)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-42"><a href="#cb13-42" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(gdp_all), <span class="st">&quot;gapfilled&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-43"><a href="#cb13-43" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(gdp_pred_r2), <span class="st">&quot;UN georegion (r2)&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-44"><a href="#cb13-44" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(pcgdp2) <span class="sc">&amp;</span> <span class="fu">is.na</span>(gdp_pred_r2) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(gdp_pred_r1), <span class="st">&quot;UN georegion (r1)&quot;</span>, method)) </span>
+<span id="cb13-45"><a href="#cb13-45" tabindex="-1"></a></span>
+<span id="cb13-46"><a href="#cb13-46" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_raw_gf, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp_raw_gf.csv&quot;</span>)))</span>
+<span id="cb13-47"><a href="#cb13-47" tabindex="-1"></a></span>
+<span id="cb13-48"><a href="#cb13-48" tabindex="-1"></a>gdp_data_gf <span class="ot">&lt;-</span> gdp_raw_gf <span class="sc">%&gt;%</span></span>
+<span id="cb13-49"><a href="#cb13-49" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, gapfilled, method) </span>
+<span id="cb13-50"><a href="#cb13-50" tabindex="-1"></a></span>
+<span id="cb13-51"><a href="#cb13-51" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_data_gf, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp_gf.csv&quot;</span>)))</span>
+<span id="cb13-52"><a href="#cb13-52" tabindex="-1"></a></span>
+<span id="cb13-53"><a href="#cb13-53" tabindex="-1"></a>gdp_data <span class="ot">&lt;-</span> gdp_raw_gf <span class="sc">%&gt;%</span></span>
+<span id="cb13-54"><a href="#cb13-54" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">pcgdp =</span> gdp_all)</span>
+<span id="cb13-55"><a href="#cb13-55" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_data, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp.csv&quot;</span>)))</span></code></pre></div>
 <p>The final step is gapfilling the Sustainability data using a linear
 model with gdppcppp and UN geopolitical regions as predictor
 variables.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>sust <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wef_ttdi.csv&quot;</span>)), <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="do">### don&#39;t need to gapfill data without tourism data:</span></span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="do">## Most recent tourism data is 2019.  </span></span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>ap_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism.csv&quot;</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  <span class="co"># filter(year == 2021) %&gt;%</span></span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, Ap, year) <span class="sc">%&gt;%</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Ap))</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co"># gdp dataframe prepared above (World Bank, CIA, and gapfilled gdp data)</span></span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>gdp_raw_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp_raw_gf.csv&quot;</span>)), <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>  <span class="co"># filter(year == 2021) %&gt;%</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, r0_label, r1_label, r2_label, rgn_label,</span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>         pcgdp, pcgdp_cia, pcgdp2, gdp_all, year) </span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a></span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> gdp_raw_gf <span class="sc">%&gt;%</span></span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>           <span class="fu">left_join</span>(sust, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>          <span class="fu">left_join</span>(ap_gf, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>          <span class="fu">rename</span>(<span class="at">S_score =</span> score) <span class="sc">%&gt;%</span></span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>          <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">213</span>)</span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a></span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="do">### Add gapfill flag variable </span></span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="do">## Reminder:</span></span>
-<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="do">## pcgdp2: includes both the World Bank and CIA data (with CIA data only used if there is not World Bank data)</span></span>
-<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="do">## Ep: Proportion of workforce directly employed in tourism</span></span>
-<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="do">## S_score: tourism sustainability score</span></span>
-<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a></span>
-<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a>tr_sust_gf <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span></span>
-<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap), <span class="st">&quot;gapfilled&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap) <span class="sc">&amp;</span> <span class="fu">is.na</span>(pcgdp2), <span class="st">&quot;lm georegion + gdppcppp, with est. gdppcppp&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(pcgdp2), <span class="st">&quot;lm georegion + gdppcppp&quot;</span>, method)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-33"><a href="#cb15-33" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, gapfilled, method, year)</span>
-<span id="cb15-34"><a href="#cb15-34" tabindex="-1"></a></span>
-<span id="cb15-35"><a href="#cb15-35" tabindex="-1"></a><span class="fu">write.csv</span>(tr_sust_gf, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_sustainability_gf.csv&quot;</span>)), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>sust <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/wef_ttdi.csv&quot;</span>)), <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="do">### don&#39;t need to gapfill data without tourism data:</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="do">## Most recent tourism data is 2019.  </span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>ap_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_arrivals_props_tourism.csv&quot;</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="co"># filter(year == 2021) %&gt;%</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, Ap, year) <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Ap))</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co"># gdp dataframe prepared above (World Bank, CIA, and gapfilled gdp data)</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>gdp_raw_gf <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/intermediate/gdp_raw_gf.csv&quot;</span>)), <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>  <span class="co"># filter(year == 2021) %&gt;%</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, r0_label, r1_label, r2_label, rgn_label,</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>         pcgdp, pcgdp_cia, pcgdp2, gdp_all, year) </span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> gdp_raw_gf <span class="sc">%&gt;%</span></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>           <span class="fu">left_join</span>(sust, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>          <span class="fu">left_join</span>(ap_gf, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;rgn_id&quot;</span>, <span class="st">&quot;year&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>          <span class="fu">rename</span>(<span class="at">S_score =</span> score) <span class="sc">%&gt;%</span></span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>          <span class="fu">filter</span>(rgn_id <span class="sc">!=</span> <span class="dv">213</span>)</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="do">### Add gapfill flag variable </span></span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="do">## Reminder:</span></span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="do">## pcgdp2: includes both the World Bank and CIA data (with CIA data only used if there is not World Bank data)</span></span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="do">## Ep: Proportion of workforce directly employed in tourism</span></span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a><span class="do">## S_score: tourism sustainability score</span></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a>tr_sust_gf <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span></span>
+<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gapfilled =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap), <span class="st">&quot;gapfilled&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap) <span class="sc">&amp;</span> <span class="fu">is.na</span>(pcgdp2), <span class="st">&quot;lm georegion + gdppcppp, with est. gdppcppp&quot;</span>, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Ap) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(pcgdp2), <span class="st">&quot;lm georegion + gdppcppp&quot;</span>, method)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, gapfilled, method, year)</span>
+<span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a></span>
+<span id="cb14-35"><a href="#cb14-35" tabindex="-1"></a><span class="fu">write.csv</span>(tr_sust_gf, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_sustainability_gf.csv&quot;</span>)), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <div id="gapfilling" class="section level3" number="4.1.1">
 <h3><span class="header-section-number">4.1.1</span> Gapfilling</h3>
 <p>Linear models using gdppcppp and UN geopolitical regions as predictor
 variables. However if there is no gdppc data we estimate the gdppc using
 the UN georegions and then used in the linear model to gapfill the
 sustainability score.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="do">### Gapfill S using r1 and/or r2 regional data and PPP-adjusted per-capita GDP</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="do">### Looked at models with a year variable, but wasn&#39;t significant and decided to exclude</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(S_score <span class="sc">~</span> <span class="fu">as.factor</span>(r2_label) <span class="sc">+</span> gdp_all, <span class="at">data=</span>tr_sust, <span class="at">na.action =</span> na.exclude)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="fu">summary</span>(mod3)</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="fu">anova</span>(mod3)</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>mod4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(S_score <span class="sc">~</span> <span class="fu">as.factor</span>(r1_label) <span class="sc">+</span> gdp_all, <span class="at">data=</span>tr_sust, <span class="at">na.action =</span> na.exclude)</span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="fu">summary</span>(mod4)</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="fu">anova</span>(mod4)</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">predict</span>(mod3), tr_sust<span class="sc">$</span>S_score)</span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">predict</span>(mod4), tr_sust<span class="sc">$</span>S_score)</span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a></span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a></span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="do">## Estimate missing data and gapfill</span></span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co"># Some of the r1 levels do not have data and consequently causes a fail. This chunk of code drops these levels so an NA is returned</span></span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a></span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co"># Select only r2 column</span></span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(r2_label, gdp_all)</span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a></span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a><span class="fu">unique</span>(tr_sust<span class="sc">$</span>r2_label)</span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a></span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a>r2_w_data <span class="ot">&lt;-</span> <span class="fu">unique</span>(tr_sust<span class="sc">$</span>r2_label[<span class="sc">!</span><span class="fu">is.na</span>(tr_sust<span class="sc">$</span>S_score)])</span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a>  </span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a>new_data_r2 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">r2_label =</span> <span class="fu">ifelse</span>(r2_label <span class="sc">%in%</span> r2_w_data, r2_label, <span class="cn">NA</span>))</span>
-<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a></span>
-<span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a><span class="co"># Predict sustainability scores using linear model 3 (using r2 data)</span></span>
-<span id="cb16-33"><a href="#cb16-33" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
-<span id="cb16-34"><a href="#cb16-34" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">S_score_pred_r2 =</span> <span class="fu">predict</span>(mod3, <span class="at">newdata =</span> new_data_r2))</span>
-<span id="cb16-35"><a href="#cb16-35" tabindex="-1"></a></span>
-<span id="cb16-36"><a href="#cb16-36" tabindex="-1"></a></span>
-<span id="cb16-37"><a href="#cb16-37" tabindex="-1"></a><span class="co"># Select only r1 column</span></span>
-<span id="cb16-38"><a href="#cb16-38" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
-<span id="cb16-39"><a href="#cb16-39" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(r1_label, gdp_all)</span>
-<span id="cb16-40"><a href="#cb16-40" tabindex="-1"></a></span>
-<span id="cb16-41"><a href="#cb16-41" tabindex="-1"></a><span class="fu">unique</span>(tr_sust<span class="sc">$</span>r1_label)</span>
-<span id="cb16-42"><a href="#cb16-42" tabindex="-1"></a></span>
-<span id="cb16-43"><a href="#cb16-43" tabindex="-1"></a>r1_w_data <span class="ot">&lt;-</span> <span class="fu">unique</span>(tr_sust<span class="sc">$</span>r1_label[<span class="sc">!</span><span class="fu">is.na</span>(tr_sust<span class="sc">$</span>S_score)])</span>
-<span id="cb16-44"><a href="#cb16-44" tabindex="-1"></a></span>
-<span id="cb16-45"><a href="#cb16-45" tabindex="-1"></a>new_data_r1 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
-<span id="cb16-46"><a href="#cb16-46" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">r1_label =</span> <span class="fu">ifelse</span>(r1_label <span class="sc">%in%</span> r1_w_data, r1_label, <span class="cn">NA</span>))</span>
-<span id="cb16-47"><a href="#cb16-47" tabindex="-1"></a></span>
-<span id="cb16-48"><a href="#cb16-48" tabindex="-1"></a><span class="co"># Predict sustainability scores using linear model 4 (using r1 data)</span></span>
-<span id="cb16-49"><a href="#cb16-49" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
-<span id="cb16-50"><a href="#cb16-50" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">S_score_pred_r1 =</span> <span class="fu">predict</span>(mod4, <span class="at">newdata =</span> new_data_r1))</span>
-<span id="cb16-51"><a href="#cb16-51" tabindex="-1"></a></span>
-<span id="cb16-52"><a href="#cb16-52" tabindex="-1"></a></span>
-<span id="cb16-53"><a href="#cb16-53" tabindex="-1"></a></span>
-<span id="cb16-54"><a href="#cb16-54" tabindex="-1"></a><span class="do">## some are missing the r1 predictions, but none of these have Ep scores, so not relevant</span></span>
-<span id="cb16-55"><a href="#cb16-55" tabindex="-1"></a><span class="fu">View</span>(<span class="fu">filter</span>(tr_sust, <span class="fu">is.na</span>(S_score_pred_r1)))</span>
-<span id="cb16-56"><a href="#cb16-56" tabindex="-1"></a></span>
-<span id="cb16-57"><a href="#cb16-57" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span></span>
-<span id="cb16-58"><a href="#cb16-58" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">S_score_2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score), S_score_pred_r2, S_score)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-59"><a href="#cb16-59" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">S_score_2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score_2), S_score_pred_r1, S_score_2)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-60"><a href="#cb16-60" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2019</span>, <span class="dv">2021</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-61"><a href="#cb16-61" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">S_score=</span>S_score_2)</span>
-<span id="cb16-62"><a href="#cb16-62" tabindex="-1"></a></span>
-<span id="cb16-63"><a href="#cb16-63" tabindex="-1"></a><span class="fu">summary</span>(tr_sust)</span>
-<span id="cb16-64"><a href="#cb16-64" tabindex="-1"></a></span>
-<span id="cb16-65"><a href="#cb16-65" tabindex="-1"></a><span class="fu">write_csv</span>(tr_sust, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_sustainability.csv&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="do">### Gapfill S using r1 and/or r2 regional data and PPP-adjusted per-capita GDP</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="do">### Looked at models with a year variable, but wasn&#39;t significant and decided to exclude</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(S_score <span class="sc">~</span> <span class="fu">as.factor</span>(r2_label) <span class="sc">+</span> gdp_all, <span class="at">data=</span>tr_sust, <span class="at">na.action =</span> na.exclude)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="fu">summary</span>(mod3)</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="fu">anova</span>(mod3)</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>mod4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(S_score <span class="sc">~</span> <span class="fu">as.factor</span>(r1_label) <span class="sc">+</span> gdp_all, <span class="at">data=</span>tr_sust, <span class="at">na.action =</span> na.exclude)</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="fu">summary</span>(mod4)</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">anova</span>(mod4)</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">predict</span>(mod3), tr_sust<span class="sc">$</span>S_score)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">predict</span>(mod4), tr_sust<span class="sc">$</span>S_score)</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="do">## Estimate missing data and gapfill</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="co"># Some of the r1 levels do not have data and consequently causes a fail. This chunk of code drops these levels so an NA is returned</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co"># Select only r2 column</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(r2_label, gdp_all)</span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="fu">unique</span>(tr_sust<span class="sc">$</span>r2_label)</span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>r2_w_data <span class="ot">&lt;-</span> <span class="fu">unique</span>(tr_sust<span class="sc">$</span>r2_label[<span class="sc">!</span><span class="fu">is.na</span>(tr_sust<span class="sc">$</span>S_score)])</span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>  </span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a>new_data_r2 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">r2_label =</span> <span class="fu">ifelse</span>(r2_label <span class="sc">%in%</span> r2_w_data, r2_label, <span class="cn">NA</span>))</span>
+<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a></span>
+<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a><span class="co"># Predict sustainability scores using linear model 3 (using r2 data)</span></span>
+<span id="cb15-33"><a href="#cb15-33" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
+<span id="cb15-34"><a href="#cb15-34" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">S_score_pred_r2 =</span> <span class="fu">predict</span>(mod3, <span class="at">newdata =</span> new_data_r2))</span>
+<span id="cb15-35"><a href="#cb15-35" tabindex="-1"></a></span>
+<span id="cb15-36"><a href="#cb15-36" tabindex="-1"></a></span>
+<span id="cb15-37"><a href="#cb15-37" tabindex="-1"></a><span class="co"># Select only r1 column</span></span>
+<span id="cb15-38"><a href="#cb15-38" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
+<span id="cb15-39"><a href="#cb15-39" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(r1_label, gdp_all)</span>
+<span id="cb15-40"><a href="#cb15-40" tabindex="-1"></a></span>
+<span id="cb15-41"><a href="#cb15-41" tabindex="-1"></a><span class="fu">unique</span>(tr_sust<span class="sc">$</span>r1_label)</span>
+<span id="cb15-42"><a href="#cb15-42" tabindex="-1"></a></span>
+<span id="cb15-43"><a href="#cb15-43" tabindex="-1"></a>r1_w_data <span class="ot">&lt;-</span> <span class="fu">unique</span>(tr_sust<span class="sc">$</span>r1_label[<span class="sc">!</span><span class="fu">is.na</span>(tr_sust<span class="sc">$</span>S_score)])</span>
+<span id="cb15-44"><a href="#cb15-44" tabindex="-1"></a></span>
+<span id="cb15-45"><a href="#cb15-45" tabindex="-1"></a>new_data_r1 <span class="ot">&lt;-</span> new_data <span class="sc">%&gt;%</span></span>
+<span id="cb15-46"><a href="#cb15-46" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">r1_label =</span> <span class="fu">ifelse</span>(r1_label <span class="sc">%in%</span> r1_w_data, r1_label, <span class="cn">NA</span>))</span>
+<span id="cb15-47"><a href="#cb15-47" tabindex="-1"></a></span>
+<span id="cb15-48"><a href="#cb15-48" tabindex="-1"></a><span class="co"># Predict sustainability scores using linear model 4 (using r1 data)</span></span>
+<span id="cb15-49"><a href="#cb15-49" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
+<span id="cb15-50"><a href="#cb15-50" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">S_score_pred_r1 =</span> <span class="fu">predict</span>(mod4, <span class="at">newdata =</span> new_data_r1))</span>
+<span id="cb15-51"><a href="#cb15-51" tabindex="-1"></a></span>
+<span id="cb15-52"><a href="#cb15-52" tabindex="-1"></a></span>
+<span id="cb15-53"><a href="#cb15-53" tabindex="-1"></a></span>
+<span id="cb15-54"><a href="#cb15-54" tabindex="-1"></a><span class="do">## some are missing the r1 predictions, but none of these have Ep scores, so not relevant</span></span>
+<span id="cb15-55"><a href="#cb15-55" tabindex="-1"></a><span class="fu">View</span>(<span class="fu">filter</span>(tr_sust, <span class="fu">is.na</span>(S_score_pred_r1)))</span>
+<span id="cb15-56"><a href="#cb15-56" tabindex="-1"></a></span>
+<span id="cb15-57"><a href="#cb15-57" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span></span>
+<span id="cb15-58"><a href="#cb15-58" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">S_score_2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score), S_score_pred_r2, S_score)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-59"><a href="#cb15-59" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">S_score_2 =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(S_score_2), S_score_pred_r1, S_score_2)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-60"><a href="#cb15-60" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2019</span>, <span class="dv">2021</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-61"><a href="#cb15-61" tabindex="-1"></a>  <span class="fu">select</span>(rgn_id, year, <span class="at">S_score=</span>S_score_2)</span>
+<span id="cb15-62"><a href="#cb15-62" tabindex="-1"></a></span>
+<span id="cb15-63"><a href="#cb15-63" tabindex="-1"></a><span class="fu">summary</span>(tr_sust)</span>
+<span id="cb15-64"><a href="#cb15-64" tabindex="-1"></a></span>
+<span id="cb15-65"><a href="#cb15-65" tabindex="-1"></a><span class="fu">write_csv</span>(tr_sust, <span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_sustainability.csv&quot;</span>)))</span></code></pre></div>
 </div>
 </div>
 <div id="compare-with-previous-year-of-data" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Compare with previous
 year of data</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_sustainability.csv&quot;</span>)))</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>prev_year <span class="ot">&lt;-</span> (<span class="fu">as.numeric</span>(version_year) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="fu">as.character</span>()</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>compare <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> S_score)</span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a></span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co"># current vs previous year of data</span></span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span><span class="st">&quot;2021&quot;</span>, compare<span class="sc">$</span><span class="st">&quot;2019&quot;</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co"># looks good</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>tr_sust <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="fu">paste0</span>(<span class="st">&quot;globalprep/tr/v&quot;</span>, version_year, <span class="st">&quot;/output/tr_sustainability.csv&quot;</span>)))</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>prev_year <span class="ot">&lt;-</span> (<span class="fu">as.numeric</span>(version_year) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="fu">as.character</span>()</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>compare <span class="ot">&lt;-</span> tr_sust <span class="sc">%&gt;%</span> </span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> S_score)</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co"># current vs previous year of data</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="fu">plot</span>(compare<span class="sc">$</span><span class="st">&quot;2021&quot;</span>, compare<span class="sc">$</span><span class="st">&quot;2019&quot;</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co"># looks good</span></span></code></pre></div>
 </div>
 </div>
 <div id="tw-travel-warnings" class="section level1" number="5">
