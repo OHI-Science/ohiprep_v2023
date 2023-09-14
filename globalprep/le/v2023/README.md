@@ -18,7 +18,7 @@ Acronyms for sectors used in the original output layers are used for simplicity 
 | Aquarium Fishing                                         | aqf     |
 | Transportation and Shipping                              | tran    |
 | Marine Mammal Watching                                   | mmw     |
-| Ocean Energy (formerly wave and tidal energy)            |  wte    |
+| Ocean Energy (formerly wave and tidal energy)            | wte     |
 | fish processing (not formerly included)                  | fp      |
 | ? (unclear what this is, only in original revenue files) | og      |
 
@@ -74,34 +74,80 @@ Methods Description:
 
 ### Ocean Energy (originally Wave and Renewable Energy)
 
--   A new data source from OECD was used
--   we used the indicator "All ocean and offshore energy (offshore wind + ocean energy) RD&D, million USD 2021 PPP"
+-   We used the indicator "All ocean and offshore energy (offshore wind + ocean energy) RD&D, million USD 2021 PPP" from the OECD Sustainable Ocean Economy data set.
+    -   Metadata is available for download through the portal. This platform is being retired, this data set will likely be located in the [OECD Data Explorer](https://data-explorer.oecd.org/) in future years.
 -   The Ocean energy data from OECD is actually the amount country and state governments budget for Ocean energy, and is not specifically revenue. However, it is included as this was the only comprehensive data set available with monetary amounts related to Ocean energy, it will likely need to be modified before being used as a proxy for revenue.
 -   This dataset only contains 32 countries, so gap filling will be needed.
+
+## Tourism:
+
+The data previously used from WTTC is no longer available for free, and
+
+we were unable to locate this data on MAZU.
+
+-   The methods state: "WTTC reports dollar values of visitor exports
+
+(spending by foreign visitors) and domestic travel and tourism
+
+spending; combining these two data sets creates a proxy for total
+
+travel and tourism revenues. WTTC was chosen as the source for
+
+tourism revenue data because of the near-complete country coverage,
+
+the yearly time series component starting in 1988 and updated
+
+yearly, and the inclusion of both foreign and domestic expenditures.
+
+This dataset lumps inland and coastal/marine revenues, and so was
+
+adjusted by the percent of a country's population within a 25 mile
+
+inland coastal zone. We included no projected data. We used total
+
+contribution to GDP data (rather than direct contribution to GDP) to
+
+avoid the use of literature derived multiplier effects."
+
+Possible data sources include:
+
+-   "Tourism spending in the country" from the "Inbound Tourism-Expenditure" tab, from the most recent WTTC data download in 2020. This file is located on MAZU at
 
 # Jobs:
 
 ### Fishing
 
--   We used People employed in fishing sectors excluding inland fisheries, total by occupation rate, thousands from [OECD Sustainable Economies Data](#0) as the primary data set.
--   Additional countries were filled in using the number of fishers data from the [FAO 2019 statistical report](https://www.fao.org/fishery/static/Yearbook/YB2019_USBcard/navigation/index_intro_e.htm).
+-   We used "People employed in fishing sectors excluding inland fisheries, total by occupation rate, thousands" from [OECD: Sustainable Ocean Economy](https://stats.oecd.org/Index.aspx?QueryId=95228#) as the primary data set.
+    -   Metadata is available for download through the portal. This platform is being retired, this data set will likely be located in the [OECD Data Explorer](https://data-explorer.oecd.org/) in future years.
+-   Additional countries were filled in using the number of fishers data from the [2019 FAO yearbook](#0).
 -   We were not able to separate subsistence fishing from other fishing jobs, as the data only includes totals for people employed in fishing. For this reason the sector has been renamed from commercial fishing to fishing.
 -   It is worth noting that using a value of 1 job for all employment is different from the original methods. Previously these methods were used: "Employment is disaggregated into full-time, parttime, occasional, and unspecified statuses. These categories are defined as full time workers having \> 90% of their time or livelihood from fishing/aquaculture, part time workers are between 30-90% time (or 30-90% of their livelihood) and occasional workers are \< 30% time. Unspecified status workers could fall anywhere from 0-100% time. Taking the midpoints of those ranges, we assume that 1 part time worker = 0.6 full time workers, 1 occasional worker = 0.15 full time workers, and 1 unspecified worker = 0.5 full time workers, which we used as a weighting scheme for determining total numbers of jobs."
 -   A disaggregation version of the OECD data can be found in OECD's [Employment in fisheries, aquaculture and processing Database](#0) if needed. We did not use the dis-aggregated data, as the disaggregated numbers were not available for the FAO data which was used to gapfill.
+-   Even after using FAO data to gapfill, there are still only 77 countries with available data. Further gapfilling will be necessary.
 
 ### Mariculture
 
--   We used OECD data on people employed in aquaculture sector (marine and inland), total by occupation rate, thousands.
+-   We used [OECD Sustainable Ocean Economies](https://www.google.com/url?q=https://stats.oecd.org/Index.aspx?QueryId%3D95228%23&sa=D&source=editors&ust=1694558475957922&usg=AOvVaw0YmPDwvN_uKIAReu61df6G) data on people employed in aquaculture sector (marine and inland), total by occupation rate, thousands.
 
--   Because this data included both marine and inland values, we estimate the proportion of total aquaculture jobs that can be attributed to marine and brackish aquaculture, we used country-specific proportions of marine and brackish aquaculture revenues (compared to total revenues) calculated from FAO aquaculture production value data set.
+    -   Metadata is available for download through the portal. This platform is being retired, this data set will likely be located in the [OECD Data Explorer](https://data-explorer.oecd.org/) in future years.
+
+-   Additional jobs data is filled in from the [2019 FAO yearbook](#0).
+
+-   Because this data included both marine and inland values, we estimate the proportion of total aquaculture jobs that can be attributed to marine and brackish aquaculture, we used country and year specific proportions of marine and brackish aquaculture revenues (compared to total revenues) calculated from FAO aquaculture production value data set.
 
 -   See note in fishing about data disaggregation for fulltime, partime, occassional and status unspecified.
 
-### Fishery Processing
+-   Even after using two datasets to fill in additional countries, there are only 57 countries with data, further gapfilling will be needed.
 
--   Data for the fishery processing sector is from the OECD Sustainable Economies database. We use the variable. People employed in fishery processing sector (marine and inland), total by occupation rate, thousands
+### Fish Processing
 
--   Due to timing constraints we did not determine a method to subset this data to only marine related fishery processing. This will needed to be added to cleaning script.
+-   Data for the fishery processing sector is from the [OECD: Sustainable Ocean Economy](#0) database. We use the variable: "People employed in fishery processing sector (marine and inland), total by occupation rate, thousands"
+
+    -   Metadata is available for download through the portal. This platform is being retired, this data set will likely be located in the [OECD Data Explorer](https://data-explorer.oecd.org/) in future years.
+
+-   Due to timing constraints we did not determine a method to subset this data to only marine related fishery processing in 2023. **This will needed to be added to the cleaning script once a method is determined.**
+
+-   There are only 49 countries included in this dataset, further gapfilling will be needed.
 
 ### Tourism
 
