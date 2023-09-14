@@ -31,7 +31,7 @@ The Ultraviolet Radiation pressure layer is generated from daily data on Local N
 
 # Updates from previous assessment
 
-- One additional year of data was added to Mazu. 
+- One additional year of data was added to Mazu 
 - Converted more functions to use the `terra` package instead of `raster`
 - Added more tic/tocs
 

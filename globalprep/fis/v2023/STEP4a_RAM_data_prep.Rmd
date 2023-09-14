@@ -29,7 +29,7 @@ This script prepares the RAM B/Bmsy data:
 
 ## Updates from previous assessment
 
-- Using updated RAM data for v2023
+- Updated RAM data for v2023
 
 
 ***
