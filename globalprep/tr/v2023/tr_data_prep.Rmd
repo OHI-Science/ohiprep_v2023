@@ -36,7 +36,7 @@ Xtr = tr/90th quantile across regions
 
 ## The following data are used:
 
-* Numbers of tourist arrivals, used in the calculation of the proportion of arrivals to area of coastline to population: obtained through the [UNWTO](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (in the form of thousands of people). Range: 1995-2021 (only 2008-2021 is used)
+* Numbers of tourist arrivals, used in the calculation of the proportion of arrivals to area of coastline to population: obtained through the [UNWTO](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (in the form of thousands of people). More info on tourism terms [here](https://www.unwto.org/glossary-tourism-terms). Range: 1995-2021 (only 2008-2021 is used)
 * Area of coastline, used in the calculation of the proportion of arrivals to area of coastline to population: calculated in the [LSP goal](https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023). Range: Static
 * Population, used in the calculation of the proportion of arrivals to area of coastline to population: primarily uses [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL) data obtained through the WDI() function. Combines [Our World in Data](https://ourworldindata.org/grapher/population) and Statista data ([1](https://www.statista.com/statistics/706807/population-of-saba-in-the-caribbean-netherlands/), [2](https://www.statista.com/statistics/706806/population-of-sint-eustatius-in-the-caribbean-netherlands/), and [3](https://www.statista.com/statistics/706799/population-of-bonaire-in-the-caribbean-netherlands/)) (obtained on their respective websites) with this to get population data for all OHI regions with arrivals and area of coastline data. Range: World Bank - 1960-2022 (2008-2021 is selected and used); Our World in Data - 10,000 BCE-2021 (2008-2021 is used); Statista - 2011-2023 (2011-2021 is used; as of v2023, 3 OHI regions use this data).
 * Tourism sustainability: World Economic Forum. The Travel & Tourism Development Index 2021 dataset (version 24 May 2022). 2022. [TTDI](https://www.weforum.org/reports/travel-and-tourism-development-index-2021/downloads-510eb47e12#report-nav)
@@ -305,7 +305,7 @@ abline(0, 1)
 
 ### Check out some specific countries (v2023) -- this was for exploring changes in methodology, can skip or use/edit parts in future years
 
-```{r}
+```{r, eval=FALSE}
 # check some countries that changed a lot in v2023's first push to global
 check_countries_graph <- tourism_props %>% 
   filter(rgn_id == 24 | rgn_id == 51 | rgn_id == 189 | rgn_id == 118 | rgn_id == 31) %>%
