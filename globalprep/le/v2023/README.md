@@ -1,8 +1,8 @@
 # Status of Livelihoods and Economies Update
 
-In 2023 we cleaned and prepped the best available data for all sectors and components included in this goal. When newly updated data wasn't available, we re-downloaded and cleaned the previous data source. The old versions of the raw data prepped by OHI were stored on a server previously used by OHI and were no longer accessible. All of the cleaned files are now saved in the folder `~/ohiprep_v2023/globalprep/le/v2023/int` in the format sector_component.csv.
+In 2023 we cleaned and prepped the best available data for most sectors and components included in this goal. Data for tourism still needs to be selected, and is discussed in tourism sections. When newly updated data wasn't available, we re-downloaded and cleaned the previous data source. The old versions of the raw data prepped by OHI were stored on a server previously used by OHI and were no longer accessible. All of the cleaned files are now saved in the folder `~/ohiprep_v2023/globalprep/le/v2023/int` in the format sector_component.csv.
 
-More detailed methods and explanations are available in the livelihoods_economies_dataprep.RMD saved in `~/ohiprep_v2023/globalprep/le/v2023`. Included below is a summary of what tasks were completed in the methods update and what still needs to be done.
+More detailed methods and explanations are available in the livelihoods_economies_dataprep.RMD saved in `~/ohiprep_v2023/globalprep/le/v2023`. Included below is a summary of what tasks were completed in the methods update.
 
 For all datasets, except tourism revenue, the current format has one value for each country and year included in the dataset. Tourism uses a pre-cleaned version of the revenue data, so countries have already been converted to regions. We did not do any gapfilling to fill in countries missing from the cleaned data sets, so this will likely need to be done for most of the included data.
 
