@@ -30,12 +30,11 @@ livelihoods and economies goal.
 It is used to read in and wrangle all available livelihoods and
 economies data as of September 2023. When newer updated data is not
 available, the original data used in the livelihoods and goal in 2013 is
-included. For more details on what data is available, please refer to
-the spreadsheet linked in the livelihoods and economies issue.
+included.
 
 # Setup
 
-```{r}
+```{r, eval = FALSE}
 # load libraries, set directories
 library(ohicore)  #devtools::install_github('ohi-science/ohicore@dev')
 library(tidyverse)
@@ -57,13 +56,12 @@ version_year <- paste0("v",current_year)
 data_path <- paste0("globalprep/le/",version_year)
 ```
 
-# Download Data:
+# Download Data
 
 **Dynamic Data Sources:**
 
 These data sources are updated regularly. If new years of data have been
-released when updating this goal is continued, an updated version of the
-data should be downloaded and used.
+release, an updated version of the data should be downloaded and used.
 
 -   FAO Capture Production Quantity
 
@@ -104,7 +102,7 @@ data should be downloaded and used.
 
 -   FAO Aquaculture Production
 
-    -   Data from the [Global Aquaculture Production](#0) dataset:
+    -   Data from the [Global Aquaculture Production](https://www.fao.org/fishery/en/collection/aquaculture?lang=en) dataset:
         Global Aquaculture production Value, is used for mariculture
         revenue.
 
@@ -153,9 +151,22 @@ data should be downloaded and used.
         the report do not separate fish, aquaculture and fishery
         processing employees in a way that is usable for our analysis.
 
+-   O'Connor et al 2009
+
+    -   This data was published in a report from 2009. It is available
+        in pdf format.
+        [here](https://www.cms.int/sites/default/files/document/BackgroundPaper_Aus_WhaleWatchingWorldwide_0.pdf)
+
+-   OWW
+
+    -   The last year of data in this dataset is 2008
+
+    -   Data can be downloaded
+        [here](https://www.nber.org/research/data/occupational-wages-around-world-oww-database)
+
 # Read in Data
 
-```{r}
+```{r, eval = FALSE}
 # OECD Data 
 oecd_raw <- read_csv(file.path(dir_M, "/git-annex/globalprep/_raw_data/OECD/d2023/ocean_economy.csv")) %>% 
   select(Country, Year, VARIABLE, Variable, Unit, Value, PowerCode) 
@@ -190,9 +201,9 @@ oww <- read_csv(file.path(dir_M,"/git-annex/globalprep/_raw_data/OWW/d2023/oww3.
 
 All values for revenue are formatted to US dollars.
 
-### OECD Revenue Data Wrangling
+### Ocean Energy
 
-```{r}
+```{r, eval = FALSE}
 #get the ocean energy data
 offshore <- oecd_raw %>% 
   filter(VARIABLE == "RD_TOTAL_OCEAN_OFFSHORE") %>% 
@@ -211,7 +222,7 @@ offshore <- oecd_raw %>%
 write_csv(offshore, here(data_path, "int/wte_revenue.csv"))
 ```
 
-### FAO Raw commodities data wrangling
+### Aquarium Fishing
 
 From the methods:
 
@@ -224,7 +235,7 @@ From the methods:
     because it is not specific to ornamental fish, and the subcategory
     'Ornamental freshwater fish' because it is not from marine systems.
 
-```{r}
+```{r, eval = FALSE}
 fao_latest_data_year <- 2021 #update to the last year available in FAO data, likely the same for all FAO data included. 
 #clean up data for ornamental fishing revenue
 ornamental_value <- commodities_value %>%
@@ -250,14 +261,14 @@ ornamental_revenue <-
 write_csv(ornamental_revenue, here(data_path, "int/aqf_revenue.csv"))
 ```
 
-### FAO capture production quantity and exvessel price data
+### Fishing
 
 FAO capture data is combined with ex-vessel price data to estimate total
 revenue from fishing for each country.
 
 Here we do some basic cleanup of the global capture production database.
 
-```{r}
+```{r, eval = FALSE}
 
 fao_capture_clean <- fao_capture %>% 
    dplyr::rename(country = "Country Name En",
@@ -281,7 +292,7 @@ fao_capture_clean <- fao_capture_clean %>%
 Next we'll clean up and gapfill the exvessel price data. This has
 exvessel price in usd/metric tonne.
 
-```{r}
+```{r, eval = FALSE}
 exvessel_prices_clean <- exvessel_prices %>% 
   clean_names() %>% 
   mutate(year = as.numeric(year)) %>% 
@@ -358,7 +369,7 @@ exvessel_prices_gapfilled <- exvessel_prices_clean %>%
   filter(exvessel > 0) #remove price less than 0. This doesn't make sense and never occurs after 1998 anyway so would not be used to calculate any scores. 
 ```
 
-```{r}
+```{r, eval = FALSE}
 
 #combine the price data with the capture data 
 fao_capture_price <- fao_capture_clean %>% 
@@ -404,14 +415,14 @@ fishing_revenue <- fao_capture_price_final %>%
   summarize(value = sum(revenue, na.rm = TRUE)) %>% 
   mutate(unit = "USD (1)",
          sector = "cf",
-         data = "FAO capture production and ex-vessel prices")
+         data_source = "FAO capture production and ex-vessel prices")
 
 write_csv(fishing_revenue, here(data_path, "int/cf_revenue.csv"))
 ```
 
-### FAO aquaculture data wrangling
+### Mariculture
 
-```{r}
+```{r, eval = FALSE}
 #clean the aquaculture value data
 #this will also be used in the mariculture jobs data section, so need to keep in all environments in the first step
 aquaculture_value_clean <- aquaculture_value %>% 
@@ -437,7 +448,7 @@ total_mar_rev <- mariculture_revenue %>%
 write_csv(total_mar_rev, here(data_path, "int/mar_revenue.csv"))
 ```
 
-### Marine Mammal Watching revenue
+### Marine Mammal Watching
 
 The whale watching revenue is stored in a separate table for each
 country throughout the paper. We will create function to extract each of
@@ -459,10 +470,10 @@ Key takeaways from the OHI methods (7.19.0.4 Marine mammal watching and
     adjusted by the proportion of marine revenue as described for the
     jobs dataset.
 
-    -   Jobs Dataset description: For countries with both marine and
+    -   Jobs Dataset description: "For countries with both marine and
         freshwater cetacean viewing, we adjusted by the proportion of
         marine revenue accordingly. Because some of the whale watching
-        in O'Connor et al. focused on freshwater cetacean viewing, we
+        in O'Connor et al.focused on freshwater cetacean viewing, we
         categorized the target species listed for each country as
         freshwater or marine. For countries with both marine and
         freshwater species, we categorized the whale watching in those
@@ -473,14 +484,14 @@ Key takeaways from the OHI methods (7.19.0.4 Marine mammal watching and
         precise determination of the percentage of marine-based whale
         watching. We applied these marine proportions to data on the
         number of whale watchers before converting these estimates into
-        employment estimates.
+        employment estimates."
 
 First we will extract all the tables with summary of country results.
 This will mainly be used for the total number of whale watchers-which is
 part of the jobs calculation, but we will extract it now to get the list
 of countries included in the paper.
 
-```{r}
+```{r, eval = FALSE}
 #number of whale watchers per country
 
 # there are 7 different tables (one per larger region) in the paper with this information, need to extract all of them and combine
@@ -552,7 +563,7 @@ For whale watching revenue each of the countries included in the table
 have their own report. We'll use the list of countries from the previous
 step to locate and convert all of these tables.
 
-```{r}
+```{r, eval = FALSE}
 #country <- country_list[15] # for testing
 #region <- region_list[15]
 
@@ -663,8 +674,10 @@ country_regions <- whale_watching_numbers %>%
 country_list <- country_regions$country
 region_list <- country_regions$region
 
-
+#create an empty list
 whale_list <- list()
+
+#run the function and extract data for each country 
 for (i in seq_along(country_list)) {
   
   country <- country_list[i]
@@ -691,13 +704,16 @@ whale_revenue_data <- bind_rows(whale_list) %>%
 We now need to subset the revenue to only revenue related to freshwater
 species. The first step is identifying all of the main species used for
 each country. These are also stored in various tables scattered
-throughout the pdf.
+throughout the pdf. We will primarily follow the methods outlined in the
+OHI original methods, however we will programmatically query for the
+habitat of each species, and assign an exact percentage of marine whale
+watching.
 
-```{r}
+```{r, eval = FALSE}
 
 #testing 
-page <- 135
-country <- 	"Japan"
+#page <- 135
+#country <- 	"Japan"
 
 key_species_country <- function(page, country){
   #the first few countries were split into multiple regions and had to be processed separately
@@ -869,10 +885,10 @@ species_final <- bind_rows(species_list) %>%
 ```
 
 Now that we have a list of all the main species for each country, we'll
-match as many of these species to the IUCN red-list and query the IUCN
-api for habitat information.
+match as many of these species as possible to the IUCN red-list and
+query the IUCN api for habitat information.
 
-```{r}
+```{r, eval = FALSE}
 #check the iucn redlist for species matches 
 
 #convert some species to match the iucn redlist 
@@ -906,7 +922,7 @@ species_final <- species_final %>%
                              
                              TRUE ~species))
 
-#read in the list of all the species IUCN has
+#read in the list of all the species IUCN has, created in iconic species data prep
 iucn_available <- read_csv(here("globalprep/ico/v2023/raw/spp_list_from_api.csv")) %>% 
   filter(class == "MAMMALIA") 
 
@@ -930,6 +946,7 @@ setdiff(species_final$species, iucn_available$join_name)
 #tucuxi marine & marine tucuxi -marine
 #various tropical dolphin -marine
 #dolphin various species - marine
+#NA - doesn't have any significant whale watching
 
 
 #add the iucn data to the final species list 
@@ -964,10 +981,12 @@ species_results <- bind_rows(results_list) %>%
   unnest(col = result)
 
 #check if any of them are found in freshwater habitats
+unique(species_results$habitat)
 
 potentially_freshwater <- species_results %>% 
   filter(str_detect(habitat,"Wetlands")| str_detect(habitat, "Artificial/Aquatic"))
 
+#join back to get species iucn to get common name
 freshwater_species <- species_iucn %>% 
   left_join(potentially_freshwater, by = c("sciname" = "name")) %>% 
   filter(!is.na(habitat)) %>% 
@@ -976,16 +995,19 @@ freshwater_species <- species_iucn %>%
 #make a list of all the freshwater species 
 freshwater_list <- unique(freshwater_species$species)
 
+#here we will calculate percent marine
+#note that when a species is listed twice (because the country is divided into smaller regions, it is counted twice)
+
 species_final_hab <- species_final %>% 
   filter(!is.na(species)) %>% #remove countries with no species
   mutate(habitat = case_when(species %in% freshwater_list ~"Freshwater",
-         TRUE ~ "Marine")) %>% 
+         TRUE ~ "Marine")) %>% #classify as marine or freshwater
   group_by(country, habitat) %>% 
   summarize(count = n()) %>% #count the total number of species in each habitat
   ungroup() %>% 
   pivot_wider(names_from = habitat, values_from = count) %>% 
   replace_na(list(Freshwater = 0, Marine = 0)) %>% 
-  mutate(percent_marine = Marine/(Marine + Freshwater))
+  mutate(percent_marine = Marine/(Marine + Freshwater)) #find percent of total species that are marine
 
 species_final_hab <- species_final_hab %>% 
   select(country, percent_marine)
@@ -994,7 +1016,7 @@ species_final_hab <- species_final_hab %>%
 Now that we have percent marine mammal watching we can calculate the
 final marine mammal watching revenue.
 
-```{r}
+```{r, eval = FALSE}
 whale_revenue_final <- whale_revenue_data %>% 
   left_join(species_final_hab, by = "country") %>% 
   mutate(value = percent_marine * total_expenditure) %>%
@@ -1007,42 +1029,23 @@ whale_revenue_final <- whale_revenue_data %>%
 write_csv(whale_revenue_final,  here(data_path, "int/mmw_revenue.csv"))
 ```
 
-### Tourism Revenue
+### Tourism
 
-There are a few data options for revenue from tourism, see read me for discussion on options. This component will need to be added before proceeding with the livelihoods and economies update. 
-
-
-```{r}
-all_wttc_data <- read_excel("~/OHI_repositories/ohiprep_v2023/globalprep/tr/v2022/raw/unwto-all-data-download_0.xlsx", sheet = "Inbound Tourism-Expenditure")
-
-# Set the 2nd row as column names
-colnames(all_wttc_data ) <- unlist(all_wttc_data[2, ])
-
-# Assign a name to the 5th column
-new_name <- "expenditure_type"  # Replace with your desired name
-colnames(all_wttc_data)[5] <- new_name
-colnames(all_wttc_data)[4] <- "country"
-
-# Remove columns with NA names
-all_wttc_data <- all_wttc_data[, !is.na(colnames(all_wttc_data))]
-
-all_wttc_data <- all_wttc_data %>% 
-  fill(country, .direction = "down")
-
-tour_expenditure <- all_wttc_data %>%
-  filter(expenditure_type == "Tourism expenditure in the country") %>% 
-  pivot_longer(cols = paste(1995:2020), names_to = "year", values_to = "value") %>% 
-  mutate(value = ifelse(value == "..", NA,value))
-```
+The final data source for tourism revenue was not finalized in 2023.
+This component will need to be added before proceeding with the
+livelihoods and economies update. See the readme for discussion of
+available data sources.
 
 ## Jobs
 
-### FAO Yearbook Number of Fishers
+### Fishing, Mariculture, Fish Processing
+
+#### FAO Yearbook Number of Fishers
 
 Turn the number of fishers table from the FAO yearbook into a data frame
 and clean.
 
-```{r}
+```{r, eval = FALSE}
 #turn the fao pdf into a format we can use
 fishers_table <- fao_pdf[[3]] %>% #page number of the pdf
   as.data.frame()
@@ -1070,9 +1073,9 @@ fao_fisher_jobs <- fishers_table %>%
   select(country, year, value, unit, sector, data_source)
 ```
 
-### Fao Yearbook Fish Farmers
+#### Fao Yearbook Fish Farmers
 
-```{r}
+```{r, eval = FALSE}
 fish_farm_table <- fao_pdf[[5]] %>% #page number of the pdf
   as.data.frame()
 
@@ -1099,9 +1102,9 @@ fao_farm_jobs <- fish_farm_table %>%
    select(country, year, value, unit, sector, data_source)
 ```
 
-### OECD Jobs Data
+#### OECD Jobs Data
 
-```{r}
+```{r, eval = FALSE}
 #number of people employed in th fishing sector 
 
 #note that this is data for the same category as the FAO fishers data, FAO data will be used to gapfill
@@ -1139,7 +1142,7 @@ Due to timing constraints we did not determine a method to subset this
 data to only marine related fishery processing in 2023. **This will
 needed to be added once a method is determined.**
 
-```{r}
+```{r, eval = FALSE}
 #fishery processing jobs
 oecd_fishproc_jobs <- oecd_raw %>% 
   filter(VARIABLE == "FISH_EMP_PROCESSING_TOT") %>% 
@@ -1164,7 +1167,7 @@ number of people employed in fishing. Another possibility is contacting
 FAO or ILOSTAT to see if they are able to provide disaggregated data for
 this sector.
 
-```{r}
+```{r, eval = FALSE}
 oecd_fisher_jobs <-oecd_fisher_jobs %>% 
   mutate(country = ifelse(country == "Korea", "South Korea", country)) #south korea is an oecd member
 
@@ -1203,7 +1206,7 @@ number of people employed in aquacutlure. Another possibility is
 contacting FAO or ILOSTAT to see if they are able to provide
 disaggregated data for this sector.
 
-```{r}
+```{r, eval = FALSE}
 oecd_aqua_jobs <- oecd_aqua_jobs %>% 
   mutate(country = ifelse(country == "Korea", "South Korea", country)) #south korea is an oecd member
 
@@ -1255,7 +1258,7 @@ production value database. We will find then find the proportion of
 revenue for each country that is associated with marine/brackish
 species.
 
-```{r}
+```{r, eval = FALSE}
 #classify brackish as marine for summing 
  aquaculture_value_proportions <- aquaculture_value_clean %>% 
    filter(!is.na(environment)) %>% 
@@ -1307,68 +1310,12 @@ mariculture_jobs_final <- mariculture_jobs_final %>%
 write_csv(mariculture_jobs_final, here(data_path, "int/mar_jobs.csv"))
 ```
 
-### Tourism Jobs Data Wrangling
+### Tourism
 
-The WTTC data was available with projections through 2030, and is the
-same data source used in the livelihoods and economies goal. Real data
-is available through x, with future years of data not available for free
-from this source. However this is the most complete data set and would
-still be a major update from the last calculation of the livelihoods and
-economies goal, even if projections were not used. This data was already
-cleaned in the v2022 tourism data prep. We will use this cleaned file
-and modify slightly.
-
-```{r}
-tourism_revenue <- read_csv("~/OHI_repositories/ohiprep_v2023/globalprep/tr/v2022/intermediate/wttc_empd_rgn.csv")
-
-tourism_revenue_clean <- tourism_revenue %>% 
-  mutate(unit = "person (1)",
-         value = jobs_ct,
-         sector = "tour",
-         data_source = "UNWTO"
-         ) %>% 
-  select(rgn_id, rgn_name, year, value, unit, sector, data_source) %>% 
-  filter(rgn_id <250 & year < 2021) 
-
-
-```
-
-```{r}
-#next we will calculate the percent of the population which is coastal
-#this was last calculated in 2021
-
-mar_pop_25 <- read_csv("~/OHI_repositories/ohiprep_v2023/globalprep/mar_prs_population/v2021/output/mar_pop_25mi.csv")
-
-#use the WDI package to get overall population
-
-population_total <- WDI(
-  country = "all",
-  indicator = "SP.POP.TOTL", 
-  start = 2000, end = 2020) %>%
-  select(eez_iso3 = iso3c, population = SP.POP.TOTL, year) %>% 
-  filter(!is.na(eez_iso3)) %>% 
-  filter(!eez_iso3 == "")
-
-
-region_populations <- mar_pop_25 %>%
-  left_join(rgns_eez, by = c("rgn_id")) %>% #add iso3c code
-  left_join(population_total, by = c("year", "eez_iso3")) %>% #add population data
-left_join(low_pop, by = "rgn_id") %>% #add low pop 
-mutate(pop = case_when((is.na(population) & Inhabited == 0) ~ 0,
-                       (is.na(population) & Inhabited == 1) ~ est_population, 
-                       T ~ population)) %>% 
-  mutate(cost_pop = popsum/pop) %>% 
-  mutate(cost_pop = ifelse(cost_pop >1 ,1,cost_pop)) %>%
-  select(rgn_id, year, rgn_name, popsum, pop, cost_pop)  
-  
-
-tourism_coastal <- tourism_revenue_clean %>% 
-  left_join(region_populations) %>% 
-  mutate(value_calc = value * cost_pop) %>%  #calculate the number of coastal jobs
-select(rgn_id, year, value= value_calc, unit, sector, data_source)
-
-write_csv(tourism_revenue_clean, here(data_path, "int/tour_jobs.csv"))
-```
+The final data source for tourism jobs was not finalized in 2023. This
+component will need to be added before proceeding with the livelihoods
+and economies update. See the readme for discussion of available data
+sources.
 
 ### Marine Mammal Watching Jobs
 
@@ -1381,22 +1328,21 @@ Key takeaways from methods:
 -   When IFAW reported "minimal" numbers of whale watchers, we converted
     this description to a 0 for lack of additional information.
 
--   For countries with both marine and freshwater cetacean viewing, we
-    adjusted by the proportion of marine revenue accordingly. Because
-    some of the whale watching in O'Connor et al. focused on freshwater
-    cetacean viewing, we categorized the target species listed for each
-    country as freshwater or marine. For countries with both marine and
-    freshwater species, we categorized the whale watching in those
-    countries as either 50% or 90% marine, based on the number of marine
-    versus freshwater target species and information provided in the
-    report narrative. For Colombia and Indonesia, more detailed
-    information in the report narrative allowed for a more precise
-    determination of the percentage of marine-based whale watching. We
-    applied these marine proportions to data on the number of whale
-    watchers before converting these estimates into employment
-    estimates.
+-   For countries with both marine and freshwater species, we
+    categorized the whale watching in those countries as either 50% or
+    90% marine, based on the number of marine versus freshwater target
+    species and information provided in the report narrative. For
+    Colombia and Indonesia, more detailed information in the report
+    narrative allowed for a more precise determination of the percentage
+    of marine-based whale watching. We applied these marine proportions
+    to data on the number of whale watchers before converting these
+    estimates into employment estimates.
 
-```{r}
+We roughly followed these methods, however percent marine was calculated
+programmatically, and an exact percentage was used. See revenue section
+for methods.
+
+```{r, eval = FALSE}
 #get table with regional average number of whale watchers per employee out of pdf
 columns <- c("region", "job_number", "watch_per_employee")
 
@@ -1416,35 +1362,34 @@ T ~ region)) %>% #fix a few regions that were split up
   select(-job_number)
 ```
 
-Apply proportion Marine to the number of whale watchers.
+Apply proportion Marine to the number of whale watchers (table extracted
+in marine mammal watching revenue section)
 
-```{r}
+```{r, eval = FALSE}
 whale_watching_marine <- whale_watching_numbers %>% 
   left_join(species_final_hab, by = "country") %>% 
   mutate(watcher = value * percent_marine) %>% 
   select(watcher,country, region, year)
 ```
 
-```{r}
+```{r, eval = FALSE}
 whale_jobs <- whale_watching_marine %>% 
   left_join(regional_whale_employee, by = c("region")) %>% 
   mutate(jobs = round(watcher/watch_per_employee,0)) %>% 
   mutate(value = ifelse(is.na(jobs), 0, jobs)) %>%  #nas are 0s in this case
   mutate(unit ="persons (1)",
-         component = "jobs",
-         sector = "marine mammal watching",
+         sector = "mmw",
          data_source = "O’Connor et al 2009") %>% 
-  select(country, year,value, unit, component, sector, data_source)
-
+  select(country, year,value, unit, sector, data_source)
 write_csv(whale_jobs, here(data_path, "int/mmw_jobs.csv"))
 
 ```
 
 ## Wages Data
 
-**From the OHI methods:**
+### Tourism, Fishing, Ports and Harbors, Ship and Boat-building
 
-We used the [Occupational Wages around the
+**From the OHI methods:** We used the [Occupational Wages around the
 World](http://www.nber.org/oww/) (OWW) database produced by Remco H.
 Oostendorp and Richard B. Freeman in 2005. These data were drawn from
 the International Labour Organization and subjected to a standardization
@@ -1536,7 +1481,7 @@ From the methods we know the occupations we need:
 
 Process and save the oww data
 
-```{r}
+```{r, eval = FALSE}
 oww_clean <- oww %>% 
   filter(y4 %in% c(9, 10, 75, 97, 98, 99, 100, 114,115, 116, 117)) %>% #select the relevany occupation codes
   select(y0, y1, y3, y4, country_name, mw3wl_us) %>% 
@@ -1558,4 +1503,3 @@ oww_clean <- oww %>%
 write_csv(oww_clean, here(data_path, "int/all_sectors_wages.csv"))
 ```
 
-### 
