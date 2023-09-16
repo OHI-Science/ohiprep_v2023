@@ -1,8 +1,8 @@
-#function for cleaning the fao data in the format available from the online query portal (2023)
+#function for cleaning the fao data in the format available from the Statistical Query Panel (2023)
 
 #' fao_online_portal_clean
 #'
-#' @param fao FAO dataset downloaded from online query portal 
+#' @param fao FAO dataset downloaded from Statistical Query Panel
 #' @param initial_data_year initial year available in the dataset
 #' @param last_data_year latest year available in the dataset
 #' @param sub_N value to substitute for rows that have the flaf of N

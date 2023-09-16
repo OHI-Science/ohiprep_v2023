@@ -67,7 +67,7 @@ release, an updated version of the data should be downloaded and used.
 
     -   The [FAO capture
         production](https://www.fao.org/fishery/en/collection/capture?lang=en)
-        data was downloaded via the fishstat query portal. This data is
+        data was downloaded via the Statistical Query Panel. This data is
         updated annually and can be downloaded using the following
         instructions:
 
