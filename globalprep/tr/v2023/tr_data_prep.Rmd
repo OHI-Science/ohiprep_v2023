@@ -70,6 +70,7 @@ library(janitor)
 library(plotly)
 library(readxl)
 library(naniar)
+library(countrycode)
 
 version_year <- "2023"
 prev_ver_yr <- as.character(as.numeric(version_year) - 1)
@@ -83,63 +84,69 @@ regions_shape()
 
 # Ap: Proportion of tourist arrivals to area of coastline to population
 
-We use international arrivals data from the [United Nations World Tourism Organization (UNWTO)](https://www.unwto.org/). Up until the current assessment, we accessed data from the [World Travel & Tourism Council (WTTC)](http://www.wttc.org/), but this is no longer a viable option. This is provided in the form of thousands of people arriving, which we divide by area of coastline for each country and further by population for each country. Missing values in arrivals (for our purposes, "Overnights visitors (tourists)") are gapfilled using "Total arrivals" minus "Same-day visitors (excursionists)" (if available) or, secondarily, by upfilling or downfilling (prioritizing downfilling) years of data based on if the previous or later year has information. Missing values in the primarily-used population data source are gapfilled using two other data sources, and one data source's years are gapfilled by upfilling. We were not able to further gapfill with other methods at this time.
+We use international arrivals data from the [United Nations World Tourism Organization (UNWTO)](https://www.unwto.org/). Up until the current assessment, we accessed data from the [World Travel & Tourism Council (WTTC)](http://www.wttc.org/), but this is no longer a viable option. 
+
+To address missing values in arrivals, specifically referring to "Overnight visitors (tourists)," we employ a two-step process. First, we attempt to fill the gaps by subtracting "Same-day visitors (excursionists)" from "Total arrivals" if the latter is available. If this is not feasible, we resort to interpolating or extrapolating based on historical data spanning from 1995 to 2019, employing a linear model to estimate increases or decreases on a regional level.
+
+However, in light of the Covid-19 pandemic, we have adopted a distinct approach for the years 2020 and 2021. We calculate the global average proportionate change from the preceding year, apply this percentage change to the previous year's arrivals or total values, and then add the result to the corresponding previous year's arrivals or total value.
+ - So 2020 was gapfilled with the global average decrease proportion of ~-0.70 for both arrivals and totals. Meaning that we took the 2019 value and multiplied it by -0.7 and then addd that to the 2019 value. 2019*-0.7 + 2019 = 2020
+ - 2021 was gapfilled with the global average increase proportion of ~0.2. Meaning that we took the 2020 value and multiplied it by 0.2 and then addd that to the 2020 value. 2020*0.2 + 2020 = 2021
 
 
-### Calculating the proportion of tourist arrivals to area of coastline to population
-
-The number of arrivals to area of coastline is used as a proxy for the value that people have for experiencing and enjoying coastal areas. We gather tourist arrivals and make it a proportion by dividing them by the area of coastline and by the population for the associated OHI region.
-
-### Source cleaned and gapfilled arrivals, area of coastline, and population data sources
+### Source cleaned and gapfilled arrivals and population data sources
 
 ```{r, eval=FALSE}
 # source in cleaned UNWTO data for current version year (make sure to download from website and put on Mazu in the UNWTO folder first)
 source(here(paste0("globalprep/tr/v", version_year, "/R/process_UNWTO_arrivals.R"))) # outputs unwto_dupe_fix_downup_gf
 
 # source in prepared area of coastline data: uses current version year for these files by default (acquire up-to-date LSP data if applicable)
-source(here(paste0("globalprep/tr/v", version_year, "/R/process_area_of_coastline.R"))) # outputs inland_offshore
+# source(here(paste0("globalprep/tr/v", version_year, "/R/process_area_of_coastline.R"))) # outputs inland_offshore
 
 # source in prepared populations data by ohi region: uses current version year for these files by default (download up-to-date data if applicable)
-source(here(paste0("globalprep/tr/v", version_year, "/R/process_populations.R"))) # outputs combined_pops_filled
+# source(here(paste0("globalprep/tr/v", version_year, "/R/process_populations.R"))) # outputs combined_pops_filled
 
 # check outputs of everything!
+
+coastal_pop_data <- read.csv(here("globalprep/mar_prs_population/v2021/output/mar_pop_25mi.csv")) ## read in coastal population data from other data layer
+
+coastal_pop_data_fill <- coastal_pop_data %>%
+  filter(year == 2020) %>%
+  mutate(year = 2021) %>%
+  rbind(coastal_pop_data) # add 2021 data year, just using year 2020
 ```
 
-### Divide tourist arrival count data by area of coastline and divide again by population
+### Divide tourist arrival count by total arrival count
+
+ - In 2023, we considered rescaling by coastal area and/or coastal population, however, we decided to scrap this, as it was unduly harming scores for larger regions. We will just use the tourist arrival/total arrivals metric.
+ - Because of some gapfilling and uncertainty in the data, some regions reported higher tourist arrivals than total arrivals. Due to this, we sometimes have ratios >1. To deal with this, we just give those regions a ratio of 1. 
+ - Some regions reported only tourist arrivals, and no total arrivals. Because of this, we gapfilled any that didn't have total arrivals with the tourist arrivals. This isn't ideal, but was the best we could do. 
 
 ```{r, eval=FALSE}
 # divide the number of tourist arrivals by area of coastline and population to get the proportion
-tourism_props <- unwto_dupe_fix_downup_gf %>%
-  left_join(inland_offshore, by = c("rgn_id", "year")) %>%
-  left_join(combined_pops_filled, by = c("rgn_id", "year")) %>%
-  mutate(Ap = (tourism_arrivals_ct/total_inland_offshore_area/population)) %>%
-  filter(year >= 2008) # filter to the years we are interested in for any data that isn't filtered yet
+tourism_props <- unwto_all_gf %>%
+    mutate(year = as.numeric(year)) %>%
+ # left_join(offshore_data, by = c("rgn_id", "year")) %>%
+  left_join(coastal_pop_data_fill, by = c("rgn_id", "year")) %>%
+  # mutate(Ap = ((tourism_arrivals_ct/total_inland_offshore_area)/popsum)) %>%
+  mutate(total = ifelse(is.na(total), tourism_arrivals_ct, total)) %>%
+  mutate(Ap = tourism_arrivals_ct/total) %>%
+  filter(year >= 2008) %>% # filter to the years we are interested in for any data that isn't filtered yet
+  filter(popsum > 0) %>% # filter out no pop regions
+  left_join(rgns_eez) %>%
+  mutate(Ap = ifelse(Ap > 1, 1, Ap)) # if greater than 1 make 1
 
 # check out things so far
 summary(tourism_props) # should be 0 NAs for Ap if gapfilling worked
+hist(tourism_props$Ap)
 
-# remove unnecessary columns after checking summary
-tourism_props <- tourism_props %>%
-  select(-tourism_arrivals_ct, -total_inland_offshore_area, -population)
 ```
 
-### Rescale the proportions to be between 0 and 1
-
 ```{r, eval=FALSE}
-# rescale to make highest Ap value 1
-quantile_marker <- quantile(tourism_props$Ap, probs = 0.90, na.rm = TRUE) # 90th quantile = 1
-tourism_props$Ap_rescaled <- tourism_props$Ap / quantile_marker # divide all values by this value
-tourism_props$Ap_rescaled <- pmin(tourism_props$Ap_rescaled, 1) # any above 1 still rescale to 1
-
-# exploratory checks
-hist(tourism_props$Ap_rescaled, main = "Distribution of Rescaled Ap Values") # check out the distribution
-perfect_scores <- tourism_props %>% filter(Ap_rescaled == 1) # get the times the Ap = 1
-unique(perfect_scores$rgn_id) # which countries have at least one Ap value = 1?
 
 # make rescaled column the actual value column
 tourism_props_rescaled <- tourism_props %>%
-  select(-Ap) %>%
-  rename(Ap = Ap_rescaled)
+  dplyr::select(rgn_id, year, arrivals_method, arrivals_gapfilled, Ap)
+  
 ```
 
 ### Removing low population / uninhabited regions
@@ -193,34 +200,14 @@ tourism_props_rescaled <- tourism_props_rescaled %>%
 year_range <- unique(tourism_props_rescaled$year) # get the year range of Ap
 year_range_df <- data.frame(year = year_range) # make it a dataframe
 
-eez_to_combine <- rgns_eez %>%
-  select(rgn_id) %>% # get all OHI regions
-  crossing(., year_range_df) # expand OHI regions so theres one entry for each applicable year
-
-# we did not maintain info on regions with population data but no arrivals data since we joined population to regions with arrivals data, so let's get that back just to have complete info on our data
-countries_w_pop_data_no_arrivals <- setdiff(combined_pops_filled$rgn_id, unwto_dupe_fix_downup_gf$rgn_id) # find regions this is the case for
-countries_w_pop_data_no_arrivals_df <- combined_pops_filled %>%
-  filter(rgn_id %in% countries_w_pop_data_no_arrivals) %>%
-  select(rgn_id, year, population) # get population data for the regions with no arrivals data but yes population data, that way later these will be the only regions with that data and we can use that to set population_method
-  
-  
-tourism_props_rescaled_eez <- eez_to_combine %>%
-  left_join(countries_w_pop_data_no_arrivals_df, by = c("rgn_id", "year")) %>% # add in the population data to later create new column
-  left_join(tourism_props_rescaled, by = c("rgn_id", "year")) %>% # add this to all regions, so we get Ap values for regions that have them and NAs for ones that don't
-  mutate(population_method = ifelse(!is.na(population), "WDI-WB", population_method)) %>% # set method based on having population data (this will be the regions with no arrivals data but yes population data)
-  select(-population) %>% # don't need this anymore
-  mutate(coastline_method = "LSP",
-         coastline_gapfilled = NA) # adding gf columns for coastline data for consistency but we have data for all OHI regions, so it's all the same
-  
-
 # save gapfill info
-tourism_props_gf_to_write <- tourism_props_rescaled_eez %>%
+tourism_props_gf_to_write <- tourism_props_rescaled %>%
   select(-Ap) # don't need actual values for the gapfill information
 
 write_csv(tourism_props_gf_to_write, here(paste0("globalprep/tr/v", version_year, "/output/tr_arrivals_props_tourism_gf.csv")))
 
 # save gap-filled data
-tourism_props_to_write <- tourism_props_rescaled_eez %>%
+tourism_props_to_write <- tourism_props_rescaled %>%
   select(rgn_id, year, Ap) # don't need gf info here, just the values
 
 write_csv(tourism_props_to_write, here(paste0("globalprep/tr/v", version_year, "/output/tr_arrivals_props_tourism.csv")))
@@ -244,7 +231,7 @@ abline(0, 1) # more data below the line
 # compare 2020 and 2021
 plot(tourism_props_compare$"2020", tourism_props_compare$"2021",
      xlab = "v2023 2020 Arrivals Proportion", ylab = "v2023 2021 Arrivals Proportion")
-abline(0, 1) # more dara above the line
+abline(0, 1) # more data above the line
 ```
 
 Everything looks reasonable.
@@ -310,7 +297,7 @@ abline(0, 1)
 check_countries_graph <- tourism_props %>% 
   filter(rgn_id == 24 | rgn_id == 51 | rgn_id == 189 | rgn_id == 118 | rgn_id == 31) %>%
   mutate(rgn_id_plot = as.factor(rgn_id),
-         year_plot = as.Date(year, "%Y"))
+         year_plot = year)
 
 Ap_graph <- ggplot(check_countries_graph, aes(x = year_plot, y = Ap, color = rgn_id_plot)) +
   geom_line() +
@@ -318,121 +305,18 @@ Ap_graph <- ggplot(check_countries_graph, aes(x = year_plot, y = Ap, color = rgn
   labs(x = "",
        color = "Region ID")
 
-Ap_rescaled_graph <- ggplot(check_countries_graph, aes(x = year_plot, y = Ap_rescaled, color = rgn_id_plot)) +
-  geom_line() +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(x = "Year",
-       y = "Rescaled Ap")
 
-library(patchwork)
-Ap_graph / Ap_rescaled_graph
+Ap_graph
 
 countries_in_2021 <- check_countries_graph %>%
   filter(year == "2021") %>%
   left_join(rgns_eez, by = "rgn_id") %>%
-  select(-year_plot, -admin_rgn_id, -admin_country_name, -Notes, -rgn_id_plot, -eez_iso3, -territory)
+  select(-year_plot)
 
 library(kableExtra)
 kable(countries_in_2021) %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
-# check what countries have really large Ap before rescaling and check the inland + offshore area of those (to see if a small area is skewing things)
-top_Ap_values <- tourism_props %>%
-  left_join(inland_offshore, by = c("rgn_id", "year")) %>%
-  group_by(rgn_id) %>%
-  summarize(max_Ap = max(Ap),
-            total_inland_offshore_area = mean(total_inland_offshore_area)) %>%
-  arrange(desc(max_Ap)) %>%
-  left_join(rgns_eez, by = "rgn_id") %>%
-  select(rgn_name, max_Ap, total_inland_offshore_area)
-
-kable(top_Ap_values, digits = 2) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
-
-# prepare total area (land + 3 nm offshore) of each ohi region
-library(sf)
-regions_no_geom <- regions %>%
-  st_drop_geometry() %>%
-  filter(rgn_type == "land") %>%
-  select(rgn_id, area_km2) %>%
-  left_join(offshore_data, by = "rgn_id", relationship = "many-to-many") %>%
-  select(-a_prot_km2, -rgn_name) %>%
-  mutate(area_tot = area_km2 + a_tot_km2,
-         year = as.character(year)) %>%
-  select(-area_km2, -a_tot_km2)
-
-# combine inland + offshore data, population, total area, arrivals, original Ap (arrivals/coastline), and some tests of other Ap calculations
-top_Ap_values_2021 <- tourism_props %>% # can adapt this code to find countries to manually add population data for
-  ungroup() %>%
-  left_join(combined_pops_filled, by = c("rgn_id", "year")) %>%
-  select(rgn_id, year, population, Ap) %>%
-  left_join(unwto_dupe_fix_downup_gf, by = c("rgn_id", "year")) %>%
-  select(-arrivals_method) %>%
-  left_join(rgns_eez, by = c("rgn_id")) %>%
-  select(rgn_id, rgn_name, tourism_arrivals_ct, Ap, year) %>%
-  left_join(inland_offshore, by = c("rgn_id", "year")) %>%
-  left_join(combined_pops_filled, by = c("rgn_id", "year")) %>%
-  left_join(regions_no_geom, by = c("rgn_id", "year"), relationship = "many-to-many") %>%
-  select(rgn_id, rgn_name, Ap, year, area_tot, population, total_inland_offshore_area, tourism_arrivals_ct) %>%
-  group_by(rgn_id) %>%
-  arrange(rgn_id, year) %>%
-  mutate(tourism_arrivals_ct = ifelse(year == 2021 & is.na(tourism_arrivals_ct), lag(tourism_arrivals_ct, n = 2), tourism_arrivals_ct)) %>%
-  fill(tourism_arrivals_ct, .direction = "downup") %>%
-  ungroup() %>%
-  filter(year == 2021) %>%
-  group_by(rgn_id) %>%
-  mutate(Ap_w_pop_and_tot_area = (tourism_arrivals_ct/total_inland_offshore_area/population/area_tot),
-         Ap_w_pop = (tourism_arrivals_ct/total_inland_offshore_area/population), # will be slightly different than the Ap value because this code gapfills arrivals (before dividing anything), while the Ap values gapfilled Ap values after dividing everything; can alter the code if you want a different comparison
-         Ap_w_tot_area = (tourism_arrivals_ct/total_inland_offshore_area/area_tot)) %>%
-  ungroup() %>%
-  select(rgn_name, Ap, Ap_w_pop, Ap_w_tot_area, Ap_w_pop_and_tot_area, area_tot, population, total_inland_offshore_area, tourism_arrivals_ct) %>%
-  arrange(desc(Ap)) # decide what to arrange by highest to lowest
-
-# create table that has everything
-kable(top_Ap_values_2021, digits = 5) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
-
-# create histogram of Ap
-hist(top_Ap_values_2021$Ap, breaks = 100, main = "Distribution of Ap", xlab = "Ap")
-
-# check where Ap values fall for these countries (should hopefully not be too low but may be unavoidable)
-which(top_Ap_values_2021$rgn_name == "United States")
-which(top_Ap_values_2021$rgn_name == "China")
-which(top_Ap_values_2021$rgn_name == "India")
-which(top_Ap_values_2021$rgn_name == "Russia")
-which(top_Ap_values_2021$rgn_name == "Philippines")
-
-# table of final (rescaled) Ap values for current version year
-new_data_for_table_2021 <- new_data %>%
-  left_join(rgns_eez, by = "rgn_id") %>%
-  select(rgn_id, rgn_name, year, Ap) %>%
-  arrange(desc(Ap)) %>%
-  rename(Ap_rescaled = Ap) %>%
-  filter(year == 2021) %>% 
-  select(-year)
-
-kable(new_data_for_table_2021, digits = 5) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
-
-# create histogram of Ap (rescaled)
-hist(new_data_for_table_2021$Ap_rescaled, breaks = 100, main = "Distribution of Ap (rescaled)", xlab = "Ap (rescaled)")
-
-# check where Ap (rescaled) values fall for these countries (should hopefully not be too low but may be unavoidable)
-which(new_data_for_table_2021$rgn_name == "United States")
-which(new_data_for_table_2021$rgn_name == "China")
-which(new_data_for_table_2021$rgn_name == "India")
-which(new_data_for_table_2021$rgn_name == "Russia")
-which(new_data_for_table_2021$rgn_name == "Philippines")
-
-# check some more countries (rescaled)
-new_data_for_table_2021 %>%
-  filter(rgn_id == 80 | rgn_id == 110 | rgn_id == 18 | rgn_id == 162)
-
-which(new_data_for_table_2021$rgn_name == "Greece")
-which(new_data_for_table_2021$rgn_name == "Bahamas")
-which(new_data_for_table_2021$rgn_name == "Fiji")
-which(new_data_for_table_2021$rgn_name == "New Zealand")
 ```
 
 
