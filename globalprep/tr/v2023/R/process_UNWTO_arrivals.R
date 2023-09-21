@@ -24,10 +24,6 @@ unwto_clean <- unwto_arrivals %>%
   group_by(country, year) %>% # group by county and year
   mutate(
     tourism_arrivals_ct = case_when(
-      # !is.na(overnights) & !is.na(same_day) ~ overnights + same_day, # when there are overngihts and same_day values, use the sum of those for tourism-related arrivals
-      # !is.na(overnights) & is.na(same_day) ~ overnights, # when there is just overnights, use that value
-      # !is.na(same_day) & is.na(overnights) ~ same_day, # when there is just same_day, use that value
-      # is.na(same_day) & is.na(overnights) & !is.na(total) ~ total, # when there are neither of those values and a total value is available, use that (last resort because may include non-tourism related arrivals; total is often the sum of overnights and same_day, however)
       !is.na(overnights) ~ overnights,
       is.na(overnights) & !is.na(same_day) & !is.na(total) ~ total - same_day,
       TRUE ~ tourism_arrivals_ct
@@ -54,34 +50,18 @@ unwto_match_iso3c <- unwto_clean %>%
   dplyr::select(rgn_id, year, arrivals_method, arrivals_gapfilled, tourism_arrivals_ct, total) %>%
   filter(!is.na(rgn_id))
 
-unwto_clean_names_bonaire <- name_2_rgn(df_in = unwto_clean %>% filter(country == "Bonaire"),
+unwto_clean_names_bonaire <- name_2_rgn(df_in = unwto_clean %>% filter(country == "Bonaire"), # do this just for Bonaire since it is the only region not matching above
                                 fld_name = 'country',
                                 # flds_unique = c('year'),
                                 keep_fld_name = TRUE) %>%
   dplyr::select(rgn_id, year, arrivals_method, arrivals_gapfilled, tourism_arrivals_ct, total)#### losing lots of regions here for some reason... most concerndely USA
-# v2023: no countries removed for not have any match in the lookup tables
-# DUPLICATES found. Confirm your script consolidates these as appropriate for your data.
-# 
-# # A tibble: 11 × 1
-# country                     
-# <chr>                       
-#   1 China                       
-# 2 Guadeloupe                  
-# 3 Guam                        
-# 4 Hong Kong, China            
-# 5 Macao, China                
-# 6 Martinique                  
-# 7 Montenegro                  
-# 8 Northern Mariana Islands    
-# 9 Puerto Rico                 
-# 10 Serbia And Montenegro       
-# 11 United States Virgin Islands
+
 
 unwto_clean_names <- rbind(unwto_clean_names_bonaire, unwto_match_iso3c) %>% # rbind back together. I would've used the name_2_rgns fxn for everything, but it was excluding a lot of regiosn for some reason...
   left_join(rgns_eez) %>%
   dplyr::select(rgn_id, rgn_name, year, arrivals_method, arrivals_gapfilled, tourism_arrivals_ct, total)
 
-# fix duplicates
+# fix duplicates if there are any
 unwto_dupe_fix <- unwto_clean_names %>%
   group_by(rgn_id, year, arrivals_method, arrivals_gapfilled) %>%
   summarize(sum_fix = ifelse(all(is.na(tourism_arrivals_ct)), NA, sum(tourism_arrivals_ct, na.rm = TRUE)),
@@ -91,12 +71,11 @@ unwto_dupe_fix <- unwto_clean_names %>%
          total = sum_fix_2)
 
 # check out things so far
-summary(unwto_dupe_fix) # v2023: 828 NAs in arrivals (before filtering the years down and gapfilling), 1708 in total
+summary(unwto_dupe_fix) # v2023: 828 NAs in arrivals (before filtering the years down and gapfilling), 1708 in `total`
 
 # gapfill arrivals
-# downfill then upfill missing values
-# use 2019 if available to fill 2021, then 2020 if not, to account for COVID-19
-# v2023: check rgn_id 114, for example, for if choosing 2019 vs. 2020 worked
+# downfill then upfill missing values using a linear model of the average increase per years across all years of data for 1995-2019
+# for 2020 and 2021, use the global average proportion increase or decrease and add to the previous years value
 
 test <- unwto_dupe_fix %>%
   filter(year %in% c(2020, 2021)) %>%
@@ -105,9 +84,9 @@ test <- unwto_dupe_fix %>%
   mutate(tourism_ct_diff = (tourism_arrivals_ct_2021 - tourism_arrivals_ct_2020)/tourism_arrivals_ct_2020) %>%
   mutate(total_diff = (total_2021 - total_2020)/total_2020)
 
-gf_2021_tourism <- mean(test$tourism_ct_diff, na.rm = TRUE)
+gf_2021_tourism <- mean(test$tourism_ct_diff, na.rm = TRUE) # global average increase for 2021 tourist
 
-gf_2021_total <- mean(test$total_diff, na.rm = TRUE)
+gf_2021_total <- mean(test$total_diff, na.rm = TRUE) # global average increase for 2021 total
 
 # 
 # plot(test$total_diff, test$tourism_ct_diff) # looks pretty linear, so thats good, we can use the same method of gapfilling
@@ -121,9 +100,9 @@ test <- unwto_dupe_fix %>%
   pivot_wider(names_from = year, values_from = c(tourism_arrivals_ct, total)) %>%
   mutate(tourism_ct_diff = (tourism_arrivals_ct_2020 - tourism_arrivals_ct_2019)/tourism_arrivals_ct_2019) %>%
   mutate(total_diff = (total_2020 - total_2019)/total_2019)
-
-gf_2020_tourism <- mean(test$tourism_ct_diff, na.rm = TRUE)
-gf_2020_total <- mean(test$total_diff, na.rm = TRUE)
+ 
+gf_2020_tourism <- mean(test$tourism_ct_diff, na.rm = TRUE) # global average decerease for 2020 tourst
+gf_2020_total <- mean(test$total_diff, na.rm = TRUE) # global average decrease for 2020 total
 
 # 
 # plot(test$total_diff, test$tourism_ct_diff) # looks pretty linear, so thats good, we can use the same method of gapfilling
@@ -137,16 +116,18 @@ unwto_upfill <-  unwto_dupe_fix %>%
   group_by(rgn_id) %>%
   arrange(rgn_id, year) %>%
   tidyr::fill(tourism_arrivals_ct, .direction = "up") %>%
-  tidyr::fill(total, .direction = "up") %>% # fill in any values that are empty from early years with values from the nearest year
+  tidyr::fill(total, .direction = "up") %>% # fill in any values that are empty from early years with values from the nearest year. Doing this because doesn't make sense to add earlier years based on a trend 
   mutate(arrivals_method = ifelse(is.na(arrivals_method) & !is.na(tourism_arrivals_ct), "nearby year", arrivals_method)) %>%
   mutate(arrivals_gapfilled = ifelse(arrivals_method == "nearby year", "gapfilled", arrivals_gapfilled))
 
+## calculate regional average increase or decrease in number of total arrivals
 lm_coef_data_total <- unwto_dupe_fix %>%
   filter(!(year %in% c(2020, 2021))) %>%
   group_by(rgn_id) %>%
   filter(!is.na(total)) %>%
   summarize(lm_coef_total = if (n() > 1) lm(total ~ year)$coefficients[2] else 0, .groups = 'drop') # give it an addition of 0 if it is stagnant
 
+## calculate regional average increase or decrease in number of tourism arrivals
 lm_coef_data_tourism <- unwto_dupe_fix %>%
   filter(!(year %in% c(2020, 2021))) %>%
   group_by(rgn_id) %>%
@@ -157,6 +138,7 @@ lm_coef_data_tourism <- unwto_dupe_fix %>%
 # Initialize a flag to check if there are still NAs
 na_flag <- TRUE
 
+# filter out any regions with all nas for each year, as these can't be gapfilled
 all_nas_tourism <- unwto_upfill %>%
   group_by(rgn_id) %>%
   filter(all(is.na(tourism_arrivals_ct))) %>%
@@ -233,18 +215,20 @@ while(na_flag) {
 
 unwto_gapfill_lm_2019_total_all <- unwto_gapfill_lm_2019_total %>%
   dplyr::select(-lm_coef_total) %>%
-  mutate(total = ifelse(rgn_id == 67 & total < 0, 204000, total)) %>% # fix libya, as it was being given negative values with the gapfill. Just give it its latest year (downfill)
+  mutate(total = ifelse(rgn_id == 67 & total < 0, unwto_gapfill_lm_2019_total %>%
+                          filter(rgn_id == 67, year == 2009 ) %>% pull(total) , total)) %>% # fix libya, as it was being given negative values with the gapfill. Just give it its latest year (downfill)
   rbind(all_nas_total)
 
 
 unwto_2020_2021 <- unwto_dupe_fix %>%
-  filter(year > 2019)
+  filter(year > 2019) # lets fix 2020 and 2021 now
 
 unwto_all_gf <- unwto_gapfill_lm_2019_tourism_all %>%
     left_join(unwto_gapfill_lm_2019_total_all) %>%
   rbind(unwto_2020_2021) %>%
   group_by(rgn_id) %>%
   arrange(rgn_id, year) %>%
+  # apply global average proportional increase or decrease for 2020 and 2021, because of covid pandemic messing up trends...
   mutate(tourism_arrivals_ct = ifelse(year == 2020 & is.na(tourism_arrivals_ct), lag(tourism_arrivals_ct, n = 1) + lag(tourism_arrivals_ct, n = 1)*gf_2020_tourism, tourism_arrivals_ct),
          total = ifelse(year == 2020 & is.na(total), lag(total, n = 1) + lag(total, n = 1)*gf_2020_total, total)) %>%
 
@@ -258,6 +242,7 @@ unwto_all_gf <- unwto_gapfill_lm_2019_tourism_all %>%
 
 
 
+## old way
 # unwto_dupe_fix_downup_gf <- unwto_dupe_fix %>%
 #   fill(tourism_arrivals_ct, .direction = "downup") %>%
 #   fill(total, .direction = "downup") %>%
