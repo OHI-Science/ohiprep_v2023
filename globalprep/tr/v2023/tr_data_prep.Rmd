@@ -52,7 +52,8 @@ The data for this layer has been paywalled. Because of this, we have replaced th
 
 **We were able to update the following data:**
 
-* Proportion of tourist arrivals to area of coastline to population - UNWTO data on thousands of tourist arrivals, reported until 2021 (downloaded [here](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (dataset: "Total arrivals" under Inbound Tourism; we use the "Overnights visitors (tourists)" categorization as arrivals where possible) on 8/10/2023, used in combination with area of coastline calculated in the [LSP goal](https://github.com/OHI-Science/ohiprep_v2023/tree/gh-pages/globalprep/lsp/v2023), update completed on 6/26/2023, and population data primarily from [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL) using the WDI() function, downloaded each time the function is run (most recently used data pulled 9/12/2023), gapfilled with population data, downloaded on 9/7/2023, from [Our World in Data](https://ourworldindata.org/grapher/population) and Statista ([1](https://www.statista.com/statistics/706807/population-of-saba-in-the-caribbean-netherlands/), [2](https://www.statista.com/statistics/706806/population-of-sint-eustatius-in-the-caribbean-netherlands/), and [3](https://www.statista.com/statistics/706799/population-of-bonaire-in-the-caribbean-netherlands/))
+* Proportion of tourist arrivals to area of coastline to population - UNWTO data on thousands of tourist arrivals, reported until 2021 (downloaded [here](https://www.unwto.org/tourism-statistics/key-tourism-statistics) (dataset: "Total arrivals" under Inbound Tourism; we use the "Overnights visitors (tourists)" categorization as arrivals where possible) on 8/10/2023.
+
 
 ## Initial set-up code
 
